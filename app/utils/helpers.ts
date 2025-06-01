@@ -22,3 +22,6 @@ export const navLinks: NavigationMenuItem[] = [
     to: '/',
   },
 ];
+
+export const featuredEventImage =
+  'https://res.cloudinary.com/rafamed-dev/image/upload/v1741120031/jueves-italiano_shyyv7.jpg';

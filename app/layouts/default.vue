@@ -14,9 +14,8 @@
       >
         <slot> </slot>
       </UContainer>
-      <Transition name="up">
-        <BottomNavbar :items="navLinks" class="lg:hidden" />
-      </Transition>
+
+      <BottomNavbar :items="navLinks" class="lg:hidden" />
 
       <!-- <FeaturedEvent /> -->
     </div>

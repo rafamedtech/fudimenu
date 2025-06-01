@@ -18,6 +18,7 @@ const isDark = computed({
       color="neutral"
       variant="ghost"
       @click="isDark = !isDark"
+      class="text-2xl"
     />
 
     <template #fallback>
