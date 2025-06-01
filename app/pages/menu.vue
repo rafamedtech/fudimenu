@@ -1,5 +1,5 @@
-<script setup lang="ts"></script>
-
 <template>
-  <main>menu</main>
+  <main>
+    <NuxtPage />
+  </main>
 </template>

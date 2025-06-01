@@ -2,24 +2,24 @@ import type { NavigationMenuItem } from '@nuxt/ui';
 
 export const navLinks: NavigationMenuItem[] = [
   {
+    label: 'Inicio',
+    icon: 'i-lucide-house',
+    to: '/',
+  },
+  {
     label: 'Menú',
-    icon: 'i-heroicons-clipboard-document-list-solid',
+    icon: 'i-lucide-book-open-text',
     to: '/menu',
   },
   {
     label: 'Eventos',
-    icon: 'i-heroicons-calendar-days-solid',
+    icon: 'i-lucide-calendar-range',
     to: '/eventos',
   },
   {
     label: 'Encuesta',
-    icon: 'i-heroicons-clipboard-document-check-solid',
+    icon: 'i-lucide-book-heart',
     to: '/encuesta',
-  },
-  {
-    label: 'Acerca de',
-    icon: 'i-heroicons-building-storefront-solid',
-    to: '/',
   },
 ];
 

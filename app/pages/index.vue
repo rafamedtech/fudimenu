@@ -6,7 +6,11 @@ const { mainCover } = restInfo;
   <main class="py-4">
     <UCard class="mx-auto md:w-1/2" :ui="{ body: 'p-0 sm:p-0' }">
       <figure>
-        <img :src="mainCover" class="h-52 w-full object-cover rounded-lg brightness-50 lg:h-52" alt="" />
+        <img
+          :src="mainCover"
+          class="h-52 w-full object-cover rounded-lg brightness-90 lg:h-52"
+          alt="Restaurant main cover"
+        />
       </figure>
     </UCard>
     <section class="px-2">
