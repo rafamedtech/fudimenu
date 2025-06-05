@@ -1,17 +1,15 @@
 <script lang="ts" setup>
+import type { Category } from '@/types';
+
 interface Props {
-  category: {
-    title: string;
-    slug: string;
-    cover: string;
-  };
+  category: Category;
 }
 
 defineProps<Props>();
 </script>
 
 <template>
-  <NuxtLink :to="`/menu/${category.slug}`" class="relative h-fit w-full text-center xl:h-[300px]">
+  <NuxtLink :to="`/menu/${category.slug}`" class="w-full text-center xl:h-[300px]">
     <UCard :ui="{ body: 'p-0 sm:p-0' }">
       <figure class="h-44 shadow-lg md:h-[25rem] lg:h-[300px]">
         <img

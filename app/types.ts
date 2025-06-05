@@ -4,3 +4,10 @@ export type NavLink = {
   to: string;
   click?: () => void;
 };
+
+export type Category = {
+  title: string;
+  description?: string;
+  slug: string;
+  cover: string;
+};
