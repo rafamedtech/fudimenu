@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { restInfo } from '@/utils/restInfo';
+
 const { mainCover } = restInfo;
 </script>
 
