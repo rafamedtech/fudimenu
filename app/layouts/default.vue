@@ -1,5 +1,3 @@
-<script setup lang="ts"></script>
-
 <template>
   <main class="relative flex w-full justify-between lg:pt-0">
     <section class="hidden justify-between lg:flex lg:w-1/6">
