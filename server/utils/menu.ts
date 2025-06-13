@@ -2,6 +2,7 @@ export const menu = [
   // Menu
   {
     title: '',
+    description: '',
     slug: 'the-menu',
     cover: 'https://res.cloudinary.com/rafamed-dev/image/upload/v1746939120/brunette/principal_e2qmpj.jpg',
     sections: [
@@ -196,6 +197,7 @@ export const menu = [
   // Barra
   {
     title: '',
+    description: '',
     slug: 'the-bar',
     cover: 'https://res.cloudinary.com/rafamed-dev/image/upload/v1746939120/brunette/barra_vdpi6q.jpg',
     sections: [
@@ -1212,6 +1214,7 @@ export const menu = [
   // Desayunos
   {
     title: '',
+    description: '',
     slug: 'desayunos',
     cover: 'https://res.cloudinary.com/rafamed-dev/image/upload/v1746939120/brunette/desayunos_tjwfv9.jpg',
     sections: [
