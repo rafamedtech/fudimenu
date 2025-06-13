@@ -3,7 +3,7 @@
 <template>
   <main class="relative flex w-full justify-between lg:pt-0">
     <section class="hidden justify-between lg:flex lg:w-1/6">
-      <SideBar :items="navLinks" />
+      <!-- <SideBar :items="navLinks" /> -->
     </section>
 
     <div class="flex-auto transition-all lg:w-5/6">

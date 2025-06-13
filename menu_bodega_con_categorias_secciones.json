@@ -1,0 +1,28 @@
+{
+  "menu": [
+    {
+      "title": "Entradas calientes",
+      "slug": "entradas-calientes",
+      "cover": "https://res.cloudinary.com/rafamed-dev/image/upload/v1746939120/brunette/principal_e2qmpj.jpg",
+      "sections": [
+        {
+          "title": "Platillos",
+          "description": "",
+          "cover": "",
+          "items": [
+            {
+              "name": "EDAMAMES",
+              "description": "Spicy / naturales / ajo o con salsa de la casa.",
+              "price": 75.0
+            },
+            {
+              "name": "CALAMARES TEMPURA",
+              "description": "Calamares fritos, bañadas en salsa spicy, acompañados de una cama de ensalada mixta.",
+              "price": 150.0
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

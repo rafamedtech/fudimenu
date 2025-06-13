@@ -1341,3 +1341,35 @@ export const menu = [
     ],
   },
 ];
+
+export const newMenu = [
+  {
+    title: 'Entradas calientes',
+    slug: 'entradas-calientes',
+    cover: 'https://res.cloudinary.com/rafamed-dev/image/upload/v1746939120/brunette/principal_e2qmpj.jpg',
+    sections: [
+      {
+        title: 'Entradas',
+        description: '',
+        cover: '',
+        items: [
+          {
+            name: 'Tablita de quesos',
+            description: 'Quesos de la región - Carnes Frías- Fruta - Pan.',
+            price: 475,
+          },
+          {
+            name: 'Tostaditas de atún',
+            description: 'Cubos de atún fresco - salsa de la casa.',
+            price: 245,
+          },
+          {
+            name: 'Camarones al Coco/Mango',
+            description: 'Camarón fresco empanizado con coco - salsa de mango.',
+            price: 265,
+          },
+        ],
+      },
+    ],
+  },
+];

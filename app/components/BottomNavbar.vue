@@ -1,9 +1,33 @@
 <script setup lang="ts">
+// import type { NavigationMenuItem } from '@nuxt/ui';
+
+// const { items } = defineProps<{
+//   items: NavigationMenuItem[] | NavigationMenuItem[][];
+// }>();
 import type { NavigationMenuItem } from '@nuxt/ui';
 
-const { items } = defineProps<{
-  items: NavigationMenuItem[] | NavigationMenuItem[][];
-}>();
+const items = computed<NavigationMenuItem[]>(() => [
+  {
+    label: 'Inicio',
+    icon: 'i-lucide-house',
+    to: '/',
+  },
+  {
+    label: 'Menú',
+    icon: 'i-lucide-book-open-text',
+    to: '/menu',
+  },
+  {
+    label: 'Eventos',
+    icon: 'i-lucide-calendar-range',
+    to: '/eventos',
+  },
+  {
+    label: 'Encuesta',
+    icon: 'i-lucide-book-heart',
+    to: '/encuesta',
+  },
+]);
 </script>
 
 <template>
