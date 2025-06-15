@@ -1,21 +1,9 @@
 <script setup lang="ts">
-// const store = useStore();
-// const { isLoading } = storeToRefs(store);
-
-// const { surveyPageLabels } = useI18n();
-
-// const { getQuestions } = useSurvey();
-// await getQuestions();
-
-// useHead({
-//   title: surveyPageLabels.value.title,
-//   meta: [
-//     {
-//       name: "description",
-//       content: surveyPageLabels.value.description,
-//     },
-//   ],
-// });
+useSeoMeta({
+  title: 'Encuesta de satisfacción',
+  description: 'Ayúdanos a mejorar tu experiencia con tus comentarios.',
+  ogImage: 'https://res.cloudinary.com/rafamed-dev/image/upload/v1749410800/fudihub/maincover_h2tw7a.jpg',
+});
 </script>
 
 <template>

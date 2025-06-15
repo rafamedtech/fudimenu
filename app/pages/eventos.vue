@@ -1,35 +1,26 @@
 <script setup lang="ts">
 import type { Evento } from '@/types';
 // import { EventModal } from "#components";
-// import { allEvents } from "@/sanity/queries";
-
-// const modal = useModal();
-// const store = useStore();
 
 // const { data: events } = useSanityQuery<Evento[]>(allEvents);
-// const { eventsPageLabels } = useI18n();
+
 const events = ref<Evento[]>([]); // Replace with actual data fetching logic
 
 // const openDetails = (event: Evento) => modal.open(EventModal, { event });
 // const openGallery = (events: Evento[] | null) =>
 //   modal.open(EventModal, { events });
 
-// useHead({
-//   title: eventsPageLabels.value.title,
-//   meta: [
-//     {
-//       name: "description",
-//       content: eventsPageLabels.value.description,
-//     },
-//   ],
-// });
+useSeoMeta({
+  title: 'Eventos y promociones',
+  description: 'Descubre nuestros eventos y promociones especiales.',
+  ogImage: 'https://res.cloudinary.com/rafamed-dev/image/upload/v1749410800/fudihub/maincover_h2tw7a.jpg',
+});
 </script>
 
 <template>
   <section>
     <AppHeading title="Eventos y promociones" description="Descubre nuestros eventos y promociones especiales." />
 
-    <!-- Events on mobile -->
     <section class="flex flex-col gap-8 px-4">
       <UButton label="Pantalla completa" icon="i-heroicons-arrows-pointing-out" class="mx-auto" />
       <!-- @click="openGallery(events)" -->
