@@ -31,6 +31,6 @@ export type Evento = {
   name: string;
   description?: string;
   cover: string;
-  startDate: Date;
-  endDate: Date;
+  startDate: Date | string;
+  endDate: Date | string;
 };

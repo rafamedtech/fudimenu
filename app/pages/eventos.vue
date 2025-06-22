@@ -1,12 +1,24 @@
 <script setup lang="ts">
-import type { Evento } from '@/types';
-// import { EventModal } from "#components";
+// import type { Evento } from '@/types';
+import { EventModal } from '#components';
 
-// const { data: events } = useSanityQuery<Evento[]>(allEvents);
+const { getEvents } = useEvent();
 
-const events = ref<Evento[]>([]); // Replace with actual data fetching logic
+const events = await getEvents();
 
-// const openDetails = (event: Evento) => modal.open(EventModal, { event });
+const overlay = useOverlay();
+
+const modal = overlay.create(EventModal, {
+  props: {
+    events: events.value,
+  },
+});
+
+async function open() {
+  modal.open();
+}
+
+// const openDetails = (event: Evento) => open();
 // const openGallery = (events: Evento[] | null) =>
 //   modal.open(EventModal, { events });
 
@@ -22,7 +34,7 @@ useSeoMeta({
     <AppHeading title="Eventos y promociones" description="Descubre nuestros eventos y promociones especiales." />
 
     <section class="flex flex-col gap-8 px-4">
-      <UButton label="Pantalla completa" icon="i-heroicons-arrows-pointing-out" class="mx-auto" />
+      <UButton label="Pantalla completa" icon="i-heroicons-arrows-pointing-out" class="mx-auto" @click="open" />
       <!-- @click="openGallery(events)" -->
 
       <section class="grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-4">

@@ -65,19 +65,7 @@ export const menuBodega = [
           },
         ],
       },
-      {
-        title: 'Postres',
-        description: '',
-        cover: '',
-        items: [
-          { name: 'HELADO TEMPURA', description: '', price: 95 },
-          { name: 'GANSITO TEMPURA', description: '', price: 115 },
-          { name: 'NIEVE DE VAINILLA', description: '', price: 65 },
-          { name: 'PLATANO FLAMEADO', description: '', price: 120 },
-          { name: 'FLAN DE LA CASA', description: '', price: 85 },
-          { name: 'PASTEL DE LA CASA', description: '', price: 160 },
-        ],
-      },
+
       {
         title: 'Entradas frias',
         description: '',
@@ -290,6 +278,82 @@ export const menuBodega = [
             description: 'Camarón, salmón, pulpo, atún, noodles cristalinos y verduras mixtas.',
             price: 180,
           },
+        ],
+      },
+    ],
+  },
+  {
+    title: '',
+    description: '',
+    slug: 'menu-bebidas',
+    cover: 'https://res.cloudinary.com/rafamed-dev/image/upload/v1746939120/brunette/barra_vdpi6q.jpg', // Puedes agregar una imagen si tienes una
+
+    sections: [
+      {
+        title: 'Coctelería clásica',
+        description: '',
+        cover: '',
+        items: [
+          { name: 'Mojito Clásico', description: '', price: 130.0 },
+          { name: 'Mojito', description: 'Fresa, tamarindo, mango, maracuyá o frutos rojos.', price: 150.0 },
+          { name: 'Sangría Preparada', description: '', price: 160.0 },
+          { name: 'Paloma', description: '', price: 140.0 },
+          { name: 'Martini Sucio', description: '', price: 145.0 },
+          { name: 'Martini', description: 'Fresa, tamarindo, mango, maracuyá o frutos rojos.', price: 145.0 },
+          { name: 'Margaritas', description: 'Fresa, tamarindo, mango, maracuyá o frutos rojos.', price: 160.0 },
+          { name: 'Piña Colada', description: '', price: 160.0 },
+          { name: 'Carajillo', description: '', price: 160.0 },
+          { name: 'Whiskey Sour', description: '', price: 140.0 },
+          { name: 'Ruso Blanco o Negro', description: '', price: 140.0 },
+          { name: 'Negroni', description: '', price: 155.0 },
+        ],
+      },
+      {
+        title: 'Sin alcohol',
+        description: '',
+        cover: '',
+        items: [
+          { name: 'Limonadas', description: '', price: 49.0 },
+          { name: 'Limonada de fresa', description: '', price: 60.0 },
+          { name: 'Té de la casa', description: '', price: 49.0 },
+          {
+            name: 'Aguas de sabor',
+            description: 'Pepino con limón, jamaica, tamarindo, maracuyá y fresa.',
+            price: 65.0,
+          },
+          { name: 'Conga', description: 'Mezcla de jugos.', price: 80.0 },
+          { name: 'Jugos', description: 'Variedad de jugos.', price: 60.0 },
+          { name: 'Piñada', description: '', price: 90.0 },
+          { name: 'Coca-cola', description: '', price: 45.0 },
+          { name: 'Coca-light', description: '', price: 45.0 },
+          { name: 'Fresca', description: '', price: 45.0 },
+          { name: 'Sprite', description: '', price: 45.0 },
+          { name: 'Mundet', description: '', price: 60.0 },
+          { name: 'Topo chico', description: '', price: 75.0 },
+          { name: 'Perrier', description: '', price: 75.0 },
+          { name: 'San Peregrino', description: '', price: 75.0 },
+          { name: 'Agua natural', description: '', price: 35.0 },
+        ],
+      },
+    ],
+  },
+  {
+    title: '',
+    description: '',
+    slug: 'menu-postres',
+    cover: 'https://res.cloudinary.com/rafamed-dev/image/upload/v1750621102/brunette/postres_wnpi2b.png', // Puedes agregar una imagen si tienes una
+    sections: [
+      {
+        title: 'Todos los postres',
+        description: '',
+        cover: '',
+        items: [
+          { name: 'HELADO TEMPURA', description: '', price: 95 },
+          { name: 'GANSITO TEMPURA', description: '', price: 115 },
+          { name: 'NIEVE DE VAINILLA', description: '', price: 65 },
+          { name: 'PLATANO FLAMEADO', description: '', price: 120 },
+          { name: 'FLAN DE LA CASA', description: '', price: 85 },
+          { name: 'PASTEL DE LA CASA', description: '', price: 160 },
         ],
       },
     ],

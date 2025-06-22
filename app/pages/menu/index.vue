@@ -3,8 +3,6 @@ const { getMenu } = useMenu();
 
 const menu = await getMenu();
 
-console.log(menu.value);
-
 useSeoMeta({
   title: 'Bodega, Sushi and loft',
   description: 'Conoce nuestros deliciosos platillos y mixología.',
