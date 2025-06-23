@@ -9,12 +9,13 @@ const emit = defineEmits<{ close: [boolean] }>();
 </script>
 
 <template>
-  <UModal :close="{ onClick: () => emit('close', false) }" :title="events.length > 1 ? 'Events' : 'Event Details'">
-    <template #footer>
-      <div class="flex gap-2">
-        <UButton color="neutral" label="Dismiss" @click="emit('close', false)" />
-        <UButton label="Success" @click="emit('close', true)" />
-      </div>
+  <UModal
+    :close="{ onClick: () => emit('close', false) }"
+    :title="events.length > 1 ? 'Galería de eventos' : 'Detalles del evento'"
+    :description="events.length > 1 ? 'Desliza para ver más eventos' : ' '"
+  >
+    <template #body>
+      <EventCarousel :items="events" />
     </template>
   </UModal>
 </template>

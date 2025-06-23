@@ -31,7 +31,7 @@ useSeoMeta({
     </section>
 
     <section class="relative">
-      <section class="pb-16 md:grid md:grid-cols-2 md:gap-8">
+      <section class="pb-32 md:grid md:grid-cols-2 md:gap-8">
         <!-- <div> -->
         <div v-for="section in currentCategory?.sections" :key="section.title">
           <SectionBanner :section="section" />
