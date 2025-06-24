@@ -31,7 +31,7 @@ const items = computed<NavigationMenuItem[]>(() => [
 </script>
 
 <template>
-  <section class="fixed w-full bottom-0 z-[49] p-2">
+  <section class="fixed w-full bottom-0 z-[99] p-2">
     <section class="bg-white dark:bg-neutral-950 shadow rounded-lg">
       <UNavigationMenu
         :items="items"

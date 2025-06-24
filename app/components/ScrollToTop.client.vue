@@ -26,7 +26,7 @@ onBeforeUnmount(() => {
 
 <template>
   <section
-    class="text-primary bg-primary fixed bottom-[6rem] right-4 z-[49] flex gap-2 flex-row rounded-xl lg:bottom-8 lg:right-8"
+    class="text-primary bg-primary fixed bottom-[6rem] right-4 z-[99] flex gap-2 flex-row rounded-xl lg:bottom-8 lg:right-8"
   >
     <UButton
       v-if="showScrollToTop"
