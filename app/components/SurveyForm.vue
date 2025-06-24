@@ -3,7 +3,7 @@
 // import { waitersList } from "@/utils/surveyInfo";
 // import type { FormSubmitEvent } from "#ui/types";
 
-const { surveyData, getQuestions } = useSurvey();
+const { surveyData, getQuestions, questions } = useSurvey();
 await getQuestions();
 
 // const modal = useModal();
@@ -43,13 +43,15 @@ const ratings = [1, 2, 3, 4, 5];
       </UFormField>
     </article>
 
-    <section class="my-12 flex flex-col gap-4">
+    <section class="my-12 flex flex-col gap-4 border-t border-gray-300 dark:border-gray-600 pt-6">
       <article
+        v-for="question in questions"
+        :key="question.text"
         class="flex items-center gap-4 border-b border-gray-300 pb-6 dark:border-gray-600 md:flex-row md:items-center md:gap-2"
       >
-        <!-- <h3 class="flex-1">{{ question.text }}</h3> -->
+        <h3 class="flex-1">{{ question.text }}</h3>
         <div class="flex items-center justify-center gap-2">
-          <USelectMenu :options="ratings" size="xl" />
+          <USelectMenu :items="ratings" size="xl" v-model="question.rating" :search-input="false" />
           <Icon name="i-heroicons-star" size="32" class="text-primary" />
         </div>
       </article>
