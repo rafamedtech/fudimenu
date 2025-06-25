@@ -28,10 +28,10 @@ const ratings = [1, 2, 3, 4, 5];
   <UForm :state="surveyData" class="mx-auto max-w-md" @submit="onSubmit">
     <article class="flex flex-col items-stretch gap-4">
       <UFormField label="Nombre (Opcional)">
-        <UInput size="xl" placeholder="Escribe aquí" v-model="surveyData.name" />
+        <UInput size="xl" placeholder="Escribe aquí" v-model="surveyData.name" class="w-full" />
       </UFormField>
       <UFormField label="Teléfono (con WhatsApp)">
-        <UInput size="xl" type="email" placeholder="ejemplo@correo.com" v-model="surveyData.email" />
+        <UInput size="xl" type="email" placeholder="ejemplo@correo.com" v-model="surveyData.email" class="w-full" />
       </UFormField>
       <UFormField label="Mesero que te atendió">
         <USelectMenu
@@ -39,6 +39,7 @@ const ratings = [1, 2, 3, 4, 5];
           size="xl"
           v-model="surveyData.waiter"
           :search-input="false"
+          class="w-full"
         />
       </UFormField>
     </article>
@@ -58,10 +59,10 @@ const ratings = [1, 2, 3, 4, 5];
     </section>
 
     <UFormField label="Comentarios">
-      <UTextarea size="xl" placeholder="Escribe aquí tus comentarios" />
+      <UTextarea size="xl" placeholder="Escribe aquí tus comentarios" class="w-full" />
     </UFormField>
 
-    <section class="mt-8 flex justify-end">
+    <section class="mt-8 pb-28 flex justify-end">
       <UButton
         :loading="loadingBtn"
         size="lg"
