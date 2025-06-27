@@ -1,25 +1,42 @@
 <script setup lang="ts">
 // import { SurveyModal } from "#components";
 // import { waitersList } from "@/utils/surveyInfo";
-// import type { FormSubmitEvent } from "#ui/types";
+import * as z from 'zod';
+import type { FormSubmitEvent } from '@nuxt/ui';
 
 const { surveyData, getQuestions, questions } = useSurvey();
 await getQuestions();
 
+/* eslint-disable @typescript-eslint/no-unused-vars */
+const schema = z.object({
+  name: z.string().optional(),
+  waiter: z.string(),
+  comments: z.string().optional(),
+  new: z.boolean().default(true),
+});
+
+type Schema = z.output<typeof schema>;
+
 // const modal = useModal();
 const loadingBtn = ref(false);
-async function onSubmit() {
-  //   const survey = { ...event.data, questions: questions.value };
-
-  loadingBtn.value = true;
-
-  setTimeout(async () => {
-    // await sendSurvey(survey);
-    // await sendEmail();
-    // modal.open(SurveyModal, {});
-    loadingBtn.value = false;
-  }, 500);
+const toast = useToast();
+async function onSubmit(event: FormSubmitEvent<Schema>) {
+  toast.add({ title: 'Success', description: 'The form has been submitted.', color: 'success' });
+  console.log({ ...event.data, questions: questions.value });
 }
+// async function onSubmit(event: FormSubmitEvent<Schema>) {
+//     const survey = { ...event.data, questions: questions.value };
+
+//   loadingBtn.value = true;
+
+//   setTimeout(async () => {
+//     // await sendSurvey(survey);
+//     // await sendEmail();
+//     // modal.open(SurveyModal, {});
+//     console.log('Survey submitted:', survey);
+//     loadingBtn.value = false;
+//   }, 500);
+// }
 
 const ratings = [1, 2, 3, 4, 5];
 </script>

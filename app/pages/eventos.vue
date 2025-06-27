@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { Evento } from '@/types';
 import { EventModal } from '#components';
+import type { Evento } from '@/types';
 
 const { getEvents } = useEvent();
 
@@ -8,18 +8,12 @@ const events = await getEvents();
 
 const overlay = useOverlay();
 
-async function open(events: Evento[]) {
+async function openModal(events: Evento[]) {
   const modal = overlay.create(EventModal, {
     props: { events },
   });
   modal.open();
 }
-
-// const openDetails = (event: Evento) => {
-
-// };
-// const openGallery = (events: Evento[] | null) =>
-//   modal.open(EventModal, { events });
 
 useSeoMeta({
   title: 'Eventos y promociones',
@@ -33,8 +27,12 @@ useSeoMeta({
     <AppHeading title="Eventos y promociones" description="Descubre nuestros eventos y promociones especiales." />
 
     <section class="flex flex-col gap-8 px-4">
-      <UButton label="Pantalla completa" icon="i-heroicons-arrows-pointing-out" class="mx-auto" @click="open(events)" />
-      <!-- @click="openGallery(events)" -->
+      <UButton
+        label="Pantalla completa"
+        icon="i-heroicons-arrows-pointing-out"
+        class="mx-auto"
+        @click="openModal(events)"
+      />
 
       <section class="grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-4">
         <UCard
@@ -42,7 +40,7 @@ useSeoMeta({
           :key="event.id"
           class="rounded-xl"
           :ui="{ body: 'p-0 sm:p-0' }"
-          @click="open([event])"
+          @click="openModal([event])"
         >
           <!-- @click="openDetails(event)" -->
           <img
