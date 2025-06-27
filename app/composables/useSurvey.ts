@@ -1,17 +1,17 @@
 import { allQuestions } from '@/sanity/queries';
-import type { SurveyOutline, QuestionOutline, SurveyWithQuestions, QuestionFromApi } from '@/types';
+import type { QuestionOutline, SurveyWithQuestions, QuestionFromApi } from '@/types';
 
 export function useSurvey() {
   //   const toast = useToast();
 
   const surveys = ref<SurveyWithQuestions[]>([]);
-  const surveyData = reactive<SurveyOutline>({
-    name: '',
-    email: '',
-    waiter: 'No lo sé',
-    comments: '',
-    new: true,
-  });
+  // const surveyData = reactive<SurveyOutline>({
+  //   name: '',
+  //   phone: '',
+  //   waiter: 'No lo sé',
+  //   comments: '',
+  //   new: true,
+  // });
 
   const questions = ref<QuestionOutline[]>([]);
   const getQuestions = async () => {
@@ -108,7 +108,7 @@ export function useSurvey() {
     // getRating,
     // markSurveyAsRead,
     surveys,
-    surveyData,
+    // surveyData,
     questions,
     // getGlobalRating,
   };

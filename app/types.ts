@@ -72,7 +72,7 @@ export type QuestionFromApi = QuestionOutline & {
 
 export interface SurveyOutline {
   name: string;
-  email: string;
+  phone: string;
   waiter: string;
   comments: string;
   new: boolean;

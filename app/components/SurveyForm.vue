@@ -4,12 +4,20 @@
 import * as z from 'zod';
 import type { FormSubmitEvent } from '@nuxt/ui';
 
-const { surveyData, getQuestions, questions } = useSurvey();
+const { getQuestions, questions } = useSurvey();
 await getQuestions();
 
-/* eslint-disable @typescript-eslint/no-unused-vars */
+const surveyData = reactive<Partial<Schema>>({
+  name: '',
+  phone: '',
+  waiter: 'No lo sé',
+  comments: '',
+  new: true,
+});
+
 const schema = z.object({
   name: z.string().optional(),
+  phone: z.string(),
   waiter: z.string(),
   comments: z.string().optional(),
   new: z.boolean().default(true),
@@ -42,13 +50,13 @@ const ratings = [1, 2, 3, 4, 5];
 </script>
 
 <template>
-  <UForm :state="surveyData" class="mx-auto max-w-md" @submit="onSubmit">
+  <UForm :state="surveyData" :schema="schema" class="mx-auto max-w-md" @submit="onSubmit">
     <article class="flex flex-col items-stretch gap-4">
-      <UFormField label="Nombre (Opcional)">
+      <UFormField label="Nombre" hint="Opcional">
         <UInput size="xl" placeholder="Escribe aquí" v-model="surveyData.name" class="w-full" />
       </UFormField>
-      <UFormField label="Teléfono (con WhatsApp)">
-        <UInput size="xl" type="email" placeholder="ejemplo@correo.com" v-model="surveyData.email" class="w-full" />
+      <UFormField label="Teléfono (con WhatsApp)" name="phone" required>
+        <UInput size="xl" type="phone" placeholder="Ej. 6641234567" v-model="surveyData.phone" class="w-full" />
       </UFormField>
       <UFormField label="Mesero que te atendió">
         <USelectMenu
