@@ -6,6 +6,10 @@ export default defineNuxtConfig({
     compatibilityVersion: 4,
   },
 
+  app: {
+    pageTransition: { name: 'slide-right', mode: 'out-in' },
+  },
+
   css: ['~/assets/css/main.css'],
 
   modules: ['@nuxt/eslint', '@nuxt/fonts', '@nuxt/icon', '@nuxt/image', '@nuxt/ui', '@nuxtjs/sanity'],
