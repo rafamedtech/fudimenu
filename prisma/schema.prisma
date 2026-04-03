@@ -1,0 +1,109 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum GlobalRole {
+  ADMIN
+  RESTAURANT_OWNER
+  USER
+}
+
+enum RestaurantMembershipRole {
+  OWNER
+  MANAGER
+}
+
+/// Mirrors authenticated users that need business data in Prisma.
+model User {
+  id          String             @id @db.Uuid
+  email       String             @unique
+  fullName    String?
+  role        GlobalRole         @default(USER)
+  memberships RestaurantMember[]
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  @@map("users")
+}
+
+/// Public restaurant profile plus the owner-managed dashboard data.
+model Restaurant {
+  id            String             @id @default(uuid()) @db.Uuid
+  name          String
+  slug          String             @unique
+  description   String?
+  logoUrl       String?
+  coverImageUrl String?
+  address       String?
+  city          String?
+  zone          String?
+  phone         String?
+  whatsapp      String?
+  cuisineType   String?
+  businessHours String?
+  isPublished   Boolean            @default(false)
+  themeConfig   Json               @default("{\"primary\":\"sky\",\"neutral\":\"stone\",\"radius\":\"0.375\",\"font\":\"public-sans\",\"icons\":\"lucide\",\"colorMode\":\"light\"}") @db.JsonB
+  members       RestaurantMember[]
+  categories    MenuCategory[]
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+
+  @@index([isPublished, name])
+  @@map("restaurants")
+}
+
+/// Centralizes restaurant ownership and future member permissions.
+model RestaurantMember {
+  id           String                     @id @default(uuid()) @db.Uuid
+  userId       String                     @db.Uuid
+  restaurantId String                     @db.Uuid
+  role         RestaurantMembershipRole   @default(OWNER)
+  user         User                       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  restaurant   Restaurant                 @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  createdAt    DateTime                   @default(now())
+
+  @@unique([userId, restaurantId])
+  @@index([restaurantId])
+  @@map("restaurant_members")
+}
+
+/// Categories keep the public menu scannable and ordered.
+model MenuCategory {
+  id           String      @id @default(uuid()) @db.Uuid
+  restaurantId String      @db.Uuid
+  name         String
+  slug         String?
+  sortOrder    Int         @default(0)
+  isActive     Boolean     @default(true)
+  restaurant   Restaurant  @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  items        MenuItem[]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  @@unique([restaurantId, slug])
+  @@index([restaurantId, sortOrder])
+  @@map("menu_categories")
+}
+
+/// Menu items stay attached to a category to keep the MVP model simple.
+model MenuItem {
+  id          String       @id @default(uuid()) @db.Uuid
+  categoryId  String       @db.Uuid
+  name        String
+  description String?
+  price       Decimal      @db.Decimal(10, 2)
+  imageUrl    String?
+  isAvailable Boolean      @default(true)
+  sortOrder   Int          @default(0)
+  category    MenuCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([categoryId, sortOrder])
+  @@map("menu_items")
+}
