@@ -112,6 +112,24 @@ Preview local:
 pnpm preview
 ```
 
+## Testing
+
+La base de testing queda separada por capa:
+
+- `pnpm test:unit` para utilidades, validaciones y reglas de permisos aisladas
+- `pnpm test:integration` para endpoints y comportamiento de Nuxt/Nitro con `@nuxt/test-utils`
+- `pnpm test:e2e` para flujos en navegador con Playwright
+- `pnpm test:coverage` para coverage de unit e integration
+- `pnpm test:all` para correr todo junto
+
+Si es la primera vez que corres Playwright en tu máquina:
+
+```bash
+pnpm test:e2e:install
+```
+
+La suite E2E usa fixtures de prueba activadas por entorno para no depender de una base real al validar home pública, detalle de restaurante y protección del dashboard.
+
 ## Seed demo incluida
 
 La seed deja una base mínima útil para probar el MVP:
@@ -152,4 +170,5 @@ public/
 - Prisma 7 usa [prisma.config.ts](/Users/rafamed/dev/proyectos/fudimenu/prisma.config.ts) y genera cliente en `generated/prisma/`.
 - Supabase se usa principalmente para auth y sesión.
 - El dominio del negocio vive en PostgreSQL con Prisma.
+- Los tests viven bajo `tests/` y usan `Vitest`, `@nuxt/test-utils` y `Playwright`.
 - Esta base está enfocada al MVP; no agrega reseñas, favoritos, pedidos, pagos ni features fuera de alcance.

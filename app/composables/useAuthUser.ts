@@ -1,18 +1,38 @@
 import type { AuthMeResponse } from '~~/types/api'
 import type { AppUser } from '~~/types/domain'
+import { testAuthCookieName } from '~~/shared/test-auth'
 
 export function useAuthUser() {
+  const runtimeConfig = useRuntimeConfig()
   const supabase = useSupabaseClient()
   const session = useSupabaseSession()
   const authClaims = useSupabaseUser()
+  const testAuthCookie = useCookie<string | null>(testAuthCookieName, {
+    default: () => null
+  })
   const appUser = useState<AppUser | null>('app-user', () => null)
   const pending = useState('app-user-pending', () => false)
   const ready = useState('app-user-ready', () => false)
   const watchRegistered = useState('app-user-watch-registered', () => false)
 
   const requestFetch = import.meta.server ? useRequestFetch() : $fetch
-  const supabaseUser = computed(() => authClaims.value)
-  const isAuthenticated = computed(() => Boolean(session.value?.access_token))
+  const testAuthBypassEnabled = computed(() => Boolean(runtimeConfig.public.testAuthBypass))
+  const hasTestSession = computed(() => testAuthBypassEnabled.value && Boolean(testAuthCookie.value))
+  const supabaseUser = computed(() => {
+    if (authClaims.value) {
+      return authClaims.value
+    }
+
+    if (!hasTestSession.value) {
+      return null
+    }
+
+    return {
+      sub: `test-${testAuthCookie.value}`,
+      email: `${testAuthCookie.value}@fudimenu.test`
+    }
+  })
+  const isAuthenticated = computed(() => Boolean(session.value?.access_token) || hasTestSession.value)
 
   async function refreshAppUser(force = false) {
     if (!isAuthenticated.value) {
@@ -48,10 +68,21 @@ export function useAuthUser() {
   }
 
   async function signOut(redirectTo = '/') {
+    if (!session.value?.access_token && hasTestSession.value) {
+      testAuthCookie.value = null
+      clearAppUser()
+      await navigateTo(redirectTo)
+      return
+    }
+
     const { error } = await supabase.auth.signOut()
 
     if (error) {
       throw error
+    }
+
+    if (testAuthBypassEnabled.value) {
+      testAuthCookie.value = null
     }
 
     clearAppUser()

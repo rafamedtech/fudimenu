@@ -53,7 +53,7 @@ export interface SiteThemeConfig {
 }
 
 export const defaultSiteThemeConfig: SiteThemeConfig = {
-  primary: 'sky',
+  primary: 'emerald',
   neutral: 'stone',
   radius: '0.25',
   font: 'public-sans',

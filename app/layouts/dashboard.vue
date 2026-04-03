@@ -13,33 +13,68 @@ if (supabaseUser.value && !appUser.value) {
 
 <template>
   <div class="app-shell app-shell--dashboard">
-    <header class="layout-header layout-header--dashboard">
-      <div class="container">
-        <UiCard class="layout-card layout-card--dashboard" padding="none">
-          <div class="layout-card__inner">
-            <div class="layout-card__bar">
-              <SharedAppLogo caption="Dashboard para dueños" />
+    <UHeader
+      class="site-shell-header dashboard-shell-header"
+      :ui="{
+        root: 'site-shell-header__root dashboard-shell-header__root',
+        container: 'site-shell-header__container',
+        center: 'min-w-0',
+        right: 'site-shell-header__right',
+        body: 'site-shell-header__body'
+      }"
+    >
+      <template #title>
+        <SharedAppLogo caption="Dashboard para dueños" />
+      </template>
 
-              <div class="layout-card__actions">
-                <UiBadge class="account-badge" tone="secondary">
-                  {{ accountLabel }}
-                </UiBadge>
+      <SharedDashboardNavigation class="hidden lg:flex" compact orientation="horizontal" />
 
-                <SharedThemeCustomizer />
+      <template #right>
+        <div class="header-actions">
+          <UiBadge class="account-badge hidden xl:inline-flex" tone="secondary">
+            {{ accountLabel }}
+          </UiBadge>
 
-                <UiButton to="/" :icon="appIcons.globe" intent="ghost" size="sm">
-                  Ver sitio público
-                </UiButton>
+          <SharedThemeCustomizer />
 
-                <UiButton :icon="appIcons.logout" intent="neutral" size="sm" @click="signOut()">
-                  Cerrar sesión
-                </UiButton>
-              </div>
-            </div>
+          <UiButton
+            to="/"
+            :icon="appIcons.globe"
+            class="hidden md:inline-flex"
+            intent="ghost"
+            size="sm"
+          >
+            Ver sitio público
+          </UiButton>
+
+          <UiButton :icon="appIcons.logout" intent="neutral" size="sm" @click="signOut()">
+            <span class="hidden sm:inline">Cerrar sesión</span>
+          </UiButton>
+        </div>
+      </template>
+
+      <template #body>
+        <div class="header-mobile-panel">
+          <UiBadge class="justify-start" tone="secondary">
+            {{ accountLabel }}
+          </UiBadge>
+
+          <SharedDashboardNavigation compact orientation="vertical" />
+
+          <div class="header-mobile-panel__actions">
+            <SharedThemeCustomizer />
+
+            <UiButton to="/" :icon="appIcons.globe" block intent="ghost">
+              Ver sitio público
+            </UiButton>
+
+            <UiButton :icon="appIcons.logout" block intent="neutral" @click="signOut()">
+              Cerrar sesión
+            </UiButton>
           </div>
-        </UiCard>
-      </div>
-    </header>
+        </div>
+      </template>
+    </UHeader>
 
     <main class="page-shell">
       <div class="container dashboard-layout">

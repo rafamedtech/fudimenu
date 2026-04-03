@@ -154,3 +154,33 @@ entrar → ver restaurantes → abrir uno → entender el menú rápido → deci
 
 Y del lado del restaurante:
 entrar → editar menú fácil → publicar cambios rápido
+
+## Testing policy
+
+- Todo cambio funcional debe incluir tests proporcionales al riesgo.
+- Si se modifica lógica de negocio, agregar o actualizar tests unitarios/integration.
+- Si se modifica un flujo crítico del usuario, considerar test E2E con Playwright.
+- No cerrar una tarea sin indicar cómo validar manualmente y cómo correr sus tests.
+- Priorizar tests sobre:
+  - permisos
+  - visibilidad pública
+  - validación de payloads
+  - reglas de publicación
+  - CRUDs críticos del dashboard
+
+## Test strategy
+
+- Vitest para unit e integration tests
+- @nuxt/test-utils para soporte de testing de Nuxt
+- Playwright para E2E
+- Evitar tests frágiles de UI
+- Preferir factories y fixtures reutilizables
+- Crear tests cerca de la lógica o bajo `tests/` según convenga, pero mantener consistencia
+
+## Done
+
+Una tarea no está terminada si:
+
+- rompe tests existentes
+- cambia comportamiento crítico sin agregar cobertura nueva
+- no explica cómo correr la validación

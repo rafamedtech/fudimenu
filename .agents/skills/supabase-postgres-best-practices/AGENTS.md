@@ -21,6 +21,7 @@ Comprehensive performance optimization guide for Postgres, maintained by Supabas
 ## When to Apply
 
 Reference these guidelines when:
+
 - Writing SQL queries or designing schemas
 - Implementing indexes or query optimization
 - Reviewing database performance issues
@@ -30,16 +31,16 @@ Reference these guidelines when:
 
 ## Rule Categories by Priority
 
-| Priority | Category | Impact | Prefix |
-|----------|----------|--------|--------|
-| 1 | Query Performance | CRITICAL | `query-` |
-| 2 | Connection Management | CRITICAL | `conn-` |
-| 3 | Security & RLS | CRITICAL | `security-` |
-| 4 | Schema Design | HIGH | `schema-` |
-| 5 | Concurrency & Locking | MEDIUM-HIGH | `lock-` |
-| 6 | Data Access Patterns | MEDIUM | `data-` |
-| 7 | Monitoring & Diagnostics | LOW-MEDIUM | `monitor-` |
-| 8 | Advanced Features | LOW | `advanced-` |
+| Priority | Category                 | Impact      | Prefix      |
+| -------- | ------------------------ | ----------- | ----------- |
+| 1        | Query Performance        | CRITICAL    | `query-`    |
+| 2        | Connection Management    | CRITICAL    | `conn-`     |
+| 3        | Security & RLS           | CRITICAL    | `security-` |
+| 4        | Schema Design            | HIGH        | `schema-`   |
+| 5        | Concurrency & Locking    | MEDIUM-HIGH | `lock-`     |
+| 6        | Data Access Patterns     | MEDIUM      | `data-`     |
+| 7        | Monitoring & Diagnostics | LOW-MEDIUM  | `monitor-`  |
+| 8        | Advanced Features        | LOW         | `advanced-` |
 
 ## How to Use
 
@@ -52,6 +53,7 @@ references/_sections.md
 ```
 
 Each rule file contains:
+
 - Brief explanation of why it matters
 - Incorrect SQL example with explanation
 - Correct SQL example with explanation
@@ -66,3 +68,33 @@ Each rule file contains:
 - https://wiki.postgresql.org/wiki/Performance_Optimization
 - https://supabase.com/docs/guides/database/overview
 - https://supabase.com/docs/guides/auth/row-level-security
+
+## Testing policy
+
+- Todo cambio funcional debe incluir tests proporcionales al riesgo.
+- Si se modifica lógica de negocio, agregar o actualizar tests unitarios/integration.
+- Si se modifica un flujo crítico del usuario, considerar test E2E con Playwright.
+- No cerrar una tarea sin indicar cómo validar manualmente y cómo correr sus tests.
+- Priorizar tests sobre:
+  - permisos
+  - visibilidad pública
+  - validación de payloads
+  - reglas de publicación
+  - CRUDs críticos del dashboard
+
+## Test strategy
+
+- Vitest para unit e integration tests
+- @nuxt/test-utils para soporte de testing de Nuxt
+- Playwright para E2E
+- Evitar tests frágiles de UI
+- Preferir factories y fixtures reutilizables
+- Crear tests cerca de la lógica o bajo `tests/` según convenga, pero mantener consistencia
+
+## Done
+
+Una tarea no está terminada si:
+
+- rompe tests existentes
+- cambia comportamiento crítico sin agregar cobertura nueva
+- no explica cómo correr la validación

@@ -5,43 +5,60 @@ const { appIcons } = useSiteTheme()
 
 <template>
   <div class="app-shell app-shell--public">
-    <header class="layout-header">
-      <div class="container">
-        <UiCard class="layout-card" padding="none">
-          <div class="layout-card__inner">
-            <div class="layout-card__bar">
-              <SharedAppLogo caption="Menús claros para decidir rápido" />
+    <UHeader
+      class="site-shell-header"
+      :ui="{
+        root: 'site-shell-header__root',
+        container: 'site-shell-header__container',
+        center: 'min-w-0',
+        right: 'site-shell-header__right',
+        body: 'site-shell-header__body'
+      }"
+    >
+      <template #title>
+        <SharedAppLogo caption="Menús claros para decidir rápido" />
+      </template>
 
-              <div class="layout-card__actions">
-                <SharedPublicNavigation :is-authenticated="isAuthenticated" />
+      <SharedPublicNavigation class="hidden lg:flex" :is-authenticated="isAuthenticated" />
 
-                <SharedThemeCustomizer />
+      <template #right>
+        <div class="header-actions">
+          <SharedThemeCustomizer />
 
-                <UiButton
-                  v-if="isAuthenticated"
-                  :icon="appIcons.logout"
-                  intent="neutral"
-                  size="sm"
-                  @click="signOut()"
-                >
-                  Cerrar sesión
-                </UiButton>
-              </div>
-            </div>
+          <UiButton
+            v-if="isAuthenticated"
+            :icon="appIcons.logout"
+            class="hidden sm:inline-flex"
+            intent="neutral"
+            size="sm"
+            @click="signOut()"
+          >
+            Cerrar sesión
+          </UiButton>
+        </div>
+      </template>
 
-            <div class="layout-card__support">
-              <p class="layout-card__copy">
-                Descubre restaurantes publicados y revisa menús desde el celular sin perder tiempo.
-              </p>
+      <template #body>
+        <div class="header-mobile-panel">
+          <SharedPublicNavigation :is-authenticated="isAuthenticated" orientation="vertical" />
 
-              <UiBadge tone="secondary">
-                Mobile-first
-              </UiBadge>
-            </div>
+          <div class="header-mobile-panel__actions">
+            <SharedThemeCustomizer />
+
+            <UiButton
+              v-if="isAuthenticated"
+              :icon="appIcons.logout"
+              block
+              intent="neutral"
+              @click="signOut()"
+            >
+              Cerrar sesión
+            </UiButton>
           </div>
-        </UiCard>
-      </div>
-    </header>
+        </div>
+      </template>
+
+    </UHeader>
 
     <main class="layout-main">
       <slot />
