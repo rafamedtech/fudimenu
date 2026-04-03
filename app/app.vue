@@ -1,5 +1,5 @@
 <script setup lang="ts">
-useSiteTheme()
+useSiteThemeSync()
 </script>
 
 <template>

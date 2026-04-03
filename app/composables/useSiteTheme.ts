@@ -1,3 +1,8 @@
+import {
+  createSharedComposable,
+  StorageSerializers,
+  useLocalStorage
+} from '@vueuse/core'
 import type { SiteThemeConfig } from '~~/lib/site-theme'
 import {
   defaultSiteThemeConfig,
@@ -10,6 +15,18 @@ import {
 
 const SITE_THEME_STORAGE_KEY = 'fudimenu-site-theme'
 
+const useSiteThemeStorage = createSharedComposable(() =>
+  useLocalStorage<SiteThemeConfig>(
+    SITE_THEME_STORAGE_KEY,
+    { ...defaultSiteThemeConfig },
+    {
+      serializer: StorageSerializers.object,
+      mergeDefaults: true,
+      writeDefaults: false
+    }
+  )
+)
+
 function sameTheme(a: SiteThemeConfig, b: SiteThemeConfig) {
   return JSON.stringify(a) === JSON.stringify(b)
 }
@@ -21,27 +38,8 @@ function resolveActiveMode(value: string | undefined): 'light' | 'dark' {
 export function useSiteTheme() {
   const appConfig = useAppConfig()
   const theme = useState<SiteThemeConfig>('site-theme-config', () => ({ ...defaultSiteThemeConfig }))
-  const initialized = useState('site-theme-initialized', () => false)
-  const restored = useState('site-theme-restored-from-storage', () => false)
   const colorMode = useColorMode()
-
-  if (import.meta.client && !restored.value) {
-    restored.value = true
-
-    try {
-      const storedValue = window.localStorage.getItem(SITE_THEME_STORAGE_KEY)
-
-      if (storedValue) {
-        theme.value = resolveSiteThemeConfig(JSON.parse(storedValue))
-      }
-    } catch {
-      window.localStorage.removeItem(SITE_THEME_STORAGE_KEY)
-      theme.value = { ...defaultSiteThemeConfig }
-    }
-  }
-
   const appIcons = computed(() => siteThemeAppIcons[theme.value.icons])
-  const themeStyle = computed(() => getSiteThemeStyle(theme.value))
 
   function applyDocumentTheme(value: SiteThemeConfig, modeValue: string | undefined) {
     if (!import.meta.client) {
@@ -57,9 +55,15 @@ export function useSiteTheme() {
   }
 
   function applyRuntimeTheme(value: SiteThemeConfig, modeValue: string | undefined) {
-    appConfig.ui.colors.primary = value.primary === 'black' ? 'sky' : value.primary
-    appConfig.ui.colors.neutral = value.neutral
-    appConfig.ui.icons = siteThemeUiIcons[value.icons]
+    updateAppConfig({
+      ui: {
+        colors: {
+          primary: value.primary === 'black' ? 'sky' : value.primary,
+          neutral: value.neutral
+        },
+        icons: siteThemeUiIcons[value.icons]
+      }
+    })
 
     if (colorMode.preference !== value.colorMode) {
       colorMode.preference = value.colorMode
@@ -79,46 +83,69 @@ export function useSiteTheme() {
     theme.value = { ...defaultSiteThemeConfig }
   }
 
-  if (!initialized.value) {
-    initialized.value = true
-
-    useHead({
-      style: [
-        {
-          key: 'site-theme',
-          innerHTML: () => themeStyle.value
-        }
-      ]
-    })
-
-    watch(
-      [theme, () => colorMode.value],
-      ([value, modeValue]) => {
-        const nextValue = resolveSiteThemeConfig(value)
-
-        if (!sameTheme(value, nextValue)) {
-          theme.value = nextValue
-          return
-        }
-
-        if (import.meta.client) {
-          window.localStorage.setItem(SITE_THEME_STORAGE_KEY, JSON.stringify(nextValue))
-        }
-
-        applyRuntimeTheme(nextValue, modeValue)
-      },
-      {
-        deep: true,
-        immediate: true
-      }
-    )
-  }
-
   return {
     theme,
     appConfig,
+    colorMode,
     appIcons,
+    applyRuntimeTheme,
     updateTheme,
     resetTheme
   }
+}
+
+export function useSiteThemeSync() {
+  const storageTheme = useSiteThemeStorage()
+  const {
+    theme,
+    colorMode,
+    applyRuntimeTheme
+  } = useSiteTheme()
+  const themeStyle = computed(() => getSiteThemeStyle(theme.value))
+
+  useHead({
+    style: [
+      {
+        key: 'site-theme',
+        innerHTML: () => themeStyle.value
+      }
+    ]
+  })
+
+  watch(
+    storageTheme,
+    (value) => {
+      const nextValue = resolveSiteThemeConfig(value)
+
+      if (!sameTheme(theme.value, nextValue)) {
+        theme.value = nextValue
+      }
+    },
+    {
+      deep: true,
+      immediate: true
+    }
+  )
+
+  watch(
+    [theme, () => colorMode.value],
+    ([value, modeValue]) => {
+      const nextValue = resolveSiteThemeConfig(value)
+
+      if (!sameTheme(value, nextValue)) {
+        theme.value = nextValue
+        return
+      }
+
+      if (!sameTheme(storageTheme.value, nextValue)) {
+        storageTheme.value = { ...nextValue }
+      }
+
+      applyRuntimeTheme(nextValue, modeValue)
+    },
+    {
+      deep: true,
+      immediate: true
+    }
+  )
 }
