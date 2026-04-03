@@ -1,51 +1,20 @@
 <script setup lang="ts">
-import type {
-  SiteThemeFont,
-  SiteThemeIcons
-} from '~~/lib/site-theme'
 import {
   siteThemeColorModeMeta,
-  siteThemeFontMeta,
-  siteThemeIconMeta,
   siteThemeNeutralMeta,
-  siteThemePrimaryMeta,
-  siteThemeRadiusMeta
+  siteThemePrimaryMeta
 } from '~~/lib/site-theme'
 
 const { theme, appIcons, updateTheme, resetTheme } = useSiteTheme()
 
-const fontModel = computed({
-  get: () => theme.value.font,
-  set: (value: SiteThemeFont) => updateTheme({ font: value })
-})
-
-const iconsModel = computed({
-  get: () => theme.value.icons,
-  set: (value: SiteThemeIcons) => updateTheme({ icons: value })
-})
-
-const currentFont = computed(() =>
-  siteThemeFontMeta.find(option => option.value === theme.value.font) ?? siteThemeFontMeta[0]!
-)
-
-const currentIconSet = computed(() =>
-  siteThemeIconMeta.find(option => option.value === theme.value.icons) ?? siteThemeIconMeta[0]!
-)
-
 const optionButtonUi = {
-  base: 'h-9 w-full rounded-lg px-3 text-[0.8125rem] font-medium shadow-none'
-} as const
-
-const selectUi = {
-  base: 'min-h-10 rounded-lg border border-default bg-default px-3 text-sm text-default shadow-none',
-  content: 'rounded-xl border border-default bg-default shadow-xl',
-  trailingIcon: 'size-4 text-muted'
+  base: 'h-9 w-full rounded-[calc(var(--ui-radius)*3)] px-2.5 text-[0.6875rem] font-medium shadow-none'
 } as const
 
 function optionButtonClass(active: boolean, align: 'start' | 'center' = 'start') {
   return [
     align === 'center' ? 'justify-center' : 'justify-start',
-    active ? 'ring-1 ring-primary/25' : 'hover:bg-elevated'
+    active ? 'ring-2 ring-inset ring-white/70 dark:ring-black/20' : 'hover:opacity-92'
   ].join(' ')
 }
 
@@ -68,10 +37,25 @@ function colorModeIcon(value: 'light' | 'dark' | 'system') {
 
   return appIcons.value.system
 }
+
+function getOptionSurfaceStyle(swatch: string, active: boolean) {
+  return {
+    backgroundColor: active
+      ? `color-mix(in srgb, ${swatch} 32%, var(--ui-bg) 68%)`
+      : `color-mix(in srgb, ${swatch} 18%, var(--ui-bg) 82%)`,
+    borderColor: active
+      ? `color-mix(in srgb, ${swatch} 55%, var(--ui-border) 45%)`
+      : `color-mix(in srgb, ${swatch} 28%, var(--ui-border) 72%)`,
+    color: `color-mix(in srgb, ${swatch} 78%, var(--ui-text-highlighted) 22%)`
+  }
+}
 </script>
 
 <template>
-  <UPopover :content="{ align: 'end', side: 'bottom', sideOffset: 12, collisionPadding: 12 }">
+  <UPopover
+    :content="{ align: 'end', side: 'bottom', sideOffset: 12, collisionPadding: 12 }"
+    :ui="{ content: 'bg-transparent shadow-none ring-0 p-0' }"
+  >
     <UiButton
       :icon="appIcons.settings"
       aria-label="Personalizar apariencia"
@@ -84,7 +68,7 @@ function colorModeIcon(value: 'light' | 'dark' | 'system') {
     <template #content>
       <UCard
         :ui="{
-          root: 'w-[min(18.5rem,calc(100vw-0.75rem))] overflow-hidden rounded-2xl border border-default bg-default shadow-xl backdrop-blur-none',
+          root: 'w-[min(21.25rem,calc(100vw-0.75rem))] overflow-hidden rounded-[calc(var(--ui-radius)*5)] border border-default bg-default shadow-xl backdrop-blur-none',
           body: 'p-4'
         }"
       >
@@ -103,16 +87,16 @@ function colorModeIcon(value: 'light' | 'dark' | 'system') {
               <UButton
                 v-for="option in siteThemePrimaryMeta"
                 :key="option.value"
-                :color="optionButtonColor(theme.primary === option.value)"
+                color="neutral"
                 :class="optionButtonClass(theme.primary === option.value)"
+                :style="getOptionSurfaceStyle(option.swatch, theme.primary === option.value)"
                 :ui="optionButtonUi"
-                :variant="optionButtonVariant(theme.primary === option.value)"
+                variant="subtle"
                 type="button"
                 @click="updateTheme({ primary: option.value })"
               >
-                <span class="flex items-center gap-2">
-                  <span class="size-2.5 rounded-full" :style="{ backgroundColor: option.swatch }" />
-                  <span>{{ option.label }}</span>
+                <span class="flex min-w-0 items-center">
+                  <span class="truncate">{{ option.label }}</span>
                 </span>
               </UButton>
             </div>
@@ -132,113 +116,19 @@ function colorModeIcon(value: 'light' | 'dark' | 'system') {
               <UButton
                 v-for="option in siteThemeNeutralMeta"
                 :key="option.value"
-                :color="optionButtonColor(theme.neutral === option.value)"
+                color="neutral"
                 :class="optionButtonClass(theme.neutral === option.value)"
+                :style="getOptionSurfaceStyle(option.swatch, theme.neutral === option.value)"
                 :ui="optionButtonUi"
-                :variant="optionButtonVariant(theme.neutral === option.value)"
+                variant="subtle"
                 type="button"
                 @click="updateTheme({ neutral: option.value })"
               >
-                <span class="flex items-center gap-2">
-                  <span class="size-2.5 rounded-full" :style="{ backgroundColor: option.swatch }" />
-                  <span>{{ option.label }}</span>
+                <span class="flex min-w-0 items-center">
+                  <span class="truncate">{{ option.label }}</span>
                 </span>
               </UButton>
             </div>
-          </section>
-
-          <section class="space-y-2.5">
-            <div class="flex items-center gap-1.5">
-              <h3 class="text-sm font-semibold text-highlighted">
-                Radius
-              </h3>
-              <UTooltip text="Radio base para botones, tarjetas y paneles.">
-                <UIcon :name="appIcons.help" class="size-4 text-muted" />
-              </UTooltip>
-            </div>
-
-            <div class="grid grid-cols-5 gap-2">
-              <UButton
-                v-for="option in siteThemeRadiusMeta"
-                :key="option.value"
-                :color="optionButtonColor(theme.radius === option.value)"
-                :class="optionButtonClass(theme.radius === option.value, 'center')"
-                :ui="optionButtonUi"
-                :variant="optionButtonVariant(theme.radius === option.value)"
-                type="button"
-                @click="updateTheme({ radius: option.value })"
-              >
-                {{ option.label }}
-              </UButton>
-            </div>
-          </section>
-
-          <section class="space-y-2.5">
-            <div class="flex items-center gap-1.5">
-              <h3 class="text-sm font-semibold text-highlighted">
-                Font
-              </h3>
-              <UTooltip text="Tipografía base del sitio.">
-                <UIcon :name="appIcons.help" class="size-4 text-muted" />
-              </UTooltip>
-            </div>
-
-            <USelect
-              v-model="fontModel"
-              :items="siteThemeFontMeta"
-              color="neutral"
-              label-key="label"
-              :ui="selectUi"
-              value-key="value"
-              variant="outline"
-            >
-              <template #leading>
-                <span
-                  class="inline-flex size-5 items-center justify-center text-[1.05rem] text-muted"
-                  :style="{ fontFamily: currentFont.previewFamily }"
-                >
-                  T
-                </span>
-              </template>
-
-              <template #item-leading="{ item }">
-                <span
-                  class="inline-flex size-5 items-center justify-center text-[1.05rem] text-muted"
-                  :style="{ fontFamily: item.previewFamily }"
-                >
-                  T
-                </span>
-              </template>
-            </USelect>
-          </section>
-
-          <section class="space-y-2.5">
-            <div class="flex items-center gap-1.5">
-              <h3 class="text-sm font-semibold text-highlighted">
-                Icons
-              </h3>
-              <UTooltip text="Colección de iconos del design system global.">
-                <UIcon :name="appIcons.help" class="size-4 text-muted" />
-              </UTooltip>
-            </div>
-
-            <USelect
-              v-model="iconsModel"
-              :items="siteThemeIconMeta"
-              color="neutral"
-              label-key="label"
-              :ui="selectUi"
-              value-key="value"
-              variant="outline"
-            >
-              <template #leading>
-                <UIcon :name="currentIconSet.icon" class="size-4 text-muted" />
-              </template>
-
-              <template #item-leading="{ item }">
-                <UIcon :name="item.icon" class="size-4 text-muted" />
-              </template>
-            </USelect>
           </section>
 
           <section class="space-y-2.5">

@@ -55,7 +55,7 @@ export interface SiteThemeConfig {
 export const defaultSiteThemeConfig: SiteThemeConfig = {
   primary: 'sky',
   neutral: 'stone',
-  radius: '0.375',
+  radius: '0.25',
   font: 'public-sans',
   icons: 'lucide',
   colorMode: 'light'
@@ -79,9 +79,7 @@ export function resolveSiteThemeConfig(value: unknown): SiteThemeConfig {
     neutral: includesOption(siteThemeNeutralOptions, source.neutral)
       ? source.neutral
       : defaultSiteThemeConfig.neutral,
-    radius: includesOption(siteThemeRadiusOptions, source.radius)
-      ? source.radius
-      : defaultSiteThemeConfig.radius,
+    radius: defaultSiteThemeConfig.radius,
     font: includesOption(siteThemeFontOptions, source.font)
       ? source.font
       : defaultSiteThemeConfig.font,

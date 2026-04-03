@@ -7,7 +7,7 @@ export default defineAppConfig({
     },
     button: {
       slots: {
-        base: 'rounded-[calc(var(--ui-radius)*999)] font-semibold transition-all duration-200 shadow-sm',
+        base: 'rounded-[calc(var(--ui-radius)*3)] font-semibold transition-all duration-200 shadow-sm',
         leadingIcon: 'shrink-0',
         trailingIcon: 'shrink-0'
       }
@@ -27,12 +27,12 @@ export default defineAppConfig({
     },
     input: {
       slots: {
-        base: 'rounded-[calc(var(--ui-radius)*4)] border border-default/70 bg-default/85 shadow-none placeholder:text-muted'
+        base: 'rounded-[calc(var(--ui-radius)*3)] border border-default/70 bg-default/85 shadow-none placeholder:text-muted'
       }
     },
     textarea: {
       slots: {
-        base: 'rounded-[calc(var(--ui-radius)*5)] border border-default/70 bg-default/85 shadow-none placeholder:text-muted'
+        base: 'rounded-[calc(var(--ui-radius)*3)] border border-default/70 bg-default/85 shadow-none placeholder:text-muted'
       }
     }
   }
