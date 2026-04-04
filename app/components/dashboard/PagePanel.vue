@@ -56,7 +56,9 @@ const hasToolbar = computed(() => Boolean(slots['toolbar-left'] || slots['toolba
     </template>
 
     <template #body>
-      <slot />
+      <main class="dashboard-page-panel__main">
+        <slot />
+      </main>
     </template>
   </UDashboardPanel>
 </template>

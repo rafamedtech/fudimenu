@@ -1,0 +1,11 @@
+- navigation "Dashboard":
+  - list:
+    - listitem:
+      - link "Resumen":
+        - /url: /dashboard
+    - listitem:
+      - link "Restaurantes":
+        - /url: /dashboard/restaurants
+    - listitem:
+      - link "Nuevo restaurante":
+        - /url: /dashboard/restaurants/new

@@ -1,0 +1,34 @@
+- main:
+  - paragraph: Restaurantes
+  - heading "Todos tus restaurantes" [level=1]
+  - paragraph: Este listado es tu punto de entrada para administrar perfil, visibilidad y menú.
+  - button "Recargar"
+  - link "Crear restaurante":
+    - /url: /dashboard/restaurants/new
+  - paragraph: Total
+  - paragraph: "2"
+  - paragraph: Restaurantes que puedes administrar.
+  - paragraph: Publicados
+  - paragraph: "1"
+  - paragraph: Con visibilidad pública activa.
+  - paragraph: Borradores
+  - paragraph: "1"
+  - paragraph: Pendientes de completar o publicar.
+  - text: OWNER Publicado
+  - paragraph: /Actualizado 3 abr \d+/
+  - heading "Brasa Norte" [level=2]
+  - paragraph: Carnes, tacos y platos para compartir.
+  - text: Tijuana Zona Río Mexicana contemporánea
+  - link "Editar perfil":
+    - /url: /dashboard/restaurants/restaurant-brasa
+  - link "Ir al menú":
+    - /url: /dashboard/restaurants/restaurant-brasa/menu
+  - text: OWNER Borrador
+  - paragraph: /Actualizado 3 abr \d+/
+  - heading "Casa Marea" [level=2]
+  - paragraph: Mariscos frescos y platos ligeros.
+  - text: Tijuana Hipódromo Mariscos
+  - link "Editar perfil":
+    - /url: /dashboard/restaurants/restaurant-casa
+  - link "Ir al menú":
+    - /url: /dashboard/restaurants/restaurant-casa/menu

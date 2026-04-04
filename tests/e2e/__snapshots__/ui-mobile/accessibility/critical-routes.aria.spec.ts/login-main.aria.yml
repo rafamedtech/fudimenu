@@ -1,0 +1,27 @@
+- main:
+  - article:
+    - text: Dashboard privado Setup simple
+    - paragraph: Acceso privado
+    - heading "Entra a tu dashboard de restaurante" [level=1]
+    - paragraph: Usa email y contraseña para publicar tu restaurante y administrar categorías y platillos con una interfaz clara, rápida y enfocada en móvil.
+    - article:
+      - heading "Publica rápido" [level=2]
+      - paragraph: Crea un perfil limpio con portada, tipo de comida y datos esenciales para empezar.
+    - article:
+      - heading "Ordena el menú" [level=2]
+      - paragraph: Agrupa categorías y platillos para que el menú se lea perfecto desde el celular.
+    - article:
+      - heading "Actualiza sin fricción" [level=2]
+      - paragraph: Marca borrador, publicado o disponibilidad sin tocar nada más del flujo del MVP.
+    - paragraph: Cuenta
+    - heading "Inicia sesión" [level=2]
+    - paragraph: El acceso queda conectado a Supabase Auth y sincroniza tu usuario de la app al entrar.
+    - button "Iniciar sesión"
+    - button "Crear cuenta"
+    - text: Email *
+    - textbox "Email":
+      - /placeholder: tu@restaurante.com
+    - text: Contraseña *
+    - textbox "Contraseña":
+      - /placeholder: ••••••••
+    - button "Entrar al dashboard"

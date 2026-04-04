@@ -1,0 +1,76 @@
+- main:
+  - text: Descubre dónde comer
+  - heading "Encuentra restaurantes con menús claros y decide más rápido." [level=1]
+  - paragraph: "Explora restaurantes publicados con una vista más visual: imagen principal, tipo de comida, zona resumida y acceso inmediato al detalle por slug."
+  - link "Publica tu restaurante":
+    - /url: /login
+  - link "Ver restaurantes":
+    - /url: "#restaurantes"
+  - text: 2 publicados Carrusel activo
+  - article:
+    - paragraph: Brasa Norte
+    - paragraph: Carnes, tacos y platos para compartir en un ambiente casual pensado para grupos pequeños.
+    - text: Mexicana contemporánea Zona Río, Tijuana
+    - img "Portada de Brasa Norte"
+  - article:
+    - paragraph: Casa Marea
+    - paragraph: Mariscos frescos, ceviches y platos ligeros con una propuesta ideal para comida familiar.
+    - text: Mariscos Hipódromo, Tijuana
+    - img "Portada de Casa Marea"
+  - article:
+    - paragraph: Brasa Norte
+    - paragraph: Carnes, tacos y platos para compartir en un ambiente casual pensado para grupos pequeños.
+    - text: Mexicana contemporánea Zona Río, Tijuana
+    - img "Portada de Brasa Norte"
+  - article:
+    - paragraph: Casa Marea
+    - paragraph: Mariscos frescos, ceviches y platos ligeros con una propuesta ideal para comida familiar.
+    - text: Mariscos Hipódromo, Tijuana
+    - img "Portada de Casa Marea"
+  - article:
+    - paragraph: Brasa Norte
+    - paragraph: Carnes, tacos y platos para compartir en un ambiente casual pensado para grupos pequeños.
+    - text: Mexicana contemporánea Zona Río, Tijuana
+    - img "Portada de Brasa Norte"
+  - article:
+    - paragraph: Casa Marea
+    - paragraph: Mariscos frescos, ceviches y platos ligeros con una propuesta ideal para comida familiar.
+    - text: Mariscos Hipódromo, Tijuana
+    - img "Portada de Casa Marea"
+  - text: Restaurantes publicados Menu claro Mobile-first Mexicana contemporánea Mariscos Zona Río, Tijuana Hipódromo, Tijuana Restaurantes publicados Menu claro Mobile-first Mexicana contemporánea Mariscos Zona Río, Tijuana Hipódromo, Tijuana Restaurantes publicados Menu claro Mobile-first Mexicana contemporánea Mariscos Zona Río, Tijuana Hipódromo, Tijuana Restaurantes publicados Menu claro Mobile-first Mexicana contemporánea Mariscos Zona Río, Tijuana Hipódromo, Tijuana
+  - article:
+    - paragraph: Restaurantes publicados
+    - paragraph: "2"
+    - paragraph: Solo perfiles visibles al publico.
+  - article:
+    - paragraph: Tipos de comida
+    - paragraph: "2"
+    - paragraph: Resumen rapido para comparar opciones.
+  - article:
+    - paragraph: Zonas visibles
+    - paragraph: "2"
+    - paragraph: Ubicacion resumida en cada tarjeta.
+  - article:
+    - paragraph: Detalle por slug
+    - paragraph: /r
+    - paragraph: Cada tarjeta lleva directo al menu.
+  - paragraph: Listado público
+  - heading "Todos los restaurantes publicados" [level=2]
+  - paragraph: "Una cuadrícula simple y rápida de escanear en móvil, inspirada en la referencia pero enfocada en el objetivo real del MVP: descubrir, abrir y entender el menú rápido."
+  - button "Recargar"
+  - link "Abrir el restaurante Brasa Norte":
+    - /url: /r/brasa-norte
+    - text: ""
+    - img "Portada de Brasa Norte"
+    - text: Mexicana contemporánea Zona Río, Tijuana
+    - heading "Brasa Norte" [level=2]
+    - paragraph: Carnes, tacos y platos para compartir en un ambiente casual pensado para grupos pequeños.
+    - text: Zona Río, Tijuana /r/brasa-norte Ver detalle y menu
+  - link "Abrir el restaurante Casa Marea":
+    - /url: /r/casa-marea
+    - text: ""
+    - img "Portada de Casa Marea"
+    - text: ""
+    - heading "Casa Marea" [level=2]
+    - paragraph: Mariscos frescos, ceviches y platos ligeros con una propuesta ideal para comida familiar.
+    - text: Hipódromo, Tijuana /r/casa-marea Ver detalle y menu

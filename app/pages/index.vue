@@ -1,235 +1,304 @@
 <script setup lang="ts">
-import { formatLocation } from '~~/lib/formatters'
-import type { PublicRestaurantsResponse } from '~~/types/api'
+import { formatLocation } from "~~/lib/formatters";
+import type { PublicRestaurantsResponse } from "~~/types/api";
+import type { PublicRestaurantSummary } from "~~/types/domain";
 
-const { data, pending, error, refresh } = await useFetch<PublicRestaurantsResponse>('/api/public/restaurants', {
-  default: () => ({ restaurants: [] })
-})
+function isNonEmptyString(value: string | null | undefined): value is string {
+  return Boolean(value);
+}
 
-const restaurants = computed(() => data.value?.restaurants ?? [])
-const featuredRestaurant = computed(() => restaurants.value[0] ?? null)
-const supportingRestaurants = computed(() => restaurants.value.slice(1, 4))
-const { appIcons } = useSiteTheme()
-const cuisineCount = computed(() => new Set(restaurants.value.map((restaurant) => restaurant.cuisineType).filter(Boolean)).size)
-const locationCount = computed(() =>
-  new Set(
-    restaurants.value
-      .map((restaurant) => formatLocation(restaurant.city, restaurant.zone))
-      .filter(Boolean)
-  ).size
-)
-const cuisineHighlights = computed(() =>
-  [...new Set(restaurants.value.map((restaurant) => restaurant.cuisineType).filter(Boolean))].slice(0, 3)
-)
-const locationHighlights = computed(() =>
-  [...new Set(restaurants.value.map((restaurant) => formatLocation(restaurant.city, restaurant.zone)).filter(Boolean))].slice(0, 2)
-)
-const quickHighlights = computed(() => [...cuisineHighlights.value, ...locationHighlights.value])
+type HeroVerticalItem = PublicRestaurantSummary & {
+  carouselKey: string;
+};
+
+type HeroLink = {
+  label: string;
+  to: string;
+  icon?: string;
+  trailingIcon?: string;
+  color?: "primary" | "secondary" | "neutral" | "success" | "error";
+  variant?: "solid" | "outline" | "ghost" | "soft" | "subtle" | "link";
+  size?: "xs" | "sm" | "md" | "lg" | "xl";
+};
+
+const { data, pending, error, refresh } =
+  await useFetch<PublicRestaurantsResponse>("/api/public/restaurants", {
+    default: () => ({ restaurants: [] }),
+  });
+
+const restaurants = computed<PublicRestaurantSummary[]>(
+  () => data.value?.restaurants ?? [],
+);
+const { appIcons } = useSiteTheme();
+const cuisineCount = computed(
+  () =>
+    new Set(
+      restaurants.value
+        .map((restaurant) => restaurant.cuisineType)
+        .filter(isNonEmptyString),
+    ).size,
+);
+const locationCount = computed(
+  () =>
+    new Set(
+      restaurants.value
+        .map((restaurant) => formatLocation(restaurant.city, restaurant.zone))
+        .filter(isNonEmptyString),
+    ).size,
+);
+const cuisineHighlights = computed<string[]>(() =>
+  [
+    ...new Set(
+      restaurants.value
+        .map((restaurant) => restaurant.cuisineType)
+        .filter(isNonEmptyString),
+    ),
+  ].slice(0, 3),
+);
+const locationHighlights = computed<string[]>(() =>
+  [
+    ...new Set(
+      restaurants.value
+        .map((restaurant) => formatLocation(restaurant.city, restaurant.zone))
+        .filter(isNonEmptyString),
+    ),
+  ].slice(0, 2),
+);
+const quickHighlights = computed<string[]>(() => [
+  ...cuisineHighlights.value,
+  ...locationHighlights.value,
+]);
+const featuredRestaurant = computed<PublicRestaurantSummary | null>(
+  () => restaurants.value[0] ?? null,
+);
+const heroCommandText = computed<string>(() =>
+  featuredRestaurant.value
+    ? `open /r/${featuredRestaurant.value.slug}`
+    : "list published restaurants",
+);
+const heroVerticalItems = computed<HeroVerticalItem[]>(() => {
+  if (!restaurants.value.length) {
+    return [];
+  }
+
+  return Array.from(
+    { length: Math.max(restaurants.value.length * 2, 6) },
+    (_, index) => {
+      const restaurant = restaurants.value[index % restaurants.value.length]!;
+
+      return {
+        ...restaurant,
+        carouselKey: `vertical-${restaurant.id}-${index}`,
+      };
+    },
+  );
+});
+const heroLinks = computed<HeroLink[]>(() => [
+  {
+    label: "Publica tu restaurante",
+    to: "/login",
+    icon: appIcons.value.store,
+    size: "xl",
+  },
+  {
+    label: "Ver restaurantes",
+    to: "#restaurantes",
+    color: "neutral",
+    variant: "subtle",
+    trailingIcon: appIcons.value.forward,
+    size: "xl",
+  },
+]);
+const heroTickerItems = computed(() => {
+  const items = [
+    "Restaurantes publicados",
+    "Menu claro",
+    "Mobile-first",
+    ...quickHighlights.value,
+  ];
+
+  return [...new Set(items)].filter(isNonEmptyString);
+});
 
 useSeoMeta({
-  title: 'Descubre restaurantes y menús',
+  title: "Descubre restaurantes y menús",
   description:
-    'Encuentra restaurantes locales y revisa menús claros, rápidos y fáciles de leer desde tu celular.'
-})
+    "Encuentra restaurantes locales y revisa menús claros, rápidos y fáciles de leer desde tu celular.",
+});
 </script>
 
 <template>
-  <div class="page-shell">
+  <div class="page-shell home-page">
     <div class="container section-stack">
-      <section class="home-hero">
-        <article class="hero__card home-hero__intro surface-card">
-          <div class="section-stack home-hero__stack">
-            <div class="button-row">
-              <UiBadge tone="secondary">
-                Publicados: {{ restaurants.length }}
-              </UiBadge>
-              <UiBadge tone="primary">
-                Inspiración editorial
-              </UiBadge>
-            </div>
-
-            <div class="section-stack home-hero__headline">
-              <p class="eyebrow">Descubre dónde comer</p>
-              <h1 class="hero__title home-hero__title">
-                Encuentra restaurantes con menús claros y decide más rápido.
-              </h1>
-              <p class="hero__copy">
-                Explora restaurantes publicados con una vista más visual: imagen principal, tipo de
-                comida, zona resumida y acceso inmediato al detalle por slug.
-              </p>
-            </div>
-
-            <div class="button-row">
-              <UiButton :icon="appIcons.store" to="/login">
-                Publica tu restaurante
-              </UiButton>
-              <UiButton :icon="appIcons.down" intent="neutral" to="#restaurantes">
-                Ver restaurantes
-              </UiButton>
-            </div>
-
-            <div v-if="quickHighlights.length" class="home-hero__chip-row">
-              <span
-                v-for="highlight in quickHighlights"
-                :key="highlight"
-                class="home-hero__chip"
-              >
-                {{ highlight }}
-              </span>
-            </div>
-
-            <div class="hero__metrics home-hero__metrics">
-              <article class="metric-card">
-                <p class="metric-label">Restaurantes publicados</p>
-                <p class="metric-value">{{ restaurants.length }}</p>
-                <p class="metric-hint">Solo perfiles visibles al publico.</p>
-              </article>
-
-              <article class="metric-card">
-                <p class="metric-label">Tipos de comida</p>
-                <p class="metric-value">{{ cuisineCount }}</p>
-                <p class="metric-hint">Resumen rapido para comparar opciones.</p>
-              </article>
-
-              <article class="metric-card">
-                <p class="metric-label">Zonas visibles</p>
-                <p class="metric-value">{{ locationCount }}</p>
-                <p class="metric-hint">Ubicacion resumida en cada tarjeta.</p>
-              </article>
-
-              <article class="metric-card">
-                <p class="metric-label">Detalle por slug</p>
-                <p class="metric-value">/r</p>
-                <p class="metric-hint">Cada tarjeta lleva directo al menu.</p>
-              </article>
-            </div>
-          </div>
-        </article>
-
-        <div class="home-hero__showcase">
-          <article v-if="featuredRestaurant" class="home-featured surface-card">
-            <div class="home-featured__media">
-              <img
-                v-if="featuredRestaurant.coverImageUrl"
-                :src="featuredRestaurant.coverImageUrl"
-                :alt="`Portada de ${featuredRestaurant.name}`"
-                loading="lazy"
-                decoding="async"
-              >
-
-              <div v-else class="home-featured__fallback">
-                <UiBadge tone="live">
-                  Publicado
-                </UiBadge>
-                <p class="home-featured__fallback-title">{{ featuredRestaurant.name }}</p>
-              </div>
-
-              <div class="home-featured__floating-card">
-                <p class="home-featured__floating-label">Selección pública</p>
-                <p class="home-featured__floating-value">{{ featuredRestaurant.cuisineType || 'Cocina local' }}</p>
-                <p class="home-featured__floating-copy">
-                  {{ formatLocation(featuredRestaurant.city, featuredRestaurant.zone) || 'Ubicación por confirmar' }}
-                </p>
-              </div>
-            </div>
-
-            <div class="home-featured__content">
-              <div class="button-row">
-                <UiBadge tone="secondary">
-                  Restaurante destacado
-                </UiBadge>
-                <UiBadge tone="neutral">
-                  /r/{{ featuredRestaurant.slug }}
-                </UiBadge>
-              </div>
-
-              <div class="section-stack">
-                <h2 class="home-featured__title">{{ featuredRestaurant.name }}</h2>
-                <p class="section-copy home-featured__copy">
-                  {{
-                    featuredRestaurant.description ||
-                    'Consulta su menú público y entiende la propuesta del restaurante en segundos.'
-                  }}
+      <section class="home-hero home-hero--nuxt">
+        <section class="home-page-hero">
+          <div class="home-page-hero__backdrop" />
+          <div class="home-page-hero__container">
+            <div class="home-page-hero__content">
+              <div class="home-page-hero__body">
+                <h1 class="home-page-hero__title">
+                  <span>La forma más fácil</span>
+                  <span class="home-page-hero__title-accent">de encontrar</span>
+                  <span>qué comer</span>
+                </h1>
+                <p class="home-page-hero__description">
+                  Descubre restaurantes publicados con una interfaz rápida,
+                  visual y pensada para móvil: portada, tipo de comida, zona
+                  resumida y acceso inmediato al detalle.
                 </p>
               </div>
 
-              <div class="home-featured__meta">
-                <span class="home-featured__meta-item">
-                  <UIcon :name="appIcons.mapPin" />
-                  {{ formatLocation(featuredRestaurant.city, featuredRestaurant.zone) || 'Ubicación por confirmar' }}
-                </span>
-                <span class="home-featured__meta-item">
-                  <UIcon :name="appIcons.utensils" />
-                  {{ featuredRestaurant.cuisineType || 'Tipo de comida por confirmar' }}
-                </span>
-              </div>
-
-              <div class="button-row">
-                <UiButton :to="`/r/${featuredRestaurant.slug}`" :icon="appIcons.external">
-                  Ver restaurante
+              <div class="home-page-hero__actions">
+                <UiButton
+                  v-for="link in heroLinks"
+                  :key="link.label"
+                  v-bind="link"
+                >
+                  {{ link.label }}
                 </UiButton>
               </div>
-            </div>
-          </article>
 
-          <div v-if="supportingRestaurants.length" class="home-preview-list">
-            <NuxtLink
-              v-for="restaurant in supportingRestaurants"
-              :key="restaurant.id"
-              class="home-preview surface-card"
-              :to="`/r/${restaurant.slug}`"
-            >
-              <div class="home-preview__media">
-                <img
-                  v-if="restaurant.coverImageUrl"
-                  :src="restaurant.coverImageUrl"
-                  :alt="`Vista previa de ${restaurant.name}`"
-                  loading="lazy"
-                  decoding="async"
-                >
+              <div class="home-page-hero__command">
+                <UIcon
+                  name="i-lucide-search"
+                  class="home-page-hero__command-icon"
+                />
+                <span>{{ heroCommandText }}</span>
+              </div>
 
-                <div v-else class="home-preview__fallback">
-                  <span>{{ restaurant.name.slice(0, 2).toUpperCase() }}</span>
+              <div v-if="heroTickerItems.length" class="home-page-hero__ticker">
+                <div class="home-page-hero__ticker-row">
+                  <UiBadge
+                    v-for="item in heroTickerItems"
+                    :key="item"
+                    tone="neutral"
+                    class="shrink-0 home-page-hero__signal"
+                  >
+                    {{ item }}
+                  </UiBadge>
                 </div>
               </div>
+            </div>
 
-              <div class="home-preview__content">
-                <p class="home-preview__eyebrow">{{ restaurant.cuisineType || 'Restaurante publicado' }}</p>
-                <h3 class="home-preview__title">{{ restaurant.name }}</h3>
-                <p class="home-preview__copy">
-                  {{ formatLocation(restaurant.city, restaurant.zone) || 'Ubicación por confirmar' }}
-                </p>
+            <div class="home-page-hero__aside">
+              <div class="home-page-hero__panel">
+                <div v-if="pending" class="home-page-hero__skeletons">
+                  <div class="home-page-hero__skeleton-card" />
+                  <div
+                    class="home-page-hero__skeleton-card home-page-hero__skeleton-card--muted"
+                  />
+                </div>
+
+                <div v-else-if="error" class="feedback feedback--error">
+                  No pudimos cargar la vista previa de restaurantes.
+                </div>
+
+                <div
+                  v-else-if="heroVerticalItems.length"
+                  class="home-page-hero__carousel-shell"
+                >
+                  <div class="home-page-hero__vertical-carousel">
+                    <div class="home-page-hero__vertical-track">
+                      <article
+                        v-for="item in heroVerticalItems"
+                        :key="item.carouselKey"
+                        class="home-page-hero__vertical-card"
+                      >
+                        <div class="home-page-hero__vertical-card-body">
+                          <div class="home-page-hero__vertical-card-copy">
+                            <p class="home-page-hero__vertical-card-title">
+                              {{ item.name }}
+                            </p>
+                            <p
+                              class="home-page-hero__vertical-card-description"
+                            >
+                              {{
+                                item.description ||
+                                "Consulta el menú público y revisa rápido la propuesta del restaurante."
+                              }}
+                            </p>
+                          </div>
+
+                          <div class="home-page-hero__vertical-card-meta">
+                            <UiBadge tone="secondary">
+                              {{ item.cuisineType || "Restaurante publicado" }}
+                            </UiBadge>
+                            <UiBadge tone="neutral">
+                              {{
+                                formatLocation(item.city, item.zone) ||
+                                "Ubicación por confirmar"
+                              }}
+                            </UiBadge>
+                          </div>
+                        </div>
+
+                        <img
+                          v-if="item.coverImageUrl"
+                          :src="item.coverImageUrl"
+                          :alt="`Portada de ${item.name}`"
+                          class="home-page-hero__vertical-card-image"
+                          loading="lazy"
+                          decoding="async"
+                        />
+
+                        <div
+                          v-else
+                          class="home-page-hero__vertical-card-fallback"
+                        >
+                          <span>{{ item.name.slice(0, 2).toUpperCase() }}</span>
+                        </div>
+                      </article>
+                    </div>
+                  </div>
+                </div>
+
+                <div v-else class="panel empty-state">
+                  Aun no hay restaurantes publicados para mostrar en el home.
+                </div>
               </div>
-            </NuxtLink>
+            </div>
           </div>
-        </div>
+        </section>
       </section>
 
-      <section id="restaurantes" class="section-stack">
+      <USeparator class="home-page-divider" color="neutral" size="sm" />
+
+      <section id="restaurantes" class="section-stack home-page-listing">
         <UiSectionHeader
-          description="Una cuadrícula simple y rápida de escanear en móvil, inspirada en la referencia pero enfocada en el objetivo real del MVP: descubrir, abrir y entender el menú rápido."
+          description="Perfiles públicos listos para comparar rápido desde móvil: imagen principal, tipo de comida, ubicación resumida y entrada directa al detalle."
           eyebrow="Listado público"
           title="Todos los restaurantes publicados"
         >
           <template #actions>
-            <UiButton :icon="appIcons.refresh" intent="neutral" type="button" @click="refresh()">
+            <UiButton
+              :icon="appIcons.refresh"
+              intent="neutral"
+              type="button"
+              @click="refresh()"
+            >
               Recargar
             </UiButton>
           </template>
         </UiSectionHeader>
 
-        <div v-if="pending" class="cards-grid" aria-label="Cargando restaurantes">
-          <RestaurantsCardSkeleton
-            v-for="index in 3"
-            :key="index"
-          />
+        <div
+          v-if="pending"
+          class="cards-grid"
+          aria-label="Cargando restaurantes"
+        >
+          <RestaurantsCardSkeleton v-for="index in 3" :key="index" />
         </div>
 
         <div v-else-if="error" class="feedback feedback--error">
           <div class="section-stack">
             <p>No pudimos cargar los restaurantes publicados.</p>
             <div class="button-row">
-              <UiButton :icon="appIcons.refresh" intent="neutral" type="button" @click="refresh()">
+              <UiButton
+                :icon="appIcons.refresh"
+                intent="neutral"
+                type="button"
+                @click="refresh()"
+              >
                 Intentar de nuevo
               </UiButton>
             </div>

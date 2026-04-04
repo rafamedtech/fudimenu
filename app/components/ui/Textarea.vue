@@ -31,14 +31,25 @@ const emit = defineEmits<{
 }>()
 
 const attrs = useAttrs()
+const generatedId = useId()
+const textareaId = computed(() => String(attrs.id ?? generatedId))
+const hintId = computed(() => (props.hint ? `${textareaId.value}-hint` : undefined))
 </script>
 
 <template>
-  <UiField :hint="hint" :label="label" :required="required">
+  <UiField
+    :for-id="textareaId"
+    :hint="hint"
+    :hint-id="hintId"
+    :label="label"
+    :required="required"
+  >
     <UTextarea
       v-bind="attrs"
+      :aria-describedby="hintId"
       :autoresize="autoresize"
       :disabled="disabled"
+      :id="textareaId"
       :model-value="modelValue ?? ''"
       :placeholder="placeholder"
       :required="required"

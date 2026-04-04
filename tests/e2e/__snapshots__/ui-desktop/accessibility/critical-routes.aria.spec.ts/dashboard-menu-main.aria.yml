@@ -1,0 +1,142 @@
+- main:
+  - paragraph: Navegación del restaurante
+  - heading "Brasa Norte" [level=2]
+  - paragraph: Cambia entre el perfil del restaurante y la captura del menú sin salir del dashboard.
+  - navigation:
+    - list:
+      - listitem:
+        - link "Todos tus restaurantes":
+          - /url: /dashboard/restaurants
+      - listitem:
+        - link "Perfil":
+          - /url: /dashboard/restaurants/restaurant-brasa
+      - listitem:
+        - link "Menú":
+          - /url: /dashboard/restaurants/restaurant-brasa/menu
+      - listitem:
+        - link "Ver público":
+          - /url: /r/brasa-norte
+  - paragraph: Menú
+  - heading "Brasa Norte" [level=1]
+  - paragraph: Organiza categorías, agrega platillos y controla qué se ve en la página pública.
+  - link "Volver al perfil":
+    - /url: /dashboard/restaurants/restaurant-brasa
+  - link "Ver público":
+    - /url: /r/brasa-norte
+  - paragraph: Categorías
+  - heading "Ordena el menú por secciones" [level=2]
+  - paragraph: Crea categorías activas para lo público y organiza el orden de lectura desde aquí.
+  - text: 3 activas 0 ocultas
+  - heading "Nueva categoría" [level=3]
+  - text: Nombre *
+  - textbox
+  - text: Slug opcional
+  - textbox
+  - text: Orden
+  - spinbutton: "4"
+  - checkbox "Visible en el menú público Solo las categorías activas se muestran en el menú público." [checked]
+  - text: Visible en el menú público Solo las categorías activas se muestran en el menú público.
+  - button "Agregar categoría" [disabled]
+  - article:
+    - heading "Entradas" [level=3]
+    - text: Orden 1 2 platillos Activa
+    - paragraph: "Slug: entradas"
+    - button "Editar"
+    - button "Eliminar"
+  - article:
+    - heading "Tacos" [level=3]
+    - text: Orden 2 3 platillos Activa
+    - paragraph: "Slug: tacos"
+    - button "Editar"
+    - button "Eliminar"
+  - article:
+    - heading "Bebidas" [level=3]
+    - text: Orden 3 2 platillos Activa
+    - paragraph: "Slug: bebidas"
+    - button "Editar"
+    - button "Eliminar"
+  - paragraph: Platillos
+  - heading "Captura tu menú" [level=2]
+  - paragraph: Usa categorías activas para ordenar el menú y marca disponibilidad sin borrar historial.
+  - text: 6 disponibles 1 ocultos
+  - heading "Nuevo platillo" [level=3]
+  - text: Categoría *
+  - combobox:
+    - option "Entradas" [selected]
+    - option "Tacos"
+    - option "Bebidas"
+  - text: Nombre *
+  - textbox
+  - text: Descripción
+  - textbox
+  - text: Precio *
+  - spinbutton
+  - text: Orden en la categoría
+  - spinbutton: "3"
+  - text: Imagen URL
+  - textbox
+  - checkbox "Disponible para mostrar en la página pública Los platillos no disponibles quedan guardados pero no se muestran al público." [checked]
+  - text: Disponible para mostrar en la página pública Los platillos no disponibles quedan guardados pero no se muestran al público.
+  - button "Agregar platillo" [disabled]
+  - heading "Entradas" [level=3]
+  - text: 2 platillos Orden 1 Activa
+  - article:
+    - heading "Queso fundido con chorizo" [level=4]
+    - text: Orden 1 Disponible
+    - paragraph: Servido con tortillas de harina recién hechas.
+    - paragraph: /\$\d+\.\d+/
+    - button "Marcar no disponible"
+    - button "Editar"
+    - button "Eliminar"
+  - article:
+    - heading "Guacamole de la casa" [level=4]
+    - text: Orden 2 Disponible
+    - paragraph: Preparado al momento con totopos artesanales.
+    - paragraph: /\$\d+\.\d+/
+    - button "Marcar no disponible"
+    - button "Editar"
+    - button "Eliminar"
+  - heading "Tacos" [level=3]
+  - text: 3 platillos Orden 2 Activa
+  - article:
+    - heading "Taco de rib eye" [level=4]
+    - text: Orden 1 Disponible
+    - paragraph: Rib eye, cebolla asada y salsa tatemada.
+    - paragraph: /\$\d+\.\d+/
+    - button "Marcar no disponible"
+    - button "Editar"
+    - button "Eliminar"
+  - article:
+    - heading "Taco gobernador" [level=4]
+    - text: Orden 2 Disponible
+    - paragraph: Camarón, queso gratinado y tortilla dorada.
+    - paragraph: /\$\d+\.\d+/
+    - button "Marcar no disponible"
+    - button "Editar"
+    - button "Eliminar"
+  - article:
+    - heading "Taco vegetariano" [level=4]
+    - text: Orden 3 No disponible
+    - paragraph: Hongos al ajillo, calabaza y crema de cilantro.
+    - paragraph: /\$\d+\.\d+/
+    - button "Marcar disponible"
+    - button "Editar"
+    - button "Eliminar"
+  - heading "Bebidas" [level=3]
+  - text: 2 platillos Orden 3 Activa
+  - article:
+    - heading "Limonada mineral" [level=4]
+    - text: Orden 1 Disponible
+    - paragraph: Sin descripción corta.
+    - paragraph: /\$\d+\.\d+/
+    - button "Marcar no disponible"
+    - button "Editar"
+    - button "Eliminar"
+  - article:
+    - heading "Agua fresca del día" [level=4]
+    - text: Orden 2 Disponible
+    - paragraph: Sin descripción corta.
+    - paragraph: /\$\d+\.\d+/
+    - button "Marcar no disponible"
+    - button "Editar"
+    - button "Eliminar"

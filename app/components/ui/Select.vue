@@ -31,6 +31,10 @@ const emit = defineEmits<{
   'update:modelValue': [value: SelectValue]
 }>()
 
+const generatedId = useId()
+const selectId = computed(() => generatedId)
+const hintId = computed(() => (props.hint ? `${selectId.value}-hint` : undefined))
+
 function handleChange(event: Event) {
   const target = event.target as HTMLSelectElement
   const nextValue = target.value
@@ -45,9 +49,17 @@ function handleChange(event: Event) {
 </script>
 
 <template>
-  <UiField :hint="hint" :label="label" :required="required">
+  <UiField
+    :for-id="selectId"
+    :hint="hint"
+    :hint-id="hintId"
+    :label="label"
+    :required="required"
+  >
     <select
+      :aria-describedby="hintId"
       :disabled="disabled"
+      :id="selectId"
       :required="required"
       :value="modelValue ?? ''"
       @change="handleChange"

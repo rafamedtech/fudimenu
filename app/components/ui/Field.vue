@@ -4,11 +4,15 @@ withDefaults(
     label?: string
     hint?: string
     required?: boolean
+    forId?: string
+    hintId?: string
   }>(),
   {
     label: '',
     hint: '',
-    required: false
+    required: false,
+    forId: '',
+    hintId: ''
   }
 )
 </script>
@@ -16,13 +20,13 @@ withDefaults(
 <template>
   <div class="field ui-field">
     <div v-if="label" class="ui-field__header">
-      <span class="field__label">{{ label }}</span>
+      <label class="field__label" :for="forId || undefined">{{ label }}</label>
       <span v-if="required" class="ui-field__required">*</span>
     </div>
 
     <slot />
 
-    <p v-if="hint" class="field__hint">
+    <p v-if="hint" :id="hintId || undefined" class="field__hint">
       {{ hint }}
     </p>
   </div>

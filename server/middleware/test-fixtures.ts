@@ -12,6 +12,10 @@ const ownerUser = {
   role: 'RESTAURANT_OWNER' as const
 }
 
+function resolveTestCoverImageUrl(slug: string) {
+  return `/test-assets/restaurants/${slug}.svg`
+}
+
 const dashboardRestaurants = [
   {
     id: 'restaurant-brasa',
@@ -19,7 +23,7 @@ const dashboardRestaurants = [
     slug: 'brasa-norte',
     description: 'Carnes, tacos y platos para compartir.',
     logoUrl: null,
-    coverImageUrl: 'https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=1400&q=80',
+    coverImageUrl: resolveTestCoverImageUrl('brasa-norte'),
     address: 'Av. Constitución 245',
     city: 'Tijuana',
     zone: 'Zona Río',
@@ -39,7 +43,7 @@ const dashboardRestaurants = [
     slug: 'casa-marea',
     description: 'Mariscos frescos y platos ligeros.',
     logoUrl: null,
-    coverImageUrl: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1400&q=80',
+    coverImageUrl: resolveTestCoverImageUrl('casa-marea'),
     address: 'Blvd. Agua Caliente 1120',
     city: 'Tijuana',
     zone: 'Hipódromo',
@@ -54,6 +58,43 @@ const dashboardRestaurants = [
     membershipRole: 'OWNER' as const
   }
 ]
+
+const dashboardCategories = dashboardRestaurants.flatMap((restaurant, restaurantIndex) => {
+  const demoRestaurant = demoRestaurants[restaurantIndex]
+
+  return (demoRestaurant?.categories ?? []).map((category, categoryIndex) => ({
+    id: `${restaurant.id}-category-${category.slug ?? categoryIndex + 1}`,
+    restaurantId: restaurant.id,
+    name: category.name,
+    slug: category.slug ?? null,
+    sortOrder: category.sortOrder,
+    isActive: category.isActive ?? true,
+    itemCount: category.items.length,
+    createdAt: restaurant.createdAt,
+    updatedAt: restaurant.updatedAt
+  }))
+})
+
+const dashboardItems = dashboardRestaurants.flatMap((restaurant, restaurantIndex) => {
+  const demoRestaurant = demoRestaurants[restaurantIndex]
+
+  return (demoRestaurant?.categories ?? []).flatMap((category, categoryIndex) =>
+    category.items.map((item, itemIndex) => ({
+      id: `${restaurant.id}-item-${category.slug ?? categoryIndex + 1}-${itemIndex + 1}`,
+      restaurantId: restaurant.id,
+      categoryId: `${restaurant.id}-category-${category.slug ?? categoryIndex + 1}`,
+      categoryName: category.name,
+      name: item.name,
+      description: item.description ?? null,
+      price: String(item.price),
+      imageUrl: null,
+      isAvailable: item.isAvailable ?? true,
+      sortOrder: item.sortOrder,
+      createdAt: restaurant.createdAt,
+      updatedAt: restaurant.updatedAt
+    }))
+  )
+})
 
 function isCategoryActive(category: { isActive?: boolean }) {
   return category.isActive ?? true
@@ -71,7 +112,7 @@ function toPublicRestaurantSummary(
     name: restaurant.name,
     slug: restaurant.slug,
     description: restaurant.description ?? null,
-    coverImageUrl: restaurant.coverImageUrl ?? null,
+    coverImageUrl: resolveTestCoverImageUrl(restaurant.slug),
     city: restaurant.city ?? null,
     zone: restaurant.zone ?? null,
     cuisineType: restaurant.cuisineType ?? null,
@@ -230,6 +271,30 @@ export default defineEventHandler((event) => {
 
       return {
         restaurant
+      }
+    }
+
+    const dashboardCategoriesMatch = pathname.match(/^\/api\/dashboard\/restaurants\/([^/]+)\/categories$/)
+
+    if (dashboardCategoriesMatch) {
+      requireOwnerTestSession(event)
+
+      const restaurantId = decodeURIComponent(dashboardCategoriesMatch[1] ?? '')
+
+      return {
+        categories: dashboardCategories.filter((category) => category.restaurantId === restaurantId)
+      }
+    }
+
+    const dashboardItemsMatch = pathname.match(/^\/api\/dashboard\/restaurants\/([^/]+)\/items$/)
+
+    if (dashboardItemsMatch) {
+      requireOwnerTestSession(event)
+
+      const restaurantId = decodeURIComponent(dashboardItemsMatch[1] ?? '')
+
+      return {
+        items: dashboardItems.filter((item) => item.restaurantId === restaurantId)
       }
     }
 

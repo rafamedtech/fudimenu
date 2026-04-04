@@ -1,0 +1,40 @@
+- main:
+  - paragraph: Dashboard
+  - heading "Hola, Owner Demo" [level=1]
+  - paragraph: Este panel te deja entrar rápido a tus restaurantes, editar su perfil y capturar el menú sin perderte en pasos extra.
+  - link "Ver tus restaurantes":
+    - /url: /dashboard/restaurants
+  - link "Crear restaurante":
+    - /url: /dashboard/restaurants/new
+  - paragraph: Tus restaurantes
+  - paragraph: "2"
+  - paragraph: Acceso centralizado al perfil y menú.
+  - paragraph: Publicados
+  - paragraph: "1"
+  - paragraph: Visibles hoy en la parte pública.
+  - paragraph: Borradores
+  - paragraph: "1"
+  - paragraph: Pendientes de completar o publicar.
+  - paragraph: Acceso rápido
+  - heading "Tus restaurantes" [level=2]
+  - paragraph: Entra directo al perfil o al menú del restaurante que quieras actualizar.
+  - link "Ver listado completo":
+    - /url: /dashboard/restaurants
+  - text: OWNER Publicado
+  - paragraph: /Actualizado 3 abr \d+/
+  - heading "Brasa Norte" [level=2]
+  - paragraph: Carnes, tacos y platos para compartir.
+  - text: Tijuana Zona Río Mexicana contemporánea
+  - link "Editar perfil":
+    - /url: /dashboard/restaurants/restaurant-brasa
+  - link "Ir al menú":
+    - /url: /dashboard/restaurants/restaurant-brasa/menu
+  - text: OWNER Borrador
+  - paragraph: /Actualizado 3 abr \d+/
+  - heading "Casa Marea" [level=2]
+  - paragraph: Mariscos frescos y platos ligeros.
+  - text: Tijuana Hipódromo Mariscos
+  - link "Editar perfil":
+    - /url: /dashboard/restaurants/restaurant-casa
+  - link "Ir al menú":
+    - /url: /dashboard/restaurants/restaurant-casa/menu

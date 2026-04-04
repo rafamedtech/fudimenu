@@ -1,6 +1,8 @@
 import { defaultRestaurantThemeConfig } from '~~/lib/restaurant-theme'
 import type {
   AppUser,
+  DashboardMenuCategory,
+  DashboardMenuItem,
   DashboardRestaurant,
   DashboardRestaurantPayload,
   PublicMenuCategory,
@@ -140,5 +142,44 @@ export function buildDashboardRestaurant(
     createdAt: overrides.createdAt ?? now,
     updatedAt: overrides.updatedAt ?? now,
     membershipRole: overrides.membershipRole ?? 'OWNER'
+  }
+}
+
+export function buildDashboardMenuCategory(
+  overrides: Partial<DashboardMenuCategory> = {}
+): DashboardMenuCategory {
+  const now = new Date('2026-04-03T12:00:00.000Z').toISOString()
+
+  return {
+    id: overrides.id ?? nextUuid(),
+    restaurantId: overrides.restaurantId ?? 'restaurant-brasa',
+    name: overrides.name ?? 'Entradas',
+    slug: overrides.slug === undefined ? 'entradas' : overrides.slug,
+    sortOrder: overrides.sortOrder ?? 0,
+    isActive: overrides.isActive ?? true,
+    itemCount: overrides.itemCount ?? 0,
+    createdAt: overrides.createdAt ?? now,
+    updatedAt: overrides.updatedAt ?? now
+  }
+}
+
+export function buildDashboardMenuItem(
+  overrides: Partial<DashboardMenuItem> = {}
+): DashboardMenuItem {
+  const now = new Date('2026-04-03T12:00:00.000Z').toISOString()
+
+  return {
+    id: overrides.id ?? nextUuid(),
+    restaurantId: overrides.restaurantId ?? 'restaurant-brasa',
+    categoryId: overrides.categoryId ?? 'category-1',
+    categoryName: overrides.categoryName ?? 'Entradas',
+    name: overrides.name ?? 'Taco gobernador',
+    description: overrides.description ?? 'Taco dorado con camarón, queso y salsa tatemada.',
+    price: overrides.price ?? '149.00',
+    imageUrl: overrides.imageUrl ?? null,
+    isAvailable: overrides.isAvailable ?? true,
+    sortOrder: overrides.sortOrder ?? 0,
+    createdAt: overrides.createdAt ?? now,
+    updatedAt: overrides.updatedAt ?? now
   }
 }

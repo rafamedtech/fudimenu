@@ -1,0 +1,7 @@
+- navigation "Ir a una categoría del menú":
+  - link "Entradas 2":
+    - /url: "#categoria-entradas"
+  - link "Tacos 2":
+    - /url: "#categoria-tacos"
+  - link "Bebidas 2":
+    - /url: "#categoria-bebidas"

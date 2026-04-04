@@ -1,10 +1,11 @@
 <script setup lang="ts">
 const { isAuthenticated, signOut } = useAuthUser()
 const { appIcons } = useSiteTheme()
+const route = useRoute()
 </script>
 
 <template>
-  <div class="app-shell app-shell--public">
+  <div class="app-shell app-shell--public" :class="{ 'app-shell--home': route.path === '/' }">
     <UHeader
       class="site-shell-header"
       :ui="{

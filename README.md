@@ -118,7 +118,10 @@ La base de testing queda separada por capa:
 
 - `pnpm test:unit` para utilidades, validaciones y reglas de permisos aisladas
 - `pnpm test:integration` para endpoints y comportamiento de Nuxt/Nitro con `@nuxt/test-utils`
+- `pnpm test:components` para component testing en navegador real con Vitest Browser Mode + Playwright provider
 - `pnpm test:e2e` para flujos en navegador con Playwright
+- `pnpm test:e2e:ui` para la suite de protección visual y accesible de rutas críticas
+- `pnpm test:e2e:update` para regenerar screenshots y snapshots ARIA cuando un cambio visual o semántico sea intencional
 - `pnpm test:coverage` para coverage de unit e integration
 - `pnpm test:all` para correr todo junto
 
@@ -129,6 +132,106 @@ pnpm test:e2e:install
 ```
 
 La suite E2E usa fixtures de prueba activadas por entorno para no depender de una base real al validar home pública, detalle de restaurante y protección del dashboard.
+
+### Component tests con Vitest Browser Mode
+
+La base de component testing usa:
+
+- `Vitest Browser Mode`
+- provider de `Playwright`
+- entorno `nuxt` de `@nuxt/test-utils`
+
+Objetivo inicial:
+
+- blindar markup real de componentes reutilizables
+- proteger jerarquía y estructura accesible básica
+- validar estados condicionales importantes
+- cubrir interacciones simples de formularios y managers del dashboard
+
+Cobertura inicial de componentes:
+
+- `RestaurantCard`
+- `MenuCategorySection`
+- `DashboardRestaurantForm`
+- `CategoryManager`
+- `MenuItemManager`
+
+Los component tests viven en:
+
+- `tests/components/restaurants/`
+- `tests/components/menu/`
+- `tests/components/dashboard/`
+- `tests/setup/`
+
+Cómo correrlos:
+
+```bash
+pnpm test:components
+```
+
+Modo watch:
+
+```bash
+pnpm test:components:watch
+```
+
+Estos tests usan un viewport móvil por defecto y montan componentes dentro del runtime real de Nuxt para que los primitives, plugins y auto-imports se comporten como en la aplicación.
+
+### UI protection con Playwright
+
+La protección de UI del MVP combina dos capas:
+
+- screenshots para detectar regresiones visuales en layout, jerarquía y composición
+- snapshots ARIA para detectar cambios problemáticos en markup, landmarks, headings, navegación y controles
+
+Cobertura inicial:
+
+- `/`
+- `/r/brasa-norte`
+- `/login`
+- `/dashboard`
+- `/dashboard/restaurants`
+- `/dashboard/restaurants/restaurant-brasa/menu`
+
+Los tests visuales y accesibles viven en:
+
+- `tests/e2e/public/`
+- `tests/e2e/dashboard/`
+- `tests/e2e/accessibility/`
+- `tests/e2e/helpers/`
+- `tests/setup/`
+
+El runner usa una variante desktop y una mobile-first para las rutas críticas. Además, desactiva animaciones durante snapshots, genera `trace` al reintentar y usa fixtures controladas para que los resultados sean reproducibles.
+
+### Cómo correr los tests de UI
+
+Suite completa E2E:
+
+```bash
+pnpm test:e2e
+```
+
+Solo protección visual/accesible:
+
+```bash
+pnpm test:e2e:ui
+```
+
+### Cómo actualizar baselines
+
+Actualiza screenshots y snapshots solo cuando el cambio en la UI o en la estructura accesible sea intencional:
+
+```bash
+pnpm test:e2e:update
+```
+
+Después revisa cuidadosamente:
+
+- archivos nuevos o modificados en `tests/e2e/__snapshots__/`
+- diffs visuales en Playwright
+- cualquier cambio inesperado en headings, botones, labels, navegación o landmarks
+
+No conviene actualizar snapshots como primer paso si hubo una regresión inesperada; primero hay que entender la causa y corregirla.
 
 ## Seed demo incluida
 

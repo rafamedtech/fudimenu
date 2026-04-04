@@ -47,6 +47,9 @@ const emit = defineEmits<{
 }>()
 
 const attrs = useAttrs()
+const generatedId = useId()
+const inputId = computed(() => String(attrs.id ?? generatedId))
+const hintId = computed(() => (props.hint ? `${inputId.value}-hint` : undefined))
 
 function handleUpdate(value: string | number) {
   if (!props.number) {
@@ -64,11 +67,19 @@ function handleUpdate(value: string | number) {
 </script>
 
 <template>
-  <UiField :hint="hint" :label="label" :required="required">
+  <UiField
+    :for-id="inputId"
+    :hint="hint"
+    :hint-id="hintId"
+    :label="label"
+    :required="required"
+  >
     <UInput
       v-bind="attrs"
+      :aria-describedby="hintId"
       :autocomplete="autocomplete"
       :disabled="disabled"
+      :id="inputId"
       :icon="icon"
       :inputmode="inputmode"
       :max="max"

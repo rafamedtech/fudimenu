@@ -1,0 +1,80 @@
+- main:
+  - img "Portada de Brasa Norte"
+  - article:
+    - text: Mexicana contemporánea Zona Río, Tijuana Publicado
+    - paragraph: Restaurante
+    - heading "Brasa Norte" [level=1]
+    - paragraph: Carnes, tacos y platos para compartir en un ambiente casual pensado para grupos pequeños.
+    - article:
+      - paragraph: Ubicacion
+      - heading "Zona Río, Tijuana" [level=2]
+      - paragraph: /Av\. Constitución \d+/
+    - article:
+      - paragraph: Horario
+      - heading "Consulta rapida" [level=2]
+      - paragraph: /Lun-Dom 1:\d+ PM - \d+:\d+ PM/
+    - article:
+      - paragraph: Contacto
+      - heading "Directo" [level=2]
+      - paragraph: /\+\d+ \d+ \d+ \d+ · \+\d+ \d+ \d+ \d+/
+  - text: 3 categorías 6 platillos
+  - paragraph: Menú
+  - heading "Categorías activas con precios visibles" [level=2]
+  - paragraph: Solo mostramos platillos disponibles para que el menú sea claro, rápido y fácil de comparar.
+  - link "Ver más restaurantes":
+    - /url: /
+  - navigation "Ir a una categoría del menú":
+    - link "Entradas 2":
+      - /url: "#categoria-entradas"
+    - link "Tacos 2":
+      - /url: "#categoria-tacos"
+    - link "Bebidas 2":
+      - /url: "#categoria-bebidas"
+  - text: Categoria activa 2 platillos
+  - heading "Entradas" [level=2]
+  - article:
+    - heading "Queso fundido con chorizo" [level=3]
+    - paragraph: Servido con tortillas de harina recién hechas.
+    - paragraph: /\$\d+\.\d+/
+  - article:
+    - heading "Guacamole de la casa" [level=3]
+    - paragraph: Preparado al momento con totopos artesanales.
+    - paragraph: /\$\d+\.\d+/
+  - text: Categoria activa 2 platillos
+  - heading "Tacos" [level=2]
+  - article:
+    - heading "Taco de rib eye" [level=3]
+    - paragraph: Rib eye, cebolla asada y salsa tatemada.
+    - paragraph: /\$\d+\.\d+/
+  - article:
+    - heading "Taco gobernador" [level=3]
+    - paragraph: Camarón, queso gratinado y tortilla dorada.
+    - paragraph: /\$\d+\.\d+/
+  - text: Categoria activa 2 platillos
+  - heading "Bebidas" [level=2]
+  - article:
+    - heading "Limonada mineral" [level=3]
+    - paragraph: /\$\d+\.\d+/
+  - article:
+    - heading "Agua fresca del día" [level=3]
+    - paragraph: /\$\d+\.\d+/
+  - complementary:
+    - paragraph: Resumen
+    - heading "Ideal para revisar rápido en celular" [level=2]
+    - paragraph: Menú ordenado por categorías, precios visibles y sin elementos fuera del flujo de decisión.
+    - article:
+      - paragraph: Categorías activas
+      - paragraph: "3"
+      - paragraph: Solo secciones con contenido público visible.
+    - article:
+      - paragraph: Platillos disponibles
+      - paragraph: "6"
+      - paragraph: Precios claros para comparar rápido.
+    - paragraph: Destacado
+    - heading "Entradas" [level=2]
+    - paragraph: Es la categoría con más opciones visibles en este momento, con 2 platillos.
+    - paragraph: ¿Eres dueño?
+    - heading "Administra tu restaurante en minutos" [level=2]
+    - paragraph: Crea tu perfil, publica tu menú y mantén disponibilidad actualizada desde el dashboard.
+    - link "Acceder al dashboard":
+      - /url: /login
