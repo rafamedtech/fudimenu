@@ -53,8 +53,8 @@ export interface SiteThemeConfig {
 }
 
 export const defaultSiteThemeConfig: SiteThemeConfig = {
-  primary: 'emerald',
-  neutral: 'stone',
+  primary: 'green',
+  neutral: 'zinc',
   radius: '0.25',
   font: 'public-sans',
   icons: 'lucide',
@@ -397,12 +397,37 @@ export function getSiteThemeRootVariables(
         ? '#f8fafc'
         : '#111827'
       : `var(--ui-color-primary-${primaryShade})`
+  const shellSurface =
+    mode === 'dark'
+      ? 'color-mix(in srgb, var(--ui-color-neutral-950) 92%, black 8%)'
+      : 'color-mix(in srgb, var(--ui-color-neutral-50) 82%, white 18%)'
+  const shellSurfaceMuted =
+    mode === 'dark'
+      ? 'color-mix(in srgb, var(--ui-color-neutral-900) 76%, var(--ui-color-neutral-950) 24%)'
+      : 'color-mix(in srgb, var(--ui-color-neutral-100) 72%, var(--ui-color-neutral-50) 28%)'
+  const pageBase =
+    mode === 'dark'
+      ? 'color-mix(in srgb, var(--ui-color-neutral-950) 90%, black 10%)'
+      : 'color-mix(in srgb, var(--ui-color-neutral-50) 88%, white 12%)'
+  const pageMid =
+    mode === 'dark'
+      ? 'color-mix(in srgb, var(--ui-color-neutral-900) 78%, var(--ui-color-neutral-950) 22%)'
+      : 'color-mix(in srgb, var(--ui-color-neutral-100) 86%, var(--ui-color-neutral-50) 14%)'
+  const pageDeep =
+    mode === 'dark'
+      ? 'color-mix(in srgb, var(--ui-color-neutral-950) 72%, var(--ui-color-neutral-900) 28%)'
+      : 'color-mix(in srgb, var(--ui-color-neutral-200) 26%, var(--ui-color-neutral-50) 74%)'
 
   return {
     '--font-sans': fontFamily,
     '--font-serif': fontFamily,
     '--ui-radius': `${config.radius}rem`,
     '--ui-container': '1180px',
-    '--ui-primary': primaryValue
+    '--ui-primary': primaryValue,
+    '--site-shell-surface': shellSurface,
+    '--site-shell-surface-muted': shellSurfaceMuted,
+    '--site-page-base': pageBase,
+    '--site-page-mid': pageMid,
+    '--site-page-deep': pageDeep
   } as const
 }

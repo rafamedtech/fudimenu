@@ -2,8 +2,22 @@
 const { supabaseUser, appUser, refreshAppUser, signOut } = useAuthUser()
 const { appIcons } = useSiteTheme()
 
+const mobileOpen = ref(false)
+
 const accountLabel = computed(() => {
   return appUser.value?.fullName || supabaseUser.value?.email || 'Tu cuenta'
+})
+
+const accountRoleLabel = computed(() => {
+  if (appUser.value?.role === 'ADMIN') {
+    return 'Administrador'
+  }
+
+  if (appUser.value?.role === 'RESTAURANT_OWNER') {
+    return 'Restaurant owner'
+  }
+
+  return 'Cuenta autenticada'
 })
 
 if (supabaseUser.value && !appUser.value) {
@@ -12,103 +26,98 @@ if (supabaseUser.value && !appUser.value) {
 </script>
 
 <template>
-  <div class="app-shell app-shell--dashboard">
-    <UHeader
-      class="site-shell-header dashboard-shell-header"
-      :ui="{
-        root: 'site-shell-header__root dashboard-shell-header__root',
-        container: 'site-shell-header__container',
-        center: 'min-w-0',
-        right: 'site-shell-header__right',
-        body: 'site-shell-header__body'
-      }"
+  <UDashboardGroup unit="rem">
+    <UDashboardSidebar
+      id="owner-dashboard"
+      v-model:open="mobileOpen"
+      class="dashboard-sidebar-shell bg-elevated/25"
+      collapsible
+      resizable
+      :default-size="18"
+      :max-size="20"
+      :min-size="15"
+      :ui="{ footer: 'lg:border-t lg:border-default' }"
     >
-      <template #title>
-        <SharedAppLogo caption="Dashboard para dueños" />
-      </template>
+      <template #header="{ collapsed }">
+        <div class="dashboard-sidebar-brand">
+          <NuxtLink class="brand-link min-w-0" to="/dashboard">
+            <span class="brand-mark">FM</span>
 
-      <SharedDashboardNavigation class="hidden lg:flex" compact orientation="horizontal" />
+            <span v-if="!collapsed" class="brand-copy">
+              <span class="brand-title">FudiMenu</span>
+              <span class="brand-caption">Dashboard para dueños</span>
+            </span>
+          </NuxtLink>
 
-      <template #right>
-        <div class="header-actions">
-          <UiBadge class="account-badge hidden xl:inline-flex" tone="secondary">
-            {{ accountLabel }}
-          </UiBadge>
-
-          <SharedThemeCustomizer />
-
-          <UiButton
-            to="/"
-            :icon="appIcons.globe"
-            class="hidden md:inline-flex"
-            intent="ghost"
-            size="sm"
+          <UiBadge
+            v-if="!collapsed"
+            class="dashboard-sidebar-brand__badge"
+            tone="secondary"
           >
-            Ver sitio público
-          </UiButton>
-
-          <UiButton :icon="appIcons.logout" intent="neutral" size="sm" @click="signOut()">
-            <span class="hidden sm:inline">Cerrar sesión</span>
-          </UiButton>
+            Administración
+          </UiBadge>
         </div>
       </template>
 
-      <template #body>
-        <div class="header-mobile-panel">
-          <UiBadge class="justify-start" tone="secondary">
-            {{ accountLabel }}
-          </UiBadge>
+      <template #default="{ collapsed }">
+        <div class="flex min-h-full flex-1 flex-col gap-5">
+          <div v-if="!collapsed" class="dashboard-workspace-card">
+            <p class="dashboard-workspace-card__eyebrow">
+              Workspace
+            </p>
+            <h2 class="dashboard-workspace-card__title">
+              Gestión de restaurantes y menús
+            </h2>
+            <p class="dashboard-workspace-card__copy">
+              Edita perfiles, organiza categorías y mantén la disponibilidad del menú al día.
+            </p>
+          </div>
 
-          <SharedDashboardNavigation compact orientation="vertical" />
+          <SharedDashboardNavigation :collapsed="collapsed" />
+        </div>
+      </template>
 
-          <div class="header-mobile-panel__actions">
+      <template #footer="{ collapsed }">
+        <div
+          class="dashboard-sidebar-footer"
+          :class="{ 'dashboard-sidebar-footer--collapsed': collapsed }"
+        >
+          <div v-if="!collapsed" class="dashboard-sidebar-footer__account">
+            <p class="dashboard-sidebar-footer__name">
+              {{ accountLabel }}
+            </p>
+            <p class="dashboard-sidebar-footer__role">
+              {{ accountRoleLabel }}
+            </p>
+          </div>
+
+          <div class="dashboard-sidebar-footer__actions">
             <SharedThemeCustomizer />
 
-            <UiButton to="/" :icon="appIcons.globe" block intent="ghost">
-              Ver sitio público
+            <UiButton
+              to="/"
+              :icon="appIcons.globe"
+              :class="collapsed ? 'w-10 justify-center px-0' : 'w-full justify-start'"
+              intent="ghost"
+              size="sm"
+            >
+              <span v-if="!collapsed">Ver sitio público</span>
             </UiButton>
 
-            <UiButton :icon="appIcons.logout" block intent="neutral" @click="signOut()">
-              Cerrar sesión
+            <UiButton
+              :icon="appIcons.logout"
+              :class="collapsed ? 'w-10 justify-center px-0' : 'w-full justify-start'"
+              intent="neutral"
+              size="sm"
+              @click="signOut()"
+            >
+              <span v-if="!collapsed">Cerrar sesión</span>
             </UiButton>
           </div>
         </div>
       </template>
-    </UHeader>
+    </UDashboardSidebar>
 
-    <main class="page-shell">
-      <div class="container dashboard-layout">
-        <aside class="dashboard-layout__aside">
-          <UiCard class="dashboard-sidebar-card" padding="none">
-            <div class="dashboard-sidebar-card__content">
-              <div class="section-stack">
-                <p class="eyebrow">Panel privado</p>
-                <h2 class="dashboard-sidebar-card__title">Gestiona tus restaurantes</h2>
-                <p class="section-copy">
-                  Mantén tu perfil publicado, ordena categorías y actualiza disponibilidad de
-                  platillos.
-                </p>
-              </div>
-
-              <UiBadge class="dashboard-sidebar-card__badge" tone="secondary">
-                {{ accountLabel }}
-              </UiBadge>
-
-              <SharedDashboardNavigation />
-
-              <UiButton to="/dashboard/restaurants" block :icon="appIcons.store">
-                Ir a tus restaurantes
-              </UiButton>
-            </div>
-          </UiCard>
-        </aside>
-
-        <section class="dashboard-main">
-          <div class="dashboard-main__content">
-            <slot />
-          </div>
-        </section>
-      </div>
-    </main>
-  </div>
+    <slot />
+  </UDashboardGroup>
 </template>

@@ -19,10 +19,32 @@ const { appIcons } = useSiteTheme()
         <SharedAppLogo caption="Menús claros para decidir rápido" />
       </template>
 
-      <SharedPublicNavigation class="hidden lg:flex" :is-authenticated="isAuthenticated" />
+      <SharedPublicNavigation class="hidden lg:flex" />
 
       <template #right>
         <div class="header-actions">
+          <UiButton
+            v-if="!isAuthenticated"
+            to="/login"
+            :icon="appIcons.login"
+            class="hidden md:inline-flex"
+            intent="neutral"
+            size="sm"
+          >
+            Acceso restaurante
+          </UiButton>
+
+          <UiButton
+            v-else
+            to="/dashboard"
+            :icon="appIcons.dashboard"
+            class="hidden md:inline-flex"
+            intent="ghost"
+            size="sm"
+          >
+            Ir al panel
+          </UiButton>
+
           <SharedThemeCustomizer />
 
           <UiButton
@@ -40,9 +62,29 @@ const { appIcons } = useSiteTheme()
 
       <template #body>
         <div class="header-mobile-panel">
-          <SharedPublicNavigation :is-authenticated="isAuthenticated" orientation="vertical" />
+          <SharedPublicNavigation orientation="vertical" />
 
           <div class="header-mobile-panel__actions">
+            <UiButton
+              v-if="!isAuthenticated"
+              to="/login"
+              :icon="appIcons.login"
+              block
+              intent="neutral"
+            >
+              Acceso restaurante
+            </UiButton>
+
+            <UiButton
+              v-else
+              to="/dashboard"
+              :icon="appIcons.dashboard"
+              block
+              intent="ghost"
+            >
+              Mi panel
+            </UiButton>
+
             <SharedThemeCustomizer />
 
             <UiButton

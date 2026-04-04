@@ -35,9 +35,20 @@ async function handleCreate(payload: DashboardRestaurantPayload, _action: Dashbo
 </script>
 
 <template>
-  <DashboardRestaurantForm
-    :error-message="errorMessage"
-    :pending="pending"
-    @submit="handleCreate"
-  />
+  <DashboardPagePanel
+    description="Crea un restaurante y deja listo su perfil público básico."
+    title="Nuevo restaurante"
+  >
+    <template #actions>
+      <UiButton intent="neutral" size="sm" to="/dashboard/restaurants">
+        Volver al listado
+      </UiButton>
+    </template>
+
+    <DashboardRestaurantForm
+      :error-message="errorMessage"
+      :pending="pending"
+      @submit="handleCreate"
+    />
+  </DashboardPagePanel>
 </template>

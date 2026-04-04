@@ -1,23 +1,33 @@
 <script setup lang="ts">
+import { buildRestaurantWorkspaceNavigation } from '~~/lib/dashboard-navigation'
+
 const props = defineProps<{
   restaurantId: string
   restaurantSlug: string
   restaurantName: string
 }>()
 
+const { appIcons } = useSiteTheme()
 const route = useRoute()
 
-const profilePath = computed(() => `/dashboard/restaurants/${props.restaurantId}`)
-const menuPath = computed(() => `/dashboard/restaurants/${props.restaurantId}/menu`)
-
-function isActiveLink(path: string) {
-  return route.path === path
-}
+const items = computed(() =>
+  buildRestaurantWorkspaceNavigation({
+    currentPath: route.path,
+    restaurantId: props.restaurantId,
+    restaurantSlug: props.restaurantSlug,
+    icons: {
+      dashboard: appIcons.value.dashboard,
+      store: appIcons.value.store,
+      utensils: appIcons.value.utensils,
+      external: appIcons.value.external
+    }
+  })
+)
 </script>
 
 <template>
   <UiCard padding="md">
-    <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+    <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
       <div class="space-y-2">
         <p class="eyebrow">Navegación del restaurante</p>
         <h2 class="text-lg font-semibold text-highlighted">
@@ -28,29 +38,19 @@ function isActiveLink(path: string) {
         </p>
       </div>
 
-      <div class="flex flex-wrap gap-2">
-        <UiButton intent="ghost" to="/dashboard/restaurants">
-          Todos tus restaurantes
-        </UiButton>
-
-        <UiButton
-          :to="profilePath"
-          :intent="isActiveLink(profilePath) ? 'primary' : 'neutral'"
-        >
-          Perfil
-        </UiButton>
-
-        <UiButton
-          :to="menuPath"
-          :intent="isActiveLink(menuPath) ? 'primary' : 'neutral'"
-        >
-          Menú
-        </UiButton>
-
-        <UiButton :to="`/r/${restaurantSlug}`" intent="ghost" target="_blank">
-          Ver público
-        </UiButton>
-      </div>
+      <UNavigationMenu
+        color="neutral"
+        highlight
+        :items="items"
+        orientation="horizontal"
+        variant="link"
+        :ui="{
+          root: 'w-full xl:w-auto',
+          list: 'flex flex-wrap gap-1',
+          item: 'py-0',
+          link: 'rounded-[calc(var(--ui-radius)*3)] px-3 py-2 text-sm'
+        }"
+      />
     </div>
   </UiCard>
 </template>

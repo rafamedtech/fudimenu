@@ -85,11 +85,22 @@ const intentMap: Record<ButtonIntent, { color: ButtonColor, variant: ButtonVaria
 const preset = computed(() => intentMap[props.intent])
 const resolvedColor = computed(() => props.color ?? preset.value.color)
 const resolvedVariant = computed(() => props.variant ?? preset.value.variant)
+const contrastClass = computed(() => {
+  const customContrastVariants: ButtonVariant[] = ['solid', 'soft', 'subtle']
+
+  if (resolvedColor.value !== 'primary' || !customContrastVariants.includes(resolvedVariant.value)) {
+    return ''
+  }
+
+  return '!text-white dark:!text-black [&_svg]:!text-white dark:[&_svg]:!text-black'
+})
+
 const resolvedClass = computed(() => [
   'ui-button',
   `ui-button--${props.intent}`,
   props.block ? 'w-full justify-center' : '',
-  preset.value.class
+  preset.value.class,
+  contrastClass.value
 ].filter(Boolean).join(' '))
 </script>
 

@@ -61,46 +61,61 @@ async function handleUpdate(payload: DashboardRestaurantPayload, action: Dashboa
 </script>
 
 <template>
-  <div class="section-stack">
-    <div v-if="saveMessage" class="feedback feedback--success">
-      {{ saveMessage }}
-    </div>
+  <DashboardPagePanel
+    :description="`Edita el perfil privado de ${restaurant.name} en FudiMenu.`"
+    :title="restaurant.name"
+  >
+    <template #actions>
+      <UiButton
+        :to="`/dashboard/restaurants/${restaurant.id}/menu`"
+        :icon="appIcons.utensils"
+        size="sm"
+      >
+        Abrir menú
+      </UiButton>
+    </template>
 
-    <DashboardRestaurantWorkspaceNav
-      :restaurant-id="restaurant.id"
-      :restaurant-name="restaurant.name"
-      :restaurant-slug="restaurant.slug"
-    />
-
-    <DashboardRestaurantForm
-      :error-message="saveError"
-      :pending="pending"
-      :restaurant="restaurant"
-      @submit="handleUpdate"
-    />
-
-    <section class="panel">
-      <div class="page-header">
-        <UiSectionHeader
-          description="Una vez listo el perfil, entra a la sección de menú para capturar categorías y platillos."
-          eyebrow="Siguiente paso"
-          title="Gestiona categorías y platillos"
-        />
-
-        <div class="button-row">
-          <UiButton
-            :to="`/r/${restaurant.slug}`"
-            :icon="appIcons.external"
-            intent="neutral"
-            target="_blank"
-          >
-            Ver página pública
-          </UiButton>
-          <UiButton :to="`/dashboard/restaurants/${restaurant.id}/menu`" :icon="appIcons.utensils">
-            Abrir menú
-          </UiButton>
-        </div>
+    <div class="section-stack">
+      <div v-if="saveMessage" class="feedback feedback--success">
+        {{ saveMessage }}
       </div>
-    </section>
-  </div>
+
+      <DashboardRestaurantWorkspaceNav
+        :restaurant-id="restaurant.id"
+        :restaurant-name="restaurant.name"
+        :restaurant-slug="restaurant.slug"
+      />
+
+      <DashboardRestaurantForm
+        :error-message="saveError"
+        :pending="pending"
+        :restaurant="restaurant"
+        @submit="handleUpdate"
+      />
+
+      <section class="panel">
+        <div class="page-header">
+          <UiSectionHeader
+            description="Una vez listo el perfil, entra a la sección de menú para capturar categorías y platillos."
+            eyebrow="Siguiente paso"
+            title="Gestiona categorías y platillos"
+          />
+
+          <div class="button-row">
+            <UiButton
+              :to="`/r/${restaurant.slug}`"
+              :icon="appIcons.external"
+              intent="neutral"
+              target="_blank"
+            >
+              Ver página pública
+            </UiButton>
+            <UiButton :to="`/dashboard/restaurants/${restaurant.id}/menu`" :icon="appIcons.utensils">
+              Abrir menú
+            </UiButton>
+          </div>
+        </div>
+      </section>
+    </div>
+  </DashboardPagePanel>
 </template>

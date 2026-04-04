@@ -84,6 +84,8 @@
   --radius-md: calc(var(--ui-radius) * 4);
   --radius-sm: calc(var(--ui-radius) * 3);
   --container: var(--ui-container);
+  --nuxt-night: #020420;
+  --nuxt-night-soft: #071224;
 }
 
 *,
@@ -94,15 +96,31 @@
 
 html {
   background:
-    radial-gradient(circle at 8% 12%, color-mix(in srgb, var(--color-primary) 26%, transparent), transparent 26%),
-    radial-gradient(circle at 92% 10%, color-mix(in srgb, var(--color-primary) 18%, transparent), transparent 24%),
-    radial-gradient(circle at 84% 76%, color-mix(in srgb, var(--color-accent) 12%, transparent), transparent 24%),
-    linear-gradient(180deg, color-mix(in srgb, var(--color-bg) 92%, white 8%) 0%, var(--color-bg-strong) 100%);
+    radial-gradient(180% 72% at 50% 0%, color-mix(in srgb, var(--color-primary) 14%, transparent), transparent 44%),
+    radial-gradient(140% 36% at 50% 10%, color-mix(in srgb, var(--color-primary) 7%, transparent), transparent 60%),
+    linear-gradient(
+      180deg,
+      var(--site-page-base) 0%,
+      var(--site-page-mid) 44%,
+      var(--site-page-deep) 100%
+    );
   color: var(--color-text);
   font-family: var(--font-sans);
   font-feature-settings: "ss01" 1, "cv11" 1;
   font-optical-sizing: auto;
   scroll-behavior: smooth;
+}
+
+html.dark {
+  background:
+    radial-gradient(210% 78% at 50% -6%, color-mix(in srgb, var(--color-primary) 20%, transparent), transparent 42%),
+    radial-gradient(150% 34% at 50% 10%, color-mix(in srgb, var(--color-primary) 10%, transparent), transparent 58%),
+    linear-gradient(
+      180deg,
+      var(--site-page-base) 0%,
+      var(--site-page-mid) 46%,
+      var(--site-page-deep) 100%
+    );
 }
 
 body {
@@ -117,26 +135,29 @@ body::before {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  background-image:
-    linear-gradient(color-mix(in srgb, var(--ui-text-highlighted) 6%, transparent) 1px, transparent 1px),
-    linear-gradient(90deg, color-mix(in srgb, var(--ui-text-highlighted) 4%, transparent) 1px, transparent 1px);
-  background-size: 32px 32px;
-  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.42), transparent 80%);
-  opacity: 0.5;
+  background:
+    radial-gradient(220% 52% at 50% -4%, color-mix(in srgb, var(--color-primary) 7%, transparent), transparent 54%),
+    linear-gradient(180deg, color-mix(in srgb, var(--ui-text-highlighted) 4%, transparent), transparent 18%);
+  opacity: 0.82;
 }
 
 body::after {
   content: "";
   position: fixed;
-  inset: auto -8% -14% auto;
-  width: min(34vw, 28rem);
-  aspect-ratio: 1;
+  inset: -10rem -18% auto -18%;
+  transform: none;
+  width: auto;
+  height: min(34vw, 18rem);
   border-radius: var(--radius-pill);
-  background:
-    radial-gradient(circle, color-mix(in srgb, var(--ui-bg) 72%, transparent), transparent 56%),
-    radial-gradient(circle at 30% 30%, color-mix(in srgb, var(--color-primary) 28%, transparent), transparent 48%);
-  filter: blur(18px);
-  opacity: 0.85;
+  background: radial-gradient(
+    ellipse at center,
+    color-mix(in srgb, var(--color-primary) 16%, transparent) 0%,
+    color-mix(in srgb, var(--color-primary) 10%, transparent) 30%,
+    color-mix(in srgb, var(--color-primary) 5%, transparent) 48%,
+    transparent 70%
+  );
+  filter: blur(44px);
+  opacity: 0.7;
   pointer-events: none;
 }
 
@@ -450,16 +471,66 @@ button:disabled {
   gap: 1rem;
 }
 
+.dashboard-page-panel__body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.dashboard-sidebar-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  width: 100%;
+}
+
+.dashboard-sidebar-footer--collapsed {
+  align-items: center;
+}
+
+.dashboard-sidebar-footer__account {
+  min-width: 0;
+}
+
+.dashboard-sidebar-footer__name {
+  color: var(--color-text);
+  font-size: 0.92rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.dashboard-sidebar-footer__role {
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+  margin: 0.18rem 0 0;
+}
+
+.dashboard-sidebar-footer__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  width: 100%;
+}
+
+.dashboard-sidebar-shell {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--site-shell-surface) 96%, transparent), color-mix(in srgb, var(--site-shell-surface-muted) 92%, transparent)),
+    radial-gradient(circle at top center, color-mix(in srgb, var(--color-primary) 7%, transparent), transparent 34%);
+}
+
 .site-shell-header__root {
-  background: color-mix(in srgb, var(--ui-bg) 82%, transparent);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid color-mix(in srgb, var(--ui-border) 72%, transparent);
+  background:
+    linear-gradient(180deg, var(--site-shell-surface) 0%, color-mix(in srgb, var(--site-shell-surface-muted) 92%, transparent) 100%),
+    radial-gradient(circle at top center, color-mix(in srgb, var(--color-primary) 6%, transparent), transparent 36%);
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-primary) 34%, var(--ui-border) 66%);
+  box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--color-primary) 10%, transparent);
 }
 
 .dashboard-shell-header__root {
   background:
-    linear-gradient(180deg, color-mix(in srgb, var(--ui-bg) 86%, transparent), color-mix(in srgb, var(--ui-bg) 78%, transparent)),
-    radial-gradient(circle at top right, color-mix(in srgb, var(--color-primary) 10%, transparent), transparent 32%);
+    linear-gradient(180deg, var(--site-shell-surface) 0%, color-mix(in srgb, var(--site-shell-surface-muted) 92%, transparent) 100%),
+    radial-gradient(circle at top center, color-mix(in srgb, var(--color-primary) 6%, transparent), transparent 36%);
 }
 
 .site-shell-header__container {
@@ -495,6 +566,54 @@ button:disabled {
 
 .header-mobile-panel {
   gap: 1rem;
+}
+
+.dashboard-sidebar-brand {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.dashboard-sidebar-brand__badge {
+  flex-shrink: 0;
+}
+
+.dashboard-workspace-card {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--ui-bg) 96%, transparent), color-mix(in srgb, var(--ui-bg-muted) 86%, transparent)),
+    radial-gradient(circle at top right, color-mix(in srgb, var(--color-primary) 12%, transparent), transparent 40%);
+  border: 1px solid color-mix(in srgb, var(--ui-border) 76%, transparent);
+  border-radius: calc(var(--radius-lg) + 2px);
+  box-shadow: 0 18px 40px rgba(14, 12, 11, 0.06);
+  display: grid;
+  gap: 0.55rem;
+  padding: 1rem;
+}
+
+.dashboard-workspace-card__eyebrow {
+  color: var(--color-primary-dark);
+  font-size: 0.73rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.dashboard-workspace-card__title {
+  color: var(--color-text);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  margin: 0;
+}
+
+.dashboard-workspace-card__copy {
+  color: var(--color-text-muted);
+  font-size: 0.88rem;
+  line-height: 1.6;
+  margin: 0;
 }
 
 .brand-link {

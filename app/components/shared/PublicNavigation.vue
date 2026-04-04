@@ -1,7 +1,6 @@
 <script setup lang="ts">
 const props = withDefaults(
   defineProps<{
-    isAuthenticated: boolean
     orientation?: 'horizontal' | 'vertical'
   }>(),
   {
@@ -13,32 +12,14 @@ const { appIcons } = useSiteTheme()
 const route = useRoute()
 
 const items = computed(() => {
-  const base = [
+  return [
     {
-      label: 'Explorar',
+      label: 'Restaurantes',
       to: '/',
       icon: appIcons.value.compass,
       matches: ['/', '/r/']
     }
-  ]
-
-  if (props.isAuthenticated) {
-    base.push({
-      label: 'Dashboard',
-      to: '/dashboard',
-      icon: appIcons.value.dashboard,
-      matches: ['/dashboard']
-    })
-  } else {
-    base.push({
-      label: 'Acceder',
-      to: '/login',
-      icon: appIcons.value.login,
-      matches: ['/login']
-    })
-  }
-
-  return base.map((item) => ({
+  ].map((item) => ({
     ...item,
     active: item.matches.some((match) => {
       if (match === '/') {

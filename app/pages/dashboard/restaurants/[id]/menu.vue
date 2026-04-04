@@ -66,49 +66,65 @@ function handleItemsUpdated(nextItems: DashboardMenuItem[]) {
 </script>
 
 <template>
-  <div class="section-stack">
-    <DashboardRestaurantWorkspaceNav
-      :restaurant-id="restaurant.id"
-      :restaurant-name="restaurant.name"
-      :restaurant-slug="restaurant.slug"
-    />
+  <DashboardPagePanel
+    :description="`Gestiona categorías y platillos del restaurante ${restaurant.name}.`"
+    :title="`Menú de ${restaurant.name}`"
+  >
+    <template #actions>
+      <UiButton
+        :to="`/dashboard/restaurants/${restaurant.id}`"
+        :icon="appIcons.back"
+        intent="neutral"
+        size="sm"
+      >
+        Volver al perfil
+      </UiButton>
+    </template>
 
-    <UiCard padding="lg">
-      <div class="page-header">
-        <UiSectionHeader
-          :title="restaurant.name"
-          description="Organiza categorías, agrega platillos y controla qué se ve en la página pública."
-          eyebrow="Menú"
-          title-tag="h1"
-        />
+    <div class="section-stack">
+      <DashboardRestaurantWorkspaceNav
+        :restaurant-id="restaurant.id"
+        :restaurant-name="restaurant.name"
+        :restaurant-slug="restaurant.slug"
+      />
 
-        <div class="button-row">
-          <UiButton
-            :to="`/dashboard/restaurants/${restaurant.id}`"
-            :icon="appIcons.back"
-            intent="neutral"
-            variant="outline"
-          >
-            Volver al perfil
-          </UiButton>
-          <UiButton :to="`/r/${restaurant.slug}`" :icon="appIcons.external" target="_blank">
-            Ver público
-          </UiButton>
+      <UiCard padding="lg">
+        <div class="page-header">
+          <UiSectionHeader
+            :title="restaurant.name"
+            description="Organiza categorías, agrega platillos y controla qué se ve en la página pública."
+            eyebrow="Menú"
+            title-tag="h1"
+          />
+
+          <div class="button-row">
+            <UiButton
+              :to="`/dashboard/restaurants/${restaurant.id}`"
+              :icon="appIcons.back"
+              intent="neutral"
+              variant="outline"
+            >
+              Volver al perfil
+            </UiButton>
+            <UiButton :to="`/r/${restaurant.slug}`" :icon="appIcons.external" target="_blank">
+              Ver público
+            </UiButton>
+          </div>
         </div>
-      </div>
-    </UiCard>
+      </UiCard>
 
-    <DashboardCategoryManager
-      :categories="categories"
-      :restaurant-id="restaurant.id"
-      @updated="handleCategoriesUpdated"
-    />
+      <DashboardCategoryManager
+        :categories="categories"
+        :restaurant-id="restaurant.id"
+        @updated="handleCategoriesUpdated"
+      />
 
-    <DashboardMenuItemManager
-      :categories="categories"
-      :items="items"
-      :restaurant-id="restaurant.id"
-      @updated="handleItemsUpdated"
-    />
-  </div>
+      <DashboardMenuItemManager
+        :categories="categories"
+        :items="items"
+        :restaurant-id="restaurant.id"
+        @updated="handleItemsUpdated"
+      />
+    </div>
+  </DashboardPagePanel>
 </template>
