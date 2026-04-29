@@ -120,6 +120,9 @@ importers:
       eslint-config-next:
         specifier: ^15.0.0
         version: 15.5.15(eslint@9.39.4(jiti@1.21.7))(typescript@5.9.3)
+      eslint-plugin-fudimenu:
+        specifier: file:./eslint-rules
+        version: file:eslint-rules
       postcss:
         specifier: ^8.4.47
         version: 8.5.12
@@ -1932,6 +1935,9 @@ packages:
         optional: true
       eslint-import-resolver-webpack:
         optional: true
+
+  eslint-plugin-fudimenu@file:eslint-rules:
+    resolution: {directory: eslint-rules, type: directory}
 
   eslint-plugin-import@2.32.0:
     resolution: {integrity: sha512-whOE1HFo/qJDyX4SnXzP4N6zOWn79WhnCUY/iDR0mPfQZO8wcYE4JClzI2oZrhBnnMUCBCHZhO6VQyoBU95mZA==}
@@ -5181,6 +5187,8 @@ snapshots:
       eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0)(eslint@9.39.4(jiti@1.21.7))
     transitivePeerDependencies:
       - supports-color
+
+  eslint-plugin-fudimenu@file:eslint-rules: {}
 
   eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.59.1(eslint@9.39.4(jiti@1.21.7))(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.4(jiti@1.21.7)):
     dependencies:

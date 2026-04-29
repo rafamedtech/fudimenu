@@ -1,6 +1,7 @@
 {
   "extends": ["next/core-web-vitals"],
+  "plugins": ["fudimenu"],
   "rules": {
-    "require-tenant-id-in-prisma-findmany": "error"
+    "fudimenu/require-tenant-id-in-prisma-findmany": "error"
   }
 }
