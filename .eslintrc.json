@@ -1,0 +1,6 @@
+{
+  "extends": ["next/core-web-vitals"],
+  "rules": {
+    "require-tenant-id-in-prisma-findmany": "error"
+  }
+}

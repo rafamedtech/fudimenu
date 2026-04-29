@@ -1,0 +1,240 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Locale {
+  es
+  en
+}
+
+enum MembershipRole {
+  owner
+  admin
+  staff
+}
+
+enum TenantPlan {
+  free
+  pro
+  business
+}
+
+enum WebhookEventStatus {
+  pending
+  processed
+  failed
+  ignored
+}
+
+model Tenant {
+  id            String         @id @default(dbgenerated("extensions.gen_random_uuid()")) @db.Uuid
+  createdBy     String?        @map("created_by") @db.Uuid
+  slug          String
+  name          String
+  logoUrl       String?        @map("logo_url")
+  primaryColor  String         @default("#F4B400") @map("primary_color")
+  cuisineType   String?        @map("cuisine_type")
+  defaultLocale Locale         @default(es) @map("default_locale")
+  currency      String         @default("MXN") @db.Char(3)
+  plan          TenantPlan     @default(free)
+  createdAt     DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime       @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt     DateTime?      @map("deleted_at") @db.Timestamptz(6)
+  memberships   Membership[]
+  categories    Category[]
+  items         MenuItem[]
+  slugHistory   SlugHistory[]
+  menuViews     MenuView[]
+  itemViews     ItemView[]
+  auditLogs     AuditLog[]
+  webhookEvents WebhookEvent[]
+
+  @@unique([slug])
+  @@index([createdBy])
+  @@index([deletedAt])
+  @@map("tenants")
+}
+
+model Membership {
+  tenantId  String         @map("tenant_id") @db.Uuid
+  userId    String         @map("user_id") @db.Uuid
+  role      MembershipRole
+  createdAt DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime       @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt DateTime?      @map("deleted_at") @db.Timestamptz(6)
+  tenant    Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@id([tenantId, userId])
+  @@index([userId])
+  @@index([tenantId, role])
+  @@index([deletedAt])
+  @@map("memberships")
+}
+
+model Category {
+  id        String     @id @default(dbgenerated("extensions.gen_random_uuid()")) @db.Uuid
+  tenantId  String     @map("tenant_id") @db.Uuid
+  name      String
+  sortOrder Int        @default(0) @map("sort_order")
+  isVisible Boolean    @default(true) @map("is_visible")
+  createdAt DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime   @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt DateTime?  @map("deleted_at") @db.Timestamptz(6)
+  tenant    Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  items     MenuItem[]
+
+  @@unique([tenantId, name])
+  @@index([tenantId, sortOrder])
+  @@index([tenantId, isVisible])
+  @@index([deletedAt])
+  @@map("categories")
+}
+
+model MenuItem {
+  id           String            @id @default(dbgenerated("extensions.gen_random_uuid()")) @db.Uuid
+  tenantId     String            @map("tenant_id") @db.Uuid
+  categoryId   String?           @map("category_id") @db.Uuid
+  name         String
+  description  String?
+  priceCents   Int               @default(0) @map("price_cents")
+  currency     String            @default("MXN") @db.Char(3)
+  imageUrl     String?           @map("image_url")
+  isAvailable  Boolean           @default(true) @map("is_available")
+  sortOrder    Int               @default(999) @map("sort_order")
+  createdAt    DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime          @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt    DateTime?         @map("deleted_at") @db.Timestamptz(6)
+  tenant       Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  category     Category?         @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  translations ItemTranslation[]
+  views        ItemView[]
+
+  @@index([tenantId, sortOrder, createdAt])
+  @@index([tenantId, categoryId])
+  @@index([tenantId, isAvailable])
+  @@index([categoryId])
+  @@index([deletedAt])
+  @@map("items")
+}
+
+model ItemTranslation {
+  itemId      String    @map("item_id") @db.Uuid
+  locale      Locale
+  name        String?
+  description String?
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(6)
+  item        MenuItem  @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@id([itemId, locale])
+  @@index([locale])
+  @@index([deletedAt])
+  @@map("item_translations")
+}
+
+model SlugHistory {
+  id        String    @id @default(dbgenerated("extensions.gen_random_uuid()")) @db.Uuid
+  tenantId  String    @map("tenant_id") @db.Uuid
+  slug      String
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz(6)
+  tenant    Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([slug])
+  @@index([tenantId, createdAt])
+  @@index([deletedAt])
+  @@map("slug_history")
+}
+
+model MenuView {
+  id        String     @id @default(dbgenerated("extensions.gen_random_uuid()")) @db.Uuid
+  tenantId  String     @map("tenant_id") @db.Uuid
+  sessionId String?    @map("session_id")
+  locale    Locale?
+  referrer  String?
+  userAgent String?    @map("user_agent")
+  ipHash    String?    @map("ip_hash")
+  viewedAt  DateTime   @default(now()) @map("viewed_at") @db.Timestamptz(6)
+  deletedAt DateTime?  @map("deleted_at") @db.Timestamptz(6)
+  tenant    Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  itemViews ItemView[]
+
+  @@index([tenantId, viewedAt])
+  @@index([sessionId])
+  @@index([deletedAt])
+  @@map("menu_views")
+}
+
+model ItemView {
+  id         String    @id @default(dbgenerated("extensions.gen_random_uuid()")) @db.Uuid
+  tenantId   String    @map("tenant_id") @db.Uuid
+  itemId     String    @map("item_id") @db.Uuid
+  menuViewId String?   @map("menu_view_id") @db.Uuid
+  sessionId  String?   @map("session_id")
+  locale     Locale?
+  viewedAt   DateTime  @default(now()) @map("viewed_at") @db.Timestamptz(6)
+  deletedAt  DateTime? @map("deleted_at") @db.Timestamptz(6)
+  tenant     Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  item       MenuItem  @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  menuView   MenuView? @relation(fields: [menuViewId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, viewedAt])
+  @@index([itemId, viewedAt])
+  @@index([menuViewId])
+  @@index([sessionId])
+  @@index([deletedAt])
+  @@map("item_views")
+}
+
+model AuditLog {
+  id          String    @id @default(dbgenerated("extensions.gen_random_uuid()")) @db.Uuid
+  tenantId    String?   @map("tenant_id") @db.Uuid
+  actorUserId String?   @map("actor_user_id") @db.Uuid
+  action      String
+  entityType  String    @map("entity_type")
+  entityId    String?   @map("entity_id") @db.Uuid
+  metadata    Json      @default("{}")
+  ipHash      String?   @map("ip_hash")
+  userAgent   String?   @map("user_agent")
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(6)
+  tenant      Tenant?   @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, createdAt])
+  @@index([actorUserId, createdAt])
+  @@index([entityType, entityId])
+  @@index([action])
+  @@index([deletedAt])
+  @@map("audit_log")
+}
+
+model WebhookEvent {
+  id          String             @id @default(dbgenerated("extensions.gen_random_uuid()")) @db.Uuid
+  tenantId    String?            @map("tenant_id") @db.Uuid
+  provider    String
+  eventId     String             @map("event_id")
+  eventType   String             @map("event_type")
+  payload     Json
+  status      WebhookEventStatus @default(pending)
+  retryCount  Int                @default(0) @map("retry_count")
+  error       String?
+  receivedAt  DateTime           @default(now()) @map("received_at") @db.Timestamptz(6)
+  processedAt DateTime?          @map("processed_at") @db.Timestamptz(6)
+  createdAt   DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime           @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt   DateTime?          @map("deleted_at") @db.Timestamptz(6)
+  tenant      Tenant?            @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  @@unique([provider, eventId])
+  @@index([tenantId, receivedAt])
+  @@index([provider, eventType])
+  @@index([status, receivedAt])
+  @@index([deletedAt])
+  @@map("webhook_events")
+}

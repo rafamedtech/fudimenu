@@ -1,0 +1,22 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "back": "Back",
+    "next": "Next",
+    "loading": "Loading...",
+    "empty": "Nothing here yet 👀",
+    "error": "Something went wrong. Retry.",
+    "saved": "✓ Saved",
+    "offline": "Offline — changes will sync"
+  },
+  "menu": {
+    "addItem": "Add item",
+    "soldOut": "Sold out",
+    "available": "Available"
+  },
+  "auth": {
+    "magicLinkSent": "Magic link sent to your email 🔮",
+    "loginTitle": "Sign in to FudiMenu"
+  }
+}

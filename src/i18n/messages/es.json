@@ -1,0 +1,22 @@
+{
+  "common": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "loading": "Sazonando...",
+    "empty": "Aún no hay nada por aquí 👀",
+    "error": "Algo no salió. Reintenta.",
+    "saved": "✓ Guardado",
+    "offline": "Sin internet — los cambios se guardan al volver"
+  },
+  "menu": {
+    "addItem": "Agregar platillo",
+    "soldOut": "Agotado",
+    "available": "Disponible"
+  },
+  "auth": {
+    "magicLinkSent": "Mandamos un link a tu correo 🔮",
+    "loginTitle": "Entra a FudiMenu"
+  }
+}

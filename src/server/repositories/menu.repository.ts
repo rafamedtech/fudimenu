@@ -1,0 +1,16 @@
+import 'server-only';
+import type { Category, MenuItem, Tenant } from '@/types/domain';
+
+export type MenuData = {
+  tenant: Tenant;
+  categories: Category[];
+  items: MenuItem[];
+};
+
+export interface IMenuRepository {
+  getTenantBySlug(slug: string): Promise<Tenant | null>;
+  getMenuByTenantId(id: string): Promise<MenuData>;
+  getItemsByTenantId(id: string): Promise<MenuItem[]>;
+  toggleItemAvailability(tenantId: string, itemId: string, available: boolean): Promise<MenuItem>;
+  upsertItem(tenantId: string, input: Partial<MenuItem>): Promise<MenuItem>;
+}

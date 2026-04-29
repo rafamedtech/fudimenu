@@ -1,0 +1,89 @@
+import 'server-only';
+import { mockCategories, mockItems, mockTenant } from '@/lib/mock/data';
+import type { IMenuRepository, MenuData } from '@/server/repositories/menu.repository';
+import type { Category, MenuItem, Tenant } from '@/types/domain';
+
+function cloneTenant(tenant: Tenant): Tenant {
+  return { ...tenant };
+}
+
+function cloneCategory(category: Category): Category {
+  return { ...category };
+}
+
+function cloneMenuItem(item: MenuItem): MenuItem {
+  return { ...item };
+}
+
+export class MockMenuRepository implements IMenuRepository {
+  private readonly tenant = cloneTenant(mockTenant);
+  private readonly categories = mockCategories.map(cloneCategory);
+  private readonly items = mockItems.map(cloneMenuItem);
+
+  async getTenantBySlug(slug: string): Promise<Tenant | null> {
+    return slug === this.tenant.slug ? cloneTenant(this.tenant) : null;
+  }
+
+  async getMenuByTenantId(tenantId: string): Promise<MenuData> {
+    if (tenantId !== this.tenant.id) throw new Error('not_found');
+
+    return {
+      tenant: cloneTenant(this.tenant),
+      categories: this.categories.map(cloneCategory),
+      items: this.items.filter((item) => item.tenantId === tenantId).map(cloneMenuItem),
+    };
+  }
+
+  async getItemsByTenantId(tenantId: string): Promise<MenuItem[]> {
+    return this.items.filter((item) => item.tenantId === tenantId).map(cloneMenuItem);
+  }
+
+  async toggleItemAvailability(
+    tenantId: string,
+    itemId: string,
+    available: boolean,
+  ): Promise<MenuItem> {
+    const idx = this.items.findIndex((item) => item.id === itemId && item.tenantId === tenantId);
+    if (idx < 0) throw new Error('not_found');
+
+    this.items[idx] = {
+      ...this.items[idx],
+      isAvailable: available,
+      updatedAt: new Date().toISOString(),
+    };
+    return cloneMenuItem(this.items[idx]);
+  }
+
+  async upsertItem(tenantId: string, input: Partial<MenuItem>): Promise<MenuItem> {
+    if (input.id) {
+      const idx = this.items.findIndex((item) => item.id === input.id && item.tenantId === tenantId);
+      if (idx >= 0) {
+        this.items[idx] = {
+          ...this.items[idx],
+          ...input,
+          tenantId,
+          updatedAt: new Date().toISOString(),
+        };
+        return cloneMenuItem(this.items[idx]);
+      }
+    }
+
+    const now = new Date().toISOString();
+    const created: MenuItem = {
+      id: `itm_${crypto.randomUUID().slice(0, 8)}`,
+      tenantId,
+      categoryId: input.categoryId ?? null,
+      name: input.name ?? 'Sin nombre',
+      description: input.description ?? null,
+      priceCents: input.priceCents ?? 0,
+      currency: input.currency ?? 'MXN',
+      imageUrl: input.imageUrl ?? null,
+      isAvailable: input.isAvailable ?? true,
+      sortOrder: input.sortOrder ?? 999,
+      createdAt: now,
+      updatedAt: now,
+    };
+    this.items.push(created);
+    return cloneMenuItem(created);
+  }
+}
