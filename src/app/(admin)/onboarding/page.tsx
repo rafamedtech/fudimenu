@@ -8,6 +8,7 @@ import { track } from '@/lib/analytics/events';
 import { completeOnboardingAction } from '@/server/actions/onboarding.actions';
 
 const TOTAL_STEPS = 2;
+const POST_ONBOARDING_PATH = '/menu?welcome=1';
 
 const cuisines = [
   { id: 'mexicana', label: '🌮 Mexicana' },
@@ -26,8 +27,6 @@ export default function OnboardingPage() {
   const [itemName, setItemName] = useState('');
   const [price, setPrice] = useState<number>(0);
   const [loading, setLoading] = useState(false);
-  const [menuSlug, setMenuSlug] = useState<string | null>(null);
-  const [showFinished, setShowFinished] = useState(false);
   const trimmedName = name.trim();
   const trimmedItemName = itemName.trim();
 
@@ -49,9 +48,8 @@ export default function OnboardingPage() {
         priceCents: Math.round(price * 100),
       });
       track('onboarding_completed', { tenantId: res.tenantId });
-      setMenuSlug(res.slug);
-      setShowFinished(true);
       toast.success('¡Tu menú ya vive online! 🎉');
+      router.push(POST_ONBOARDING_PATH);
     } catch {
       toast.error('No pude crear el platillo. Reintenta.');
     } finally {
@@ -62,8 +60,6 @@ export default function OnboardingPage() {
   const canNext =
     (step === 1 && trimmedName.length > 0 && cuisine.length > 0) ||
     (step === 2 && trimmedItemName.length > 0 && price > 0);
-  const publicMenuPath = menuSlug ? `/m/${menuSlug}` : '/menu';
-  const displaySlug = (menuSlug ?? trimmedName.toLowerCase().replace(/\s+/g, '-')) || 'tu-restaurante';
 
   return (
     <main className="mx-auto flex min-h-dvh max-w-md flex-col px-6 pb-6 pt-8">
@@ -151,36 +147,6 @@ export default function OnboardingPage() {
           </Button>
         )}
       </div>
-
-      {showFinished && (
-        <div
-          className="fixed inset-0 z-50 flex items-end bg-ink-900/40 px-4 py-6 sm:items-center sm:justify-center"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="onboarding-finished-title"
-        >
-          <div className="w-full max-w-sm rounded-md bg-white p-6 shadow-xl">
-            <div className="text-5xl">🎉</div>
-            <h2 id="onboarding-finished-title" className="mt-4 text-2xl font-extrabold">
-              ¡Listo, jefe!
-            </h2>
-            <p className="mt-2 text-ink-500">
-              Tu menú ya vive en internet. Compártelo donde sea; el QR se queda fijo aunque cambies precios.
-            </p>
-            <div className="mt-4 overflow-hidden rounded-md bg-crema-100 p-4 text-center">
-              <code className="break-all text-sm">fudimenu.app/m/{displaySlug}</code>
-            </div>
-            <div className="mt-5 flex flex-col gap-3">
-              <Button size="lg" onClick={() => router.push(publicMenuPath)}>
-                Ver mi menú
-              </Button>
-              <Button variant="outline" size="lg" onClick={() => router.push('/menu')}>
-                Editar platillos
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
     </main>
   );
 }

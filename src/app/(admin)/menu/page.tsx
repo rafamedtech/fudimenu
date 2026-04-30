@@ -3,6 +3,7 @@ import { TenantSwitcher } from '@/components/admin/tenant-switcher';
 import { AppHeader } from '@/components/layout/app-header';
 import { Fab } from '@/components/layout/fab';
 import { ItemCard } from '@/components/menu/item-card';
+import { Card } from '@/components/ui/card';
 import { ItemCardSkeleton } from '@/components/ui/skeleton';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Button } from '@/components/ui/button';
@@ -10,8 +11,14 @@ import { requireAuth } from '@/server/guards/require-auth';
 import { menuService } from '@/server/services/menu.service';
 import Link from 'next/link';
 
-export default async function MenuPage() {
+type MenuPageProps = {
+  searchParams: Promise<{ welcome?: string }>;
+};
+
+export default async function MenuPage({ searchParams }: MenuPageProps) {
+  const { welcome } = await searchParams;
   const ctx = await requireAuth();
+  const showWelcomeBanner = welcome === '1';
 
   return (
     <>
@@ -20,6 +27,13 @@ export default async function MenuPage() {
         right={<TenantSwitcher activeTenantId={ctx.tenantId} memberships={ctx.memberships} />}
       />
       <main className="flex-1 px-4">
+        {showWelcomeBanner && (
+          <Card className="mb-4 border-[1.5px] border-mostaza-500 bg-mostaza-50 shadow-sm">
+            <p className="text-sm font-extrabold text-ink-900">
+              Agrega 4 platillos más → desbloquea analytics 📊
+            </p>
+          </Card>
+        )}
         <Suspense fallback={<MenuListLoading />}>
           <MenuList tenantId={ctx.tenantId} />
         </Suspense>
