@@ -3,11 +3,13 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { createSupabaseBrowser } from '@/lib/supabase/client';
 import { signInWithMagicLinkAction } from '@/server/actions/auth.actions';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -22,6 +24,30 @@ export default function LoginPage() {
       toast.error('No pude enviar el link. Reintenta.');
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleGoogleSignIn() {
+    setGoogleLoading(true);
+    try {
+      const supabase = createSupabaseBrowser();
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            prompt: 'select_account',
+          },
+        },
+      });
+
+      if (error) {
+        toast.error(error.message);
+        setGoogleLoading(false);
+      }
+    } catch {
+      toast.error('No pude iniciar sesión con Google. Reintenta.');
+      setGoogleLoading(false);
     }
   }
 
@@ -52,7 +78,13 @@ export default function LoginPage() {
         <div className="h-px flex-1 bg-ink-100" />o<div className="h-px flex-1 bg-ink-100" />
       </div>
 
-      <Button variant="outline" size="lg">
+      <Button
+        type="button"
+        variant="outline"
+        size="lg"
+        loading={googleLoading}
+        onClick={handleGoogleSignIn}
+      >
         Continuar con Google
       </Button>
     </main>
