@@ -10,14 +10,20 @@ import { itemSchema, type ItemInput } from '@/lib/validators/item.schema';
 import { upsertItemAction } from '@/server/actions/items.actions';
 import { toUserMessage } from '@/lib/api/errors';
 import { track } from '@/lib/analytics/events';
-import type { MenuItem } from '@/types/domain';
+import type { Category, MenuItem } from '@/types/domain';
 
 interface Props {
   initial: MenuItem | null;
+  categories: Category[];
 }
 
-export function ItemEditorForm({ initial }: Props) {
+export function ItemEditorForm({ initial, categories }: Props) {
   const router = useRouter();
+  const fallbackCategoryId = categories[0]?.id ?? null;
+  const initialCategoryId =
+    initial?.categoryId && categories.some((category) => category.id === initial.categoryId)
+      ? initial.categoryId
+      : fallbackCategoryId;
   const {
     register,
     handleSubmit,
@@ -28,7 +34,7 @@ export function ItemEditorForm({ initial }: Props) {
     resolver: zodResolver(itemSchema),
     defaultValues: {
       id: initial?.id,
-      categoryId: initial?.categoryId ?? null,
+      categoryId: initialCategoryId,
       name: initial?.name ?? '',
       description: initial?.description ?? '',
       priceCents: initial?.priceCents ?? 0,
@@ -43,7 +49,10 @@ export function ItemEditorForm({ initial }: Props) {
 
   async function onSubmit(data: ItemInput) {
     try {
-      const res = await upsertItemAction(data);
+      const res = await upsertItemAction({
+        ...data,
+        categoryId: data.categoryId ?? fallbackCategoryId,
+      });
       if (res.ok) {
         toast.success('✓ Guardado');
         track(initial ? 'item_edited' : 'item_created', {
@@ -73,6 +82,28 @@ export function ItemEditorForm({ initial }: Props) {
         error={errors.name?.message}
         {...register('name')}
       />
+
+      <div>
+        <label className="mb-1.5 block text-sm font-medium text-ink-700" htmlFor="categoryId">
+          Categoría
+        </label>
+        <select
+          id="categoryId"
+          required={categories.length > 0}
+          disabled={categories.length === 0}
+          className="h-14 w-full rounded-md border-[1.5px] border-ink-300 bg-white px-4 text-base text-ink-900 outline-none focus-within:border-mostaza-500 focus-within:shadow-glow-mostaza disabled:cursor-not-allowed disabled:bg-crema-100 disabled:text-ink-500"
+          {...register('categoryId')}
+        >
+          {categories.map((category) => (
+            <option key={category.id} value={category.id}>
+              {category.name}
+            </option>
+          ))}
+        </select>
+        {errors.categoryId?.message && (
+          <p className="mt-1 text-sm text-red-600">{errors.categoryId.message}</p>
+        )}
+      </div>
 
       <Input
         label="Precio"

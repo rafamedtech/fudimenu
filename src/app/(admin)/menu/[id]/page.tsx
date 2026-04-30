@@ -12,7 +12,7 @@ interface Props {
 export default async function ItemEditPage({ params }: Props) {
   const { id } = await params;
   const ctx = await requireAuth();
-  const items = await menuService.getItemsByTenantId(ctx.tenantId);
+  const { categories, items } = await menuService.getMenuByTenantId(ctx.tenantId);
   const item = items.find((i) => i.id === id);
 
   if (id !== 'new' && !item) notFound();
@@ -25,7 +25,7 @@ export default async function ItemEditPage({ params }: Props) {
         right={<TenantSwitcher activeTenantId={ctx.tenantId} memberships={ctx.memberships} />}
       />
       <main className="flex-1 px-4 pb-24">
-        <ItemEditorForm initial={item ?? null} />
+        <ItemEditorForm initial={item ?? null} categories={categories} />
       </main>
     </>
   );
