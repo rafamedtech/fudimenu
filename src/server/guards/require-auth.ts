@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { getPrisma } from '@/lib/db/prisma';
 import { createSupabaseServer } from '@/lib/supabase/server';
 import { mockTenant } from '@/lib/mock/data';
+import { ACTIVE_TENANT_COOKIE } from '@/server/tenants/active-tenant-cookie';
 
 export type AuthContext = {
   userId: string;
@@ -43,11 +44,16 @@ export async function requireAuth(): Promise<AuthContext> {
 
   if (!user) redirect('/login');
 
+  const cookieStore = await cookies();
+  const activeTenantId = cookieStore.get(ACTIVE_TENANT_COOKIE)?.value;
   const prisma = getPrisma();
-  const membership = await prisma.membership.findFirst({
-    where: { userId: user.id },
+  const memberships = await prisma.membership.findMany({
+    where: { userId: user.id, deletedAt: null },
     select: { tenantId: true, role: true },
+    orderBy: { createdAt: 'asc' },
   });
+  const membership =
+    memberships.find(({ tenantId }) => tenantId === activeTenantId) ?? memberships[0];
 
   if (!membership) redirect('/onboarding');
 

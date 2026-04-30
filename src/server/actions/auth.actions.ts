@@ -1,8 +1,18 @@
 'use server';
+import { revalidatePath } from 'next/cache';
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 import { z } from 'zod';
+import { getPrisma } from '@/lib/db/prisma';
 import { createSupabaseServer } from '@/lib/supabase/server';
+import { mockTenant } from '@/lib/mock/data';
+import {
+  ACTIVE_TENANT_COOKIE,
+  activeTenantCookieOptions,
+} from '@/server/tenants/active-tenant-cookie';
 
 const emailSchema = z.string().email('Correo inválido');
+const tenantIdSchema = z.string().min(1, 'Restaurante inválido');
 
 export async function signInWithMagicLinkAction(formData: FormData) {
   const email = emailSchema.parse(formData.get('email'));
@@ -26,8 +36,47 @@ export async function signInWithMagicLinkAction(formData: FormData) {
 }
 
 export async function signOutAction() {
+  const cookieStore = await cookies();
+  cookieStore.delete(ACTIVE_TENANT_COOKIE);
+
   if (process.env.USE_MOCKS === 'true') return { ok: true as const };
   const supabase = await createSupabaseServer();
   await supabase.auth.signOut();
   return { ok: true as const };
+}
+
+export async function switchActiveTenantAction(input: unknown) {
+  const tenantId = tenantIdSchema.parse(input);
+  const cookieStore = await cookies();
+
+  if (process.env.USE_MOCKS === 'true') {
+    if (tenantId !== mockTenant.id) {
+      return { ok: false as const, error: 'No tienes acceso a este restaurante.' };
+    }
+
+    cookieStore.set(ACTIVE_TENANT_COOKIE, tenantId, activeTenantCookieOptions);
+    revalidatePath('/', 'layout');
+    return { ok: true as const, tenantId };
+  }
+
+  const supabase = await createSupabaseServer();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) redirect('/login');
+
+  const membership = await getPrisma().membership.findFirst({
+    where: { userId: user.id, tenantId, deletedAt: null },
+    select: { tenantId: true },
+  });
+
+  if (!membership) {
+    return { ok: false as const, error: 'No tienes acceso a este restaurante.' };
+  }
+
+  cookieStore.set(ACTIVE_TENANT_COOKIE, membership.tenantId, activeTenantCookieOptions);
+  revalidatePath('/', 'layout');
+
+  return { ok: true as const, tenantId: membership.tenantId };
 }

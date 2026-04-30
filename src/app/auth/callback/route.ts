@@ -1,5 +1,10 @@
 import { NextResponse, type NextRequest } from 'next/server';
+import { getPrisma } from '@/lib/db/prisma';
 import { createSupabaseServer } from '@/lib/supabase/server';
+import {
+  ACTIVE_TENANT_COOKIE,
+  activeTenantCookieOptions,
+} from '@/server/tenants/active-tenant-cookie';
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
@@ -10,7 +15,30 @@ export async function GET(request: NextRequest) {
     const supabase = await createSupabaseServer();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
-      return NextResponse.redirect(`${origin}${next}`);
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      const response = NextResponse.redirect(`${origin}${next}`);
+
+      if (user) {
+        const membership = await getPrisma().membership.findFirst({
+          where: { userId: user.id, deletedAt: null },
+          select: { tenantId: true },
+          orderBy: { createdAt: 'asc' },
+        });
+
+        if (membership) {
+          response.cookies.set(
+            ACTIVE_TENANT_COOKIE,
+            membership.tenantId,
+            activeTenantCookieOptions,
+          );
+        } else {
+          response.cookies.delete(ACTIVE_TENANT_COOKIE);
+        }
+      }
+
+      return response;
     }
   }
 
