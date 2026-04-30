@@ -5,6 +5,7 @@ import { menuService } from '@/server/services/menu.service';
 import type { Metadata } from 'next';
 
 export const revalidate = 60;
+const OTHER_CATEGORY_NAME = 'Otros';
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -28,9 +29,31 @@ export default async function PublicMenuPage({ params }: Props) {
 
   const { categories, items } = await menuService.getMenuByTenantId(tenant.id);
 
-  const itemsByCategory = categories.map((cat) => ({
+  const uncategorizedItems = items.filter((item) => item.categoryId === null);
+  const otherCategory = categories.find(
+    (category) => category.name.trim().toLocaleLowerCase() === OTHER_CATEGORY_NAME.toLocaleLowerCase(),
+  );
+  const visibleCategories =
+    uncategorizedItems.length > 0 && !otherCategory
+      ? [
+          ...categories,
+          {
+            id: 'uncategorized',
+            tenantId: tenant.id,
+            name: OTHER_CATEGORY_NAME,
+            sortOrder: 999,
+            isVisible: true,
+          },
+        ]
+      : categories;
+
+  const itemsByCategory = visibleCategories.map((cat) => ({
     category: cat,
-    items: items.filter((i) => i.categoryId === cat.id),
+    items: items.filter((item) => item.categoryId === cat.id).concat(
+      cat.id === otherCategory?.id || (cat.id === 'uncategorized' && !otherCategory)
+        ? uncategorizedItems
+        : [],
+    ),
   }));
 
   return (
@@ -59,7 +82,7 @@ export default async function PublicMenuPage({ params }: Props) {
       </header>
 
       <nav className="sticky top-0 z-10 flex gap-2 overflow-x-auto bg-crema-50/95 px-4 py-3 backdrop-blur">
-        {categories.map((cat) => (
+        {visibleCategories.map((cat) => (
           <a
             key={cat.id}
             href={`#cat-${cat.id}`}
