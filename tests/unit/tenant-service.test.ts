@@ -28,7 +28,7 @@ describe('tenantService', () => {
     vi.resetModules();
   });
 
-  it('creates the default Otros category when a tenant is created from onboarding', async () => {
+  it('seeds four editable categories for the selected cuisine when onboarding creates a tenant', async () => {
     vi.stubGlobal('crypto', { randomUUID: mocks.randomUUID });
 
     const { tenantService } = await import('../../src/server/services/tenant.service');
@@ -45,12 +45,29 @@ describe('tenantService', () => {
       tenantId: '11111111-2222-4333-8444-555555555555',
       slug: 'taqueria-norte-11111111',
     });
-    expect(mocks.tx.category.create).toHaveBeenCalledWith(
+    expect(mocks.tx.category.create).toHaveBeenCalledTimes(4);
+    expect(mocks.tx.category.create).toHaveBeenNthCalledWith(
+      1,
       expect.objectContaining({
-        data: expect.objectContaining({
-          name: 'Otros',
-          sortOrder: 999,
-        }),
+        data: expect.objectContaining({ name: 'Tacos', sortOrder: 0 }),
+      }),
+    );
+    expect(mocks.tx.category.create).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({
+        data: expect.objectContaining({ name: 'Bebidas', sortOrder: 1 }),
+      }),
+    );
+    expect(mocks.tx.category.create).toHaveBeenNthCalledWith(
+      3,
+      expect.objectContaining({
+        data: expect.objectContaining({ name: 'Postres', sortOrder: 2 }),
+      }),
+    );
+    expect(mocks.tx.category.create).toHaveBeenNthCalledWith(
+      4,
+      expect.objectContaining({
+        data: expect.objectContaining({ name: 'Otros', sortOrder: 3 }),
       }),
     );
     expect(mocks.tx.menuItem.create).toHaveBeenCalledWith(
@@ -60,5 +77,27 @@ describe('tenantService', () => {
         }),
       }),
     );
+  });
+
+  it('uses cuisine-specific category presets', async () => {
+    vi.stubGlobal('crypto', { randomUUID: mocks.randomUUID });
+
+    const { tenantService } = await import('../../src/server/services/tenant.service');
+
+    await tenantService.createFromOnboarding({
+      userId: 'user-1',
+      name: 'Pizza Centro',
+      cuisine: 'pizza',
+      itemName: 'Pizza margarita',
+      priceCents: 12000,
+    });
+
+    expect(mocks.tx.category.create).toHaveBeenCalledTimes(4);
+    expect(mocks.tx.category.create.mock.calls.map(([call]) => call.data.name)).toEqual([
+      'Pizzas',
+      'Pastas',
+      'Bebidas',
+      'Otros',
+    ]);
   });
 });

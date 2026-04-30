@@ -3,15 +3,14 @@ import { getPrisma } from '@/lib/db/prisma';
 import { slugify } from '@/lib/utils';
 
 const DEFAULT_CATEGORY_NAME = 'Otros';
-const DEFAULT_CATEGORY_SORT_ORDER = 999;
 
 const categoryPresets: Record<string, string[]> = {
-  mexicana: ['Tacos', 'Bebidas', 'Postres'],
-  pizza: ['Pizzas', 'Entradas', 'Bebidas'],
-  burgers: ['Hamburguesas', 'Acompañamientos', 'Bebidas'],
-  cafe: ['Café', 'Panadería', 'Bebidas frías'],
-  sushi: ['Rollos', 'Entradas', 'Bebidas'],
-  saludable: ['Bowls', 'Ensaladas', 'Bebidas'],
+  mexicana: ['Tacos', 'Bebidas', 'Postres', DEFAULT_CATEGORY_NAME],
+  pizza: ['Pizzas', 'Pastas', 'Bebidas', DEFAULT_CATEGORY_NAME],
+  burgers: ['Hamburguesas', 'Acompañamientos', 'Bebidas', DEFAULT_CATEGORY_NAME],
+  cafe: ['Cafés', 'Alimentos', 'Postres', DEFAULT_CATEGORY_NAME],
+  sushi: ['Rollos', 'Nigiris', 'Bebidas', DEFAULT_CATEGORY_NAME],
+  saludable: ['Bowls', 'Ensaladas', 'Jugos', DEFAULT_CATEGORY_NAME],
 };
 
 type CompleteOnboardingTenantInput = {
@@ -23,14 +22,11 @@ type CompleteOnboardingTenantInput = {
 };
 
 function getStarterCategories(cuisine: string) {
-  const names = categoryPresets[cuisine] ?? ['Menú', 'Bebidas', 'Especiales'];
-  const categoryNames = names.includes(DEFAULT_CATEGORY_NAME)
-    ? names
-    : [...names, DEFAULT_CATEGORY_NAME];
+  const categoryNames = categoryPresets[cuisine] ?? ['Menú', 'Bebidas', 'Especiales', DEFAULT_CATEGORY_NAME];
 
   return categoryNames.map((name, index) => ({
     name,
-    sortOrder: name === DEFAULT_CATEGORY_NAME ? DEFAULT_CATEGORY_SORT_ORDER : index,
+    sortOrder: index,
   }));
 }
 
