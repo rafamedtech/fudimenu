@@ -3,8 +3,8 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { getPrisma } from '@/lib/db/prisma';
 import { createSupabaseServer } from '@/lib/supabase/server';
-import { slugify } from '@/lib/utils';
 import { mockTenant } from '@/lib/mock/data';
+import { tenantService } from '@/server/services/tenant.service';
 
 const onboardingSchema = z.object({
   name: z.string().min(1).max(80),
@@ -12,15 +12,6 @@ const onboardingSchema = z.object({
   itemName: z.string().min(1).max(80),
   priceCents: z.number().int().min(1).max(10_000_00),
 });
-
-const categoryPresets: Record<string, string[]> = {
-  mexicana: ['Tacos', 'Bebidas', 'Postres'],
-  pizza: ['Pizzas', 'Entradas', 'Bebidas'],
-  burgers: ['Hamburguesas', 'Acompañamientos', 'Bebidas'],
-  cafe: ['Café', 'Panadería', 'Bebidas frías'],
-  sushi: ['Rollos', 'Entradas', 'Bebidas'],
-  saludable: ['Bowls', 'Ensaladas', 'Bebidas'],
-};
 
 export async function completeOnboardingAction(input: unknown) {
   const data = onboardingSchema.parse(input);
@@ -46,56 +37,12 @@ export async function completeOnboardingAction(input: unknown) {
     return { ok: true as const, tenantId: existingMembership.tenantId, slug: null };
   }
 
-  const tenantId = crypto.randomUUID();
-  const slug = `${slugify(data.name) || 'restaurante'}-${tenantId.slice(0, 8)}`;
-  const categoryNames = categoryPresets[data.cuisine] ?? ['Menú', 'Bebidas', 'Especiales'];
-
-  await prisma.$transaction(async (tx) => {
-    await tx.tenant.create({
-      data: {
-        id: tenantId,
-        createdBy: user.id,
-        slug,
-        name: data.name,
-        cuisineType: data.cuisine,
-        currency: 'MXN',
-        defaultLocale: 'es',
-        plan: 'free',
-      },
-    });
-
-    await tx.membership.create({
-      data: {
-        tenantId,
-        userId: user.id,
-        role: 'owner',
-      },
-    });
-
-    const categories = await Promise.all(
-      categoryNames.map((name, sortOrder) =>
-        tx.category.create({
-          data: {
-            tenantId,
-            name,
-            sortOrder,
-          },
-          select: { id: true },
-        }),
-      ),
-    );
-
-    await tx.menuItem.create({
-      data: {
-        tenantId,
-        categoryId: categories[0]?.id ?? null,
-        name: data.itemName,
-        priceCents: data.priceCents,
-        currency: 'MXN',
-        isAvailable: true,
-        sortOrder: 0,
-      },
-    });
+  const { tenantId, slug } = await tenantService.createFromOnboarding({
+    userId: user.id,
+    name: data.name,
+    cuisine: data.cuisine,
+    itemName: data.itemName,
+    priceCents: data.priceCents,
   });
 
   return { ok: true as const, tenantId, slug };
