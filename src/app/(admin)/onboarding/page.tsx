@@ -1,4 +1,5 @@
 'use client';
+import Image from 'next/image';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
@@ -27,8 +28,11 @@ export default function OnboardingPage() {
   const [itemName, setItemName] = useState('');
   const [price, setPrice] = useState<number>(0);
   const [loading, setLoading] = useState(false);
+  const [menuSlug, setMenuSlug] = useState<string | null>(null);
+  const [menuUrl, setMenuUrl] = useState('');
   const trimmedName = name.trim();
   const trimmedItemName = itemName.trim();
+  const showCelebration = Boolean(menuSlug && menuUrl);
 
   function next() {
     track('onboarding_step', { step });
@@ -48,13 +52,40 @@ export default function OnboardingPage() {
         priceCents: Math.round(price * 100),
       });
       track('onboarding_completed', { tenantId: res.tenantId });
+      setMenuSlug(res.slug);
+      setMenuUrl(`${window.location.origin}/m/${res.slug}`);
       toast.success('¡Tu menú ya vive online! 🎉');
-      router.push(POST_ONBOARDING_PATH);
     } catch {
       toast.error('No pude crear el platillo. Reintenta.');
     } finally {
       setLoading(false);
     }
+  }
+
+  async function copyMenuLink() {
+    try {
+      await navigator.clipboard.writeText(menuUrl);
+      toast.success('Link copiado');
+    } catch {
+      toast.error('No pude copiar el link.');
+    }
+  }
+
+  async function shareMenu() {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: trimmedName || 'Mi menú',
+          text: 'Ya puedes ver mi menú aquí:',
+          url: menuUrl,
+        });
+        return;
+      } catch (err) {
+        if (err instanceof DOMException && err.name === 'AbortError') return;
+      }
+    }
+
+    await copyMenuLink();
   }
 
   const canNext =
@@ -147,6 +178,55 @@ export default function OnboardingPage() {
           </Button>
         )}
       </div>
+
+      {showCelebration && (
+        <div
+          className="fixed inset-0 z-50 flex items-end bg-ink-900/40 px-4 py-6 sm:items-center sm:justify-center"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="onboarding-celebration-title"
+        >
+          <div className="w-full max-w-sm rounded-md bg-white p-6 shadow-xl">
+            <div className="text-5xl" aria-hidden>
+              🎉
+            </div>
+            <h2 id="onboarding-celebration-title" className="mt-4 text-2xl font-extrabold">
+              ¡Listo, jefe!
+            </h2>
+            <p className="mt-2 text-sm text-ink-500">
+              Tu menú ya vive en internet. Comparte el link o escanea este QR.
+            </p>
+
+            <div className="mt-4 flex items-center gap-4 rounded-md bg-crema-100 p-4">
+              <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-md bg-white">
+                <Image
+                  src={`/api/qr/${menuSlug}`}
+                  alt="QR del menú"
+                  fill
+                  sizes="96px"
+                  className="object-contain p-2"
+                />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-semibold uppercase text-ink-500">Link de tu menú</p>
+                <p className="mt-1 break-all text-sm font-bold text-ink-900">{menuUrl}</p>
+              </div>
+            </div>
+
+            <div className="mt-5 grid grid-cols-2 gap-3">
+              <Button variant="outline" size="lg" onClick={copyMenuLink}>
+                Copiar link
+              </Button>
+              <Button variant="outline" size="lg" onClick={shareMenu}>
+                Compartir
+              </Button>
+            </div>
+            <Button size="lg" className="mt-3 w-full" onClick={() => router.push(POST_ONBOARDING_PATH)}>
+              Seguir editando
+            </Button>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

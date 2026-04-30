@@ -30,11 +30,18 @@ export async function completeOnboardingAction(input: unknown) {
   const prisma = getPrisma();
   const existingMembership = await prisma.membership.findFirst({
     where: { userId: user.id },
-    select: { tenantId: true },
+    select: {
+      tenantId: true,
+      tenant: { select: { slug: true } },
+    },
   });
 
   if (existingMembership) {
-    return { ok: true as const, tenantId: existingMembership.tenantId, slug: null };
+    return {
+      ok: true as const,
+      tenantId: existingMembership.tenantId,
+      slug: existingMembership.tenant.slug,
+    };
   }
 
   const { tenantId, slug } = await tenantService.createFromOnboarding({
