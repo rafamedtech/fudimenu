@@ -1,10 +1,17 @@
 import { AppHeader } from '@/components/layout/app-header';
+import { TenantSwitcher } from '@/components/admin/tenant-switcher';
 import { Card } from '@/components/ui/card';
+import { requireAuth } from '@/server/guards/require-auth';
 
-export default function AnalyticsPage() {
+export default async function AnalyticsPage() {
+  const ctx = await requireAuth();
+
   return (
     <>
-      <AppHeader title="Stats" />
+      <AppHeader
+        title="Stats"
+        right={<TenantSwitcher activeTenantId={ctx.tenantId} memberships={ctx.memberships} />}
+      />
       <main className="flex flex-col gap-4 px-4">
         <Card className="bg-gradient-to-br from-mostaza-50 to-white">
           <p className="text-sm font-medium text-ink-500">Vistas semana 📈</p>

@@ -6,11 +6,21 @@ import { createSupabaseServer } from '@/lib/supabase/server';
 import { mockTenant } from '@/lib/mock/data';
 import { ACTIVE_TENANT_COOKIE } from '@/server/tenants/active-tenant-cookie';
 
+export type AuthRole = 'owner' | 'admin' | 'staff';
+
 export type AuthContext = {
   userId: string;
   email: string;
   tenantId: string;
-  role: 'owner' | 'admin' | 'staff';
+  role: AuthRole;
+  memberships: Array<{
+    tenantId: string;
+    role: AuthRole;
+    tenant: {
+      name: string;
+      slug: string;
+    };
+  }>;
 };
 
 export async function requireAuth(): Promise<AuthContext> {
@@ -24,6 +34,13 @@ export async function requireAuth(): Promise<AuthContext> {
         email: 'e2e@fudimenu.test',
         tenantId,
         role: 'owner',
+        memberships: [
+          {
+            tenantId,
+            role: 'owner',
+            tenant: { name: 'E2E tenant', slug: 'e2e-tenant' },
+          },
+        ],
       };
     }
   }
@@ -34,6 +51,13 @@ export async function requireAuth(): Promise<AuthContext> {
       email: 'demo@fudimenu.app',
       tenantId: mockTenant.id,
       role: 'owner',
+      memberships: [
+        {
+          tenantId: mockTenant.id,
+          role: 'owner',
+          tenant: { name: mockTenant.name, slug: mockTenant.slug },
+        },
+      ],
     };
   }
 
@@ -49,7 +73,13 @@ export async function requireAuth(): Promise<AuthContext> {
   const prisma = getPrisma();
   const memberships = await prisma.membership.findMany({
     where: { userId: user.id, deletedAt: null },
-    select: { tenantId: true, role: true },
+    select: {
+      tenantId: true,
+      role: true,
+      tenant: {
+        select: { name: true, slug: true },
+      },
+    },
     orderBy: { createdAt: 'asc' },
   });
   const membership =
@@ -61,6 +91,11 @@ export async function requireAuth(): Promise<AuthContext> {
     userId: user.id,
     email: user.email!,
     tenantId: membership.tenantId,
-    role: membership.role as AuthContext['role'],
+    role: membership.role as AuthRole,
+    memberships: memberships.map((item) => ({
+      tenantId: item.tenantId,
+      role: item.role as AuthRole,
+      tenant: item.tenant,
+    })),
   };
 }

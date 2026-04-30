@@ -25,7 +25,7 @@ export function AppHeader({ title, showBack, right }: AppHeaderProps) {
         )}
       </div>
       <h1 className="flex-1 truncate text-center text-lg font-bold text-ink-900">{title}</h1>
-      <div className="flex w-12 items-center justify-end">{right}</div>
+      <div className="flex min-w-12 items-center justify-end">{right}</div>
     </header>
   );
 }

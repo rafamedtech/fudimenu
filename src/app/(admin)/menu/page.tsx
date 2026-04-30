@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import { TenantSwitcher } from '@/components/admin/tenant-switcher';
 import { AppHeader } from '@/components/layout/app-header';
 import { Fab } from '@/components/layout/fab';
 import { ItemCard } from '@/components/menu/item-card';
@@ -10,12 +11,17 @@ import { menuService } from '@/server/services/menu.service';
 import Link from 'next/link';
 
 export default async function MenuPage() {
+  const ctx = await requireAuth();
+
   return (
     <>
-      <AppHeader title="Menú" />
+      <AppHeader
+        title="Menú"
+        right={<TenantSwitcher activeTenantId={ctx.tenantId} memberships={ctx.memberships} />}
+      />
       <main className="flex-1 px-4">
         <Suspense fallback={<MenuListLoading />}>
-          <MenuList />
+          <MenuList tenantId={ctx.tenantId} />
         </Suspense>
       </main>
       <Fab href="/menu/new" label="Agregar platillo" />
@@ -23,9 +29,8 @@ export default async function MenuPage() {
   );
 }
 
-async function MenuList() {
-  const ctx = await requireAuth();
-  const items = await menuService.getItemsByTenantId(ctx.tenantId);
+async function MenuList({ tenantId }: { tenantId: string }) {
+  const items = await menuService.getItemsByTenantId(tenantId);
 
   if (items.length === 0) {
     return (

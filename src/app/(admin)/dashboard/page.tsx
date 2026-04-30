@@ -1,4 +1,5 @@
 import { Card } from '@/components/ui/card';
+import { TenantSwitcher } from '@/components/admin/tenant-switcher';
 import { AppHeader } from '@/components/layout/app-header';
 import { requireAuth } from '@/server/guards/require-auth';
 import { menuService } from '@/server/services/menu.service';
@@ -19,7 +20,10 @@ export default async function DashboardPage() {
 
   return (
     <>
-      <AppHeader title="Inicio" />
+      <AppHeader
+        title="Inicio"
+        right={<TenantSwitcher activeTenantId={ctx.tenantId} memberships={ctx.memberships} />}
+      />
       <main className="flex flex-col gap-4 px-4 pb-6">
         <div>
           <p className="text-sm text-ink-500">{greeting()}</p>

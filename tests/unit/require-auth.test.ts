@@ -58,8 +58,8 @@ describe('requireAuth', () => {
     process.env.USE_MOCKS = 'false';
     process.env.E2E_TEST_AUTH = 'false';
     const findMany = vi.fn(async () => [
-      { tenantId: 'tenant-a', role: 'staff' },
-      { tenantId: 'tenant-b', role: 'admin' },
+      { tenantId: 'tenant-a', role: 'staff', tenant: { name: 'Tenant A', slug: 'tenant-a' } },
+      { tenantId: 'tenant-b', role: 'admin', tenant: { name: 'Tenant B', slug: 'tenant-b' } },
     ]);
 
     mocks.cookies.mockResolvedValue(mockCookieStore({ activetenantId: 'tenant-b' }));
@@ -76,10 +76,20 @@ describe('requireAuth', () => {
       email: 'user@example.com',
       tenantId: 'tenant-b',
       role: 'admin',
+      memberships: [
+        { tenantId: 'tenant-a', role: 'staff', tenant: { name: 'Tenant A', slug: 'tenant-a' } },
+        { tenantId: 'tenant-b', role: 'admin', tenant: { name: 'Tenant B', slug: 'tenant-b' } },
+      ],
     });
     expect(findMany).toHaveBeenCalledWith({
       where: { userId: 'user-1', deletedAt: null },
-      select: { tenantId: true, role: true },
+      select: {
+        tenantId: true,
+        role: true,
+        tenant: {
+          select: { name: true, slug: true },
+        },
+      },
       orderBy: { createdAt: 'asc' },
     });
   });
@@ -88,8 +98,8 @@ describe('requireAuth', () => {
     process.env.USE_MOCKS = 'false';
     process.env.E2E_TEST_AUTH = 'false';
     const findMany = vi.fn(async () => [
-      { tenantId: 'tenant-a', role: 'owner' },
-      { tenantId: 'tenant-b', role: 'admin' },
+      { tenantId: 'tenant-a', role: 'owner', tenant: { name: 'Tenant A', slug: 'tenant-a' } },
+      { tenantId: 'tenant-b', role: 'admin', tenant: { name: 'Tenant B', slug: 'tenant-b' } },
     ]);
 
     mocks.cookies.mockResolvedValue(mockCookieStore({}));
@@ -109,8 +119,8 @@ describe('requireAuth', () => {
     process.env.USE_MOCKS = 'false';
     process.env.E2E_TEST_AUTH = 'false';
     const findMany = vi.fn(async () => [
-      { tenantId: 'tenant-a', role: 'owner' },
-      { tenantId: 'tenant-b', role: 'admin' },
+      { tenantId: 'tenant-a', role: 'owner', tenant: { name: 'Tenant A', slug: 'tenant-a' } },
+      { tenantId: 'tenant-b', role: 'admin', tenant: { name: 'Tenant B', slug: 'tenant-b' } },
     ]);
 
     mocks.cookies.mockResolvedValue(mockCookieStore({ activetenantId: 'tenant-x' }));

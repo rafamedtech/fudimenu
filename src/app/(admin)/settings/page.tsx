@@ -1,7 +1,9 @@
 import { AppHeader } from '@/components/layout/app-header';
+import { TenantSwitcher } from '@/components/admin/tenant-switcher';
 import { Card } from '@/components/ui/card';
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
+import { requireAuth } from '@/server/guards/require-auth';
 
 const links = [
   { href: '/settings/brand', label: 'Marca y tema', emoji: '🎨' },
@@ -10,10 +12,15 @@ const links = [
   { href: '/account', label: 'Cuenta', emoji: '👤' },
 ];
 
-export default function SettingsPage() {
+export default async function SettingsPage() {
+  const ctx = await requireAuth();
+
   return (
     <>
-      <AppHeader title="Ajustes" />
+      <AppHeader
+        title="Ajustes"
+        right={<TenantSwitcher activeTenantId={ctx.tenantId} memberships={ctx.memberships} />}
+      />
       <main className="flex flex-col gap-3 px-4">
         {links.map((l) => (
           <Link key={l.href} href={l.href}>

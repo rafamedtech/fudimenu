@@ -80,3 +80,7 @@ export async function switchActiveTenantAction(input: unknown) {
 
   return { ok: true as const, tenantId: membership.tenantId };
 }
+
+export async function switchActiveTenantFormAction(formData: FormData) {
+  await switchActiveTenantAction(formData.get('tenantId'));
+}
