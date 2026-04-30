@@ -3,8 +3,7 @@ import Link from 'next/link';
 import { getCategoryEmoji } from '@/lib/category-placeholder';
 import { formatPrice } from '@/lib/utils';
 import type { MenuItem } from '@/types/domain';
-import { StockToggle } from '@/components/admin/stock-toggle';
-import { ItemCardToggle } from './item-card-toggle';
+import { ItemCardSwipeActions } from './item-card-swipe-actions';
 
 interface ItemCardProps {
   item: MenuItem;
@@ -35,18 +34,22 @@ export function ItemCard({ item, categoryName, href, showToggle = true }: ItemCa
         <h3 className="truncate font-semibold text-ink-900">{item.name}</h3>
         <p className="font-bold text-ink-900">{formatPrice(item.priceCents, item.currency)}</p>
       </div>
-      {showToggle && (
-        <ItemCardToggle>
-          <StockToggle itemId={item.id} initial={item.isAvailable} />
-        </ItemCardToggle>
-      )}
     </div>
   );
-  return href ? (
+
+  const card = href ? (
     <Link href={href} className="block">
       {content}
     </Link>
   ) : (
     content
+  );
+
+  return showToggle ? (
+    <ItemCardSwipeActions itemId={item.id} initialAvailable={item.isAvailable}>
+      {card}
+    </ItemCardSwipeActions>
+  ) : (
+    card
   );
 }
