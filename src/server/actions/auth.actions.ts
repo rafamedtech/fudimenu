@@ -45,7 +45,7 @@ export async function signOutAction() {
   return { ok: true as const };
 }
 
-export async function switchActiveTenantAction(input: unknown) {
+export async function switchTenantAction(input: unknown) {
   const tenantId = tenantIdSchema.parse(input);
   const cookieStore = await cookies();
 
@@ -81,6 +81,10 @@ export async function switchActiveTenantAction(input: unknown) {
   return { ok: true as const, tenantId: membership.tenantId };
 }
 
+export async function switchActiveTenantAction(input: unknown) {
+  return switchTenantAction(input);
+}
+
 export async function switchActiveTenantFormAction(formData: FormData) {
-  await switchActiveTenantAction(formData.get('tenantId'));
+  await switchTenantAction(formData.get('tenantId'));
 }

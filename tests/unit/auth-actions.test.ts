@@ -64,8 +64,8 @@ describe('auth actions', () => {
     });
     mocks.findFirst.mockResolvedValue({ tenantId: 'tenant-b' });
 
-    const { switchActiveTenantAction } = await loadAuthActions();
-    const result = await switchActiveTenantAction('tenant-b');
+    const { switchTenantAction } = await loadAuthActions();
+    const result = await switchTenantAction('tenant-b');
 
     expect(result).toEqual({ ok: true, tenantId: 'tenant-b' });
     expect(mocks.findFirst).toHaveBeenCalledWith({
@@ -87,8 +87,8 @@ describe('auth actions', () => {
     });
     mocks.findFirst.mockResolvedValue(null);
 
-    const { switchActiveTenantAction } = await loadAuthActions();
-    const result = await switchActiveTenantAction('tenant-x');
+    const { switchTenantAction } = await loadAuthActions();
+    const result = await switchTenantAction('tenant-x');
 
     expect(result.ok).toBe(false);
     expect(mocks.cookieSet).not.toHaveBeenCalled();
