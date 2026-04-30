@@ -18,14 +18,19 @@ export function Toggle({ checked, onChange, disabled, ariaLabel }: ToggleProps) 
       disabled={disabled}
       onClick={() => onChange(!checked)}
       className={cn(
-        'relative inline-flex h-8 w-[52px] flex-shrink-0 cursor-pointer rounded-full transition-colors duration-200',
+        'relative inline-flex h-12 w-[52px] flex-shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200',
         'disabled:opacity-40 disabled:cursor-not-allowed',
-        checked ? 'bg-menta-500' : 'bg-ink-300',
       )}
     >
       <span
         className={cn(
-          'pointer-events-none inline-block h-7 w-7 translate-y-0.5 rounded-full bg-white shadow-md transition-transform duration-200',
+          'pointer-events-none absolute left-0 top-1/2 h-8 w-[52px] -translate-y-1/2 rounded-full transition-colors duration-200',
+          checked ? 'bg-menta-500' : 'bg-ink-300',
+        )}
+      />
+      <span
+        className={cn(
+          'pointer-events-none absolute top-1/2 inline-block h-7 w-7 -translate-y-1/2 rounded-full bg-white shadow-md transition-transform duration-200',
           checked ? 'translate-x-[22px]' : 'translate-x-0.5',
         )}
       />

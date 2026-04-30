@@ -59,7 +59,7 @@ export function ItemCardQuickActions({
             disabled={isPending}
             onClick={handleToggleStock}
             className={cn(
-              'flex h-11 items-center gap-2 rounded px-3 text-sm font-bold text-white transition-opacity disabled:opacity-60',
+              'flex h-12 min-w-12 items-center gap-2 rounded px-3 text-sm font-bold text-white transition-opacity disabled:opacity-60',
               nextAvailable ? 'bg-menta-500' : 'bg-red-500',
             )}
           >

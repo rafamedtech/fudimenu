@@ -3,7 +3,7 @@ import { forwardRef } from 'react';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 font-semibold transition-all duration-150 active:scale-[0.97] disabled:opacity-40 disabled:pointer-events-none focus-visible:outline-none focus-visible:shadow-glow-mostaza',
+  'inline-flex min-h-12 min-w-12 items-center justify-center gap-2 font-semibold transition-all duration-150 active:scale-[0.97] disabled:opacity-40 disabled:pointer-events-none focus-visible:outline-none focus-visible:shadow-glow-mostaza',
   {
     variants: {
       variant: {
@@ -17,7 +17,7 @@ const buttonVariants = cva(
           'bg-gradient-to-r from-mostaza-500 to-coral-500 text-ink-900 hover:opacity-95 shadow-md',
       },
       size: {
-        sm: 'h-9 px-3 text-sm rounded-sm',
+        sm: 'px-3 text-sm rounded-sm',
         md: 'h-12 px-5 text-base rounded-md',
         lg: 'h-14 px-6 text-base rounded-md',
         xl: 'h-16 px-7 text-lg rounded-md',
