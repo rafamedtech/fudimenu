@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { getCategoryEmoji } from '@/lib/category-placeholder';
 import { formatPrice } from '@/lib/utils';
 import type { MenuItem } from '@/types/domain';
-import { ItemCardSwipeActions } from './item-card-swipe-actions';
+import { ItemCardQuickActions } from './item-card-quick-actions';
 
 interface ItemCardProps {
   item: MenuItem;
@@ -46,9 +46,9 @@ export function ItemCard({ item, categoryName, href, showToggle = true }: ItemCa
   );
 
   return showToggle ? (
-    <ItemCardSwipeActions itemId={item.id} initialAvailable={item.isAvailable}>
+    <ItemCardQuickActions itemId={item.id} initialAvailable={item.isAvailable}>
       {card}
-    </ItemCardSwipeActions>
+    </ItemCardQuickActions>
   ) : (
     card
   );

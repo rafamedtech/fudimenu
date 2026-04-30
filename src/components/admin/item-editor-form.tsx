@@ -1,6 +1,7 @@
 'use client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
+import { useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -8,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Toggle } from '@/components/ui/toggle';
 import { getCategoryEmoji } from '@/lib/category-placeholder';
 import { itemSchema, type ItemInput } from '@/lib/validators/item.schema';
-import { upsertItemAction } from '@/server/actions/items.actions';
+import { toggleItemAvailabilityAction, upsertItemAction } from '@/server/actions/items.actions';
 import { toUserMessage } from '@/lib/api/errors';
 import { track } from '@/lib/analytics/events';
 import type { Category, MenuItem } from '@/types/domain';
@@ -20,6 +21,7 @@ interface Props {
 
 export function ItemEditorForm({ initial, categories }: Props) {
   const router = useRouter();
+  const [isStockPending, startStockTransition] = useTransition();
   const fallbackCategoryId = categories[0]?.id ?? null;
   const initialCategoryId =
     initial?.categoryId && categories.some((category) => category.id === initial.categoryId)
@@ -70,8 +72,41 @@ export function ItemEditorForm({ initial, categories }: Props) {
     }
   }
 
+  function handleAvailabilityChange(next: boolean) {
+    const previous = !!isAvailable;
+    setValue('isAvailable', next, { shouldDirty: true });
+
+    if (!initial?.id) return;
+
+    track('stock_toggled', { itemId: initial.id, available: next });
+    startStockTransition(async () => {
+      try {
+        await toggleItemAvailabilityAction(initial.id, next);
+        toast.success(next ? 'Disponible' : 'Marcado agotado');
+      } catch (err) {
+        setValue('isAvailable', previous, { shouldDirty: true });
+        toast.error(toUserMessage(err));
+      }
+    });
+  }
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 pt-4">
+      <div className="flex items-center justify-between rounded-md bg-white p-4 shadow-sm">
+        <div>
+          <p className="font-semibold">Stock</p>
+          <p className="text-xs text-ink-500">
+            {initial?.id ? 'Cambia al instante, sin guardar' : 'Se aplicará al guardar'}
+          </p>
+        </div>
+        <Toggle
+          checked={!!isAvailable}
+          onChange={handleAvailabilityChange}
+          disabled={isStockPending}
+          ariaLabel="Disponible"
+        />
+      </div>
+
       <button
         type="button"
         className="flex h-44 w-full flex-col items-center justify-center gap-2 rounded-lg bg-crema-100 text-ink-500"
@@ -130,18 +165,6 @@ export function ItemEditorForm({ initial, categories }: Props) {
           rows={4}
           placeholder="¿Qué lleva? ¿Por qué les va a encantar?"
           className="w-full rounded-md border-[1.5px] border-ink-300 bg-white p-4 text-base text-ink-900 outline-none placeholder:text-ink-500 focus-within:border-mostaza-500 focus-within:shadow-glow-mostaza"
-        />
-      </div>
-
-      <div className="flex items-center justify-between rounded-md bg-white p-4 shadow-sm">
-        <div>
-          <p className="font-semibold">Disponible</p>
-          <p className="text-xs text-ink-500">Apaga si se acabó</p>
-        </div>
-        <Toggle
-          checked={!!isAvailable}
-          onChange={(v) => setValue('isAvailable', v)}
-          ariaLabel="Disponible"
         />
       </div>
 
