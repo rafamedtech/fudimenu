@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Toggle } from '@/components/ui/toggle';
+import { getCategoryEmoji } from '@/lib/category-placeholder';
 import { itemSchema, type ItemInput } from '@/lib/validators/item.schema';
 import { upsertItemAction } from '@/server/actions/items.actions';
 import { toUserMessage } from '@/lib/api/errors';
@@ -46,6 +47,9 @@ export function ItemEditorForm({ initial, categories }: Props) {
 
   const isAvailable = watch('isAvailable');
   const priceCents = watch('priceCents');
+  const selectedCategoryId = watch('categoryId');
+  const selectedCategory = categories.find((category) => category.id === selectedCategoryId);
+  const placeholderEmoji = getCategoryEmoji(selectedCategory?.name);
 
   async function onSubmit(data: ItemInput) {
     try {
@@ -70,10 +74,13 @@ export function ItemEditorForm({ initial, categories }: Props) {
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 pt-4">
       <button
         type="button"
-        className="flex h-44 w-full items-center justify-center rounded-lg bg-crema-100 text-ink-500"
+        className="flex h-44 w-full flex-col items-center justify-center gap-2 rounded-lg bg-crema-100 text-ink-500"
         onClick={() => toast.info('Upload conectado a Cloudinary próximamente')}
       >
-        📸 Sube una foto rica
+        <span className="text-6xl" aria-hidden>
+          {placeholderEmoji}
+        </span>
+        <span className="text-sm font-semibold text-ink-700">Foto opcional</span>
       </button>
 
       <Input

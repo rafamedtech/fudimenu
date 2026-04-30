@@ -44,7 +44,8 @@ export default async function MenuPage({ searchParams }: MenuPageProps) {
 }
 
 async function MenuList({ tenantId }: { tenantId: string }) {
-  const items = await menuService.getItemsByTenantId(tenantId);
+  const { categories, items } = await menuService.getMenuByTenantId(tenantId);
+  const categoryNamesById = new Map(categories.map((category) => [category.id, category.name]));
 
   if (items.length === 0) {
     return (
@@ -65,7 +66,11 @@ async function MenuList({ tenantId }: { tenantId: string }) {
     <ul className="flex flex-col gap-2">
       {items.map((item) => (
         <li key={item.id}>
-          <ItemCard item={item} href={`/menu/${item.id}`} />
+          <ItemCard
+            item={item}
+            categoryName={item.categoryId ? categoryNamesById.get(item.categoryId) : null}
+            href={`/menu/${item.id}`}
+          />
         </li>
       ))}
     </ul>

@@ -109,7 +109,7 @@ export default function OnboardingPage() {
         {step === 2 && (
           <>
             <h2 className="text-3xl font-extrabold">Tu primer platillo</h2>
-            <p className="text-ink-500">Solo necesitamos nombre y precio. La foto puede ir después.</p>
+            <p className="text-ink-500">Solo necesitamos nombre y precio. La foto va después, desde el editor.</p>
             <Input
               autoFocus
               label="Nombre"

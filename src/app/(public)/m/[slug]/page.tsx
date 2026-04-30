@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
+import { getCategoryEmoji } from '@/lib/category-placeholder';
 import { formatPrice } from '@/lib/utils';
 import { menuService } from '@/server/services/menu.service';
 import type { Metadata } from 'next';
@@ -113,8 +114,8 @@ export default async function PublicMenuPage({ params }: Props) {
                         className="object-cover"
                       />
                     ) : (
-                      <div className="flex h-full w-full items-center justify-center text-3xl">
-                        🍽️
+                      <div className="flex h-full w-full items-center justify-center text-4xl">
+                        {getCategoryEmoji(category.name)}
                       </div>
                     )}
                     {!item.isAvailable && (
