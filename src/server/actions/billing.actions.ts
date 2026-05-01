@@ -1,0 +1,92 @@
+'use server';
+
+import { redirect } from 'next/navigation';
+import Stripe from 'stripe';
+import { z } from 'zod';
+import { PLAN_CONFIG } from '@/config/plans';
+import { requireAuth } from '@/server/guards/require-auth';
+import type { Plan } from '@/types/domain';
+
+const checkoutSchema = z.object({
+  plan: z.enum(['pro', 'business']),
+});
+
+let stripeClient: Stripe | null = null;
+
+function getStripe() {
+  const secretKey = process.env.STRIPE_SECRET_KEY;
+  if (!secretKey) throw new Error('missing_stripe_secret_key');
+
+  stripeClient ??= new Stripe(secretKey, {
+    apiVersion: '2025-02-24.acacia',
+  });
+
+  return stripeClient;
+}
+
+function getAppUrl() {
+  return process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+}
+
+export async function createBillingCheckoutAction(input: unknown) {
+  const { plan } = checkoutSchema.parse(input);
+  const ctx = await requireAuth();
+  const stripe = getStripe();
+  const planConfig = PLAN_CONFIG[plan as Plan];
+  const appUrl = getAppUrl();
+  const metadata = {
+    tenantId: ctx.tenantId,
+    userId: ctx.userId,
+    plan,
+  };
+
+  const customer = await stripe.customers.create({
+    email: ctx.email,
+    metadata,
+  });
+
+  const session = await stripe.checkout.sessions.create({
+    mode: 'payment',
+    payment_method_types: ['card', 'oxxo', 'customer_balance'],
+    customer: customer.id,
+    payment_method_options: {
+      customer_balance: {
+        funding_type: 'bank_transfer',
+        bank_transfer: {
+          type: 'mx_bank_transfer',
+          requested_address_types: ['spei'],
+        },
+      },
+    },
+    line_items: [
+      {
+        price_data: {
+          currency: 'mxn',
+          unit_amount: planConfig.priceCents,
+          product_data: {
+            name: `FudiMenu ${planConfig.name}`,
+          },
+        },
+        quantity: 1,
+      },
+    ],
+    metadata,
+    payment_intent_data: {
+      metadata,
+    },
+    success_url: `${appUrl}/settings/billing?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${appUrl}/settings/billing?checkout=cancelled`,
+  });
+
+  return { ok: true as const, url: session.url };
+}
+
+export async function createBillingCheckoutFormAction(formData: FormData) {
+  const result = await createBillingCheckoutAction({
+    plan: formData.get('plan'),
+  });
+
+  if (!result.url) throw new Error('missing_checkout_url');
+
+  redirect(result.url);
+}

@@ -46,6 +46,7 @@ export async function completeOnboardingAction(input: unknown) {
 
   const { tenantId, slug } = await tenantService.createFromOnboarding({
     userId: user.id,
+    email: user.email!,
     name: data.name,
     cuisine: data.cuisine,
     itemName: data.itemName,

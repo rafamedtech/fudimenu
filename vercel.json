@@ -7,6 +7,10 @@
     {
       "path": "/api/cron/daily-special-nudge",
       "schedule": "0 17 * * *"
+    },
+    {
+      "path": "/api/cron/billing-trials",
+      "schedule": "0 18 * * *"
     }
   ]
 }

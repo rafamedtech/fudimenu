@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 const mocks = vi.hoisted(() => ({
   randomUUID: vi.fn(() => '11111111-2222-4333-8444-555555555555'),
   transaction: vi.fn(async (callback: (tx: unknown) => Promise<void>) => callback(mocks.tx)),
+  startProTrialForTenant: vi.fn(async () => ({ ok: true, stripeEnabled: false })),
   tx: {
     tenant: { create: vi.fn() },
     membership: { create: vi.fn() },
@@ -21,6 +22,12 @@ vi.mock('@/lib/db/prisma', () => ({
   })),
 }));
 
+vi.mock('@/server/services/billing.service', () => ({
+  billingService: {
+    startProTrialForTenant: mocks.startProTrialForTenant,
+  },
+}));
+
 describe('tenantService', () => {
   afterEach(() => {
     vi.unstubAllGlobals();
@@ -35,6 +42,7 @@ describe('tenantService', () => {
 
     const result = await tenantService.createFromOnboarding({
       userId: 'user-1',
+      email: 'owner@example.com',
       name: 'Taquería Norte',
       cuisine: 'mexicana',
       itemName: 'Taco de asada',
@@ -44,6 +52,20 @@ describe('tenantService', () => {
     expect(result).toEqual({
       tenantId: '11111111-2222-4333-8444-555555555555',
       slug: 'taqueria-norte-11111111',
+    });
+    expect(mocks.tx.tenant.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          plan: 'pro',
+        }),
+      }),
+    );
+    expect(mocks.startProTrialForTenant).toHaveBeenCalledWith({
+      tenantId: '11111111-2222-4333-8444-555555555555',
+      tenantName: 'Taquería Norte',
+      tenantSlug: 'taqueria-norte-11111111',
+      userId: 'user-1',
+      email: 'owner@example.com',
     });
     expect(mocks.tx.category.create).toHaveBeenCalledTimes(4);
     expect(mocks.tx.category.create).toHaveBeenNthCalledWith(
@@ -86,6 +108,7 @@ describe('tenantService', () => {
 
     await tenantService.createFromOnboarding({
       userId: 'user-1',
+      email: 'owner@example.com',
       name: 'Pizza Centro',
       cuisine: 'pizza',
       itemName: 'Pizza margarita',

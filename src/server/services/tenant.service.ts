@@ -1,6 +1,7 @@
 import 'server-only';
 import { getPrisma } from '@/lib/db/prisma';
 import { slugify } from '@/lib/utils';
+import { billingService } from '@/server/services/billing.service';
 
 const DEFAULT_CATEGORY_NAME = 'Otros';
 
@@ -15,6 +16,7 @@ const categoryPresets: Record<string, string[]> = {
 
 type CompleteOnboardingTenantInput = {
   userId: string;
+  email: string;
   name: string;
   cuisine: string;
   itemName: string;
@@ -47,7 +49,7 @@ export const tenantService = {
           cuisineType: input.cuisine,
           currency: 'MXN',
           defaultLocale: 'es',
-          plan: 'free',
+          plan: 'pro',
         },
       });
 
@@ -83,6 +85,14 @@ export const tenantService = {
           sortOrder: 0,
         },
       });
+    });
+
+    await billingService.startProTrialForTenant({
+      tenantId,
+      tenantName: input.name,
+      tenantSlug: slug,
+      userId: input.userId,
+      email: input.email,
     });
 
     return { tenantId, slug };
