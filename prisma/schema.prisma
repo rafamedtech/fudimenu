@@ -119,7 +119,7 @@ model MenuItem {
   @@index([tenantId, isAvailable])
   @@index([categoryId])
   @@index([deletedAt])
-  @@map("items")
+  @@map("menu_items")
 }
 
 model ItemTranslation {

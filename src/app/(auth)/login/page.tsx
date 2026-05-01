@@ -1,15 +1,56 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { createSupabaseBrowser } from '@/lib/supabase/client';
 import { signInWithMagicLinkAction } from '@/server/actions/auth.actions';
 
+const MAGIC_LINK_POLL_MS = 3000;
+const MAGIC_LINK_POLL_TIMEOUT_MS = 30_000;
+
 export default function LoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [magicLinkSentAt, setMagicLinkSentAt] = useState<number | null>(null);
+  const [magicLinkPollExpired, setMagicLinkPollExpired] = useState(false);
+
+  useEffect(() => {
+    if (!magicLinkSentAt) return;
+
+    let cancelled = false;
+    const supabase = createSupabaseBrowser();
+    let interval: number | undefined;
+    let timeout: number | undefined;
+
+    async function checkSession() {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!cancelled && session) {
+        router.replace('/dashboard');
+        router.refresh();
+      }
+    }
+
+    setMagicLinkPollExpired(false);
+    void checkSession();
+    interval = window.setInterval(() => void checkSession(), MAGIC_LINK_POLL_MS);
+    timeout = window.setTimeout(() => {
+      if (!cancelled) setMagicLinkPollExpired(true);
+      if (interval) window.clearInterval(interval);
+    }, MAGIC_LINK_POLL_TIMEOUT_MS);
+
+    return () => {
+      cancelled = true;
+      if (interval) window.clearInterval(interval);
+      if (timeout) window.clearTimeout(timeout);
+    };
+  }, [magicLinkSentAt, router]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -18,8 +59,12 @@ export default function LoginPage() {
       const fd = new FormData();
       fd.set('email', email);
       const res = await signInWithMagicLinkAction(fd);
-      if (res.ok) toast.success(res.message);
-      else toast.error(res.error);
+      if (res.ok) {
+        setMagicLinkSentAt(Date.now());
+        toast.success(res.message);
+      } else {
+        toast.error(res.error);
+      }
     } catch {
       toast.error('No pude enviar el link. Reintenta.');
     } finally {
@@ -70,9 +115,28 @@ export default function LoginPage() {
           label="Correo"
         />
         <Button type="submit" size="lg" loading={loading}>
-          Mándame link
+          {magicLinkSentAt ? 'Reenviar link' : 'Mándame link'}
         </Button>
       </form>
+
+      {magicLinkSentAt ? (
+        <div
+          role="status"
+          aria-live="polite"
+          className="mt-5 rounded-md border-[1.5px] border-menta-500/40 bg-menta-50 px-4 py-3 text-sm text-ink-700"
+        >
+          <p className="font-bold text-ink-900">
+            {magicLinkPollExpired ? 'Listo, revisa tu correo' : 'Revisando tu correo...'}
+          </p>
+          <p className="mt-1">
+            Abre el link desde este mismo navegador. Si detectamos tu sesión en los próximos 30
+            segundos, te llevamos directo a tu panel.
+          </p>
+          <p className="mt-2 text-ink-500">
+            ¿No llegó? Revisa spam o intenta con Google.
+          </p>
+        </div>
+      ) : null}
 
       <div className="my-6 flex items-center gap-3 text-xs text-ink-500">
         <div className="h-px flex-1 bg-ink-100" />o<div className="h-px flex-1 bg-ink-100" />
