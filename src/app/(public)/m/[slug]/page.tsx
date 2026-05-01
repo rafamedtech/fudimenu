@@ -5,6 +5,7 @@ import { formatPrice } from '@/lib/utils';
 import { menuService } from '@/server/services/menu.service';
 import { PublicMenuPwaWrapper } from './public-menu-pwa-wrapper';
 import type { Metadata } from 'next';
+import type { MenuItem } from '@/types/domain';
 
 export const revalidate = 60;
 const OTHER_CATEGORY_NAME = 'Otros';
@@ -24,6 +25,53 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+function getItemPrice(item: MenuItem) {
+  return item.isSpecialToday ? item.specialPrice ?? item.priceCents : item.priceCents;
+}
+
+function PublicMenuItemCard({
+  item,
+  categoryName,
+}: {
+  item: MenuItem;
+  categoryName: string;
+}) {
+  return (
+    <article className="flex gap-3 rounded-lg bg-white p-3 shadow-sm">
+      <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-md bg-crema-100">
+        {item.imageUrl ? (
+          <Image src={item.imageUrl} alt={item.name} fill sizes="80px" className="object-cover" />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center text-4xl">
+            {getCategoryEmoji(categoryName)}
+          </div>
+        )}
+        {!item.isAvailable && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/60 text-[10px] font-bold uppercase text-white">
+            Agotado
+          </div>
+        )}
+      </div>
+      <div className="flex min-w-0 flex-1 flex-col">
+        <div className="flex items-start justify-between gap-2">
+          <h3 className="font-semibold text-ink-900">{item.name}</h3>
+          {item.isSpecialToday && (
+            <span className="shrink-0 rounded-full bg-coral-500 px-2 py-1 text-[10px] font-extrabold uppercase text-white">
+              Especial 🔥
+            </span>
+          )}
+        </div>
+        {item.description && (
+          <p className="line-clamp-2 text-sm text-ink-500">{item.description}</p>
+        )}
+        <p className="mt-1 font-bold text-ink-900">
+          {formatPrice(getItemPrice(item), item.currency)}
+        </p>
+      </div>
+    </article>
+  );
+}
+
 export default async function PublicMenuPage({ params }: Props) {
   const { slug } = await params;
   const tenant = await menuService.getTenantBySlug(slug);
@@ -31,7 +79,10 @@ export default async function PublicMenuPage({ params }: Props) {
 
   const { categories, items } = await menuService.getMenuByTenantId(tenant.id);
 
-  const uncategorizedItems = items.filter((item) => item.categoryId === null);
+  const categoryNamesById = new Map(categories.map((category) => [category.id, category.name]));
+  const dailySpecials = items.filter((item) => item.isSpecialToday);
+  const regularItems = items.filter((item) => !item.isSpecialToday);
+  const uncategorizedItems = regularItems.filter((item) => item.categoryId === null);
   const otherCategory = categories.find(
     (category) => category.name.trim().toLocaleLowerCase() === OTHER_CATEGORY_NAME.toLocaleLowerCase(),
   );
@@ -51,12 +102,12 @@ export default async function PublicMenuPage({ params }: Props) {
 
   const itemsByCategory = visibleCategories.map((cat) => ({
     category: cat,
-    items: items.filter((item) => item.categoryId === cat.id).concat(
+    items: regularItems.filter((item) => item.categoryId === cat.id).concat(
       cat.id === otherCategory?.id || (cat.id === 'uncategorized' && !otherCategory)
         ? uncategorizedItems
         : [],
     ),
-  }));
+  })).filter(({ items }) => items.length > 0);
 
   return (
     <PublicMenuPwaWrapper slug={slug}>
@@ -85,57 +136,53 @@ export default async function PublicMenuPage({ params }: Props) {
         </header>
 
         <nav className="sticky top-0 z-10 flex gap-2 overflow-x-auto bg-crema-50/95 px-4 py-3 backdrop-blur">
-          {visibleCategories.map((cat) => (
+          {dailySpecials.length > 0 && (
             <a
-              key={cat.id}
-              href={`#cat-${cat.id}`}
+              href="#especiales-hoy"
+              className="whitespace-nowrap rounded-full bg-coral-500 px-4 py-2 text-sm font-extrabold text-white shadow-sm"
+            >
+              Especiales de hoy
+            </a>
+          )}
+          {itemsByCategory.map(({ category }) => (
+            <a
+              key={category.id}
+              href={`#cat-${category.id}`}
               className="whitespace-nowrap rounded-full bg-white px-4 py-2 text-sm font-semibold text-ink-700 shadow-sm"
             >
-              {cat.name}
+              {category.name}
             </a>
           ))}
         </nav>
 
         <div className="flex flex-col gap-8 px-4 pt-4">
+          {dailySpecials.length > 0 && (
+            <section id="especiales-hoy">
+              <h2 className="mb-3 text-xl font-bold">Especiales de hoy</h2>
+              <div className="flex flex-col gap-3">
+                {dailySpecials.map((item) => (
+                  <PublicMenuItemCard
+                    key={item.id}
+                    item={item}
+                    categoryName={
+                      item.categoryId ? categoryNamesById.get(item.categoryId) ?? '' : OTHER_CATEGORY_NAME
+                    }
+                  />
+                ))}
+              </div>
+            </section>
+          )}
+
           {itemsByCategory.map(({ category, items: catItems }) => (
             <section key={category.id} id={`cat-${category.id}`}>
               <h2 className="mb-3 text-xl font-bold">{category.name}</h2>
               <div className="flex flex-col gap-3">
                 {catItems.map((item) => (
-                  <article
+                  <PublicMenuItemCard
                     key={item.id}
-                    className="flex gap-3 rounded-lg bg-white p-3 shadow-sm"
-                  >
-                    <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-md bg-crema-100">
-                      {item.imageUrl ? (
-                        <Image
-                          src={item.imageUrl}
-                          alt={item.name}
-                          fill
-                          sizes="80px"
-                          className="object-cover"
-                        />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center text-4xl">
-                          {getCategoryEmoji(category.name)}
-                        </div>
-                      )}
-                      {!item.isAvailable && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-black/60 text-[10px] font-bold uppercase text-white">
-                          Agotado
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex flex-1 flex-col">
-                      <h3 className="font-semibold text-ink-900">{item.name}</h3>
-                      {item.description && (
-                        <p className="line-clamp-2 text-sm text-ink-500">{item.description}</p>
-                      )}
-                      <p className="mt-1 font-bold text-ink-900">
-                        {formatPrice(item.priceCents, item.currency)}
-                      </p>
-                    </div>
-                  </article>
+                    item={item}
+                    categoryName={category.name}
+                  />
                 ))}
               </div>
             </section>
