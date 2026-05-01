@@ -31,6 +31,8 @@ type MenuItemRow = {
   name: string;
   description: string | null;
   priceCents: number;
+  isSpecialToday?: boolean;
+  specialPrice?: number | null;
   currency: string;
   imageUrl: string | null;
   isAvailable: boolean;
@@ -73,6 +75,8 @@ function mapMenuItem(row: MenuItemRow): MenuItem {
     name: row.name,
     description: row.description,
     priceCents: row.priceCents,
+    isSpecialToday: row.isSpecialToday ?? false,
+    specialPrice: row.specialPrice ?? null,
     currency: row.currency,
     imageUrl: row.imageUrl,
     isAvailable: row.isAvailable,
@@ -147,6 +151,26 @@ export class PrismaMenuRepository implements IMenuRepository {
     return mapMenuItem(item);
   }
 
+  async setItemSpecialToday(
+    tenantId: string,
+    itemId: string,
+    isSpecialToday: boolean,
+  ): Promise<MenuItem> {
+    const prisma = getPrisma();
+    const result = await prisma.menuItem.updateMany({
+      where: { id: itemId, tenantId, deletedAt: null },
+      data: { isSpecialToday },
+    });
+
+    if (result.count === 0) throw new Error('not_found');
+
+    const item = await prisma.menuItem.findFirst({
+      where: { id: itemId, tenantId, deletedAt: null },
+    });
+    if (!item) throw new Error('not_found');
+    return mapMenuItem(item);
+  }
+
   async softDeleteItem(tenantId: string, itemId: string): Promise<MenuItem> {
     const prisma = getPrisma();
     const result = await prisma.menuItem.updateMany({
@@ -178,7 +202,18 @@ export class PrismaMenuRepository implements IMenuRepository {
   }
 
   async upsertItem(tenantId: string, input: Partial<MenuItem>): Promise<MenuItem> {
-    const payload = {
+    const payload: {
+      categoryId: string | null;
+      name: string;
+      description: string | null;
+      priceCents: number;
+      isSpecialToday?: boolean;
+      specialPrice?: number | null;
+      currency: string;
+      imageUrl: string | null;
+      isAvailable: boolean;
+      sortOrder: number;
+    } = {
       categoryId: input.categoryId ?? null,
       name: input.name ?? 'Sin nombre',
       description: normalizeText(input.description),
@@ -188,6 +223,14 @@ export class PrismaMenuRepository implements IMenuRepository {
       isAvailable: input.isAvailable ?? true,
       sortOrder: input.sortOrder ?? 999,
     };
+
+    if (!input.id || 'isSpecialToday' in input) {
+      payload.isSpecialToday = input.isSpecialToday ?? false;
+    }
+
+    if (!input.id || 'specialPrice' in input) {
+      payload.specialPrice = input.specialPrice ?? null;
+    }
 
     const prisma = getPrisma();
 

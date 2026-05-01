@@ -30,6 +30,13 @@ export async function toggleItemAvailabilityAction(itemId: string, available: bo
   return { ok: true as const, item };
 }
 
+export async function setItemSpecialTodayAction(itemId: string, isSpecialToday: boolean) {
+  const ctx = await requireAuth();
+  const item = await menuService.setItemSpecialToday(ctx.tenantId, itemId, isSpecialToday);
+  revalidateMenu(ctx);
+  return { ok: true as const, item };
+}
+
 export async function softDeleteItemAction(itemId: string) {
   const ctx = await requireAuth();
   const item = await menuService.softDeleteItem(ctx.tenantId, itemId);

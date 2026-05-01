@@ -2,10 +2,10 @@ import { Card } from '@/components/ui/card';
 import { TenantSwitcher } from '@/components/admin/tenant-switcher';
 import { AppHeader } from '@/components/layout/app-header';
 import { formatPrice } from '@/lib/utils';
-import { toggleItemAvailabilityAction } from '@/server/actions/items.actions';
+import { setItemSpecialTodayAction } from '@/server/actions/items.actions';
 import { requireAuth } from '@/server/guards/require-auth';
 import { menuService } from '@/server/services/menu.service';
-import type { Category, MenuItem } from '@/types/domain';
+import type { MenuItem } from '@/types/domain';
 import Link from 'next/link';
 
 function greeting() {
@@ -16,32 +16,8 @@ function greeting() {
   return '¡Buenas noches!';
 }
 
-function normalizeSpecialText(value: string) {
-  return value
-    .toLocaleLowerCase('es-MX')
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '');
-}
-
-function findDailySpecial(categories: Category[], items: MenuItem[]) {
-  const specialCategoryIds = new Set(
-    categories
-      .filter((category) => normalizeSpecialText(category.name).includes('especial'))
-      .map((category) => category.id),
-  );
-
-  return (
-    items.find(
-      (item) =>
-        item.isAvailable &&
-        item.categoryId !== null &&
-        specialCategoryIds.has(item.categoryId),
-    ) ??
-    items.find(
-      (item) => item.isAvailable && normalizeSpecialText(item.name).includes('especial'),
-    ) ??
-    null
-  );
+function findDailySpecial(items: MenuItem[]) {
+  return items.find((item) => item.isAvailable && item.isSpecialToday) ?? null;
 }
 
 async function removeDailySpecialAction(formData: FormData) {
@@ -50,13 +26,13 @@ async function removeDailySpecialAction(formData: FormData) {
   const itemId = formData.get('itemId');
   if (typeof itemId !== 'string' || itemId.length === 0) return;
 
-  await toggleItemAvailabilityAction(itemId, false);
+  await setItemSpecialTodayAction(itemId, false);
 }
 
 export default async function DashboardPage() {
   const ctx = await requireAuth();
-  const { categories, items } = await menuService.getMenuByTenantId(ctx.tenantId);
-  const dailySpecial = findDailySpecial(categories, items);
+  const { items } = await menuService.getMenuByTenantId(ctx.tenantId);
+  const dailySpecial = findDailySpecial(items);
   const total = items.length;
   const agotados = items.filter((i) => !i.isAvailable).length;
 
@@ -101,7 +77,10 @@ export default async function DashboardPage() {
                     {dailySpecial.name}
                   </h3>
                   <p className="mt-1 text-sm font-bold text-ink-700">
-                    {formatPrice(dailySpecial.priceCents, dailySpecial.currency)}
+                    {formatPrice(
+                      dailySpecial.specialPrice ?? dailySpecial.priceCents,
+                      dailySpecial.currency,
+                    )}
                   </p>
                 </>
               ) : (

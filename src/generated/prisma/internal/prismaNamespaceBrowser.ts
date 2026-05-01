@@ -131,6 +131,8 @@ export const MenuItemScalarFieldEnum = {
   name: 'name',
   description: 'description',
   priceCents: 'priceCents',
+  isSpecialToday: 'isSpecialToday',
+  specialPrice: 'specialPrice',
   currency: 'currency',
   imageUrl: 'imageUrl',
   isAvailable: 'isAvailable',

@@ -24,6 +24,14 @@ export const menuService = {
     return (await getMenuRepository()).toggleItemAvailability(tenantId, itemId, available);
   },
 
+  async setItemSpecialToday(
+    tenantId: string,
+    itemId: string,
+    isSpecialToday: boolean,
+  ): Promise<MenuItem> {
+    return (await getMenuRepository()).setItemSpecialToday(tenantId, itemId, isSpecialToday);
+  },
+
   async softDeleteItem(tenantId: string, itemId: string): Promise<MenuItem> {
     return (await getMenuRepository()).softDeleteItem(tenantId, itemId);
   },

@@ -96,23 +96,25 @@ model Category {
 }
 
 model MenuItem {
-  id           String            @id @default(dbgenerated("extensions.gen_random_uuid()")) @db.Uuid
-  tenantId     String            @map("tenant_id") @db.Uuid
-  categoryId   String?           @map("category_id") @db.Uuid
-  name         String
-  description  String?
-  priceCents   Int               @default(0) @map("price_cents")
-  currency     String            @default("MXN") @db.Char(3)
-  imageUrl     String?           @map("image_url")
-  isAvailable  Boolean           @default(true) @map("is_available")
-  sortOrder    Int               @default(999) @map("sort_order")
-  createdAt    DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt    DateTime          @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
-  deletedAt    DateTime?         @map("deleted_at") @db.Timestamptz(6)
-  tenant       Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  category     Category?         @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  translations ItemTranslation[]
-  views        ItemView[]
+  id             String            @id @default(dbgenerated("extensions.gen_random_uuid()")) @db.Uuid
+  tenantId       String            @map("tenant_id") @db.Uuid
+  categoryId     String?           @map("category_id") @db.Uuid
+  name           String
+  description    String?
+  priceCents     Int               @default(0) @map("price_cents")
+  isSpecialToday Boolean           @default(false) @map("is_special_today")
+  specialPrice   Int?              @map("special_price")
+  currency       String            @default("MXN") @db.Char(3)
+  imageUrl       String?           @map("image_url")
+  isAvailable    Boolean           @default(true) @map("is_available")
+  sortOrder      Int               @default(999) @map("sort_order")
+  createdAt      DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime          @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt      DateTime?         @map("deleted_at") @db.Timestamptz(6)
+  tenant         Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  category       Category?         @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  translations   ItemTranslation[]
+  views          ItemView[]
 
   @@index([tenantId, sortOrder, createdAt])
   @@index([tenantId, categoryId])

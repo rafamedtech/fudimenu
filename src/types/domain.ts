@@ -30,6 +30,8 @@ export type MenuItem = {
   name: string;
   description: string | null;
   priceCents: number;
+  isSpecialToday?: boolean;
+  specialPrice?: number | null;
   currency: string;
   imageUrl: string | null;
   isAvailable: boolean;

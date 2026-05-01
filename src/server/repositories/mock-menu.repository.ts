@@ -64,6 +64,24 @@ export class MockMenuRepository implements IMenuRepository {
     return cloneMenuItem(this.items[idx]);
   }
 
+  async setItemSpecialToday(
+    tenantId: string,
+    itemId: string,
+    isSpecialToday: boolean,
+  ): Promise<MenuItem> {
+    const idx = this.items.findIndex(
+      (item) => item.id === itemId && item.tenantId === tenantId && isActive(item),
+    );
+    if (idx < 0) throw new Error('not_found');
+
+    this.items[idx] = {
+      ...this.items[idx],
+      isSpecialToday,
+      updatedAt: new Date().toISOString(),
+    };
+    return cloneMenuItem(this.items[idx]);
+  }
+
   async softDeleteItem(tenantId: string, itemId: string): Promise<MenuItem> {
     const idx = this.items.findIndex(
       (item) => item.id === itemId && item.tenantId === tenantId && isActive(item),
@@ -115,6 +133,8 @@ export class MockMenuRepository implements IMenuRepository {
       name: input.name ?? 'Sin nombre',
       description: input.description ?? null,
       priceCents: input.priceCents ?? 0,
+      isSpecialToday: input.isSpecialToday ?? false,
+      specialPrice: input.specialPrice ?? null,
       currency: input.currency ?? 'MXN',
       imageUrl: input.imageUrl ?? null,
       isAvailable: input.isAvailable ?? true,

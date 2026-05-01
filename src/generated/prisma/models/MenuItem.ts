@@ -28,11 +28,13 @@ export type AggregateMenuItem = {
 
 export type MenuItemAvgAggregateOutputType = {
   priceCents: number | null
+  specialPrice: number | null
   sortOrder: number | null
 }
 
 export type MenuItemSumAggregateOutputType = {
   priceCents: number | null
+  specialPrice: number | null
   sortOrder: number | null
 }
 
@@ -43,6 +45,8 @@ export type MenuItemMinAggregateOutputType = {
   name: string | null
   description: string | null
   priceCents: number | null
+  isSpecialToday: boolean | null
+  specialPrice: number | null
   currency: string | null
   imageUrl: string | null
   isAvailable: boolean | null
@@ -59,6 +63,8 @@ export type MenuItemMaxAggregateOutputType = {
   name: string | null
   description: string | null
   priceCents: number | null
+  isSpecialToday: boolean | null
+  specialPrice: number | null
   currency: string | null
   imageUrl: string | null
   isAvailable: boolean | null
@@ -75,6 +81,8 @@ export type MenuItemCountAggregateOutputType = {
   name: number
   description: number
   priceCents: number
+  isSpecialToday: number
+  specialPrice: number
   currency: number
   imageUrl: number
   isAvailable: number
@@ -88,11 +96,13 @@ export type MenuItemCountAggregateOutputType = {
 
 export type MenuItemAvgAggregateInputType = {
   priceCents?: true
+  specialPrice?: true
   sortOrder?: true
 }
 
 export type MenuItemSumAggregateInputType = {
   priceCents?: true
+  specialPrice?: true
   sortOrder?: true
 }
 
@@ -103,6 +113,8 @@ export type MenuItemMinAggregateInputType = {
   name?: true
   description?: true
   priceCents?: true
+  isSpecialToday?: true
+  specialPrice?: true
   currency?: true
   imageUrl?: true
   isAvailable?: true
@@ -119,6 +131,8 @@ export type MenuItemMaxAggregateInputType = {
   name?: true
   description?: true
   priceCents?: true
+  isSpecialToday?: true
+  specialPrice?: true
   currency?: true
   imageUrl?: true
   isAvailable?: true
@@ -135,6 +149,8 @@ export type MenuItemCountAggregateInputType = {
   name?: true
   description?: true
   priceCents?: true
+  isSpecialToday?: true
+  specialPrice?: true
   currency?: true
   imageUrl?: true
   isAvailable?: true
@@ -238,6 +254,8 @@ export type MenuItemGroupByOutputType = {
   name: string
   description: string | null
   priceCents: number
+  isSpecialToday: boolean
+  specialPrice: number | null
   currency: string
   imageUrl: string | null
   isAvailable: boolean
@@ -277,6 +295,8 @@ export type MenuItemWhereInput = {
   name?: Prisma.StringFilter<"MenuItem"> | string
   description?: Prisma.StringNullableFilter<"MenuItem"> | string | null
   priceCents?: Prisma.IntFilter<"MenuItem"> | number
+  isSpecialToday?: Prisma.BoolFilter<"MenuItem"> | boolean
+  specialPrice?: Prisma.IntNullableFilter<"MenuItem"> | number | null
   currency?: Prisma.StringFilter<"MenuItem"> | string
   imageUrl?: Prisma.StringNullableFilter<"MenuItem"> | string | null
   isAvailable?: Prisma.BoolFilter<"MenuItem"> | boolean
@@ -297,6 +317,8 @@ export type MenuItemOrderByWithRelationInput = {
   name?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   priceCents?: Prisma.SortOrder
+  isSpecialToday?: Prisma.SortOrder
+  specialPrice?: Prisma.SortOrderInput | Prisma.SortOrder
   currency?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   isAvailable?: Prisma.SortOrder
@@ -320,6 +342,8 @@ export type MenuItemWhereUniqueInput = Prisma.AtLeast<{
   name?: Prisma.StringFilter<"MenuItem"> | string
   description?: Prisma.StringNullableFilter<"MenuItem"> | string | null
   priceCents?: Prisma.IntFilter<"MenuItem"> | number
+  isSpecialToday?: Prisma.BoolFilter<"MenuItem"> | boolean
+  specialPrice?: Prisma.IntNullableFilter<"MenuItem"> | number | null
   currency?: Prisma.StringFilter<"MenuItem"> | string
   imageUrl?: Prisma.StringNullableFilter<"MenuItem"> | string | null
   isAvailable?: Prisma.BoolFilter<"MenuItem"> | boolean
@@ -340,6 +364,8 @@ export type MenuItemOrderByWithAggregationInput = {
   name?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   priceCents?: Prisma.SortOrder
+  isSpecialToday?: Prisma.SortOrder
+  specialPrice?: Prisma.SortOrderInput | Prisma.SortOrder
   currency?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   isAvailable?: Prisma.SortOrder
@@ -364,6 +390,8 @@ export type MenuItemScalarWhereWithAggregatesInput = {
   name?: Prisma.StringWithAggregatesFilter<"MenuItem"> | string
   description?: Prisma.StringNullableWithAggregatesFilter<"MenuItem"> | string | null
   priceCents?: Prisma.IntWithAggregatesFilter<"MenuItem"> | number
+  isSpecialToday?: Prisma.BoolWithAggregatesFilter<"MenuItem"> | boolean
+  specialPrice?: Prisma.IntNullableWithAggregatesFilter<"MenuItem"> | number | null
   currency?: Prisma.StringWithAggregatesFilter<"MenuItem"> | string
   imageUrl?: Prisma.StringNullableWithAggregatesFilter<"MenuItem"> | string | null
   isAvailable?: Prisma.BoolWithAggregatesFilter<"MenuItem"> | boolean
@@ -378,6 +406,8 @@ export type MenuItemCreateInput = {
   name: string
   description?: string | null
   priceCents?: number
+  isSpecialToday?: boolean
+  specialPrice?: number | null
   currency?: string
   imageUrl?: string | null
   isAvailable?: boolean
@@ -398,6 +428,8 @@ export type MenuItemUncheckedCreateInput = {
   name: string
   description?: string | null
   priceCents?: number
+  isSpecialToday?: boolean
+  specialPrice?: number | null
   currency?: string
   imageUrl?: string | null
   isAvailable?: boolean
@@ -414,6 +446,8 @@ export type MenuItemUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceCents?: Prisma.IntFieldUpdateOperationsInput | number
+  isSpecialToday?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  specialPrice?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -434,6 +468,8 @@ export type MenuItemUncheckedUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceCents?: Prisma.IntFieldUpdateOperationsInput | number
+  isSpecialToday?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  specialPrice?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -452,6 +488,8 @@ export type MenuItemCreateManyInput = {
   name: string
   description?: string | null
   priceCents?: number
+  isSpecialToday?: boolean
+  specialPrice?: number | null
   currency?: string
   imageUrl?: string | null
   isAvailable?: boolean
@@ -466,6 +504,8 @@ export type MenuItemUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceCents?: Prisma.IntFieldUpdateOperationsInput | number
+  isSpecialToday?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  specialPrice?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -482,6 +522,8 @@ export type MenuItemUncheckedUpdateManyInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceCents?: Prisma.IntFieldUpdateOperationsInput | number
+  isSpecialToday?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  specialPrice?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -508,6 +550,8 @@ export type MenuItemCountOrderByAggregateInput = {
   name?: Prisma.SortOrder
   description?: Prisma.SortOrder
   priceCents?: Prisma.SortOrder
+  isSpecialToday?: Prisma.SortOrder
+  specialPrice?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   isAvailable?: Prisma.SortOrder
@@ -519,6 +563,7 @@ export type MenuItemCountOrderByAggregateInput = {
 
 export type MenuItemAvgOrderByAggregateInput = {
   priceCents?: Prisma.SortOrder
+  specialPrice?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
 }
 
@@ -529,6 +574,8 @@ export type MenuItemMaxOrderByAggregateInput = {
   name?: Prisma.SortOrder
   description?: Prisma.SortOrder
   priceCents?: Prisma.SortOrder
+  isSpecialToday?: Prisma.SortOrder
+  specialPrice?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   isAvailable?: Prisma.SortOrder
@@ -545,6 +592,8 @@ export type MenuItemMinOrderByAggregateInput = {
   name?: Prisma.SortOrder
   description?: Prisma.SortOrder
   priceCents?: Prisma.SortOrder
+  isSpecialToday?: Prisma.SortOrder
+  specialPrice?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   isAvailable?: Prisma.SortOrder
@@ -556,6 +605,7 @@ export type MenuItemMinOrderByAggregateInput = {
 
 export type MenuItemSumOrderByAggregateInput = {
   priceCents?: Prisma.SortOrder
+  specialPrice?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
 }
 
@@ -648,6 +698,14 @@ export type MenuItemUncheckedUpdateManyWithoutCategoryNestedInput = {
   deleteMany?: Prisma.MenuItemScalarWhereInput | Prisma.MenuItemScalarWhereInput[]
 }
 
+export type NullableIntFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
 export type MenuItemCreateNestedOneWithoutTranslationsInput = {
   create?: Prisma.XOR<Prisma.MenuItemCreateWithoutTranslationsInput, Prisma.MenuItemUncheckedCreateWithoutTranslationsInput>
   connectOrCreate?: Prisma.MenuItemCreateOrConnectWithoutTranslationsInput
@@ -681,6 +739,8 @@ export type MenuItemCreateWithoutTenantInput = {
   name: string
   description?: string | null
   priceCents?: number
+  isSpecialToday?: boolean
+  specialPrice?: number | null
   currency?: string
   imageUrl?: string | null
   isAvailable?: boolean
@@ -699,6 +759,8 @@ export type MenuItemUncheckedCreateWithoutTenantInput = {
   name: string
   description?: string | null
   priceCents?: number
+  isSpecialToday?: boolean
+  specialPrice?: number | null
   currency?: string
   imageUrl?: string | null
   isAvailable?: boolean
@@ -746,6 +808,8 @@ export type MenuItemScalarWhereInput = {
   name?: Prisma.StringFilter<"MenuItem"> | string
   description?: Prisma.StringNullableFilter<"MenuItem"> | string | null
   priceCents?: Prisma.IntFilter<"MenuItem"> | number
+  isSpecialToday?: Prisma.BoolFilter<"MenuItem"> | boolean
+  specialPrice?: Prisma.IntNullableFilter<"MenuItem"> | number | null
   currency?: Prisma.StringFilter<"MenuItem"> | string
   imageUrl?: Prisma.StringNullableFilter<"MenuItem"> | string | null
   isAvailable?: Prisma.BoolFilter<"MenuItem"> | boolean
@@ -760,6 +824,8 @@ export type MenuItemCreateWithoutCategoryInput = {
   name: string
   description?: string | null
   priceCents?: number
+  isSpecialToday?: boolean
+  specialPrice?: number | null
   currency?: string
   imageUrl?: string | null
   isAvailable?: boolean
@@ -778,6 +844,8 @@ export type MenuItemUncheckedCreateWithoutCategoryInput = {
   name: string
   description?: string | null
   priceCents?: number
+  isSpecialToday?: boolean
+  specialPrice?: number | null
   currency?: string
   imageUrl?: string | null
   isAvailable?: boolean
@@ -820,6 +888,8 @@ export type MenuItemCreateWithoutTranslationsInput = {
   name: string
   description?: string | null
   priceCents?: number
+  isSpecialToday?: boolean
+  specialPrice?: number | null
   currency?: string
   imageUrl?: string | null
   isAvailable?: boolean
@@ -839,6 +909,8 @@ export type MenuItemUncheckedCreateWithoutTranslationsInput = {
   name: string
   description?: string | null
   priceCents?: number
+  isSpecialToday?: boolean
+  specialPrice?: number | null
   currency?: string
   imageUrl?: string | null
   isAvailable?: boolean
@@ -870,6 +942,8 @@ export type MenuItemUpdateWithoutTranslationsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceCents?: Prisma.IntFieldUpdateOperationsInput | number
+  isSpecialToday?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  specialPrice?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -889,6 +963,8 @@ export type MenuItemUncheckedUpdateWithoutTranslationsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceCents?: Prisma.IntFieldUpdateOperationsInput | number
+  isSpecialToday?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  specialPrice?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -904,6 +980,8 @@ export type MenuItemCreateWithoutViewsInput = {
   name: string
   description?: string | null
   priceCents?: number
+  isSpecialToday?: boolean
+  specialPrice?: number | null
   currency?: string
   imageUrl?: string | null
   isAvailable?: boolean
@@ -923,6 +1001,8 @@ export type MenuItemUncheckedCreateWithoutViewsInput = {
   name: string
   description?: string | null
   priceCents?: number
+  isSpecialToday?: boolean
+  specialPrice?: number | null
   currency?: string
   imageUrl?: string | null
   isAvailable?: boolean
@@ -954,6 +1034,8 @@ export type MenuItemUpdateWithoutViewsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceCents?: Prisma.IntFieldUpdateOperationsInput | number
+  isSpecialToday?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  specialPrice?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -973,6 +1055,8 @@ export type MenuItemUncheckedUpdateWithoutViewsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceCents?: Prisma.IntFieldUpdateOperationsInput | number
+  isSpecialToday?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  specialPrice?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -989,6 +1073,8 @@ export type MenuItemCreateManyTenantInput = {
   name: string
   description?: string | null
   priceCents?: number
+  isSpecialToday?: boolean
+  specialPrice?: number | null
   currency?: string
   imageUrl?: string | null
   isAvailable?: boolean
@@ -1003,6 +1089,8 @@ export type MenuItemUpdateWithoutTenantInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceCents?: Prisma.IntFieldUpdateOperationsInput | number
+  isSpecialToday?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  specialPrice?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1021,6 +1109,8 @@ export type MenuItemUncheckedUpdateWithoutTenantInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceCents?: Prisma.IntFieldUpdateOperationsInput | number
+  isSpecialToday?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  specialPrice?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1038,6 +1128,8 @@ export type MenuItemUncheckedUpdateManyWithoutTenantInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceCents?: Prisma.IntFieldUpdateOperationsInput | number
+  isSpecialToday?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  specialPrice?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1053,6 +1145,8 @@ export type MenuItemCreateManyCategoryInput = {
   name: string
   description?: string | null
   priceCents?: number
+  isSpecialToday?: boolean
+  specialPrice?: number | null
   currency?: string
   imageUrl?: string | null
   isAvailable?: boolean
@@ -1067,6 +1161,8 @@ export type MenuItemUpdateWithoutCategoryInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceCents?: Prisma.IntFieldUpdateOperationsInput | number
+  isSpecialToday?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  specialPrice?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1085,6 +1181,8 @@ export type MenuItemUncheckedUpdateWithoutCategoryInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceCents?: Prisma.IntFieldUpdateOperationsInput | number
+  isSpecialToday?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  specialPrice?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1102,6 +1200,8 @@ export type MenuItemUncheckedUpdateManyWithoutCategoryInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceCents?: Prisma.IntFieldUpdateOperationsInput | number
+  isSpecialToday?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  specialPrice?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1158,6 +1258,8 @@ export type MenuItemSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   name?: boolean
   description?: boolean
   priceCents?: boolean
+  isSpecialToday?: boolean
+  specialPrice?: boolean
   currency?: boolean
   imageUrl?: boolean
   isAvailable?: boolean
@@ -1179,6 +1281,8 @@ export type MenuItemSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   name?: boolean
   description?: boolean
   priceCents?: boolean
+  isSpecialToday?: boolean
+  specialPrice?: boolean
   currency?: boolean
   imageUrl?: boolean
   isAvailable?: boolean
@@ -1197,6 +1301,8 @@ export type MenuItemSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   name?: boolean
   description?: boolean
   priceCents?: boolean
+  isSpecialToday?: boolean
+  specialPrice?: boolean
   currency?: boolean
   imageUrl?: boolean
   isAvailable?: boolean
@@ -1215,6 +1321,8 @@ export type MenuItemSelectScalar = {
   name?: boolean
   description?: boolean
   priceCents?: boolean
+  isSpecialToday?: boolean
+  specialPrice?: boolean
   currency?: boolean
   imageUrl?: boolean
   isAvailable?: boolean
@@ -1224,7 +1332,7 @@ export type MenuItemSelectScalar = {
   deletedAt?: boolean
 }
 
-export type MenuItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "categoryId" | "name" | "description" | "priceCents" | "currency" | "imageUrl" | "isAvailable" | "sortOrder" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["menuItem"]>
+export type MenuItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "categoryId" | "name" | "description" | "priceCents" | "isSpecialToday" | "specialPrice" | "currency" | "imageUrl" | "isAvailable" | "sortOrder" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["menuItem"]>
 export type MenuItemInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   category?: boolean | Prisma.MenuItem$categoryArgs<ExtArgs>
@@ -1256,6 +1364,8 @@ export type $MenuItemPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     name: string
     description: string | null
     priceCents: number
+    isSpecialToday: boolean
+    specialPrice: number | null
     currency: string
     imageUrl: string | null
     isAvailable: boolean
@@ -1696,6 +1806,8 @@ export interface MenuItemFieldRefs {
   readonly name: Prisma.FieldRef<"MenuItem", 'String'>
   readonly description: Prisma.FieldRef<"MenuItem", 'String'>
   readonly priceCents: Prisma.FieldRef<"MenuItem", 'Int'>
+  readonly isSpecialToday: Prisma.FieldRef<"MenuItem", 'Boolean'>
+  readonly specialPrice: Prisma.FieldRef<"MenuItem", 'Int'>
   readonly currency: Prisma.FieldRef<"MenuItem", 'String'>
   readonly imageUrl: Prisma.FieldRef<"MenuItem", 'String'>
   readonly isAvailable: Prisma.FieldRef<"MenuItem", 'Boolean'>
