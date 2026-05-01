@@ -37,6 +37,7 @@ type MenuItemRow = {
   sortOrder: number;
   createdAt: Date;
   updatedAt: Date;
+  deletedAt: Date | null;
 };
 
 function mapTenant(row: TenantRow): Tenant {
@@ -78,6 +79,7 @@ function mapMenuItem(row: MenuItemRow): MenuItem {
     sortOrder: row.sortOrder,
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
+    deletedAt: row.deletedAt?.toISOString() ?? null,
   };
 }
 
@@ -98,11 +100,11 @@ export class PrismaMenuRepository implements IMenuRepository {
     const [tenant, categories, items] = await Promise.all([
       prisma.tenant.findUnique({ where: { id: tenantId } }),
       prisma.category.findMany({
-        where: { tenantId, isVisible: true },
+        where: { tenantId, isVisible: true, deletedAt: null },
         orderBy: { sortOrder: 'asc' },
       }),
       prisma.menuItem.findMany({
-        where: { tenantId },
+        where: { tenantId, deletedAt: null },
         orderBy: { sortOrder: 'asc' },
       }),
     ]);
@@ -119,7 +121,7 @@ export class PrismaMenuRepository implements IMenuRepository {
   async getItemsByTenantId(tenantId: string): Promise<MenuItem[]> {
     const prisma = getPrisma();
     const items = await prisma.menuItem.findMany({
-      where: { tenantId },
+      where: { tenantId, deletedAt: null },
       orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
     });
     return items.map(mapMenuItem);
@@ -132,13 +134,45 @@ export class PrismaMenuRepository implements IMenuRepository {
   ): Promise<MenuItem> {
     const prisma = getPrisma();
     const result = await prisma.menuItem.updateMany({
-      where: { id: itemId, tenantId },
+      where: { id: itemId, tenantId, deletedAt: null },
       data: { isAvailable: available },
     });
 
     if (result.count === 0) throw new Error('not_found');
 
+    const item = await prisma.menuItem.findFirst({
+      where: { id: itemId, tenantId, deletedAt: null },
+    });
+    if (!item) throw new Error('not_found');
+    return mapMenuItem(item);
+  }
+
+  async softDeleteItem(tenantId: string, itemId: string): Promise<MenuItem> {
+    const prisma = getPrisma();
+    const result = await prisma.menuItem.updateMany({
+      where: { id: itemId, tenantId, deletedAt: null },
+      data: { deletedAt: new Date() },
+    });
+
+    if (result.count === 0) throw new Error('not_found');
+
     const item = await prisma.menuItem.findFirst({ where: { id: itemId, tenantId } });
+    if (!item) throw new Error('not_found');
+    return mapMenuItem(item);
+  }
+
+  async restoreItem(tenantId: string, itemId: string): Promise<MenuItem> {
+    const prisma = getPrisma();
+    const result = await prisma.menuItem.updateMany({
+      where: { id: itemId, tenantId },
+      data: { deletedAt: null },
+    });
+
+    if (result.count === 0) throw new Error('not_found');
+
+    const item = await prisma.menuItem.findFirst({
+      where: { id: itemId, tenantId, deletedAt: null },
+    });
     if (!item) throw new Error('not_found');
     return mapMenuItem(item);
   }
@@ -159,13 +193,15 @@ export class PrismaMenuRepository implements IMenuRepository {
 
     if (input.id) {
       const result = await prisma.menuItem.updateMany({
-        where: { id: input.id, tenantId },
+        where: { id: input.id, tenantId, deletedAt: null },
         data: payload,
       });
 
       if (result.count === 0) throw new Error('not_found');
 
-      const item = await prisma.menuItem.findFirst({ where: { id: input.id, tenantId } });
+      const item = await prisma.menuItem.findFirst({
+        where: { id: input.id, tenantId, deletedAt: null },
+      });
       if (!item) throw new Error('not_found');
       return mapMenuItem(item);
     }

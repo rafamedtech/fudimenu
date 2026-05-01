@@ -15,6 +15,10 @@ function cloneMenuItem(item: MenuItem): MenuItem {
   return { ...item };
 }
 
+function isActive(item: MenuItem) {
+  return !item.deletedAt;
+}
+
 export class MockMenuRepository implements IMenuRepository {
   private readonly tenant = cloneTenant(mockTenant);
   private readonly categories = mockCategories.map(cloneCategory);
@@ -30,12 +34,16 @@ export class MockMenuRepository implements IMenuRepository {
     return {
       tenant: cloneTenant(this.tenant),
       categories: this.categories.map(cloneCategory),
-      items: this.items.filter((item) => item.tenantId === tenantId).map(cloneMenuItem),
+      items: this.items
+        .filter((item) => item.tenantId === tenantId && isActive(item))
+        .map(cloneMenuItem),
     };
   }
 
   async getItemsByTenantId(tenantId: string): Promise<MenuItem[]> {
-    return this.items.filter((item) => item.tenantId === tenantId).map(cloneMenuItem);
+    return this.items
+      .filter((item) => item.tenantId === tenantId && isActive(item))
+      .map(cloneMenuItem);
   }
 
   async toggleItemAvailability(
@@ -43,7 +51,9 @@ export class MockMenuRepository implements IMenuRepository {
     itemId: string,
     available: boolean,
   ): Promise<MenuItem> {
-    const idx = this.items.findIndex((item) => item.id === itemId && item.tenantId === tenantId);
+    const idx = this.items.findIndex(
+      (item) => item.id === itemId && item.tenantId === tenantId && isActive(item),
+    );
     if (idx < 0) throw new Error('not_found');
 
     this.items[idx] = {
@@ -54,9 +64,38 @@ export class MockMenuRepository implements IMenuRepository {
     return cloneMenuItem(this.items[idx]);
   }
 
+  async softDeleteItem(tenantId: string, itemId: string): Promise<MenuItem> {
+    const idx = this.items.findIndex(
+      (item) => item.id === itemId && item.tenantId === tenantId && isActive(item),
+    );
+    if (idx < 0) throw new Error('not_found');
+
+    const now = new Date().toISOString();
+    this.items[idx] = {
+      ...this.items[idx],
+      deletedAt: now,
+      updatedAt: now,
+    };
+    return cloneMenuItem(this.items[idx]);
+  }
+
+  async restoreItem(tenantId: string, itemId: string): Promise<MenuItem> {
+    const idx = this.items.findIndex((item) => item.id === itemId && item.tenantId === tenantId);
+    if (idx < 0) throw new Error('not_found');
+
+    this.items[idx] = {
+      ...this.items[idx],
+      deletedAt: null,
+      updatedAt: new Date().toISOString(),
+    };
+    return cloneMenuItem(this.items[idx]);
+  }
+
   async upsertItem(tenantId: string, input: Partial<MenuItem>): Promise<MenuItem> {
     if (input.id) {
-      const idx = this.items.findIndex((item) => item.id === input.id && item.tenantId === tenantId);
+      const idx = this.items.findIndex(
+        (item) => item.id === input.id && item.tenantId === tenantId && isActive(item),
+      );
       if (idx >= 0) {
         this.items[idx] = {
           ...this.items[idx],

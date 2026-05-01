@@ -12,5 +12,7 @@ export interface IMenuRepository {
   getMenuByTenantId(id: string): Promise<MenuData>;
   getItemsByTenantId(id: string): Promise<MenuItem[]>;
   toggleItemAvailability(tenantId: string, itemId: string, available: boolean): Promise<MenuItem>;
+  softDeleteItem(tenantId: string, itemId: string): Promise<MenuItem>;
+  restoreItem(tenantId: string, itemId: string): Promise<MenuItem>;
   upsertItem(tenantId: string, input: Partial<MenuItem>): Promise<MenuItem>;
 }

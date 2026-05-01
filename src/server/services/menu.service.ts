@@ -24,6 +24,14 @@ export const menuService = {
     return (await getMenuRepository()).toggleItemAvailability(tenantId, itemId, available);
   },
 
+  async softDeleteItem(tenantId: string, itemId: string): Promise<MenuItem> {
+    return (await getMenuRepository()).softDeleteItem(tenantId, itemId);
+  },
+
+  async restoreItem(tenantId: string, itemId: string): Promise<MenuItem> {
+    return (await getMenuRepository()).restoreItem(tenantId, itemId);
+  },
+
   async upsertItem(tenantId: string, input: Partial<MenuItem>): Promise<MenuItem> {
     return (await getMenuRepository()).upsertItem(tenantId, input);
   },

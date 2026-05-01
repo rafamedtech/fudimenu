@@ -36,6 +36,7 @@ export type MenuItem = {
   sortOrder: number;
   createdAt: string;
   updatedAt: string;
+  deletedAt?: string | null;
 };
 
 export type ItemTranslation = {

@@ -1,5 +1,6 @@
 'use client';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
 import { useForm } from 'react-hook-form';
@@ -9,7 +10,12 @@ import { Input } from '@/components/ui/input';
 import { Toggle } from '@/components/ui/toggle';
 import { getCategoryEmoji } from '@/lib/category-placeholder';
 import { itemSchema, type ItemInput } from '@/lib/validators/item.schema';
-import { toggleItemAvailabilityAction, upsertItemAction } from '@/server/actions/items.actions';
+import {
+  restoreItemAction,
+  softDeleteItemAction,
+  toggleItemAvailabilityAction,
+  upsertItemAction,
+} from '@/server/actions/items.actions';
 import { toUserMessage } from '@/lib/api/errors';
 import { track } from '@/lib/analytics/events';
 import type { Category, MenuItem } from '@/types/domain';
@@ -22,6 +28,7 @@ interface Props {
 export function ItemEditorForm({ initial, categories }: Props) {
   const router = useRouter();
   const [isStockPending, startStockTransition] = useTransition();
+  const [isDeletePending, startDeleteTransition] = useTransition();
   const fallbackCategoryId = categories[0]?.id ?? null;
   const initialCategoryId =
     initial?.categoryId && categories.some((category) => category.id === initial.categoryId)
@@ -85,6 +92,36 @@ export function ItemEditorForm({ initial, categories }: Props) {
         toast.success(next ? 'Disponible' : 'Marcado agotado');
       } catch (err) {
         setValue('isAvailable', previous, { shouldDirty: true });
+        toast.error(toUserMessage(err));
+      }
+    });
+  }
+
+  function handleDelete() {
+    if (!initial?.id) return;
+
+    startDeleteTransition(async () => {
+      try {
+        await softDeleteItemAction(initial.id);
+        router.push('/menu');
+        router.refresh();
+
+        toast.success('Platillo eliminado', {
+          duration: 5000,
+          action: {
+            label: 'Deshacer',
+            onClick: async () => {
+              try {
+                await restoreItemAction(initial.id);
+                toast.success('Platillo restaurado');
+                router.refresh();
+              } catch (err) {
+                toast.error(toUserMessage(err));
+              }
+            },
+          },
+        });
+      } catch (err) {
         toast.error(toUserMessage(err));
       }
     });
@@ -169,7 +206,25 @@ export function ItemEditorForm({ initial, categories }: Props) {
       </div>
 
       <div className="sticky bottom-[88px] mt-4 flex gap-3">
-        <Button type="button" variant="outline" size="lg" className="flex-1" onClick={() => router.back()}>
+        {initial?.id && (
+          <Button
+            type="button"
+            variant="destructive"
+            size="lg"
+            aria-label="Eliminar platillo"
+            loading={isDeletePending}
+            onClick={handleDelete}
+          >
+            <Trash2 aria-hidden="true" className="h-5 w-5" />
+          </Button>
+        )}
+        <Button
+          type="button"
+          variant="outline"
+          size="lg"
+          className="flex-1"
+          onClick={() => router.back()}
+        >
           Cancelar
         </Button>
         <Button type="submit" size="lg" className="flex-1" loading={isSubmitting}>
