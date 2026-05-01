@@ -1,8 +1,12 @@
 import { Card } from '@/components/ui/card';
 import { TenantSwitcher } from '@/components/admin/tenant-switcher';
 import { AppHeader } from '@/components/layout/app-header';
+import { formatPrice } from '@/lib/utils';
+import { toggleItemAvailabilityAction } from '@/server/actions/items.actions';
 import { requireAuth } from '@/server/guards/require-auth';
 import { menuService } from '@/server/services/menu.service';
+import type { Category, MenuItem } from '@/types/domain';
+import Link from 'next/link';
 
 function greeting() {
   const h = new Date().getHours();
@@ -12,9 +16,47 @@ function greeting() {
   return '¡Buenas noches!';
 }
 
+function normalizeSpecialText(value: string) {
+  return value
+    .toLocaleLowerCase('es-MX')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+}
+
+function findDailySpecial(categories: Category[], items: MenuItem[]) {
+  const specialCategoryIds = new Set(
+    categories
+      .filter((category) => normalizeSpecialText(category.name).includes('especial'))
+      .map((category) => category.id),
+  );
+
+  return (
+    items.find(
+      (item) =>
+        item.isAvailable &&
+        item.categoryId !== null &&
+        specialCategoryIds.has(item.categoryId),
+    ) ??
+    items.find(
+      (item) => item.isAvailable && normalizeSpecialText(item.name).includes('especial'),
+    ) ??
+    null
+  );
+}
+
+async function removeDailySpecialAction(formData: FormData) {
+  'use server';
+
+  const itemId = formData.get('itemId');
+  if (typeof itemId !== 'string' || itemId.length === 0) return;
+
+  await toggleItemAvailabilityAction(itemId, false);
+}
+
 export default async function DashboardPage() {
   const ctx = await requireAuth();
-  const items = await menuService.getItemsByTenantId(ctx.tenantId);
+  const { categories, items } = await menuService.getMenuByTenantId(ctx.tenantId);
+  const dailySpecial = findDailySpecial(categories, items);
   const total = items.length;
   const agotados = items.filter((i) => !i.isAvailable).length;
 
@@ -48,6 +90,55 @@ export default async function DashboardPage() {
             <p className="text-2xl font-bold tabular-nums text-coral-500">{agotados}</p>
           </Card>
         </div>
+
+        <Card className="border-[1.5px] border-mostaza-500 bg-mostaza-50 shadow-sm">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-ink-500">Especial de hoy</p>
+              {dailySpecial ? (
+                <>
+                  <h3 className="mt-1 text-xl font-extrabold text-ink-900">
+                    {dailySpecial.name}
+                  </h3>
+                  <p className="mt-1 text-sm font-bold text-ink-700">
+                    {formatPrice(dailySpecial.priceCents, dailySpecial.currency)}
+                  </p>
+                </>
+              ) : (
+                <h3 className="mt-1 text-lg font-extrabold text-ink-900">
+                  ¿Qué hay de especial hoy? 👨‍🍳
+                </h3>
+              )}
+            </div>
+
+            {dailySpecial ? (
+              <div className="flex shrink-0 gap-2">
+                <Link
+                  href={`/menu/${dailySpecial.id}`}
+                  className="inline-flex min-h-12 flex-1 items-center justify-center rounded-md border-[1.5px] border-ink-300 bg-white px-4 text-sm font-semibold text-ink-900 transition-all duration-150 active:scale-[0.97] sm:flex-none"
+                >
+                  Cambiar
+                </Link>
+                <form action={removeDailySpecialAction} className="flex-1 sm:flex-none">
+                  <input type="hidden" name="itemId" value={dailySpecial.id} />
+                  <button
+                    type="submit"
+                    className="inline-flex min-h-12 w-full items-center justify-center rounded-md bg-ink-900 px-4 text-sm font-semibold text-white transition-all duration-150 active:scale-[0.97]"
+                  >
+                    Quitar
+                  </button>
+                </form>
+              </div>
+            ) : (
+              <Link
+                href="/menu/new"
+                className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-md bg-mostaza-500 px-4 text-sm font-semibold text-ink-900 shadow-md transition-all duration-150 active:scale-[0.97]"
+              >
+                + Agregar
+              </Link>
+            )}
+          </div>
+        </Card>
 
         <Card>
           <p className="text-sm font-medium text-ink-700">Top platillo esta semana</p>
