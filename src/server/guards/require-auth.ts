@@ -5,6 +5,7 @@ import { getPrisma } from '@/lib/db/prisma';
 import { createSupabaseServer } from '@/lib/supabase/server';
 import { mockTenant } from '@/lib/mock/data';
 import { ACTIVE_TENANT_COOKIE } from '@/server/tenants/active-tenant-cookie';
+import type { Plan } from '@/types/domain';
 
 export type AuthRole = 'owner' | 'admin' | 'staff';
 
@@ -12,6 +13,7 @@ export type AuthContext = {
   userId: string;
   email: string;
   tenantId: string;
+  plan: Plan;
   role: AuthRole;
   memberships: Array<{
     tenantId: string;
@@ -19,6 +21,7 @@ export type AuthContext = {
     tenant: {
       name: string;
       slug: string;
+      plan: Plan;
     };
   }>;
 };
@@ -33,12 +36,13 @@ export async function requireAuth(): Promise<AuthContext> {
         userId: cookieStore.get('e2e_user_id')?.value ?? 'e2e-user',
         email: 'e2e@fudimenu.test',
         tenantId,
+        plan: 'pro',
         role: 'owner',
         memberships: [
           {
             tenantId,
             role: 'owner',
-            tenant: { name: 'E2E tenant', slug: 'e2e-tenant' },
+            tenant: { name: 'E2E tenant', slug: 'e2e-tenant', plan: 'pro' },
           },
         ],
       };
@@ -50,12 +54,13 @@ export async function requireAuth(): Promise<AuthContext> {
       userId: 'usr_demo',
       email: 'demo@fudimenu.app',
       tenantId: mockTenant.id,
+      plan: mockTenant.plan,
       role: 'owner',
       memberships: [
         {
           tenantId: mockTenant.id,
           role: 'owner',
-          tenant: { name: mockTenant.name, slug: mockTenant.slug },
+          tenant: { name: mockTenant.name, slug: mockTenant.slug, plan: mockTenant.plan },
         },
       ],
     };
@@ -77,7 +82,7 @@ export async function requireAuth(): Promise<AuthContext> {
       tenantId: true,
       role: true,
       tenant: {
-        select: { name: true, slug: true },
+        select: { name: true, slug: true, plan: true },
       },
     },
     orderBy: { createdAt: 'asc' },
@@ -91,11 +96,15 @@ export async function requireAuth(): Promise<AuthContext> {
     userId: user.id,
     email: user.email!,
     tenantId: membership.tenantId,
+    plan: membership.tenant.plan as Plan,
     role: membership.role as AuthRole,
     memberships: memberships.map((item) => ({
       tenantId: item.tenantId,
       role: item.role as AuthRole,
-      tenant: item.tenant,
+      tenant: {
+        ...item.tenant,
+        plan: item.tenant.plan as Plan,
+      },
     })),
   };
 }

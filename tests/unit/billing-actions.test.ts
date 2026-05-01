@@ -7,12 +7,13 @@ const mocks = vi.hoisted(() => ({
     userId: 'user-1',
     email: 'owner@example.com',
     tenantId: 'tenant-1',
+    plan: 'pro',
     role: 'owner',
     memberships: [
       {
         tenantId: 'tenant-1',
         role: 'owner',
-        tenant: { name: 'Taquería Norte', slug: 'taqueria-norte' },
+        tenant: { name: 'Taquería Norte', slug: 'taqueria-norte', plan: 'pro' },
       },
     ],
   })),

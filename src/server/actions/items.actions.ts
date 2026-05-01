@@ -1,5 +1,6 @@
 'use server';
 import { revalidatePath, revalidateTag } from 'next/cache';
+import { PLAN_CONFIG } from '@/config/plans';
 import { itemSchema } from '@/lib/validators/item.schema';
 import { requireAuth, type AuthContext } from '@/server/guards/require-auth';
 import { menuService } from '@/server/services/menu.service';
@@ -18,6 +19,16 @@ function revalidateMenu(ctx: AuthContext) {
 export async function upsertItemAction(input: unknown) {
   const ctx = await requireAuth();
   const data = itemSchema.parse(input);
+
+  if (!data.id) {
+    const { tenant, items } = await menuService.getMenuByTenantId(ctx.tenantId);
+    const freeItemLimit = PLAN_CONFIG.free.limits.items ?? 20;
+
+    if (tenant.plan === 'free' && items.length >= freeItemLimit) {
+      throw new Error('free_item_limit_reached');
+    }
+  }
+
   const item = await menuService.upsertItem(ctx.tenantId, data);
   revalidateMenu(ctx);
   return { ok: true as const, item };

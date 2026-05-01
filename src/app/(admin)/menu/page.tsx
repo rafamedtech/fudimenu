@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
+import { PlanLimitBanner } from '@/components/admin/plan-limit-banner';
 import { TenantSwitcher } from '@/components/admin/tenant-switcher';
 import { AppHeader } from '@/components/layout/app-header';
-import { Fab } from '@/components/layout/fab';
 import { ItemCard } from '@/components/menu/item-card';
 import { Card } from '@/components/ui/card';
 import { ItemCardSkeleton } from '@/components/ui/skeleton';
@@ -38,42 +38,47 @@ export default async function MenuPage({ searchParams }: MenuPageProps) {
           <MenuList tenantId={ctx.tenantId} />
         </Suspense>
       </main>
-      <Fab href="/menu/new" label="Agregar platillo" />
     </>
   );
 }
 
 async function MenuList({ tenantId }: { tenantId: string }) {
-  const { categories, items } = await menuService.getMenuByTenantId(tenantId);
+  const { tenant, categories, items } = await menuService.getMenuByTenantId(tenantId);
   const categoryNamesById = new Map(categories.map((category) => [category.id, category.name]));
 
   if (items.length === 0) {
     return (
-      <EmptyState
-        emoji="🍽️"
-        title="Tu menú está vacío"
-        description="Agrega tu primer platillo, ese que más venden."
-        action={
-          <Link href="/menu/new">
-            <Button size="lg">+ Agregar platillo</Button>
-          </Link>
-        }
-      />
+      <>
+        <EmptyState
+          emoji="🍽️"
+          title="Tu menú está vacío"
+          description="Agrega tu primer platillo, ese que más venden."
+          action={
+            <Link href="/menu/new">
+              <Button size="lg">+ Agregar platillo</Button>
+            </Link>
+          }
+        />
+        <PlanLimitBanner plan={tenant.plan} itemCount={items.length} />
+      </>
     );
   }
 
   return (
-    <ul className="flex flex-col gap-2">
-      {items.map((item) => (
-        <li key={item.id}>
-          <ItemCard
-            item={item}
-            categoryName={item.categoryId ? categoryNamesById.get(item.categoryId) : null}
-            href={`/menu/${item.id}`}
-          />
-        </li>
-      ))}
-    </ul>
+    <>
+      <PlanLimitBanner plan={tenant.plan} itemCount={items.length} />
+      <ul className="flex flex-col gap-2">
+        {items.map((item) => (
+          <li key={item.id}>
+            <ItemCard
+              item={item}
+              categoryName={item.categoryId ? categoryNamesById.get(item.categoryId) : null}
+              href={`/menu/${item.id}`}
+            />
+          </li>
+        ))}
+      </ul>
+    </>
   );
 }
 

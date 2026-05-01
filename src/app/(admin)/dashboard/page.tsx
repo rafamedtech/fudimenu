@@ -1,4 +1,5 @@
 import { Card } from '@/components/ui/card';
+import { ProFeatureLock, ProBadge } from '@/components/admin/pro-feature-lock';
 import { TenantSwitcher } from '@/components/admin/tenant-switcher';
 import { AppHeader } from '@/components/layout/app-header';
 import { formatPrice } from '@/lib/utils';
@@ -48,13 +49,31 @@ export default async function DashboardPage() {
           <h2 className="text-2xl font-bold">¡Hola, {ctx.email.split('@')[0]}!</h2>
         </div>
 
-        <Card className="bg-gradient-to-br from-mostaza-50 to-white">
-          <div className="flex items-center justify-between">
-            <p className="text-sm font-medium text-ink-500">Vistas hoy 👀</p>
-          </div>
-          <p className="mt-1 text-4xl font-extrabold tabular-nums">142</p>
-          <p className="mt-1 text-sm text-menta-500">▲ +18% vs ayer</p>
-        </Card>
+        {ctx.plan === 'free' ? (
+          <ProFeatureLock
+            title="Analytics es Pro"
+            description="Desbloquea vistas del día, tendencias semanales y top platillos para saber qué se está moviendo."
+            className="block"
+          >
+            <Card className="border-[1.5px] border-mostaza-500 bg-mostaza-50 shadow-sm">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-medium text-ink-500">Vistas hoy</p>
+                <ProBadge />
+              </div>
+              <p className="mt-2 text-sm leading-6 text-ink-700">
+                Toca para activar analytics y ver qué platillos están ganando atención.
+              </p>
+            </Card>
+          </ProFeatureLock>
+        ) : (
+          <Card className="bg-gradient-to-br from-mostaza-50 to-white">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium text-ink-500">Vistas hoy 👀</p>
+            </div>
+            <p className="mt-1 text-4xl font-extrabold tabular-nums">142</p>
+            <p className="mt-1 text-sm text-menta-500">▲ +18% vs ayer</p>
+          </Card>
+        )}
 
         <div className="grid grid-cols-2 gap-3">
           <Card className="p-4">

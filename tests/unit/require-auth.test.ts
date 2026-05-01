@@ -58,8 +58,16 @@ describe('requireAuth', () => {
     process.env.USE_MOCKS = 'false';
     process.env.E2E_TEST_AUTH = 'false';
     const findMany = vi.fn(async () => [
-      { tenantId: 'tenant-a', role: 'staff', tenant: { name: 'Tenant A', slug: 'tenant-a' } },
-      { tenantId: 'tenant-b', role: 'admin', tenant: { name: 'Tenant B', slug: 'tenant-b' } },
+      {
+        tenantId: 'tenant-a',
+        role: 'staff',
+        tenant: { name: 'Tenant A', slug: 'tenant-a', plan: 'free' },
+      },
+      {
+        tenantId: 'tenant-b',
+        role: 'admin',
+        tenant: { name: 'Tenant B', slug: 'tenant-b', plan: 'pro' },
+      },
     ]);
 
     mocks.cookies.mockResolvedValue(mockCookieStore({ activetenantId: 'tenant-b' }));
@@ -75,10 +83,19 @@ describe('requireAuth', () => {
       userId: 'user-1',
       email: 'user@example.com',
       tenantId: 'tenant-b',
+      plan: 'pro',
       role: 'admin',
       memberships: [
-        { tenantId: 'tenant-a', role: 'staff', tenant: { name: 'Tenant A', slug: 'tenant-a' } },
-        { tenantId: 'tenant-b', role: 'admin', tenant: { name: 'Tenant B', slug: 'tenant-b' } },
+        {
+          tenantId: 'tenant-a',
+          role: 'staff',
+          tenant: { name: 'Tenant A', slug: 'tenant-a', plan: 'free' },
+        },
+        {
+          tenantId: 'tenant-b',
+          role: 'admin',
+          tenant: { name: 'Tenant B', slug: 'tenant-b', plan: 'pro' },
+        },
       ],
     });
     expect(findMany).toHaveBeenCalledWith({
@@ -87,7 +104,7 @@ describe('requireAuth', () => {
         tenantId: true,
         role: true,
         tenant: {
-          select: { name: true, slug: true },
+          select: { name: true, slug: true, plan: true },
         },
       },
       orderBy: { createdAt: 'asc' },
@@ -98,8 +115,16 @@ describe('requireAuth', () => {
     process.env.USE_MOCKS = 'false';
     process.env.E2E_TEST_AUTH = 'false';
     const findMany = vi.fn(async () => [
-      { tenantId: 'tenant-a', role: 'owner', tenant: { name: 'Tenant A', slug: 'tenant-a' } },
-      { tenantId: 'tenant-b', role: 'admin', tenant: { name: 'Tenant B', slug: 'tenant-b' } },
+      {
+        tenantId: 'tenant-a',
+        role: 'owner',
+        tenant: { name: 'Tenant A', slug: 'tenant-a', plan: 'free' },
+      },
+      {
+        tenantId: 'tenant-b',
+        role: 'admin',
+        tenant: { name: 'Tenant B', slug: 'tenant-b', plan: 'pro' },
+      },
     ]);
 
     mocks.cookies.mockResolvedValue(mockCookieStore({}));
@@ -112,6 +137,7 @@ describe('requireAuth', () => {
     const ctx = await requireAuth();
 
     expect(ctx.tenantId).toBe('tenant-a');
+    expect(ctx.plan).toBe('free');
     expect(ctx.role).toBe('owner');
   });
 
@@ -119,8 +145,16 @@ describe('requireAuth', () => {
     process.env.USE_MOCKS = 'false';
     process.env.E2E_TEST_AUTH = 'false';
     const findMany = vi.fn(async () => [
-      { tenantId: 'tenant-a', role: 'owner', tenant: { name: 'Tenant A', slug: 'tenant-a' } },
-      { tenantId: 'tenant-b', role: 'admin', tenant: { name: 'Tenant B', slug: 'tenant-b' } },
+      {
+        tenantId: 'tenant-a',
+        role: 'owner',
+        tenant: { name: 'Tenant A', slug: 'tenant-a', plan: 'free' },
+      },
+      {
+        tenantId: 'tenant-b',
+        role: 'admin',
+        tenant: { name: 'Tenant B', slug: 'tenant-b', plan: 'pro' },
+      },
     ]);
 
     mocks.cookies.mockResolvedValue(mockCookieStore({ activetenantId: 'tenant-x' }));

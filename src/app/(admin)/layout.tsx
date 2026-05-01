@@ -3,12 +3,12 @@ import { PwaInstallBanner } from '@/components/layout/pwa-install-banner';
 import { requireAuth } from '@/server/guards/require-auth';
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  await requireAuth();
+  const ctx = await requireAuth();
   return (
     <div className="mx-auto flex min-h-dvh max-w-md flex-col bg-crema-50 pb-[88px]">
       {children}
       <PwaInstallBanner />
-      <BottomNav />
+      <BottomNav plan={ctx.plan} />
     </div>
   );
 }
