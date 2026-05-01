@@ -2,7 +2,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useTransition } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -29,6 +29,8 @@ export function ItemEditorForm({ initial, categories }: Props) {
   const router = useRouter();
   const [isStockPending, startStockTransition] = useTransition();
   const [isDeletePending, startDeleteTransition] = useTransition();
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+  const saveStatusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const fallbackCategoryId = categories[0]?.id ?? null;
   const initialCategoryId =
     initial?.categoryId && categories.some((category) => category.id === initial.categoryId)
@@ -60,14 +62,39 @@ export function ItemEditorForm({ initial, categories }: Props) {
   const selectedCategory = categories.find((category) => category.id === selectedCategoryId);
   const placeholderEmoji = getCategoryEmoji(selectedCategory?.name);
 
+  useEffect(() => {
+    return () => {
+      if (saveStatusTimerRef.current) clearTimeout(saveStatusTimerRef.current);
+    };
+  }, []);
+
+  function clearSaveStatusTimer() {
+    if (saveStatusTimerRef.current) {
+      clearTimeout(saveStatusTimerRef.current);
+      saveStatusTimerRef.current = null;
+    }
+  }
+
+  function showSavedIndicator() {
+    clearSaveStatusTimer();
+    setSaveStatus('saved');
+    saveStatusTimerRef.current = setTimeout(() => {
+      setSaveStatus('idle');
+      saveStatusTimerRef.current = null;
+    }, 1000);
+  }
+
   async function onSubmit(data: ItemInput) {
+    clearSaveStatusTimer();
+    setSaveStatus('saving');
+
     try {
       const res = await upsertItemAction({
         ...data,
         categoryId: data.categoryId ?? fallbackCategoryId,
       });
       if (res.ok) {
-        toast.success('✓ Guardado');
+        showSavedIndicator();
         track(initial ? 'item_edited' : 'item_created', {
           itemId: res.item.id,
           field: 'all',
@@ -75,6 +102,7 @@ export function ItemEditorForm({ initial, categories }: Props) {
         router.push('/menu');
       }
     } catch (err) {
+      setSaveStatus('idle');
       toast.error(toUserMessage(err));
     }
   }
@@ -128,7 +156,17 @@ export function ItemEditorForm({ initial, categories }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 pt-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="relative flex flex-col gap-4 pt-4">
+      {saveStatus !== 'idle' && (
+        <div
+          className="absolute right-0 top-1 z-10 rounded-full bg-white/95 px-3 py-1 text-xs font-semibold text-ink-700 shadow-sm ring-1 ring-ink-100"
+          role="status"
+          aria-live="polite"
+        >
+          {saveStatus === 'saving' ? 'Guardando...' : '✓'}
+        </div>
+      )}
+
       <div className="flex items-center justify-between rounded-md bg-white p-4 shadow-sm">
         <div>
           <p className="font-semibold">Stock</p>
