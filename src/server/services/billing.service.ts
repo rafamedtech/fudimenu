@@ -18,6 +18,14 @@ type TrialTenantInput = {
 type TrialReminderDay = 12;
 
 let stripeClient: Stripe | null = null;
+const CANCELABLE_SUBSCRIPTION_STATUSES = new Set<Stripe.Subscription.Status>([
+  'active',
+  'incomplete',
+  'past_due',
+  'paused',
+  'trialing',
+  'unpaid',
+]);
 
 function getStripe() {
   const secretKey = process.env.STRIPE_SECRET_KEY;
@@ -109,6 +117,26 @@ async function getUserEmail(userId: string) {
 
   if (error) return null;
   return data.user?.email ?? null;
+}
+
+async function findSubscriptionsByTenant(stripe: Stripe, tenantId: string) {
+  const query = `metadata['tenantId']:'${tenantId.replace(/'/g, "\\'")}'`;
+
+  try {
+    const result = await stripe.subscriptions.search({
+      query,
+      limit: 100,
+    });
+
+    return result.data;
+  } catch {
+    const result = await stripe.subscriptions.list({
+      status: 'all',
+      limit: 100,
+    });
+
+    return result.data.filter((subscription) => subscription.metadata.tenantId === tenantId);
+  }
 }
 
 export const billingService = {
@@ -287,5 +315,36 @@ export const billingService = {
     }
 
     return { checked: subscriptions.data.length, downgraded, stripeEnabled: true as const };
+  },
+
+  async cancelSubscriptionsForTenant(tenantId: string) {
+    const stripe = getStripe();
+    if (!stripe) return { stripeEnabled: false as const, checked: 0, canceled: 0 };
+
+    const subscriptions = await findSubscriptionsByTenant(stripe, tenantId);
+    let canceled = 0;
+
+    for (const subscription of subscriptions) {
+      if (!CANCELABLE_SUBSCRIPTION_STATUSES.has(subscription.status)) continue;
+
+      await stripe.subscriptions.cancel(subscription.id);
+      canceled += 1;
+    }
+
+    return { stripeEnabled: true as const, checked: subscriptions.length, canceled };
+  },
+
+  async sendAccountDeletionEmail(input: { email: string; tenantName: string }) {
+    return sendEmail({
+      to: input.email,
+      subject: 'Confirmación de eliminación de cuenta',
+      text: [
+        `Confirmamos la eliminación de la cuenta de ${input.tenantName}.`,
+        '',
+        'El acceso al restaurante quedó desactivado. Conservaremos los datos durante 30 días para completar el proceso y después se eliminarán automáticamente.',
+        '',
+        `Si esto fue un error, contáctanos desde ${getAppUrl()}.`,
+      ].join('\n'),
+    });
   },
 };

@@ -12,17 +12,30 @@ export async function GET(request: Request) {
 
   const cutoff = new Date(Date.now() - RETENTION_MS);
   const prisma = getPrisma();
-  const result = await prisma.menuItem.deleteMany({
-    where: {
-      deletedAt: {
-        lt: cutoff,
+  const [deletedTenants, deletedItems] = await prisma.$transaction([
+    prisma.tenant.deleteMany({
+      where: {
+        deletedAt: {
+          lt: cutoff,
+        },
       },
-    },
-  });
+    }),
+    prisma.menuItem.deleteMany({
+      where: {
+        deletedAt: {
+          lt: cutoff,
+        },
+        tenant: {
+          deletedAt: null,
+        },
+      },
+    }),
+  ]);
 
   return Response.json({
     ok: true,
-    deletedItems: result.count,
+    deletedTenants: deletedTenants.count,
+    deletedItems: deletedItems.count,
     cutoff: cutoff.toISOString(),
   });
 }
