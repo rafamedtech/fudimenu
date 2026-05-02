@@ -2,6 +2,7 @@
 
 import { Download, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { CookieConsent } from '@/components/public/cookie-consent';
 import { Button } from '@/components/ui/button';
 import { usePwaInstall } from '@/hooks/use-pwa-install';
 
@@ -72,6 +73,7 @@ export function PublicMenuPwaWrapper({ slug, children }: PublicMenuPwaWrapperPro
           </div>
         </div>
       )}
+      <CookieConsent />
     </>
   );
 }

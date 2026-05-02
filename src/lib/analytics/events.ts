@@ -3,17 +3,44 @@ import posthog from 'posthog-js';
 
 let initialized = false;
 
+export const ANALYTICS_CONSENT_KEY = 'fudi:consent';
+export type AnalyticsConsent = 'accepted' | 'declined';
+
+export function getStoredAnalyticsConsent(): AnalyticsConsent | null {
+  if (typeof window === 'undefined') return null;
+  const value = window.localStorage.getItem(ANALYTICS_CONSENT_KEY);
+  return value === 'accepted' || value === 'declined' ? value : null;
+}
+
 export function initAnalytics() {
   if (initialized || typeof window === 'undefined') return;
   const key = process.env.NEXT_PUBLIC_POSTHOG_KEY;
   if (!key) return;
+  const consent = getStoredAnalyticsConsent();
   posthog.init(key, {
     api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST ?? 'https://us.i.posthog.com',
     capture_pageview: true,
     capture_pageleave: true,
     persistence: 'localStorage',
+    opt_out_capturing_by_default: consent !== 'accepted',
+    opt_out_persistence_by_default: consent !== 'accepted',
+    opt_out_capturing_persistence_type: 'localStorage',
   });
   initialized = true;
+}
+
+export function acceptAnalyticsConsent() {
+  if (typeof window !== 'undefined') {
+    window.localStorage.setItem(ANALYTICS_CONSENT_KEY, 'accepted');
+  }
+  posthog.opt_in_capturing();
+}
+
+export function declineAnalyticsConsent() {
+  if (typeof window !== 'undefined') {
+    window.localStorage.setItem(ANALYTICS_CONSENT_KEY, 'declined');
+  }
+  posthog.opt_out_capturing();
 }
 
 export type AnalyticsEvent =
