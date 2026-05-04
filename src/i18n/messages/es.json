@@ -13,7 +13,17 @@
   "menu": {
     "addItem": "Agregar platillo",
     "soldOut": "Agotado",
-    "available": "Disponible"
+    "available": "Disponible",
+    "special": "Especial 🔥",
+    "dailySpecials": "Especiales de hoy",
+    "orderWhatsApp": "Pedir por WhatsApp",
+    "otherCategory": "Otros",
+    "madeWith": "Hecho con",
+    "metadata": {
+      "notFoundTitle": "Menú no encontrado",
+      "title": "{restaurant} — Menú",
+      "description": "Menú digital de {restaurant}."
+    }
   },
   "auth": {
     "magicLinkSent": "Mandamos un link a tu correo 🔮",

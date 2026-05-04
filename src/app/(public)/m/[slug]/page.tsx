@@ -1,12 +1,14 @@
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
+import { getLocale, getTranslations } from 'next-intl/server';
 import { getCategoryEmoji } from '@/lib/category-placeholder';
 import { formatPrice } from '@/lib/utils';
 import { buildWhatsAppOrderUrl } from '@/lib/whatsapp';
 import { menuService } from '@/server/services/menu.service';
 import { PublicMenuPwaWrapper } from './public-menu-pwa-wrapper';
 import type { Metadata } from 'next';
-import type { MenuItem } from '@/types/domain';
+import type { Category, MenuItem, Tenant } from '@/types/domain';
 
 export const revalidate = 60;
 const OTHER_CATEGORY_NAME = 'Otros';
@@ -18,11 +20,12 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
+  const t = await getTranslations('menu');
   const tenant = await menuService.getTenantBySlug(slug);
-  if (!tenant) return { title: 'Menú no encontrado' };
+  if (!tenant) return { title: t('metadata.notFoundTitle') };
   return {
-    title: `${tenant.name} — Menú`,
-    description: `Menú digital de ${tenant.name}.`,
+    title: t('metadata.title', { restaurant: tenant.name }),
+    description: t('metadata.description', { restaurant: tenant.name }),
   };
 }
 
@@ -34,11 +37,15 @@ function PublicMenuItemCard({
   item,
   categoryName,
   whatsappHref,
+  priceLocale,
 }: {
   item: MenuItem;
   categoryName: string;
   whatsappHref: string | null;
+  priceLocale: string;
 }) {
+  const t = useTranslations('menu');
+
   return (
     <article className="flex gap-3 rounded-lg bg-white p-3 shadow-sm">
       <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-md bg-crema-100">
@@ -51,7 +58,7 @@ function PublicMenuItemCard({
         )}
         {!item.isAvailable && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/60 text-[10px] font-bold uppercase text-white">
-            Agotado
+            {t('soldOut')}
           </div>
         )}
       </div>
@@ -60,7 +67,7 @@ function PublicMenuItemCard({
           <h3 className="font-semibold text-ink-900">{item.name}</h3>
           {item.isSpecialToday && (
             <span className="shrink-0 rounded-full bg-coral-500 px-2 py-1 text-[10px] font-extrabold uppercase text-white">
-              Especial 🔥
+              {t('special')}
             </span>
           )}
         </div>
@@ -68,7 +75,7 @@ function PublicMenuItemCard({
           <p className="line-clamp-2 text-sm text-ink-500">{item.description}</p>
         )}
         <p className="mt-1 font-bold text-ink-900">
-          {formatPrice(getItemPrice(item), item.currency)}
+          {formatPrice(getItemPrice(item), item.currency, priceLocale)}
         </p>
         {whatsappHref && item.isAvailable && (
           <a
@@ -77,7 +84,7 @@ function PublicMenuItemCard({
             rel="noopener noreferrer"
             className="mt-3 inline-flex min-h-11 items-center justify-center rounded-md bg-menta-500 px-3 text-sm font-extrabold text-ink-900 shadow-sm transition-all hover:opacity-90 active:scale-[0.98]"
           >
-            Pedir por WhatsApp
+            {t('orderWhatsApp')}
           </a>
         )}
       </div>
@@ -85,12 +92,20 @@ function PublicMenuItemCard({
   );
 }
 
-export default async function PublicMenuPage({ params }: Props) {
-  const { slug } = await params;
-  const tenant = await menuService.getTenantBySlug(slug);
-  if (!tenant) notFound();
-
-  const { categories, items } = await menuService.getMenuByTenantId(tenant.id);
+function PublicMenuContent({
+  slug,
+  tenant,
+  categories,
+  items,
+  priceLocale,
+}: {
+  slug: string;
+  tenant: Tenant;
+  categories: Category[];
+  items: MenuItem[];
+  priceLocale: string;
+}) {
+  const t = useTranslations('menu');
 
   const categoryNamesById = new Map(categories.map((category) => [category.id, category.name]));
   const dailySpecials = items.filter((item) => item.isSpecialToday);
@@ -106,7 +121,7 @@ export default async function PublicMenuPage({ params }: Props) {
           {
             id: 'uncategorized',
             tenantId: tenant.id,
-            name: OTHER_CATEGORY_NAME,
+            name: t('otherCategory'),
             sortOrder: 999,
             isVisible: true,
           },
@@ -154,7 +169,7 @@ export default async function PublicMenuPage({ params }: Props) {
               href="#especiales-hoy"
               className="whitespace-nowrap rounded-full bg-coral-500 px-4 py-2 text-sm font-extrabold text-white shadow-sm"
             >
-              Especiales de hoy
+              {t('dailySpecials')}
             </a>
           )}
           {itemsByCategory.map(({ category }) => (
@@ -171,7 +186,7 @@ export default async function PublicMenuPage({ params }: Props) {
         <div className="flex flex-col gap-8 px-4 pt-4">
           {dailySpecials.length > 0 && (
             <section id="especiales-hoy">
-              <h2 className="mb-3 text-xl font-bold">Especiales de hoy</h2>
+              <h2 className="mb-3 text-xl font-bold">{t('dailySpecials')}</h2>
               <div className="flex flex-col gap-3">
                 {dailySpecials.map((item) => (
                   <PublicMenuItemCard
@@ -183,8 +198,9 @@ export default async function PublicMenuPage({ params }: Props) {
                       itemName: item.name,
                     })}
                     categoryName={
-                      item.categoryId ? categoryNamesById.get(item.categoryId) ?? '' : OTHER_CATEGORY_NAME
+                      item.categoryId ? categoryNamesById.get(item.categoryId) ?? '' : t('otherCategory')
                     }
+                    priceLocale={priceLocale}
                   />
                 ))}
               </div>
@@ -205,6 +221,7 @@ export default async function PublicMenuPage({ params }: Props) {
                       itemName: item.name,
                     })}
                     categoryName={category.name}
+                    priceLocale={priceLocale}
                   />
                 ))}
               </div>
@@ -214,10 +231,31 @@ export default async function PublicMenuPage({ params }: Props) {
 
         {tenant.plan === 'free' && (
           <footer className="mt-12 text-center text-xs text-ink-500">
-            Hecho con <span className="font-bold text-mostaza-500">FudiMenu</span>
+            {t('madeWith')} <span className="font-bold text-mostaza-500">FudiMenu</span>
           </footer>
         )}
       </main>
     </PublicMenuPwaWrapper>
+  );
+}
+
+export default async function PublicMenuPage({ params }: Props) {
+  const { slug } = await params;
+  const tenant = await menuService.getTenantBySlug(slug);
+  if (!tenant) notFound();
+
+  const [{ categories, items }, locale] = await Promise.all([
+    menuService.getMenuByTenantId(tenant.id),
+    getLocale(),
+  ]);
+
+  return (
+    <PublicMenuContent
+      slug={slug}
+      tenant={tenant}
+      categories={categories}
+      items={items}
+      priceLocale={locale === 'en' ? 'en-US' : 'es-MX'}
+    />
   );
 }

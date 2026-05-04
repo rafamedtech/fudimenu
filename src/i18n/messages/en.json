@@ -13,7 +13,17 @@
   "menu": {
     "addItem": "Add item",
     "soldOut": "Sold out",
-    "available": "Available"
+    "available": "Available",
+    "special": "Special 🔥",
+    "dailySpecials": "Today's specials",
+    "orderWhatsApp": "Order on WhatsApp",
+    "otherCategory": "Other",
+    "madeWith": "Made with",
+    "metadata": {
+      "notFoundTitle": "Menu not found",
+      "title": "{restaurant} — Menu",
+      "description": "Digital menu for {restaurant}."
+    }
   },
   "auth": {
     "magicLinkSent": "Magic link sent to your email 🔮",
