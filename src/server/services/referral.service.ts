@@ -7,6 +7,8 @@ const REFERRAL_SUFFIX_LENGTH = 4;
 const REFERRAL_ALPHABET = 'abcdefghijklmnopqrstuvwxyz0123456789';
 const REFERRAL_BASE_URL = 'https://fudimenu.app/r';
 const MAX_CODE_GENERATION_ATTEMPTS = 8;
+export const REFERRAL_COOKIE = 'fudi_referral';
+export const REFERRAL_COOKIE_MAX_AGE = 60 * 60 * 24 * 30;
 
 type ReferralLink = Pick<Referral, 'id' | 'code' | 'status' | 'creditedAt'> & {
   url: string;
@@ -15,6 +17,11 @@ type ReferralLink = Pick<Referral, 'id' | 'code' | 'status' | 'creditedAt'> & {
 type GetOrCreateReferralInput = {
   tenantId: string;
   referrerId: string;
+};
+
+type ReferralLanding = Pick<Referral, 'id' | 'code' | 'referrerId'> & {
+  restaurantName: string;
+  restaurantSlug: string;
 };
 
 function randomReferralSuffix() {
@@ -45,6 +52,43 @@ export function getReferralUrl(code: string) {
 }
 
 export const referralService = {
+  async getLandingByCode(code: string): Promise<ReferralLanding | null> {
+    const prisma = getPrisma();
+    const referral = await prisma.referral.findUnique({
+      where: { code },
+      select: {
+        id: true,
+        code: true,
+        referrerId: true,
+        status: true,
+        deletedAt: true,
+        referredTenant: {
+          select: {
+            name: true,
+            slug: true,
+            deletedAt: true,
+          },
+        },
+      },
+    });
+
+    if (!referral || referral.deletedAt || referral.referredTenant.deletedAt) {
+      return null;
+    }
+
+    if (referral.status === 'cancelled') {
+      return null;
+    }
+
+    return {
+      id: referral.id,
+      code: referral.code,
+      referrerId: referral.referrerId,
+      restaurantName: referral.referredTenant.name,
+      restaurantSlug: referral.referredTenant.slug,
+    };
+  },
+
   async getOrCreateForTenant(input: GetOrCreateReferralInput): Promise<ReferralLink> {
     const prisma = getPrisma();
     const tenant = await prisma.tenant.findFirst({

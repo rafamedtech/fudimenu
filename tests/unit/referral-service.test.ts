@@ -79,6 +79,60 @@ describe('referralService', () => {
     });
   });
 
+  it('loads active referral landing data by code', async () => {
+    mocks.getPrisma.mockReturnValue({
+      referral: {
+        findUnique: mocks.referralFindUnique,
+      },
+    });
+    mocks.referralFindUnique.mockResolvedValue({
+      id: 'referral-1',
+      code: 'tacos-pepe-x9k2',
+      referrerId: 'user-1',
+      status: 'pending',
+      deletedAt: null,
+      referredTenant: {
+        name: 'Tacos Pepe',
+        slug: 'tacos-pepe',
+        deletedAt: null,
+      },
+    });
+
+    const { referralService } = await import('../../src/server/services/referral.service');
+
+    await expect(referralService.getLandingByCode('tacos-pepe-x9k2')).resolves.toEqual({
+      id: 'referral-1',
+      code: 'tacos-pepe-x9k2',
+      referrerId: 'user-1',
+      restaurantName: 'Tacos Pepe',
+      restaurantSlug: 'tacos-pepe',
+    });
+  });
+
+  it('hides cancelled referral landing data', async () => {
+    mocks.getPrisma.mockReturnValue({
+      referral: {
+        findUnique: mocks.referralFindUnique,
+      },
+    });
+    mocks.referralFindUnique.mockResolvedValue({
+      id: 'referral-1',
+      code: 'tacos-pepe-x9k2',
+      referrerId: 'user-1',
+      status: 'cancelled',
+      deletedAt: null,
+      referredTenant: {
+        name: 'Tacos Pepe',
+        slug: 'tacos-pepe',
+        deletedAt: null,
+      },
+    });
+
+    const { referralService } = await import('../../src/server/services/referral.service');
+
+    await expect(referralService.getLandingByCode('tacos-pepe-x9k2')).resolves.toBeNull();
+  });
+
   it('returns the existing referral link when the tenant already has one', async () => {
     mocks.getPrisma.mockReturnValue({
       tenant: { findFirst: mocks.tenantFindFirst },
