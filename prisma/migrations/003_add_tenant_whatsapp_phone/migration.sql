@@ -1,5 +1,6 @@
 ALTER TABLE "tenants"
-ADD COLUMN "whatsapp_phone" VARCHAR(13);
+ADD COLUMN "whatsapp_phone" VARCHAR(13),
+ADD COLUMN "business_hours" TEXT;
 
 ALTER TABLE "tenants"
 ADD CONSTRAINT "tenants_whatsapp_phone_format"

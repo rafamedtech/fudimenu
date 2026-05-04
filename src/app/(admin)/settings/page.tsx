@@ -7,7 +7,7 @@ import { Building2, ChevronRight, MessageCircle, Palette, Sparkles } from 'lucid
 import { requireAuth } from '@/server/guards/require-auth';
 
 const links = [
-  { href: '/settings/contact', label: 'Pedidos por WhatsApp', emoji: null },
+  { href: '/settings/brand', label: 'WhatsApp y horarios', emoji: null },
   { href: '/settings/billing', label: 'Plan y facturación', emoji: '💳' },
   { href: '/qr', label: 'QR y compartir', emoji: '📱' },
   { href: '/account', label: 'Cuenta', emoji: '👤' },

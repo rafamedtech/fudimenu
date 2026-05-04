@@ -6,6 +6,7 @@ export const mockTenant: Tenant = {
   name: "Taquería Don Pepe",
   logoUrl: null,
   whatsappPhone: null,
+  businessHours: null,
   primaryColor: '#F4B400',
   cuisineType: 'mexicana',
   defaultLocale: 'es',

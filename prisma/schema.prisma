@@ -38,6 +38,7 @@ model Tenant {
   name          String
   logoUrl       String?        @map("logo_url")
   whatsappPhone String?        @map("whatsapp_phone") @db.VarChar(13)
+  businessHours String?        @map("business_hours")
   primaryColor  String         @default("#F4B400") @map("primary_color")
   cuisineType   String?        @map("cuisine_type")
   defaultLocale Locale         @default(es) @map("default_locale")

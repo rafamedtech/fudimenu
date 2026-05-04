@@ -8,6 +8,7 @@ export type Tenant = {
   name: string;
   logoUrl: string | null;
   whatsappPhone: string | null;
+  businessHours: string | null;
   primaryColor: string;
   cuisineType: string | null;
   defaultLocale: Locale;

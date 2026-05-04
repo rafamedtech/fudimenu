@@ -62,6 +62,7 @@ export async function GET() {
         name: true,
         logoUrl: true,
         whatsappPhone: true,
+        businessHours: true,
         primaryColor: true,
         cuisineType: true,
         defaultLocale: true,

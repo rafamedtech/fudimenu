@@ -34,6 +34,7 @@ export const tenantUpdateSchema = z.object({
     .optional(),
   logoUrl: z.string().url().nullable().optional(),
   whatsappPhone: z.string().max(32).nullable().optional(),
+  businessHours: z.string().max(120).nullable().optional(),
 });
 
 export type ItemInput = z.infer<typeof itemSchema>;

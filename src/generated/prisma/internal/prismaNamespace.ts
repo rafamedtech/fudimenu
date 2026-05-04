@@ -1199,6 +1199,7 @@ export const TenantScalarFieldEnum = {
   name: 'name',
   logoUrl: 'logoUrl',
   whatsappPhone: 'whatsappPhone',
+  businessHours: 'businessHours',
   primaryColor: 'primaryColor',
   cuisineType: 'cuisineType',
   defaultLocale: 'defaultLocale',

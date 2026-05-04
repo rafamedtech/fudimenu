@@ -31,6 +31,7 @@ export type TenantMinAggregateOutputType = {
   name: string | null
   logoUrl: string | null
   whatsappPhone: string | null
+  businessHours: string | null
   primaryColor: string | null
   cuisineType: string | null
   defaultLocale: $Enums.Locale | null
@@ -48,6 +49,7 @@ export type TenantMaxAggregateOutputType = {
   name: string | null
   logoUrl: string | null
   whatsappPhone: string | null
+  businessHours: string | null
   primaryColor: string | null
   cuisineType: string | null
   defaultLocale: $Enums.Locale | null
@@ -65,6 +67,7 @@ export type TenantCountAggregateOutputType = {
   name: number
   logoUrl: number
   whatsappPhone: number
+  businessHours: number
   primaryColor: number
   cuisineType: number
   defaultLocale: number
@@ -84,6 +87,7 @@ export type TenantMinAggregateInputType = {
   name?: true
   logoUrl?: true
   whatsappPhone?: true
+  businessHours?: true
   primaryColor?: true
   cuisineType?: true
   defaultLocale?: true
@@ -101,6 +105,7 @@ export type TenantMaxAggregateInputType = {
   name?: true
   logoUrl?: true
   whatsappPhone?: true
+  businessHours?: true
   primaryColor?: true
   cuisineType?: true
   defaultLocale?: true
@@ -118,6 +123,7 @@ export type TenantCountAggregateInputType = {
   name?: true
   logoUrl?: true
   whatsappPhone?: true
+  businessHours?: true
   primaryColor?: true
   cuisineType?: true
   defaultLocale?: true
@@ -208,6 +214,7 @@ export type TenantGroupByOutputType = {
   name: string
   logoUrl: string | null
   whatsappPhone: string | null
+  businessHours: string | null
   primaryColor: string
   cuisineType: string | null
   defaultLocale: $Enums.Locale
@@ -246,6 +253,7 @@ export type TenantWhereInput = {
   name?: Prisma.StringFilter<"Tenant"> | string
   logoUrl?: Prisma.StringNullableFilter<"Tenant"> | string | null
   whatsappPhone?: Prisma.StringNullableFilter<"Tenant"> | string | null
+  businessHours?: Prisma.StringNullableFilter<"Tenant"> | string | null
   primaryColor?: Prisma.StringFilter<"Tenant"> | string
   cuisineType?: Prisma.StringNullableFilter<"Tenant"> | string | null
   defaultLocale?: Prisma.EnumLocaleFilter<"Tenant"> | $Enums.Locale
@@ -271,6 +279,7 @@ export type TenantOrderByWithRelationInput = {
   name?: Prisma.SortOrder
   logoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   whatsappPhone?: Prisma.SortOrderInput | Prisma.SortOrder
+  businessHours?: Prisma.SortOrderInput | Prisma.SortOrder
   primaryColor?: Prisma.SortOrder
   cuisineType?: Prisma.SortOrderInput | Prisma.SortOrder
   defaultLocale?: Prisma.SortOrder
@@ -299,6 +308,7 @@ export type TenantWhereUniqueInput = Prisma.AtLeast<{
   name?: Prisma.StringFilter<"Tenant"> | string
   logoUrl?: Prisma.StringNullableFilter<"Tenant"> | string | null
   whatsappPhone?: Prisma.StringNullableFilter<"Tenant"> | string | null
+  businessHours?: Prisma.StringNullableFilter<"Tenant"> | string | null
   primaryColor?: Prisma.StringFilter<"Tenant"> | string
   cuisineType?: Prisma.StringNullableFilter<"Tenant"> | string | null
   defaultLocale?: Prisma.EnumLocaleFilter<"Tenant"> | $Enums.Locale
@@ -324,6 +334,7 @@ export type TenantOrderByWithAggregationInput = {
   name?: Prisma.SortOrder
   logoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   whatsappPhone?: Prisma.SortOrderInput | Prisma.SortOrder
+  businessHours?: Prisma.SortOrderInput | Prisma.SortOrder
   primaryColor?: Prisma.SortOrder
   cuisineType?: Prisma.SortOrderInput | Prisma.SortOrder
   defaultLocale?: Prisma.SortOrder
@@ -347,6 +358,7 @@ export type TenantScalarWhereWithAggregatesInput = {
   name?: Prisma.StringWithAggregatesFilter<"Tenant"> | string
   logoUrl?: Prisma.StringNullableWithAggregatesFilter<"Tenant"> | string | null
   whatsappPhone?: Prisma.StringNullableWithAggregatesFilter<"Tenant"> | string | null
+  businessHours?: Prisma.StringNullableWithAggregatesFilter<"Tenant"> | string | null
   primaryColor?: Prisma.StringWithAggregatesFilter<"Tenant"> | string
   cuisineType?: Prisma.StringNullableWithAggregatesFilter<"Tenant"> | string | null
   defaultLocale?: Prisma.EnumLocaleWithAggregatesFilter<"Tenant"> | $Enums.Locale
@@ -364,6 +376,7 @@ export type TenantCreateInput = {
   name: string
   logoUrl?: string | null
   whatsappPhone?: string | null
+  businessHours?: string | null
   primaryColor?: string
   cuisineType?: string | null
   defaultLocale?: $Enums.Locale
@@ -389,6 +402,7 @@ export type TenantUncheckedCreateInput = {
   name: string
   logoUrl?: string | null
   whatsappPhone?: string | null
+  businessHours?: string | null
   primaryColor?: string
   cuisineType?: string | null
   defaultLocale?: $Enums.Locale
@@ -414,6 +428,7 @@ export type TenantUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
   cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
@@ -439,6 +454,7 @@ export type TenantUncheckedUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
   cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
@@ -464,6 +480,7 @@ export type TenantCreateManyInput = {
   name: string
   logoUrl?: string | null
   whatsappPhone?: string | null
+  businessHours?: string | null
   primaryColor?: string
   cuisineType?: string | null
   defaultLocale?: $Enums.Locale
@@ -481,6 +498,7 @@ export type TenantUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
   cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
@@ -498,6 +516,7 @@ export type TenantUncheckedUpdateManyInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
   cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
@@ -515,6 +534,7 @@ export type TenantCountOrderByAggregateInput = {
   name?: Prisma.SortOrder
   logoUrl?: Prisma.SortOrder
   whatsappPhone?: Prisma.SortOrder
+  businessHours?: Prisma.SortOrder
   primaryColor?: Prisma.SortOrder
   cuisineType?: Prisma.SortOrder
   defaultLocale?: Prisma.SortOrder
@@ -532,6 +552,7 @@ export type TenantMaxOrderByAggregateInput = {
   name?: Prisma.SortOrder
   logoUrl?: Prisma.SortOrder
   whatsappPhone?: Prisma.SortOrder
+  businessHours?: Prisma.SortOrder
   primaryColor?: Prisma.SortOrder
   cuisineType?: Prisma.SortOrder
   defaultLocale?: Prisma.SortOrder
@@ -549,6 +570,7 @@ export type TenantMinOrderByAggregateInput = {
   name?: Prisma.SortOrder
   logoUrl?: Prisma.SortOrder
   whatsappPhone?: Prisma.SortOrder
+  businessHours?: Prisma.SortOrder
   primaryColor?: Prisma.SortOrder
   cuisineType?: Prisma.SortOrder
   defaultLocale?: Prisma.SortOrder
@@ -716,6 +738,7 @@ export type TenantCreateWithoutMembershipsInput = {
   name: string
   logoUrl?: string | null
   whatsappPhone?: string | null
+  businessHours?: string | null
   primaryColor?: string
   cuisineType?: string | null
   defaultLocale?: $Enums.Locale
@@ -740,6 +763,7 @@ export type TenantUncheckedCreateWithoutMembershipsInput = {
   name: string
   logoUrl?: string | null
   whatsappPhone?: string | null
+  businessHours?: string | null
   primaryColor?: string
   cuisineType?: string | null
   defaultLocale?: $Enums.Locale
@@ -780,6 +804,7 @@ export type TenantUpdateWithoutMembershipsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
   cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
@@ -804,6 +829,7 @@ export type TenantUncheckedUpdateWithoutMembershipsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
   cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
@@ -828,6 +854,7 @@ export type TenantCreateWithoutCategoriesInput = {
   name: string
   logoUrl?: string | null
   whatsappPhone?: string | null
+  businessHours?: string | null
   primaryColor?: string
   cuisineType?: string | null
   defaultLocale?: $Enums.Locale
@@ -852,6 +879,7 @@ export type TenantUncheckedCreateWithoutCategoriesInput = {
   name: string
   logoUrl?: string | null
   whatsappPhone?: string | null
+  businessHours?: string | null
   primaryColor?: string
   cuisineType?: string | null
   defaultLocale?: $Enums.Locale
@@ -892,6 +920,7 @@ export type TenantUpdateWithoutCategoriesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
   cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
@@ -916,6 +945,7 @@ export type TenantUncheckedUpdateWithoutCategoriesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
   cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
@@ -940,6 +970,7 @@ export type TenantCreateWithoutItemsInput = {
   name: string
   logoUrl?: string | null
   whatsappPhone?: string | null
+  businessHours?: string | null
   primaryColor?: string
   cuisineType?: string | null
   defaultLocale?: $Enums.Locale
@@ -964,6 +995,7 @@ export type TenantUncheckedCreateWithoutItemsInput = {
   name: string
   logoUrl?: string | null
   whatsappPhone?: string | null
+  businessHours?: string | null
   primaryColor?: string
   cuisineType?: string | null
   defaultLocale?: $Enums.Locale
@@ -1004,6 +1036,7 @@ export type TenantUpdateWithoutItemsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
   cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
@@ -1028,6 +1061,7 @@ export type TenantUncheckedUpdateWithoutItemsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
   cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
@@ -1052,6 +1086,7 @@ export type TenantCreateWithoutSlugHistoryInput = {
   name: string
   logoUrl?: string | null
   whatsappPhone?: string | null
+  businessHours?: string | null
   primaryColor?: string
   cuisineType?: string | null
   defaultLocale?: $Enums.Locale
@@ -1076,6 +1111,7 @@ export type TenantUncheckedCreateWithoutSlugHistoryInput = {
   name: string
   logoUrl?: string | null
   whatsappPhone?: string | null
+  businessHours?: string | null
   primaryColor?: string
   cuisineType?: string | null
   defaultLocale?: $Enums.Locale
@@ -1116,6 +1152,7 @@ export type TenantUpdateWithoutSlugHistoryInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
   cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
@@ -1140,6 +1177,7 @@ export type TenantUncheckedUpdateWithoutSlugHistoryInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
   cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
@@ -1164,6 +1202,7 @@ export type TenantCreateWithoutMenuViewsInput = {
   name: string
   logoUrl?: string | null
   whatsappPhone?: string | null
+  businessHours?: string | null
   primaryColor?: string
   cuisineType?: string | null
   defaultLocale?: $Enums.Locale
@@ -1188,6 +1227,7 @@ export type TenantUncheckedCreateWithoutMenuViewsInput = {
   name: string
   logoUrl?: string | null
   whatsappPhone?: string | null
+  businessHours?: string | null
   primaryColor?: string
   cuisineType?: string | null
   defaultLocale?: $Enums.Locale
@@ -1228,6 +1268,7 @@ export type TenantUpdateWithoutMenuViewsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
   cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
@@ -1252,6 +1293,7 @@ export type TenantUncheckedUpdateWithoutMenuViewsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
   cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
@@ -1276,6 +1318,7 @@ export type TenantCreateWithoutItemViewsInput = {
   name: string
   logoUrl?: string | null
   whatsappPhone?: string | null
+  businessHours?: string | null
   primaryColor?: string
   cuisineType?: string | null
   defaultLocale?: $Enums.Locale
@@ -1300,6 +1343,7 @@ export type TenantUncheckedCreateWithoutItemViewsInput = {
   name: string
   logoUrl?: string | null
   whatsappPhone?: string | null
+  businessHours?: string | null
   primaryColor?: string
   cuisineType?: string | null
   defaultLocale?: $Enums.Locale
@@ -1340,6 +1384,7 @@ export type TenantUpdateWithoutItemViewsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
   cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
@@ -1364,6 +1409,7 @@ export type TenantUncheckedUpdateWithoutItemViewsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
   cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
@@ -1388,6 +1434,7 @@ export type TenantCreateWithoutAuditLogsInput = {
   name: string
   logoUrl?: string | null
   whatsappPhone?: string | null
+  businessHours?: string | null
   primaryColor?: string
   cuisineType?: string | null
   defaultLocale?: $Enums.Locale
@@ -1412,6 +1459,7 @@ export type TenantUncheckedCreateWithoutAuditLogsInput = {
   name: string
   logoUrl?: string | null
   whatsappPhone?: string | null
+  businessHours?: string | null
   primaryColor?: string
   cuisineType?: string | null
   defaultLocale?: $Enums.Locale
@@ -1452,6 +1500,7 @@ export type TenantUpdateWithoutAuditLogsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
   cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
@@ -1476,6 +1525,7 @@ export type TenantUncheckedUpdateWithoutAuditLogsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
   cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
@@ -1500,6 +1550,7 @@ export type TenantCreateWithoutWebhookEventsInput = {
   name: string
   logoUrl?: string | null
   whatsappPhone?: string | null
+  businessHours?: string | null
   primaryColor?: string
   cuisineType?: string | null
   defaultLocale?: $Enums.Locale
@@ -1524,6 +1575,7 @@ export type TenantUncheckedCreateWithoutWebhookEventsInput = {
   name: string
   logoUrl?: string | null
   whatsappPhone?: string | null
+  businessHours?: string | null
   primaryColor?: string
   cuisineType?: string | null
   defaultLocale?: $Enums.Locale
@@ -1564,6 +1616,7 @@ export type TenantUpdateWithoutWebhookEventsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
   cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
@@ -1588,6 +1641,7 @@ export type TenantUncheckedUpdateWithoutWebhookEventsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
   cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
@@ -1706,6 +1760,7 @@ export type TenantSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   name?: boolean
   logoUrl?: boolean
   whatsappPhone?: boolean
+  businessHours?: boolean
   primaryColor?: boolean
   cuisineType?: boolean
   defaultLocale?: boolean
@@ -1732,6 +1787,7 @@ export type TenantSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   name?: boolean
   logoUrl?: boolean
   whatsappPhone?: boolean
+  businessHours?: boolean
   primaryColor?: boolean
   cuisineType?: boolean
   defaultLocale?: boolean
@@ -1749,6 +1805,7 @@ export type TenantSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   name?: boolean
   logoUrl?: boolean
   whatsappPhone?: boolean
+  businessHours?: boolean
   primaryColor?: boolean
   cuisineType?: boolean
   defaultLocale?: boolean
@@ -1766,6 +1823,7 @@ export type TenantSelectScalar = {
   name?: boolean
   logoUrl?: boolean
   whatsappPhone?: boolean
+  businessHours?: boolean
   primaryColor?: boolean
   cuisineType?: boolean
   defaultLocale?: boolean
@@ -1776,7 +1834,7 @@ export type TenantSelectScalar = {
   deletedAt?: boolean
 }
 
-export type TenantOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "createdBy" | "slug" | "name" | "logoUrl" | "whatsappPhone" | "primaryColor" | "cuisineType" | "defaultLocale" | "currency" | "plan" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["tenant"]>
+export type TenantOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "createdBy" | "slug" | "name" | "logoUrl" | "whatsappPhone" | "businessHours" | "primaryColor" | "cuisineType" | "defaultLocale" | "currency" | "plan" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["tenant"]>
 export type TenantInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   memberships?: boolean | Prisma.Tenant$membershipsArgs<ExtArgs>
   categories?: boolean | Prisma.Tenant$categoriesArgs<ExtArgs>
@@ -1810,6 +1868,7 @@ export type $TenantPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     name: string
     logoUrl: string | null
     whatsappPhone: string | null
+    businessHours: string | null
     primaryColor: string
     cuisineType: string | null
     defaultLocale: $Enums.Locale
@@ -2255,6 +2314,7 @@ export interface TenantFieldRefs {
   readonly name: Prisma.FieldRef<"Tenant", 'String'>
   readonly logoUrl: Prisma.FieldRef<"Tenant", 'String'>
   readonly whatsappPhone: Prisma.FieldRef<"Tenant", 'String'>
+  readonly businessHours: Prisma.FieldRef<"Tenant", 'String'>
   readonly primaryColor: Prisma.FieldRef<"Tenant", 'String'>
   readonly cuisineType: Prisma.FieldRef<"Tenant", 'String'>
   readonly defaultLocale: Prisma.FieldRef<"Tenant", 'Locale'>
