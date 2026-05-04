@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import Stripe from 'stripe';
 import { z } from 'zod';
 import { PLAN_CONFIG } from '@/config/plans';
+import { getPrisma } from '@/lib/db/prisma';
 import { requireAuth } from '@/server/guards/require-auth';
 import type { Plan } from '@/types/domain';
 
@@ -31,7 +32,6 @@ function getAppUrl() {
 export async function createBillingCheckoutAction(input: unknown) {
   const { plan } = checkoutSchema.parse(input);
   const ctx = await requireAuth();
-  const stripe = getStripe();
   const planConfig = PLAN_CONFIG[plan as Plan];
   const appUrl = getAppUrl();
   const metadata = {
@@ -39,6 +39,24 @@ export async function createBillingCheckoutAction(input: unknown) {
     userId: ctx.userId,
     plan,
   };
+
+  if (
+    process.env.E2E_TEST_AUTH === 'true' &&
+    process.env.E2E_STRIPE_CHECKOUT_MOCK === 'true' &&
+    process.env.STRIPE_SECRET_KEY?.startsWith('sk_test_')
+  ) {
+    await getPrisma().tenant.update({
+      where: { id: ctx.tenantId },
+      data: { plan },
+    });
+
+    return {
+      ok: true as const,
+      url: `${appUrl}/settings/billing?checkout=success&session_id=cs_test_e2e_mock`,
+    };
+  }
+
+  const stripe = getStripe();
 
   const customer = await stripe.customers.create({
     email: ctx.email,

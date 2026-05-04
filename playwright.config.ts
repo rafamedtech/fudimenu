@@ -16,6 +16,9 @@ export default defineConfig({
         env: {
           ...process.env,
           E2E_TEST_AUTH: 'true',
+          E2E_STRIPE_CHECKOUT_MOCK: 'true',
+          NEXT_PUBLIC_APP_URL: 'http://127.0.0.1:3102',
+          STRIPE_SECRET_KEY: 'sk_test_e2e_mock',
           USE_MOCKS: 'false',
         },
         reuseExistingServer: !process.env.CI,
