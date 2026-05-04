@@ -5,6 +5,8 @@ import { Card } from '@/components/ui/card';
 import { requireAuth } from '@/server/guards/require-auth';
 import { referralService } from '@/server/services/referral.service';
 
+export const dynamic = 'force-dynamic';
+
 function formatMoney(cents: number) {
   return new Intl.NumberFormat('es-MX', {
     style: 'currency',

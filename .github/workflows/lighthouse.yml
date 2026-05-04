@@ -1,0 +1,73 @@
+name: Lighthouse
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  lighthouse:
+    name: Lighthouse CI gate
+    runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_APP_URL: http://127.0.0.1:3102
+      USE_MOCKS: "true"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm db:generate
+
+      - name: Build
+        run: pnpm build
+
+      - name: Run Lighthouse CI
+        run: |
+          cat > lighthouserc.json <<'JSON'
+          {
+            "ci": {
+              "collect": {
+                "url": [
+                  "http://127.0.0.1:3102/",
+                  "http://127.0.0.1:3102/m/taqueria-don-pepe"
+                ],
+                "startServerCommand": "pnpm start --hostname 127.0.0.1 --port 3102",
+                "startServerReadyPattern": "Ready",
+                "numberOfRuns": 3,
+                "settings": {
+                  "preset": "desktop",
+                  "chromeFlags": "--no-sandbox --headless=new"
+                }
+              },
+              "assert": {
+                "assertions": {
+                  "categories:performance": ["error", { "minScore": 0.9 }],
+                  "largest-contentful-paint": ["error", { "maxNumericValue": 1000 }],
+                  "interaction-to-next-paint": ["error", { "maxNumericValue": 200 }]
+                }
+              },
+              "upload": {
+                "target": "temporary-public-storage"
+              }
+            }
+          }
+          JSON
+          pnpm dlx @lhci/cli@0.15.x autorun --config=./lighthouserc.json

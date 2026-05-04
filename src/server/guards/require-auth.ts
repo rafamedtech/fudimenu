@@ -34,6 +34,7 @@ export async function requireAuth(): Promise<AuthContext> {
     if (tenantId) {
       const e2eUserId = cookieStore.get('e2e_user_id')?.value ?? 'e2e-user';
       const prisma = getPrisma();
+      // eslint-disable-next-line fudimenu/require-tenant-id-in-prisma-findmany -- E2E auth must load the test user's memberships before enforcing the requested tenant.
       const e2eMemberships = await prisma.membership.findMany({
         where: { userId: e2eUserId, deletedAt: null },
         select: {
