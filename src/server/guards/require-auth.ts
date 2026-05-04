@@ -32,17 +32,25 @@ export async function requireAuth(): Promise<AuthContext> {
     const tenantId = cookieStore.get('e2e_tenant_id')?.value;
 
     if (tenantId) {
+      const tenant = await getPrisma().tenant.findUnique({
+        where: { id: tenantId },
+        select: { name: true, slug: true, plan: true },
+      });
+      const tenantInfo = tenant
+        ? { name: tenant.name, slug: tenant.slug, plan: tenant.plan as Plan }
+        : { name: 'E2E tenant', slug: 'e2e-tenant', plan: 'pro' as Plan };
+
       return {
         userId: cookieStore.get('e2e_user_id')?.value ?? 'e2e-user',
         email: 'e2e@fudimenu.test',
         tenantId,
-        plan: 'pro',
+        plan: tenantInfo.plan,
         role: 'owner',
         memberships: [
           {
             tenantId,
             role: 'owner',
-            tenant: { name: 'E2E tenant', slug: 'e2e-tenant', plan: 'pro' },
+            tenant: tenantInfo,
           },
         ],
       };
