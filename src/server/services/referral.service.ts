@@ -6,6 +6,7 @@ import { slugify } from '@/lib/utils';
 const REFERRAL_SUFFIX_LENGTH = 4;
 const REFERRAL_ALPHABET = 'abcdefghijklmnopqrstuvwxyz0123456789';
 const REFERRAL_BASE_URL = 'https://fudimenu.app/r';
+const REFERRAL_CREDIT_CENTS = 14_900;
 const MAX_CODE_GENERATION_ATTEMPTS = 8;
 export const REFERRAL_COOKIE = 'fudi_referral';
 export const REFERRAL_COOKIE_MAX_AGE = 60 * 60 * 24 * 30;
@@ -22,6 +23,14 @@ type GetOrCreateReferralInput = {
 type ReferralLanding = Pick<Referral, 'id' | 'code' | 'referrerId'> & {
   restaurantName: string;
   restaurantSlug: string;
+};
+
+type ReferralDashboard = ReferralLink & {
+  stats: {
+    invited: number;
+    signups: number;
+    creditsEarnedCents: number;
+  };
 };
 
 function randomReferralSuffix() {
@@ -52,6 +61,43 @@ export function getReferralUrl(code: string) {
 }
 
 export const referralService = {
+  async getDashboardForTenant(input: GetOrCreateReferralInput): Promise<ReferralDashboard> {
+    const [referralLink, signups, credited] = await Promise.all([
+      referralService.getOrCreateForTenant(input),
+      getPrisma().referral.count({
+        where: {
+          referrerId: input.referrerId,
+          referredTenantId: {
+            not: input.tenantId,
+          },
+          deletedAt: null,
+        },
+      }),
+      getPrisma().referral.count({
+        where: {
+          referrerId: input.referrerId,
+          referredTenantId: {
+            not: input.tenantId,
+          },
+          status: 'credited',
+          creditedAt: {
+            not: null,
+          },
+          deletedAt: null,
+        },
+      }),
+    ]);
+
+    return {
+      ...referralLink,
+      stats: {
+        invited: signups,
+        signups,
+        creditsEarnedCents: credited * REFERRAL_CREDIT_CENTS,
+      },
+    };
+  },
+
   async getLandingByCode(code: string): Promise<ReferralLanding | null> {
     const prisma = getPrisma();
     const referral = await prisma.referral.findUnique({

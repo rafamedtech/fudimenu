@@ -4,6 +4,7 @@ const mocks = vi.hoisted(() => ({
   getPrisma: vi.fn(),
   tenantFindFirst: vi.fn(),
   referralFindUnique: vi.fn(),
+  referralCount: vi.fn(),
   referralCreate: vi.fn(),
 }));
 
@@ -158,5 +159,44 @@ describe('referralService', () => {
 
     expect(mocks.referralCreate).not.toHaveBeenCalled();
     expect(referral.url).toBe('https://fudimenu.app/r/tacos-pepe-x9k2');
+  });
+
+  it('returns referral dashboard stats for the referrer', async () => {
+    mocks.getPrisma.mockReturnValue({
+      tenant: { findFirst: mocks.tenantFindFirst },
+      referral: {
+        findUnique: mocks.referralFindUnique,
+        create: mocks.referralCreate,
+        count: mocks.referralCount,
+      },
+    });
+    mocks.tenantFindFirst.mockResolvedValue({ id: 'tenant-1', slug: 'tacos-pepe' });
+    mocks.referralFindUnique.mockResolvedValue({
+      id: 'referral-1',
+      code: 'tacos-pepe-x9k2',
+      status: 'pending',
+      creditedAt: null,
+    });
+    mocks.referralCount.mockResolvedValueOnce(3).mockResolvedValueOnce(2);
+
+    const { referralService } = await import('../../src/server/services/referral.service');
+
+    await expect(
+      referralService.getDashboardForTenant({
+        tenantId: 'tenant-1',
+        referrerId: 'user-1',
+      }),
+    ).resolves.toEqual({
+      id: 'referral-1',
+      code: 'tacos-pepe-x9k2',
+      status: 'pending',
+      creditedAt: null,
+      url: 'https://fudimenu.app/r/tacos-pepe-x9k2',
+      stats: {
+        invited: 3,
+        signups: 3,
+        creditsEarnedCents: 29800,
+      },
+    });
   });
 });

@@ -9,6 +9,7 @@ import { requireAuth } from '@/server/guards/require-auth';
 const links = [
   { href: '/settings/brand', label: 'WhatsApp y horarios', emoji: null },
   { href: '/settings/billing', label: 'Plan y facturación', emoji: '💳' },
+  { href: '/settings/referrals', label: 'Referidos', emoji: '🎁' },
   { href: '/qr', label: 'QR y compartir', emoji: '📱' },
   { href: '/account', label: 'Cuenta', emoji: '👤' },
 ];
