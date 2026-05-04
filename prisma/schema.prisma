@@ -263,8 +263,8 @@ model Referral {
   referredTenant   Tenant         @relation(fields: [referredTenantId], references: [id], onDelete: Cascade)
 
   @@unique([referredTenantId])
+  @@unique([code])
   @@index([referrerId])
-  @@index([code])
   @@index([status, createdAt])
   @@index([creditedAt])
   @@index([deletedAt])

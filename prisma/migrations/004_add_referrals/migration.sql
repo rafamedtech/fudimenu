@@ -18,7 +18,7 @@ CREATE UNIQUE INDEX "referrals_referred_tenant_id_key" ON "referrals"("referred_
 
 CREATE INDEX "referrals_referrer_id_idx" ON "referrals"("referrer_id");
 
-CREATE INDEX "referrals_code_idx" ON "referrals"("code");
+CREATE UNIQUE INDEX "referrals_code_key" ON "referrals"("code");
 
 CREATE INDEX "referrals_status_created_at_idx" ON "referrals"("status", "created_at");
 
