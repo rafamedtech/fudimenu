@@ -4,6 +4,8 @@ import { createClient } from '@supabase/supabase-js';
 import { getPrisma } from '@/lib/db/prisma';
 
 const PRO_TRIAL_DAYS = 14;
+const REFERRAL_CREDIT_CENTS = 14_900;
+const REFERRAL_CREDIT_CURRENCY = 'mxn';
 const RESEND_API_URL = 'https://api.resend.com/emails';
 const EMAIL_FROM = 'FudiMenu <noreply@fudimenu.app>';
 
@@ -139,6 +141,83 @@ async function findSubscriptionsByTenant(stripe: Stripe, tenantId: string) {
   }
 }
 
+async function findStripeCustomerByUserId(stripe: Stripe, userId: string) {
+  const query = `metadata['userId']:'${userId.replace(/'/g, "\\'")}'`;
+
+  try {
+    const result = await stripe.customers.search({
+      query,
+      limit: 1,
+    });
+
+    return result.data[0] ?? null;
+  } catch {
+    const result = await stripe.customers.list({
+      limit: 100,
+    });
+
+    return result.data.find((customer) => customer.metadata.userId === userId) ?? null;
+  }
+}
+
+async function applyReferralCreditForTenant(stripe: Stripe, tenantId: string) {
+  const prisma = getPrisma();
+  const referral = await prisma.referral.findFirst({
+    where: {
+      referredTenantId: tenantId,
+      creditedAt: null,
+      deletedAt: null,
+      status: {
+        not: 'cancelled',
+      },
+    },
+    select: {
+      id: true,
+      code: true,
+      referrerId: true,
+    },
+  });
+
+  if (!referral) return { applied: false as const, reason: 'missing_referral' as const };
+
+  const referrerCustomer = await findStripeCustomerByUserId(stripe, referral.referrerId);
+  if (!referrerCustomer) return { applied: false as const, reason: 'missing_referrer_customer' as const };
+
+  await stripe.customers.createBalanceTransaction(
+    referrerCustomer.id,
+    {
+      amount: -REFERRAL_CREDIT_CENTS,
+      currency: REFERRAL_CREDIT_CURRENCY,
+      description: 'Credito por referido FudiMenu',
+      metadata: {
+        referralId: referral.id,
+        referralCode: referral.code,
+        referredTenantId: tenantId,
+      },
+    },
+    { idempotencyKey: `referral:${referral.id}:credit:${REFERRAL_CREDIT_CENTS}${REFERRAL_CREDIT_CURRENCY}` },
+  );
+
+  await prisma.referral.updateMany({
+    where: {
+      id: referral.id,
+      creditedAt: null,
+    },
+    data: {
+      status: 'credited',
+      creditedAt: new Date(),
+    },
+  });
+
+  return {
+    applied: true as const,
+    referralId: referral.id,
+    customerId: referrerCustomer.id,
+    amount: REFERRAL_CREDIT_CENTS,
+    currency: REFERRAL_CREDIT_CURRENCY,
+  };
+}
+
 export const billingService = {
   async startProTrialForTenant(input: TrialTenantInput) {
     const stripe = getStripe();
@@ -189,6 +268,8 @@ export const billingService = {
       { idempotencyKey: `tenant:${input.tenantId}:pro-trial` },
     );
 
+    const referralCredit = await applyReferralCreditForTenant(stripe, input.tenantId);
+
     await sendEmail({
       to: input.email,
       subject: 'Tu prueba Pro termina en 14 días',
@@ -204,6 +285,7 @@ export const billingService = {
       stripeEnabled: true as const,
       customerId: customer.id,
       subscriptionId: subscription.id,
+      referralCredit,
     };
   },
 
