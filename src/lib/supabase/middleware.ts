@@ -8,8 +8,9 @@ type CookieToSet = {
   options: CookieOptions;
 };
 
-export async function updateSession(request: NextRequest) {
-  let response = NextResponse.next({ request });
+export async function updateSession(request: NextRequest, requestHeaders = request.headers) {
+  const createResponse = () => NextResponse.next({ request: { headers: requestHeaders } });
+  let response = createResponse();
 
   const supabase = createServerClient(
     getSupabaseUrl(),
@@ -21,7 +22,7 @@ export async function updateSession(request: NextRequest) {
         },
         setAll(cookiesToSet: CookieToSet[]) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
-          response = NextResponse.next({ request });
+          response = createResponse();
           cookiesToSet.forEach(({ name, value, options }) =>
             response.cookies.set(name, value, options),
           );
