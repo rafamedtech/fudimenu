@@ -43,3 +43,12 @@ export const WebhookEventStatus = {
 } as const
 
 export type WebhookEventStatus = (typeof WebhookEventStatus)[keyof typeof WebhookEventStatus]
+
+
+export const ReferralStatus = {
+  pending: 'pending',
+  credited: 'credited',
+  cancelled: 'cancelled'
+} as const
+
+export type ReferralStatus = (typeof ReferralStatus)[keyof typeof ReferralStatus]

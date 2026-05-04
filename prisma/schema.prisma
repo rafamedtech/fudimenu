@@ -31,6 +31,12 @@ enum WebhookEventStatus {
   ignored
 }
 
+enum ReferralStatus {
+  pending
+  credited
+  cancelled
+}
+
 model Tenant {
   id            String         @id @default(dbgenerated("extensions.gen_random_uuid()")) @db.Uuid
   createdBy     String?        @map("created_by") @db.Uuid
@@ -55,6 +61,7 @@ model Tenant {
   itemViews     ItemView[]
   auditLogs     AuditLog[]
   webhookEvents WebhookEvent[]
+  referrals     Referral[]
 
   @@unique([slug])
   @@index([createdBy])
@@ -241,4 +248,25 @@ model WebhookEvent {
   @@index([status, receivedAt])
   @@index([deletedAt])
   @@map("webhook_events")
+}
+
+model Referral {
+  id               String         @id @default(dbgenerated("extensions.gen_random_uuid()")) @db.Uuid
+  referrerId       String         @map("referrer_id") @db.Uuid
+  referredTenantId String         @map("referred_tenant_id") @db.Uuid
+  code             String
+  status           ReferralStatus @default(pending)
+  creditedAt       DateTime?      @map("credited_at") @db.Timestamptz(6)
+  createdAt        DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime       @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt        DateTime?      @map("deleted_at") @db.Timestamptz(6)
+  referredTenant   Tenant         @relation(fields: [referredTenantId], references: [id], onDelete: Cascade)
+
+  @@unique([referredTenantId])
+  @@index([referrerId])
+  @@index([code])
+  @@index([status, createdAt])
+  @@index([creditedAt])
+  @@index([deletedAt])
+  @@map("referrals")
 }

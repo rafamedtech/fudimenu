@@ -91,3 +91,8 @@ export type AuditLog = Prisma.AuditLogModel
  * 
  */
 export type WebhookEvent = Prisma.WebhookEventModel
+/**
+ * Model Referral
+ * 
+ */
+export type Referral = Prisma.ReferralModel
