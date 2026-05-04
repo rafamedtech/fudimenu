@@ -76,6 +76,7 @@ export async function requireAuth(): Promise<AuthContext> {
   const cookieStore = await cookies();
   const activeTenantId = cookieStore.get(ACTIVE_TENANT_COOKIE)?.value;
   const prisma = getPrisma();
+  // eslint-disable-next-line fudimenu/require-tenant-id-in-prisma-findmany -- Auth bootstrap must discover the user's allowed tenants before a trusted tenantId exists.
   const memberships = await prisma.membership.findMany({
     where: { userId: user.id, deletedAt: null },
     select: {

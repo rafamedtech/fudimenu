@@ -7,6 +7,7 @@ export type Tenant = {
   slug: string;
   name: string;
   logoUrl: string | null;
+  whatsappPhone: string | null;
   primaryColor: string;
   cuisineType: string | null;
   defaultLocale: Locale;

@@ -210,6 +210,7 @@ export const billingService = {
   async sendTrialReminderEmails(day: TrialReminderDay = 12) {
     const prisma = getPrisma();
     const { start, end } = getTrialDayWindow(day);
+    // eslint-disable-next-line fudimenu/require-tenant-id-in-prisma-findmany -- Cron job intentionally scans eligible trial tenants across the platform.
     const tenants = await prisma.tenant.findMany({
       where: {
         plan: 'pro',

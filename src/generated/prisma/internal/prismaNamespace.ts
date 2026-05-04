@@ -1198,6 +1198,7 @@ export const TenantScalarFieldEnum = {
   slug: 'slug',
   name: 'name',
   logoUrl: 'logoUrl',
+  whatsappPhone: 'whatsappPhone',
   primaryColor: 'primaryColor',
   cuisineType: 'cuisineType',
   defaultLocale: 'defaultLocale',

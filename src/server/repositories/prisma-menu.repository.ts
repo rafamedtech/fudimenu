@@ -8,6 +8,7 @@ type TenantRow = {
   slug: string;
   name: string;
   logoUrl: string | null;
+  whatsappPhone: string | null;
   primaryColor: string;
   cuisineType: string | null;
   defaultLocale: string;
@@ -48,6 +49,7 @@ function mapTenant(row: TenantRow): Tenant {
     slug: row.slug,
     name: row.name,
     logoUrl: row.logoUrl,
+    whatsappPhone: row.whatsappPhone,
     primaryColor: row.primaryColor,
     cuisineType: row.cuisineType,
     defaultLocale: row.defaultLocale as Tenant['defaultLocale'],

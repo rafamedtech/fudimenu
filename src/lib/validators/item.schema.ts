@@ -33,6 +33,7 @@ export const tenantUpdateSchema = z.object({
     .regex(/^#[0-9A-Fa-f]{6}$/, 'Color hex inválido')
     .optional(),
   logoUrl: z.string().url().nullable().optional(),
+  whatsappPhone: z.string().max(32).nullable().optional(),
 });
 
 export type ItemInput = z.infer<typeof itemSchema>;

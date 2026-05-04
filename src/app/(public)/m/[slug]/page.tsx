@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { getCategoryEmoji } from '@/lib/category-placeholder';
 import { formatPrice } from '@/lib/utils';
+import { buildWhatsAppOrderUrl } from '@/lib/whatsapp';
 import { menuService } from '@/server/services/menu.service';
 import { PublicMenuPwaWrapper } from './public-menu-pwa-wrapper';
 import type { Metadata } from 'next';
@@ -32,9 +33,11 @@ function getItemPrice(item: MenuItem) {
 function PublicMenuItemCard({
   item,
   categoryName,
+  whatsappHref,
 }: {
   item: MenuItem;
   categoryName: string;
+  whatsappHref: string | null;
 }) {
   return (
     <article className="flex gap-3 rounded-lg bg-white p-3 shadow-sm">
@@ -67,6 +70,16 @@ function PublicMenuItemCard({
         <p className="mt-1 font-bold text-ink-900">
           {formatPrice(getItemPrice(item), item.currency)}
         </p>
+        {whatsappHref && item.isAvailable && (
+          <a
+            href={whatsappHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-3 inline-flex min-h-11 items-center justify-center rounded-md bg-menta-500 px-3 text-sm font-extrabold text-ink-900 shadow-sm transition-all hover:opacity-90 active:scale-[0.98]"
+          >
+            Pedir por WhatsApp
+          </a>
+        )}
       </div>
     </article>
   );
@@ -164,6 +177,11 @@ export default async function PublicMenuPage({ params }: Props) {
                   <PublicMenuItemCard
                     key={item.id}
                     item={item}
+                    whatsappHref={buildWhatsAppOrderUrl({
+                      phone: tenant.whatsappPhone,
+                      slug,
+                      itemName: item.name,
+                    })}
                     categoryName={
                       item.categoryId ? categoryNamesById.get(item.categoryId) ?? '' : OTHER_CATEGORY_NAME
                     }
@@ -181,6 +199,11 @@ export default async function PublicMenuPage({ params }: Props) {
                   <PublicMenuItemCard
                     key={item.id}
                     item={item}
+                    whatsappHref={buildWhatsAppOrderUrl({
+                      phone: tenant.whatsappPhone,
+                      slug,
+                      itemName: item.name,
+                    })}
                     categoryName={category.name}
                   />
                 ))}

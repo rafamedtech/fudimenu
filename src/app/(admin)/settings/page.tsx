@@ -3,10 +3,11 @@ import { ProBadge, ProFeatureLock } from '@/components/admin/pro-feature-lock';
 import { TenantSwitcher } from '@/components/admin/tenant-switcher';
 import { Card } from '@/components/ui/card';
 import Link from 'next/link';
-import { Building2, ChevronRight, Palette, Sparkles } from 'lucide-react';
+import { Building2, ChevronRight, MessageCircle, Palette, Sparkles } from 'lucide-react';
 import { requireAuth } from '@/server/guards/require-auth';
 
 const links = [
+  { href: '/settings/contact', label: 'Pedidos por WhatsApp', emoji: null },
   { href: '/settings/billing', label: 'Plan y facturación', emoji: '💳' },
   { href: '/qr', label: 'QR y compartir', emoji: '📱' },
   { href: '/account', label: 'Cuenta', emoji: '👤' },
@@ -66,7 +67,11 @@ export default async function SettingsPage() {
         {links.map((l) => (
           <Link key={l.href} href={l.href}>
             <Card className="flex items-center gap-3">
-              <span className="text-2xl">{l.emoji}</span>
+              {l.emoji ? (
+                <span className="text-2xl">{l.emoji}</span>
+              ) : (
+                <MessageCircle className="h-6 w-6 text-menta-700" />
+              )}
               <span className="flex-1 font-semibold">{l.label}</span>
               <ChevronRight size={20} className="text-ink-300" />
             </Card>

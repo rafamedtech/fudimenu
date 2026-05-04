@@ -97,6 +97,7 @@ async function main() {
           slug,
           name,
           logo_url,
+          whatsapp_phone,
           primary_color,
           cuisine_type,
           default_locale,
@@ -104,10 +105,11 @@ async function main() {
           plan,
           deleted_at
         )
-        VALUES ($1, $2, $3, $4, $5, $6, $7::"Locale", $8, $9::"TenantPlan", NULL)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8::"Locale", $9, $10::"TenantPlan", NULL)
         ON CONFLICT (slug) DO UPDATE SET
           name = EXCLUDED.name,
           logo_url = EXCLUDED.logo_url,
+          whatsapp_phone = EXCLUDED.whatsapp_phone,
           primary_color = EXCLUDED.primary_color,
           cuisine_type = EXCLUDED.cuisine_type,
           default_locale = EXCLUDED.default_locale,
@@ -120,6 +122,7 @@ async function main() {
         tenantId,
         'taqueria-don-pepe',
         'Taquería Don Pepe',
+        null,
         null,
         '#F4B400',
         'mexicana',

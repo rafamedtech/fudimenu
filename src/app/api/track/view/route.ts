@@ -72,7 +72,7 @@ function expandIpv6Groups(ip: string) {
   ].slice(0, 8);
 }
 
-export function anonymizeIp(ip: string | null) {
+function anonymizeIp(ip: string | null) {
   if (!ip) return null;
 
   const candidate = cleanIpCandidate(ip);
