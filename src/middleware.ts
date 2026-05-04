@@ -6,9 +6,14 @@ const AUTH_PREFIXES = ['/login', '/signup', '/forgot-password'];
 
 export async function middleware(request: NextRequest) {
   const useMocks = process.env.USE_MOCKS === 'true';
+  const useE2eAuth = process.env.E2E_TEST_AUTH === 'true';
   const { pathname } = request.nextUrl;
 
   if (useMocks) return NextResponse.next();
+
+  if (useE2eAuth && request.cookies.get('e2e_user_id')?.value) {
+    return NextResponse.next();
+  }
 
   const { response, user } = await updateSession(request);
 

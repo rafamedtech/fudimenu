@@ -1,5 +1,6 @@
 'use server';
 import { redirect } from 'next/navigation';
+import { cookies } from 'next/headers';
 import { z } from 'zod';
 import { getPrisma } from '@/lib/db/prisma';
 import { createSupabaseServer } from '@/lib/supabase/server';
@@ -20,10 +21,26 @@ export async function completeOnboardingAction(input: unknown) {
     return { ok: true as const, tenantId: mockTenant.id, slug: mockTenant.slug };
   }
 
-  const supabase = await createSupabaseServer();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let user: { id: string; email?: string | null } | null = null;
+
+  if (process.env.E2E_TEST_AUTH === 'true') {
+    const cookieStore = await cookies();
+    const e2eUserId = cookieStore.get('e2e_user_id')?.value;
+    if (e2eUserId) {
+      user = {
+        id: e2eUserId,
+        email: cookieStore.get('e2e_user_email')?.value ?? 'e2e@fudimenu.test',
+      };
+    }
+  }
+
+  if (!user) {
+    const supabase = await createSupabaseServer();
+    const {
+      data: { user: supabaseUser },
+    } = await supabase.auth.getUser();
+    user = supabaseUser;
+  }
 
   if (!user) redirect('/login');
 
