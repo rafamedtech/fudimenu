@@ -18,8 +18,8 @@ function getTestPrisma() {
   return prisma;
 }
 
-function authCookie(tenantId: string) {
-  return `e2e_tenant_id=${tenantId}; e2e_user_id=${randomUUID()}`;
+function authCookie(tenantId: string, userId: string) {
+  return `e2e_tenant_id=${tenantId}; e2e_user_id=${userId}`;
 }
 
 test.describe('tenant isolation', () => {
@@ -37,7 +37,7 @@ test.describe('tenant isolation', () => {
     await prisma?.$disconnect();
   });
 
-  test('keeps GET /api/items and upsertItemAction scoped to the authenticated tenant', async ({
+  test('keeps two accounts scoped to their own tenant data', async ({
     request,
   }) => {
     test.skip(!databaseUrl, 'Missing DATABASE_URL or DIRECT_URL for E2E tenant isolation test.');
@@ -45,6 +45,8 @@ test.describe('tenant isolation', () => {
     const db = getTestPrisma();
     const tenantAId = randomUUID();
     const tenantBId = randomUUID();
+    const userAId = randomUUID();
+    const userBId = randomUUID();
     const tenantSuffix = randomUUID().slice(0, 8);
     tenantIds.push(tenantAId, tenantBId);
 
@@ -87,8 +89,23 @@ test.describe('tenant isolation', () => {
       ],
     });
 
+    await db.membership.createMany({
+      data: [
+        {
+          tenantId: tenantAId,
+          userId: userAId,
+          role: 'owner',
+        },
+        {
+          tenantId: tenantBId,
+          userId: userBId,
+          role: 'owner',
+        },
+      ],
+    });
+
     const itemsResponse = await request.get('/api/items', {
-      headers: { cookie: authCookie(tenantAId) },
+      headers: { cookie: authCookie(tenantAId, userAId) },
     });
     expect(itemsResponse.ok()).toBe(true);
 
@@ -96,8 +113,26 @@ test.describe('tenant isolation', () => {
     expect(itemNames).toContain('Tenant A taco');
     expect(itemNames).not.toContain('Tenant B ramen');
 
+    const tenantBItemsResponse = await request.get('/api/items', {
+      headers: { cookie: authCookie(tenantBId, userBId) },
+    });
+    expect(tenantBItemsResponse.ok()).toBe(true);
+
+    const tenantBItemNames = ((await tenantBItemsResponse.json()) as Array<{ name: string }>).map(
+      (item) => item.name,
+    );
+    expect(tenantBItemNames).toContain('Tenant B ramen');
+    expect(tenantBItemNames).not.toContain('Tenant A taco');
+
+    const forgedTenantAccess = await request.get('/api/items', {
+      headers: { cookie: authCookie(tenantBId, userAId) },
+      maxRedirects: 0,
+    });
+    expect(forgedTenantAccess.status()).toBeGreaterThanOrEqual(300);
+    expect(forgedTenantAccess.status()).toBeLessThan(400);
+
     const crossTenantWrite = await request.post('/api/e2e/upsert-item-action', {
-      headers: { cookie: authCookie(tenantAId) },
+      headers: { cookie: authCookie(tenantAId, userAId) },
       data: {
         id: itemBId,
         categoryId: null,

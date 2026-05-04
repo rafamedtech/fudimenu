@@ -32,7 +32,42 @@ export async function requireAuth(): Promise<AuthContext> {
     const tenantId = cookieStore.get('e2e_tenant_id')?.value;
 
     if (tenantId) {
-      const tenant = await getPrisma().tenant.findUnique({
+      const e2eUserId = cookieStore.get('e2e_user_id')?.value ?? 'e2e-user';
+      const prisma = getPrisma();
+      const e2eMemberships = await prisma.membership.findMany({
+        where: { userId: e2eUserId, deletedAt: null },
+        select: {
+          tenantId: true,
+          role: true,
+          tenant: {
+            select: { name: true, slug: true, plan: true },
+          },
+        },
+        orderBy: { createdAt: 'asc' },
+      });
+
+      if (e2eMemberships.length > 0) {
+        const membership = e2eMemberships.find((item) => item.tenantId === tenantId);
+        if (!membership) redirect('/login');
+
+        return {
+          userId: e2eUserId,
+          email: 'e2e@fudimenu.test',
+          tenantId: membership.tenantId,
+          plan: membership.tenant.plan as Plan,
+          role: membership.role as AuthRole,
+          memberships: e2eMemberships.map((item) => ({
+            tenantId: item.tenantId,
+            role: item.role as AuthRole,
+            tenant: {
+              ...item.tenant,
+              plan: item.tenant.plan as Plan,
+            },
+          })),
+        };
+      }
+
+      const tenant = await prisma.tenant.findUnique({
         where: { id: tenantId },
         select: { name: true, slug: true, plan: true },
       });
@@ -41,7 +76,7 @@ export async function requireAuth(): Promise<AuthContext> {
         : { name: 'E2E tenant', slug: 'e2e-tenant', plan: 'pro' as Plan };
 
       return {
-        userId: cookieStore.get('e2e_user_id')?.value ?? 'e2e-user',
+        userId: e2eUserId,
         email: 'e2e@fudimenu.test',
         tenantId,
         plan: tenantInfo.plan,
