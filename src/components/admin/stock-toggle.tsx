@@ -1,4 +1,5 @@
 'use client';
+import { useLocale } from 'next-intl';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { Toggle } from '@/components/ui/toggle';
@@ -12,6 +13,7 @@ interface StockToggleProps {
 }
 
 export function StockToggle({ itemId, initial }: StockToggleProps) {
+  const locale = useLocale();
   const [available, setAvailable] = useState(initial);
   const [isPending, startTransition] = useTransition();
 
@@ -25,7 +27,7 @@ export function StockToggle({ itemId, initial }: StockToggleProps) {
         toast.success(next ? 'Disponible' : 'Marcado agotado');
       } catch (err) {
         setAvailable(previous);
-        toast.error(toUserMessage(err));
+        toast.error(toUserMessage(err, locale));
       }
     });
   }

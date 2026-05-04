@@ -1,6 +1,7 @@
 'use client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trash2 } from 'lucide-react';
+import { useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
@@ -27,6 +28,7 @@ interface Props {
 }
 
 export function ItemEditorForm({ initial, categories }: Props) {
+  const locale = useLocale();
   const router = useRouter();
   const [isStockPending, startStockTransition] = useTransition();
   const [isDeletePending, startDeleteTransition] = useTransition();
@@ -80,7 +82,7 @@ export function ItemEditorForm({ initial, categories }: Props) {
       }
     } catch (err) {
       setSaveStatus('idle');
-      toast.error(toUserMessage(err));
+      toast.error(toUserMessage(err, locale));
     }
   }
 
@@ -97,7 +99,7 @@ export function ItemEditorForm({ initial, categories }: Props) {
         toast.success(next ? 'Disponible' : 'Marcado agotado');
       } catch (err) {
         setValue('isAvailable', previous, { shouldDirty: true });
-        toast.error(toUserMessage(err));
+        toast.error(toUserMessage(err, locale));
       }
     });
   }
@@ -121,13 +123,13 @@ export function ItemEditorForm({ initial, categories }: Props) {
                 toast.success('Platillo restaurado');
                 router.refresh();
               } catch (err) {
-                toast.error(toUserMessage(err));
+                toast.error(toUserMessage(err, locale));
               }
             },
           },
         });
       } catch (err) {
-        toast.error(toUserMessage(err));
+        toast.error(toUserMessage(err, locale));
       }
     });
   }

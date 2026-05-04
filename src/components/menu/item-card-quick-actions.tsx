@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react';
 import { useCallback, useState, useTransition } from 'react';
 import { CheckCircle2, CircleSlash2 } from 'lucide-react';
+import { useLocale } from 'next-intl';
 import { toast } from 'sonner';
 import { toggleItemAvailabilityAction } from '@/server/actions/items.actions';
 import { track } from '@/lib/analytics/events';
@@ -21,6 +22,7 @@ export function ItemCardQuickActions({
   itemId,
   initialAvailable,
 }: ItemCardQuickActionsProps) {
+  const locale = useLocale();
   const [available, setAvailable] = useState(initialAvailable);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -44,7 +46,7 @@ export function ItemCardQuickActions({
         toast.success(nextAvailable ? 'Disponible' : 'Marcado agotado');
       } catch (err) {
         setAvailable(previous);
-        toast.error(toUserMessage(err));
+        toast.error(toUserMessage(err, locale));
       }
     });
   }
