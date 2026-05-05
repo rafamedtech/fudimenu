@@ -37,6 +37,14 @@ export type OfflineMutation<TPayload extends JsonValue = JsonValue> =
 const DATABASE_NAME = 'fudimenu-admin-offline';
 const MUTATIONS_TABLE = 'mutations';
 const DEFAULT_MAX_ATTEMPTS = 5;
+const OFFLINE_QUEUE_SYNC_TAG = 'fudimenu-offline-mutations';
+const OFFLINE_QUEUE_REPLAY_MESSAGE = 'fudimenu:replay-offline-queue';
+
+type ServiceWorkerRegistrationWithSync = ServiceWorkerRegistration & {
+  sync?: {
+    register(tag: string): Promise<void>;
+  };
+};
 
 class OfflineQueueDatabase extends Dexie {
   mutations!: Table<OfflineMutation, number>;
@@ -82,6 +90,8 @@ export async function enqueueOfflineMutation<TPayload extends JsonValue = JsonVa
   };
 
   const id = await getOfflineQueueDb().mutations.add(queuedMutation);
+  void registerOfflineQueueSync().catch(() => undefined);
+
   return { ...queuedMutation, id };
 }
 
@@ -136,6 +146,19 @@ export async function clearOfflineMutations(): Promise<void> {
 
 export async function countQueuedOfflineMutations(): Promise<number> {
   return getOfflineQueueDb().mutations.where('status').equals('pending').count();
+}
+
+export async function registerOfflineQueueSync(): Promise<void> {
+  if (typeof navigator === 'undefined' || !('serviceWorker' in navigator)) return;
+
+  const registration = (await navigator.serviceWorker.ready) as ServiceWorkerRegistrationWithSync;
+
+  if (registration.sync) {
+    await registration.sync.register(OFFLINE_QUEUE_SYNC_TAG);
+    return;
+  }
+
+  registration.active?.postMessage({ type: OFFLINE_QUEUE_REPLAY_MESSAGE });
 }
 
 function createClientMutationId(): string {

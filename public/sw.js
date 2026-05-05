@@ -1,6 +1,10 @@
 const CACHE_VERSION = 'v1';
 const STATIC_CACHE = `fudimenu-static-${CACHE_VERSION}`;
 const ADMIN_CACHE = `fudimenu-admin-${CACHE_VERSION}`;
+const OFFLINE_QUEUE_DB = 'fudimenu-admin-offline';
+const OFFLINE_QUEUE_VERSION = 1;
+const OFFLINE_QUEUE_STORE = 'mutations';
+const OFFLINE_QUEUE_SYNC_TAG = 'fudimenu-offline-mutations';
 
 const ADMIN_SHELL_URLS = ['/dashboard', '/menu', '/analytics', '/settings'];
 const STATIC_PATH_PREFIXES = ['/_next/static/', '/icon', '/manifest.webmanifest'];
@@ -44,6 +48,18 @@ self.addEventListener('fetch', (event) => {
   if (request.mode === 'navigate' || isAdminPath(url.pathname)) {
     event.respondWith(networkFirstAdmin(request));
   }
+});
+
+self.addEventListener('sync', (event) => {
+  if (event.tag !== OFFLINE_QUEUE_SYNC_TAG) return;
+
+  event.waitUntil(replayOfflineQueue());
+});
+
+self.addEventListener('message', (event) => {
+  if (event.data?.type !== 'fudimenu:replay-offline-queue') return;
+
+  event.waitUntil(replayOfflineQueue());
 });
 
 async function warmAdminShell() {
@@ -148,4 +164,169 @@ async function withOfflineBanner(response) {
       'x-fudimenu-offline': '1',
     },
   });
+}
+
+async function replayOfflineQueue() {
+  const db = await openOfflineQueueDb();
+  const mutations = await getPendingOfflineMutations(db);
+  let replayed = 0;
+
+  try {
+    for (const mutation of mutations) {
+      if (!mutation.id) continue;
+
+      await updateOfflineMutation(db, mutation.id, {
+        status: 'processing',
+        updatedAt: Date.now(),
+      });
+
+      try {
+        await sendOfflineMutation(mutation);
+        await deleteOfflineMutation(db, mutation.id);
+        replayed += 1;
+      } catch (error) {
+        await markOfflineMutationFailed(db, mutation, error);
+        await notifyOfflineQueueClients({
+          type: 'fudimenu:offline-queue-sync',
+          status: 'failed',
+          replayed,
+          failedMutationId: mutation.id,
+        });
+        throw error;
+      }
+    }
+
+    await notifyOfflineQueueClients({
+      type: 'fudimenu:offline-queue-sync',
+      status: 'synced',
+      replayed,
+    });
+  } finally {
+    db.close();
+  }
+}
+
+function openOfflineQueueDb() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(OFFLINE_QUEUE_DB, OFFLINE_QUEUE_VERSION);
+
+    request.onupgradeneeded = () => {
+      const db = request.result;
+      if (db.objectStoreNames.contains(OFFLINE_QUEUE_STORE)) return;
+
+      const store = db.createObjectStore(OFFLINE_QUEUE_STORE, {
+        keyPath: 'id',
+        autoIncrement: true,
+      });
+
+      store.createIndex('clientMutationId', 'clientMutationId');
+      store.createIndex('status', 'status');
+      store.createIndex('type', 'type');
+      store.createIndex('createdAt', 'createdAt');
+      store.createIndex('updatedAt', 'updatedAt');
+      store.createIndex('[status+createdAt]', ['status', 'createdAt']);
+    };
+
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+    request.onblocked = () => reject(new Error('Offline queue database upgrade was blocked.'));
+  });
+}
+
+function getPendingOfflineMutations(db) {
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(OFFLINE_QUEUE_STORE, 'readonly');
+    const store = transaction.objectStore(OFFLINE_QUEUE_STORE);
+    const index = store.index('[status+createdAt]');
+    const range = IDBKeyRange.bound(['pending', 0], ['pending', Number.MAX_SAFE_INTEGER]);
+    const request = index.getAll(range);
+
+    request.onsuccess = () => resolve(request.result ?? []);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+function updateOfflineMutation(db, id, patch) {
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(OFFLINE_QUEUE_STORE, 'readwrite');
+    const store = transaction.objectStore(OFFLINE_QUEUE_STORE);
+    const getRequest = store.get(id);
+
+    getRequest.onsuccess = () => {
+      const mutation = getRequest.result;
+      if (!mutation) {
+        resolve();
+        return;
+      }
+
+      store.put({ ...mutation, ...patch });
+    };
+    getRequest.onerror = () => reject(getRequest.error);
+    transaction.oncomplete = () => resolve();
+    transaction.onerror = () => reject(transaction.error);
+  });
+}
+
+function deleteOfflineMutation(db, id) {
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(OFFLINE_QUEUE_STORE, 'readwrite');
+    transaction.objectStore(OFFLINE_QUEUE_STORE).delete(id);
+    transaction.oncomplete = () => resolve();
+    transaction.onerror = () => reject(transaction.error);
+  });
+}
+
+async function markOfflineMutationFailed(db, mutation, error) {
+  const attempts = (mutation.attempts ?? 0) + 1;
+  const maxAttempts = mutation.maxAttempts ?? 5;
+
+  await updateOfflineMutation(db, mutation.id, {
+    attempts,
+    lastError: formatOfflineQueueError(error),
+    status: attempts >= maxAttempts ? 'failed' : 'pending',
+    updatedAt: Date.now(),
+  });
+}
+
+async function sendOfflineMutation(mutation) {
+  const headers = new Headers(mutation.headers ?? {});
+
+  if (mutation.payload !== undefined && !headers.has('content-type')) {
+    headers.set('content-type', 'application/json');
+  }
+
+  if (!headers.has('x-fudimenu-client-mutation-id')) {
+    headers.set('x-fudimenu-client-mutation-id', mutation.clientMutationId);
+  }
+
+  const response = await fetch(normalizeOfflineMutationUrl(mutation.url), {
+    method: mutation.method ?? 'POST',
+    headers,
+    credentials: 'same-origin',
+    body: mutation.payload === undefined ? undefined : JSON.stringify(mutation.payload),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Offline mutation failed with ${response.status}`);
+  }
+}
+
+function normalizeOfflineMutationUrl(url) {
+  const normalized = new URL(url, self.location.origin);
+  if (normalized.origin !== self.location.origin) {
+    throw new Error('Offline queue only replays same-origin mutations.');
+  }
+
+  return normalized.href;
+}
+
+function formatOfflineQueueError(error) {
+  if (error instanceof Error) return error.message;
+  if (typeof error === 'string') return error;
+  return 'Unknown offline queue error';
+}
+
+async function notifyOfflineQueueClients(message) {
+  const clients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+  await Promise.all(clients.map((client) => client.postMessage(message)));
 }
