@@ -430,4 +430,18 @@ export const billingService = {
       ].join('\n'),
     });
   },
+
+  async sendPaymentFailedEmail(input: { email: string; tenantName: string }) {
+    return sendEmail({
+      to: input.email,
+      subject: 'Falló el cobro de FudiMenu',
+      text: [
+        `Falló el cobro de ${input.tenantName}.`,
+        '',
+        'Falló el cobro, actualiza tu tarjeta.',
+        '',
+        `Actualiza tu método de pago: ${getAppUrl()}/settings/billing`,
+      ].join('\n'),
+    });
+  },
 };
