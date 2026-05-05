@@ -11,13 +11,16 @@ type ItemActionError = {
 };
 
 function revalidateMenu(ctx: AuthContext) {
+  revalidateTag(`menu:${ctx.tenantId}`);
+  revalidateTag(`tenant:${ctx.tenantId}`);
+
+  revalidatePath('/menu');
+  revalidatePath('/dashboard');
+
   const activeMembership = ctx.memberships.find(
     (membership) => membership.tenantId === ctx.tenantId,
   );
 
-  revalidateTag(`menu:${ctx.tenantId}`);
-  revalidatePath('/menu');
-  revalidatePath('/dashboard');
   if (activeMembership) revalidatePath(`/m/${activeMembership.tenant.slug}`);
 }
 

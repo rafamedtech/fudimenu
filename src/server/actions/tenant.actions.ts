@@ -1,6 +1,6 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { getPrisma } from '@/lib/db/prisma';
@@ -52,9 +52,11 @@ export async function updateBrandSettingsFormAction(formData: FormData) {
   });
 
   if (!currentTenant) redirect('/settings/brand');
+  const oldSlug = currentTenant.slug;
+  const newSlug = data.slug;
 
-  if (data.slug !== currentTenant.slug) {
-    const slugCheck = await checkTenantSlugAvailability(data.slug, {
+  if (newSlug !== oldSlug) {
+    const slugCheck = await checkTenantSlugAvailability(newSlug, {
       currentTenantId: ctx.tenantId,
     });
 
@@ -66,14 +68,14 @@ export async function updateBrandSettingsFormAction(formData: FormData) {
       await tx.tenant.update({
         where: { id: ctx.tenantId },
         data: {
-          slug: data.slug,
+          slug: newSlug,
           whatsappPhone: data.whatsappPhone,
           businessHours: data.businessHours,
         },
       });
 
       await tx.slugHistory.createMany({
-        data: [{ tenantId: ctx.tenantId, slug: currentTenant.slug }],
+        data: [{ tenantId: ctx.tenantId, slug: oldSlug }],
         skipDuplicates: true,
       });
     });
@@ -87,9 +89,11 @@ export async function updateBrandSettingsFormAction(formData: FormData) {
     });
   }
 
+  revalidateTag(`menu:${ctx.tenantId}`);
+  revalidateTag(`tenant:${ctx.tenantId}`);
   revalidatePath('/settings/brand');
-  revalidatePath(`/m/${currentTenant.slug}`);
-  if (data.slug !== currentTenant.slug) revalidatePath(`/m/${data.slug}`);
+  revalidatePath(`/m/${oldSlug}`);
+  revalidatePath(`/m/${newSlug}`);
 
   redirect('/settings/brand?saved=1');
 }
