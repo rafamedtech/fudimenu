@@ -6,7 +6,7 @@ import { getCategoryEmoji } from '@/lib/category-placeholder';
 import { formatPrice } from '@/lib/utils';
 import { buildWhatsAppOrderUrl } from '@/lib/whatsapp';
 import { menuService } from '@/server/services/menu.service';
-import { PublicMenuPwaWrapper } from './public-menu-pwa-wrapper';
+import { PublicMenuLanguageSwitcher, PublicMenuPwaWrapper } from './public-menu-pwa-wrapper';
 import type { Metadata } from 'next';
 import type { Category, MenuItem, Tenant } from '@/types/domain';
 
@@ -143,7 +143,10 @@ function PublicMenuContent({
         className="mx-auto min-h-dvh max-w-md bg-crema-50 pb-12"
         style={{ ['--brand' as string]: tenant.primaryColor }}
       >
-        <header className="bg-white px-6 py-8 text-center shadow-sm">
+        <header className="relative bg-white px-6 py-8 text-center shadow-sm">
+          <div className="absolute right-4 top-4">
+            <PublicMenuLanguageSwitcher />
+          </div>
           {tenant.logoUrl ? (
             <Image
               src={tenant.logoUrl}

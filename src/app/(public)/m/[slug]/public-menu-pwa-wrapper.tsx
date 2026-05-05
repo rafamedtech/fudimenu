@@ -1,14 +1,94 @@
 'use client';
 
 import { Download, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState, useTransition } from 'react';
 import { CookieConsent } from '@/components/public/cookie-consent';
 import { Button } from '@/components/ui/button';
 import { usePwaInstall } from '@/hooks/use-pwa-install';
+import { localStore } from '@/lib/storage/local';
 
 const PUBLIC_MENU_VISITS_PREFIX = 'fudimenu:public-menu-visits:';
 const PUBLIC_MENU_SESSION_PREFIX = 'fudimenu:public-menu-session-counted:';
 const PUBLIC_MENU_DISMISSED_PREFIX = 'fudimenu:public-menu-pwa-dismissed:';
+const LANG_QUERY_PARAM = 'lang';
+const LOCALES = ['es', 'en'] as const;
+type PublicMenuLocale = (typeof LOCALES)[number];
+
+function isPublicMenuLocale(value: string | null): value is PublicMenuLocale {
+  return value === 'es' || value === 'en';
+}
+
+function getLocalizedHref(pathname: string, searchParams: URLSearchParams, locale: PublicMenuLocale) {
+  const params = new URLSearchParams(searchParams);
+  params.set(LANG_QUERY_PARAM, locale);
+  return `${pathname}?${params.toString()}${typeof window === 'undefined' ? '' : window.location.hash}`;
+}
+
+export function PublicMenuLanguageSwitcher() {
+  const locale = useLocale();
+  const t = useTranslations('menu.language');
+  const pathname = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [isPending, startTransition] = useTransition();
+  const activeLocale = isPublicMenuLocale(locale) ? locale : 'es';
+  const queryLocale = searchParams.get(LANG_QUERY_PARAM);
+
+  useEffect(() => {
+    if (isPublicMenuLocale(queryLocale)) {
+      localStore.set('fudi:locale', queryLocale);
+      return;
+    }
+
+    const storedLocale = localStore.get('fudi:locale');
+    if (storedLocale) {
+      startTransition(() => {
+        router.replace(getLocalizedHref(pathname, searchParams, storedLocale), { scroll: false });
+      });
+    }
+  }, [activeLocale, pathname, queryLocale, router, searchParams]);
+
+  function switchLocale(nextLocale: PublicMenuLocale) {
+    if (nextLocale === activeLocale && queryLocale === nextLocale) return;
+
+    localStore.set('fudi:locale', nextLocale);
+    startTransition(() => {
+      router.replace(getLocalizedHref(pathname, searchParams, nextLocale), { scroll: false });
+    });
+  }
+
+  return (
+    <div
+      className="inline-grid h-9 grid-cols-2 rounded-md border border-ink-900/10 bg-crema-50 p-0.5 shadow-sm"
+      role="group"
+      aria-label={t('label')}
+    >
+      {LOCALES.map((option) => {
+        const isActive = option === activeLocale;
+
+        return (
+          <button
+            key={option}
+            type="button"
+            aria-pressed={isActive}
+            disabled={isPending}
+            onClick={() => switchLocale(option)}
+            className={[
+              'h-8 min-w-10 rounded px-2 text-xs font-extrabold uppercase transition-colors disabled:cursor-wait',
+              isActive
+                ? 'bg-ink-900 text-white shadow-sm'
+                : 'text-ink-500 hover:bg-white hover:text-ink-900',
+            ].join(' ')}
+          >
+            {option}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
 
 interface PublicMenuPwaWrapperProps {
   slug: string;

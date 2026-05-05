@@ -19,6 +19,9 @@
     "orderWhatsApp": "Pedir por WhatsApp",
     "otherCategory": "Otros",
     "madeWith": "Hecho con",
+    "language": {
+      "label": "Idioma del menú"
+    },
     "metadata": {
       "notFoundTitle": "Menú no encontrado",
       "title": "{restaurant} — Menú",
