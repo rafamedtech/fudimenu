@@ -4,6 +4,10 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { getPrisma } from '@/lib/db/prisma';
+import {
+  checkTenantSlugAvailability,
+  normalizeTenantSlug,
+} from '@/server/services/slug.service';
 import { normalizeWhatsAppPhone } from '@/lib/whatsapp';
 import { requireAuth } from '@/server/guards/require-auth';
 
@@ -13,6 +17,13 @@ function normalizeOptionalText(input: string | null | undefined) {
 }
 
 const brandSettingsSchema = z.object({
+  slug: z
+    .string()
+    .max(80, 'Usa maximo 80 caracteres')
+    .transform((value) => normalizeTenantSlug(value))
+    .refine((value) => /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value), {
+      message: 'Usa solo letras, numeros y guiones',
+    }),
   whatsappPhone: z
     .string()
     .max(24, 'Usa el formato +52XXXXXXXXXX')
@@ -29,25 +40,56 @@ const brandSettingsSchema = z.object({
 export async function updateBrandSettingsFormAction(formData: FormData) {
   const ctx = await requireAuth();
   const data = brandSettingsSchema.parse({
+    slug: formData.get('slug')?.toString() ?? '',
     whatsappPhone: formData.get('whatsappPhone')?.toString() ?? '',
     businessHours: formData.get('businessHours')?.toString() ?? '',
   });
 
   const prisma = getPrisma();
-  await prisma.tenant.update({
+  const currentTenant = await prisma.tenant.findUnique({
     where: { id: ctx.tenantId },
-    data: {
-      whatsappPhone: data.whatsappPhone,
-      businessHours: data.businessHours,
-    },
+    select: { slug: true },
   });
 
-  const activeMembership = ctx.memberships.find(
-    (membership) => membership.tenantId === ctx.tenantId,
-  );
+  if (!currentTenant) redirect('/settings/brand');
+
+  if (data.slug !== currentTenant.slug) {
+    const slugCheck = await checkTenantSlugAvailability(data.slug, {
+      currentTenantId: ctx.tenantId,
+    });
+
+    if (!slugCheck.available) {
+      redirect(`/settings/brand?slugTaken=${encodeURIComponent(slugCheck.suggestion)}`);
+    }
+
+    await prisma.$transaction(async (tx) => {
+      await tx.tenant.update({
+        where: { id: ctx.tenantId },
+        data: {
+          slug: data.slug,
+          whatsappPhone: data.whatsappPhone,
+          businessHours: data.businessHours,
+        },
+      });
+
+      await tx.slugHistory.createMany({
+        data: [{ tenantId: ctx.tenantId, slug: currentTenant.slug }],
+        skipDuplicates: true,
+      });
+    });
+  } else {
+    await prisma.tenant.update({
+      where: { id: ctx.tenantId },
+      data: {
+        whatsappPhone: data.whatsappPhone,
+        businessHours: data.businessHours,
+      },
+    });
+  }
 
   revalidatePath('/settings/brand');
-  if (activeMembership) revalidatePath(`/m/${activeMembership.tenant.slug}`);
+  revalidatePath(`/m/${currentTenant.slug}`);
+  if (data.slug !== currentTenant.slug) revalidatePath(`/m/${data.slug}`);
 
   redirect('/settings/brand?saved=1');
 }

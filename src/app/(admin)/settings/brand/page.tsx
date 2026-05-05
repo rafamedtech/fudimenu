@@ -6,16 +6,18 @@ import { Input } from '@/components/ui/input';
 import { getPrisma } from '@/lib/db/prisma';
 import { updateBrandSettingsFormAction } from '@/server/actions/tenant.actions';
 import { requireAuth } from '@/server/guards/require-auth';
+import { BrandSlugInput } from './brand-slug-input';
 
 type BrandSettingsPageProps = {
-  searchParams: Promise<{ saved?: string }>;
+  searchParams: Promise<{ saved?: string; slugTaken?: string }>;
 };
 
 export default async function BrandSettingsPage({ searchParams }: BrandSettingsPageProps) {
-  const [{ saved }, ctx] = await Promise.all([searchParams, requireAuth()]);
+  const [{ saved, slugTaken }, ctx] = await Promise.all([searchParams, requireAuth()]);
   const tenant = await getPrisma().tenant.findUnique({
     where: { id: ctx.tenantId },
     select: {
+      slug: true,
       whatsappPhone: true,
       businessHours: true,
     },
@@ -31,6 +33,11 @@ export default async function BrandSettingsPage({ searchParams }: BrandSettingsP
             <span className="text-sm font-semibold text-ink-800">Ajustes actualizados</span>
           </Card>
         )}
+        {slugTaken && (
+          <Card className="border border-red-200 bg-red-50 text-sm font-semibold text-red-700 shadow-sm">
+            Slug tomado — prueba: {slugTaken}
+          </Card>
+        )}
 
         <Card className="space-y-5">
           <div className="flex items-start gap-3">
@@ -44,6 +51,7 @@ export default async function BrandSettingsPage({ searchParams }: BrandSettingsP
           </div>
 
           <form action={updateBrandSettingsFormAction} className="space-y-4">
+            <BrandSlugInput currentSlug={tenant?.slug ?? ''} />
             <Input
               name="whatsappPhone"
               type="tel"
