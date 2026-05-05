@@ -27,7 +27,8 @@ async function removeDailySpecialAction(formData: FormData) {
   const itemId = formData.get('itemId');
   if (typeof itemId !== 'string' || itemId.length === 0) return;
 
-  await setItemSpecialTodayAction(itemId, false);
+  const result = await setItemSpecialTodayAction(itemId, false);
+  if (!result.ok) return;
 }
 
 export default async function DashboardPage() {

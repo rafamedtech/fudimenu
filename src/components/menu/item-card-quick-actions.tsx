@@ -7,7 +7,7 @@ import { useLocale } from 'next-intl';
 import { toast } from 'sonner';
 import { toggleItemAvailabilityAction } from '@/server/actions/items.actions';
 import { track } from '@/lib/analytics/events';
-import { toUserMessage } from '@/lib/api/errors';
+import { ApiError, toUserMessage } from '@/lib/api/errors';
 import { cn } from '@/lib/utils';
 import { useLongPress } from '@/hooks/use-long-press';
 
@@ -42,7 +42,13 @@ export function ItemCardQuickActions({
 
     startTransition(async () => {
       try {
-        await toggleItemAvailabilityAction(itemId, nextAvailable);
+        const res = await toggleItemAvailabilityAction(itemId, nextAvailable);
+        if (!res.ok) {
+          setAvailable(previous);
+          toast.error(toUserMessage(actionErrorToApiError(res.code), locale));
+          return;
+        }
+
         toast.success(nextAvailable ? 'Disponible' : 'Marcado agotado');
       } catch (err) {
         setAvailable(previous);
@@ -73,4 +79,8 @@ export function ItemCardQuickActions({
       <div className={cn(isMenuOpen && 'opacity-80')}>{children}</div>
     </div>
   );
+}
+
+function actionErrorToApiError(code: 'unauthorized') {
+  return new ApiError(401, code, 'Unauthorized');
 }

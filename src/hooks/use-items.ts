@@ -2,6 +2,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { MenuItem } from '@/types/domain';
 import { apiFetch } from '@/lib/api/client';
+import { ApiError } from '@/lib/api/errors';
 import { upsertItemAction, toggleItemAvailabilityAction } from '@/server/actions/items.actions';
 import type { ItemInput } from '@/lib/validators/item.schema';
 
@@ -18,7 +19,11 @@ export function useItems() {
 export function useUpsertItem() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (input: ItemInput) => upsertItemAction(input),
+    mutationFn: async (input: ItemInput) => {
+      const result = await upsertItemAction(input);
+      if (!result.ok) throw actionErrorToApiError(result.code);
+      return result;
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ITEMS_KEY });
     },
@@ -28,8 +33,11 @@ export function useUpsertItem() {
 export function useToggleAvailability() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, available }: { id: string; available: boolean }) =>
-      toggleItemAvailabilityAction(id, available),
+    mutationFn: async ({ id, available }: { id: string; available: boolean }) => {
+      const result = await toggleItemAvailabilityAction(id, available);
+      if (!result.ok) throw actionErrorToApiError(result.code);
+      return result;
+    },
     onMutate: async ({ id, available }) => {
       await qc.cancelQueries({ queryKey: ITEMS_KEY });
       const previous = qc.getQueryData<MenuItem[]>(ITEMS_KEY);
@@ -43,4 +51,8 @@ export function useToggleAvailability() {
     },
     onSettled: () => qc.invalidateQueries({ queryKey: ITEMS_KEY }),
   });
+}
+
+function actionErrorToApiError(code: 'unauthorized') {
+  return new ApiError(401, code, 'Unauthorized');
 }

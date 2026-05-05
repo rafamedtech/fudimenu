@@ -24,7 +24,7 @@ import {
   toggleItemAvailabilityAction,
   upsertItemAction,
 } from '@/server/actions/items.actions';
-import { toUserMessage } from '@/lib/api/errors';
+import { ApiError, toUserMessage } from '@/lib/api/errors';
 import { track } from '@/lib/analytics/events';
 import type { Category, MenuItem } from '@/types/domain';
 
@@ -107,6 +107,12 @@ export function ItemEditorForm({ initial, categories }: Props) {
         ...data,
         categoryId: data.categoryId ?? fallbackCategoryId,
       });
+      if (!res.ok) {
+        setSaveStatus('idle');
+        toast.error(toUserMessage(actionErrorToApiError(res.code), locale));
+        return;
+      }
+
       if (res.ok) {
         setSaveStatus('saved');
         track(initial ? 'item_edited' : 'item_created', {
@@ -130,7 +136,13 @@ export function ItemEditorForm({ initial, categories }: Props) {
     track('stock_toggled', { itemId: initial.id, available: next });
     startStockTransition(async () => {
       try {
-        await toggleItemAvailabilityAction(initial.id, next);
+        const res = await toggleItemAvailabilityAction(initial.id, next);
+        if (!res.ok) {
+          setValue('isAvailable', previous, { shouldDirty: true });
+          toast.error(toUserMessage(actionErrorToApiError(res.code), locale));
+          return;
+        }
+
         toast.success(next ? 'Disponible' : 'Marcado agotado');
       } catch (err) {
         setValue('isAvailable', previous, { shouldDirty: true });
@@ -144,7 +156,12 @@ export function ItemEditorForm({ initial, categories }: Props) {
 
     startDeleteTransition(async () => {
       try {
-        await softDeleteItemAction(initial.id);
+        const res = await softDeleteItemAction(initial.id);
+        if (!res.ok) {
+          toast.error(toUserMessage(actionErrorToApiError(res.code), locale));
+          return;
+        }
+
         router.push('/menu');
         router.refresh();
 
@@ -154,7 +171,12 @@ export function ItemEditorForm({ initial, categories }: Props) {
             label: 'Deshacer',
             onClick: async () => {
               try {
-                await restoreItemAction(initial.id);
+                const restoreRes = await restoreItemAction(initial.id);
+                if (!restoreRes.ok) {
+                  toast.error(toUserMessage(actionErrorToApiError(restoreRes.code), locale));
+                  return;
+                }
+
                 toast.success('Platillo restaurado');
                 router.refresh();
               } catch (err) {
@@ -340,6 +362,10 @@ function isItemInputPayload(payload: JsonValue): payload is ItemInput {
     typeof payload.name === 'string' &&
     typeof payload.priceCents === 'number'
   );
+}
+
+function actionErrorToApiError(code: 'unauthorized') {
+  return new ApiError(401, code, 'Unauthorized');
 }
 
 function buildConflictRows(

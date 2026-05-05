@@ -9,6 +9,10 @@ export async function POST(request: Request) {
   try {
     const input = await request.json();
     const result = await upsertItemAction(input);
+    if (!result.ok) {
+      return NextResponse.json(result, { status: 401 });
+    }
+
     return NextResponse.json(result);
   } catch (err) {
     if (err instanceof Error && err.message === 'not_found') {
