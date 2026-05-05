@@ -101,7 +101,7 @@ describe('auth actions', () => {
     const { signOutAction } = await loadAuthActions();
     const result = await signOutAction();
 
-    expect(result).toEqual({ ok: true });
+    expect(result).toEqual({ ok: true, clearLocalStorageKeys: ['fudi:branch'] });
     expect(mocks.cookieDelete).toHaveBeenCalledWith('activetenantId');
     expect(mocks.signOut).toHaveBeenCalled();
   });

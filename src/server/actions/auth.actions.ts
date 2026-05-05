@@ -13,6 +13,7 @@ import {
 
 const emailSchema = z.string().email('Correo inválido');
 const tenantIdSchema = z.string().min(1, 'Restaurante inválido');
+export const BRANCH_STORAGE_KEY = 'fudi:branch';
 
 export async function signInWithMagicLinkAction(formData: FormData) {
   const email = emailSchema.parse(formData.get('email'));
@@ -39,10 +40,12 @@ export async function signOutAction() {
   const cookieStore = await cookies();
   cookieStore.delete(ACTIVE_TENANT_COOKIE);
 
-  if (process.env.USE_MOCKS === 'true') return { ok: true as const };
-  const supabase = await createSupabaseServer();
-  await supabase.auth.signOut();
-  return { ok: true as const };
+  if (process.env.USE_MOCKS !== 'true') {
+    const supabase = await createSupabaseServer();
+    await supabase.auth.signOut();
+  }
+
+  return { ok: true as const, clearLocalStorageKeys: [BRANCH_STORAGE_KEY] };
 }
 
 export async function switchTenantAction(input: unknown) {
