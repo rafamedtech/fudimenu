@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   buildWhatsAppOrderMessage,
   buildWhatsAppOrderUrl,
@@ -18,13 +18,15 @@ describe('whatsapp helpers', () => {
   });
 
   it('builds the MVP order message', () => {
+    vi.stubEnv('NEXT_PUBLIC_APP_URL', 'https://staging.fudimenu.test/');
+
     expect(
       buildWhatsAppOrderMessage({
         slug: 'taqueria-don-pepe',
         itemName: 'Tacos al pastor',
       }),
     ).toBe(
-      'Hola! Vi tu menú en fudimenu.app/m/taqueria-don-pepe y quiero pedir:\n- Tacos al pastor x1\n¿Tienen disponibilidad?',
+      'Hola! Vi tu menú en https://staging.fudimenu.test/m/taqueria-don-pepe y quiero pedir:\n- Tacos al pastor x1\n¿Tienen disponibilidad?',
     );
   });
 

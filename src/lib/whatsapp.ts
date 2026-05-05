@@ -10,13 +10,18 @@ export function isValidWhatsAppPhone(input: string | null | undefined) {
   return phone !== null && MEXICO_WHATSAPP_PHONE_PATTERN.test(phone);
 }
 
+function getBaseUrl() {
+  return process.env.NEXT_PUBLIC_APP_URL ?? 'https://fudimenu.app';
+}
+
 export function buildWhatsAppOrderMessage(input: {
   slug: string;
   itemName: string;
   quantity?: number;
 }) {
+  const baseUrl = getBaseUrl().replace(/\/$/, '');
   return [
-    `Hola! Vi tu menú en fudimenu.app/m/${input.slug} y quiero pedir:`,
+    `Hola! Vi tu menú en ${baseUrl}/m/${input.slug} y quiero pedir:`,
     `- ${input.itemName} x${input.quantity ?? 1}`,
     '¿Tienen disponibilidad?',
   ].join('\n');
