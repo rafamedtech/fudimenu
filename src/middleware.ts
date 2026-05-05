@@ -8,7 +8,7 @@ import {
 } from '@/i18n/config';
 import { updateSession } from '@/lib/supabase/middleware';
 
-const ADMIN_PREFIXES = ['/dashboard', '/menu', '/categories', '/branches', '/analytics', '/settings', '/onboarding'];
+const ADMIN_PREFIXES = ['/dashboard', '/menu', '/categories', '/branches', '/analytics', '/settings', '/qr', '/account', '/onboarding'];
 const AUTH_PREFIXES = ['/login', '/signup', '/forgot-password'];
 const LOCALE_HEADER_NAME = 'X-NEXT-INTL-LOCALE';
 

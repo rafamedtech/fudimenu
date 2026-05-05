@@ -34,6 +34,9 @@ export async function GET(
     headers: {
       'Content-Type': 'image/png',
       'Cache-Control': 'public, max-age=86400, immutable',
+      ...(request.nextUrl.searchParams.get('download') === '1'
+        ? { 'Content-Disposition': `attachment; filename="qr-${slug}.png"` }
+        : {}),
     },
   });
 }
