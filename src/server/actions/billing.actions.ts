@@ -65,7 +65,16 @@ export async function createBillingCheckoutAction(input: unknown) {
 
   const session = await stripe.checkout.sessions.create({
     mode: 'payment',
-    payment_method_types: ['card', 'oxxo'],
+    payment_method_types: ['card', 'oxxo', 'customer_balance'],
+    payment_method_options: {
+      customer_balance: {
+        funding_type: 'bank_transfer',
+        bank_transfer: {
+          type: 'mx_bank_transfer',
+          requested_address_types: ['spei'],
+        },
+      },
+    },
     customer: customer.id,
     line_items: [
       {

@@ -13,7 +13,7 @@ import {
 
 const emailSchema = z.string().email('Correo inválido');
 const tenantIdSchema = z.string().min(1, 'Restaurante inválido');
-export const BRANCH_STORAGE_KEY = 'fudi:branch';
+const BRANCH_STORAGE_KEY = 'fudi:branch';
 
 export async function signInWithMagicLinkAction(formData: FormData) {
   const email = emailSchema.parse(formData.get('email'));
