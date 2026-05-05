@@ -1,5 +1,6 @@
 import { isIP } from 'node:net';
 import { NextResponse, type NextRequest } from 'next/server';
+import { UAParser } from 'ua-parser-js';
 import { getPrisma } from '@/lib/db/prisma';
 import { checkRateLimit, getClientIp } from '@/lib/ratelimit';
 import { Locale, type Locale as LocaleValue } from '@/generated/prisma/enums';
@@ -95,6 +96,20 @@ function anonymizeIp(ip: string | null) {
   return null;
 }
 
+function anonymizeUserAgent(uaString: string | null) {
+  if (!uaString) return null;
+  const parser = new UAParser(uaString);
+  const result = parser.getResult();
+  const browserName = result.browser.name === 'Mobile Safari' ? 'Safari' : result.browser.name;
+
+  return JSON.stringify({
+    browser: browserName ?? null,
+    browserMajor: result.browser.major ?? null,
+    os: result.os.name ?? null,
+    deviceType: result.device.type ?? 'desktop',
+  });
+}
+
 function getRequestIp(headers: Headers) {
   for (const header of IP_HEADERS) {
     const value = headers.get(header);
@@ -148,7 +163,7 @@ export async function POST(request: NextRequest) {
       sessionId: optionalString(payload.sessionId),
       locale: optionalLocale(payload.locale),
       referrer: optionalString(payload.referrer) ?? request.headers.get('referer'),
-      userAgent: request.headers.get('user-agent'),
+      userAgent: anonymizeUserAgent(request.headers.get('user-agent')),
       ipHash: anonymizeIp(getRequestIp(request.headers)),
     },
     select: {
