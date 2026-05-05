@@ -2,6 +2,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { Toaster } from 'sonner';
+import { OfflineConflictListener } from '@/components/admin/offline-conflict-listener';
 import { initAnalytics } from '@/lib/analytics/events';
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -25,6 +26,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <QueryClientProvider client={client}>
       {children}
+      <OfflineConflictListener />
       <Toaster
         position="top-center"
         toastOptions={{

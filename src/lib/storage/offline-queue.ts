@@ -39,6 +39,7 @@ const MUTATIONS_TABLE = 'mutations';
 const DEFAULT_MAX_ATTEMPTS = 5;
 const OFFLINE_QUEUE_SYNC_TAG = 'fudimenu-offline-mutations';
 const OFFLINE_QUEUE_REPLAY_MESSAGE = 'fudimenu:replay-offline-queue';
+const OFFLINE_QUEUE_RESOLVE_CONFLICT_MESSAGE = 'fudimenu:resolve-offline-conflict';
 
 type ServiceWorkerRegistrationWithSync = ServiceWorkerRegistration & {
   sync?: {
@@ -159,6 +160,17 @@ export async function registerOfflineQueueSync(): Promise<void> {
   }
 
   registration.active?.postMessage({ type: OFFLINE_QUEUE_REPLAY_MESSAGE });
+}
+
+export async function keepLocalOfflineMutation(mutationId: number): Promise<void> {
+  if (typeof navigator === 'undefined' || !('serviceWorker' in navigator)) return;
+
+  const registration = await navigator.serviceWorker.ready;
+  registration.active?.postMessage({
+    type: OFFLINE_QUEUE_RESOLVE_CONFLICT_MESSAGE,
+    mutationId,
+    resolution: 'keep-local',
+  });
 }
 
 function createClientMutationId(): string {

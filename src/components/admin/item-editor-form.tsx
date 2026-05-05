@@ -2,15 +2,21 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trash2 } from 'lucide-react';
 import { useLocale } from 'next-intl';
-import { useRouter } from 'next/navigation';
-import { useState, useTransition } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useMemo, useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { SaveIndicator, type SaveIndicatorStatus } from '@/components/ui/save-indicator';
+import { Sheet } from '@/components/ui/sheet';
 import { Toggle } from '@/components/ui/toggle';
 import { getCategoryEmoji } from '@/lib/category-placeholder';
+import {
+  getQueuedOfflineMutation,
+  keepLocalOfflineMutation,
+  type JsonValue,
+} from '@/lib/storage/offline-queue';
 import { itemSchema, type ItemInput } from '@/lib/validators/item.schema';
 import {
   restoreItemAction,
@@ -30,9 +36,12 @@ interface Props {
 export function ItemEditorForm({ initial, categories }: Props) {
   const locale = useLocale();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isStockPending, startStockTransition] = useTransition();
   const [isDeletePending, startDeleteTransition] = useTransition();
   const [saveStatus, setSaveStatus] = useState<SaveIndicatorStatus>('idle');
+  const [conflictDraft, setConflictDraft] = useState<ItemInput | null>(null);
+  const [conflictMutationId, setConflictMutationId] = useState<number | null>(null);
   const fallbackCategoryId = categories[0]?.id ?? null;
   const initialCategoryId =
     initial?.categoryId && categories.some((category) => category.id === initial.categoryId)
@@ -63,6 +72,32 @@ export function ItemEditorForm({ initial, categories }: Props) {
   const selectedCategoryId = watch('categoryId');
   const selectedCategory = categories.find((category) => category.id === selectedCategoryId);
   const placeholderEmoji = getCategoryEmoji(selectedCategory?.name);
+  const conflictRows = useMemo(
+    () => buildConflictRows(initial, conflictDraft, categories),
+    [categories, conflictDraft, initial],
+  );
+
+  useEffect(() => {
+    const conflictId = Number(searchParams.get('offlineConflict'));
+    if (!Number.isFinite(conflictId) || conflictId <= 0) return;
+
+    let isMounted = true;
+
+    getQueuedOfflineMutation(conflictId)
+      .then((mutation) => {
+        if (!isMounted || !mutation?.payload) return;
+        const payload = mutation.payload;
+        if (!isItemInputPayload(payload)) return;
+
+        setConflictMutationId(conflictId);
+        setConflictDraft(payload);
+      })
+      .catch(() => undefined);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [searchParams]);
 
   async function onSubmit(data: ItemInput) {
     setSaveStatus('saving');
@@ -137,6 +172,59 @@ export function ItemEditorForm({ initial, categories }: Props) {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="relative flex flex-col gap-4 pt-4">
       <SaveIndicator status={saveStatus} className="absolute right-0 top-1 z-10" />
+      <Sheet
+        open={!!conflictDraft}
+        onOpenChange={(open) => {
+          if (!open) setConflictDraft(null);
+        }}
+        title="Ver ambos"
+      >
+        <div className="space-y-4">
+          <p className="text-sm leading-6 text-ink-700">
+            Otro usuario guardó una versión nueva mientras estabas offline.
+          </p>
+          <div className="overflow-hidden rounded-md border border-ink-200">
+            <div className="grid grid-cols-3 bg-crema-100 px-3 py-2 text-xs font-bold uppercase text-ink-500">
+              <span>Campo</span>
+              <span>Actual</span>
+              <span>Tus cambios</span>
+            </div>
+            {conflictRows.map((row) => (
+              <div
+                key={row.label}
+                className="grid grid-cols-3 gap-2 border-t border-ink-100 px-3 py-3 text-sm"
+              >
+                <span className="font-semibold text-ink-700">{row.label}</span>
+                <span className="break-words text-ink-600">{row.current}</span>
+                <span className="break-words font-semibold text-ink-900">{row.local}</span>
+              </div>
+            ))}
+          </div>
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              className="flex-1"
+              onClick={() => {
+                if (conflictMutationId) {
+                  void keepLocalOfflineMutation(conflictMutationId);
+                  setConflictDraft(null);
+                  toast.info('Intentando guardar tus cambios');
+                }
+              }}
+            >
+              Mis cambios
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="flex-1"
+              onClick={() => setConflictDraft(null)}
+            >
+              Cerrar
+            </Button>
+          </div>
+        </div>
+      </Sheet>
 
       <div className="flex items-center justify-between rounded-md bg-white p-4 shadow-sm">
         <div>
@@ -242,4 +330,57 @@ export function ItemEditorForm({ initial, categories }: Props) {
       </div>
     </form>
   );
+}
+
+function isItemInputPayload(payload: JsonValue): payload is ItemInput {
+  return (
+    typeof payload === 'object' &&
+    payload !== null &&
+    !Array.isArray(payload) &&
+    typeof payload.name === 'string' &&
+    typeof payload.priceCents === 'number'
+  );
+}
+
+function buildConflictRows(
+  current: MenuItem | null,
+  local: ItemInput | null,
+  categories: Category[],
+) {
+  const categoryNames = new Map(categories.map((category) => [category.id, category.name]));
+
+  return [
+    {
+      label: 'Nombre',
+      current: current?.name ?? '',
+      local: local?.name ?? '',
+    },
+    {
+      label: 'Precio',
+      current: formatPrice(current?.priceCents, current?.currency),
+      local: formatPrice(local?.priceCents, local?.currency),
+    },
+    {
+      label: 'Categoría',
+      current: current?.categoryId ? (categoryNames.get(current.categoryId) ?? 'Sin categoría') : 'Sin categoría',
+      local: local?.categoryId ? (categoryNames.get(local.categoryId) ?? 'Sin categoría') : 'Sin categoría',
+    },
+    {
+      label: 'Stock',
+      current: current?.isAvailable ? 'Disponible' : 'Agotado',
+      local: local?.isAvailable ? 'Disponible' : 'Agotado',
+    },
+    {
+      label: 'Descripción',
+      current: current?.description || 'Sin descripción',
+      local: local?.description || 'Sin descripción',
+    },
+  ];
+}
+
+function formatPrice(priceCents?: number, currency = 'MXN') {
+  return new Intl.NumberFormat('es-MX', {
+    style: 'currency',
+    currency,
+  }).format((priceCents ?? 0) / 100);
 }

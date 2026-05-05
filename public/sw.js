@@ -57,9 +57,14 @@ self.addEventListener('sync', (event) => {
 });
 
 self.addEventListener('message', (event) => {
-  if (event.data?.type !== 'fudimenu:replay-offline-queue') return;
+  if (event.data?.type === 'fudimenu:replay-offline-queue') {
+    event.waitUntil(replayOfflineQueue());
+    return;
+  }
 
-  event.waitUntil(replayOfflineQueue());
+  if (event.data?.type === 'fudimenu:resolve-offline-conflict') {
+    event.waitUntil(resolveOfflineConflict(event.data.mutationId, event.data.resolution));
+  }
 });
 
 async function warmAdminShell() {
@@ -186,6 +191,14 @@ async function replayOfflineQueue() {
         replayed += 1;
       } catch (error) {
         await markOfflineMutationFailed(db, mutation, error);
+        if (isOfflineMutationConflict(error)) {
+          await notifyOfflineQueueClients({
+            type: 'fudimenu:offline-queue-conflict',
+            mutation: toOfflineConflictPayload(mutation, error),
+          });
+          return;
+        }
+
         await notifyOfflineQueueClients({
           type: 'fudimenu:offline-queue-sync',
           status: 'failed',
@@ -200,6 +213,34 @@ async function replayOfflineQueue() {
       type: 'fudimenu:offline-queue-sync',
       status: 'synced',
       replayed,
+    });
+  } finally {
+    db.close();
+  }
+}
+
+async function resolveOfflineConflict(mutationId, resolution) {
+  if (!mutationId || resolution !== 'keep-local') return;
+
+  const db = await openOfflineQueueDb();
+
+  try {
+    const mutation = await getOfflineMutation(db, mutationId);
+    if (!mutation) return;
+
+    await sendOfflineMutation(mutation, {
+      'x-fudimenu-conflict-resolution': 'keep-local',
+    });
+    await deleteOfflineMutation(db, mutationId);
+    await notifyOfflineQueueClients({
+      type: 'fudimenu:offline-queue-conflict-resolved',
+      mutationId,
+    });
+  } catch (error) {
+    await notifyOfflineQueueClients({
+      type: 'fudimenu:offline-queue-conflict-resolution-failed',
+      mutationId,
+      error: formatOfflineQueueError(error),
     });
   } finally {
     db.close();
@@ -246,6 +287,16 @@ function getPendingOfflineMutations(db) {
   });
 }
 
+function getOfflineMutation(db, id) {
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(OFFLINE_QUEUE_STORE, 'readonly');
+    const request = transaction.objectStore(OFFLINE_QUEUE_STORE).get(id);
+
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
 function updateOfflineMutation(db, id, patch) {
   return new Promise((resolve, reject) => {
     const transaction = db.transaction(OFFLINE_QUEUE_STORE, 'readwrite');
@@ -288,8 +339,8 @@ async function markOfflineMutationFailed(db, mutation, error) {
   });
 }
 
-async function sendOfflineMutation(mutation) {
-  const headers = new Headers(mutation.headers ?? {});
+async function sendOfflineMutation(mutation, extraHeaders) {
+  const headers = new Headers({ ...(mutation.headers ?? {}), ...(extraHeaders ?? {}) });
 
   if (mutation.payload !== undefined && !headers.has('content-type')) {
     headers.set('content-type', 'application/json');
@@ -307,7 +358,10 @@ async function sendOfflineMutation(mutation) {
   });
 
   if (!response.ok) {
-    throw new Error(`Offline mutation failed with ${response.status}`);
+    const error = new Error(`Offline mutation failed with ${response.status}`);
+    error.status = response.status;
+    error.body = await response.json().catch(() => null);
+    throw error;
   }
 }
 
@@ -324,6 +378,22 @@ function formatOfflineQueueError(error) {
   if (error instanceof Error) return error.message;
   if (typeof error === 'string') return error;
   return 'Unknown offline queue error';
+}
+
+function isOfflineMutationConflict(error) {
+  return error?.status === 409 || error?.status === 412;
+}
+
+function toOfflineConflictPayload(mutation, error) {
+  return {
+    id: mutation.id,
+    clientMutationId: mutation.clientMutationId,
+    type: mutation.type,
+    url: mutation.url,
+    method: mutation.method,
+    payload: mutation.payload,
+    server: error.body?.item ?? error.body?.current ?? error.body ?? null,
+  };
 }
 
 async function notifyOfflineQueueClients(message) {
