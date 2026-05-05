@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getPrisma } from '@/lib/db/prisma';
+import { checkRateLimit, getClientIp } from '@/lib/ratelimit';
 import { requireAuth } from '@/server/guards/require-auth';
 
 export const runtime = 'nodejs';
@@ -11,7 +12,20 @@ function secondsUntil(date: Date) {
   return Math.max(1, Math.ceil((date.getTime() - Date.now()) / 1000));
 }
 
-export async function GET() {
+export async function GET(request: Request) {
+  const rateLimit = await checkRateLimit(getClientIp(request.headers), {
+    identifier: 'account-export',
+    requests: 5,
+    windowSec: 3600,
+  });
+
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { ok: false, error: 'rate_limited' },
+      { status: 429, headers: { 'Retry-After': String(rateLimit.resetSec), 'Cache-Control': 'no-store' } },
+    );
+  }
+
   const ctx = await requireAuth();
   const prisma = getPrisma();
   const cutoff = new Date(Date.now() - EXPORT_RATE_LIMIT_MS);

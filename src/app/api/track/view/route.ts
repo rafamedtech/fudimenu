@@ -1,6 +1,7 @@
 import { isIP } from 'node:net';
 import { NextResponse, type NextRequest } from 'next/server';
 import { getPrisma } from '@/lib/db/prisma';
+import { checkRateLimit, getClientIp } from '@/lib/ratelimit';
 import { Locale, type Locale as LocaleValue } from '@/generated/prisma/enums';
 
 type TrackViewPayload = {
@@ -115,6 +116,18 @@ export async function POST(request: NextRequest) {
 
   const tenantId = optionalString(payload.tenantId);
   const slug = optionalString(payload.slug);
+  const rateLimit = await checkRateLimit(`${getClientIp(request.headers)}:${slug ?? tenantId ?? 'unknown'}`, {
+    identifier: 'track-view',
+    requests: 60,
+    windowSec: 60,
+  });
+
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { ok: false, error: 'rate_limited' },
+      { status: 429, headers: { 'Retry-After': String(rateLimit.resetSec) } },
+    );
+  }
 
   if (!tenantId && !slug) {
     return NextResponse.json({ ok: false, error: 'missing_tenant' }, { status: 400 });

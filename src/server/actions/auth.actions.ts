@@ -1,9 +1,10 @@
 'use server';
 import { revalidatePath } from 'next/cache';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { getPrisma } from '@/lib/db/prisma';
+import { checkRateLimit, getClientIp } from '@/lib/ratelimit';
 import { createSupabaseServer } from '@/lib/supabase/server';
 import { mockTenant } from '@/lib/mock/data';
 import {
@@ -20,6 +21,24 @@ export async function signInWithMagicLinkAction(formData: FormData) {
 
   if (process.env.USE_MOCKS === 'true') {
     return { ok: true as const, message: 'Mock: link mágico enviado.' };
+  }
+
+  const requestHeaders = await headers();
+  const [emailRateLimit, ipRateLimit] = await Promise.all([
+    checkRateLimit(email, {
+      identifier: 'magic-link-email',
+      requests: 5,
+      windowSec: 3600,
+    }),
+    checkRateLimit(getClientIp(requestHeaders), {
+      identifier: 'magic-link-ip',
+      requests: 20,
+      windowSec: 3600,
+    }),
+  ]);
+
+  if (!emailRateLimit.allowed || !ipRateLimit.allowed) {
+    return { ok: false as const, error: 'Demasiados intentos, espera unos minutos' };
   }
 
   const supabase = await createSupabaseServer();

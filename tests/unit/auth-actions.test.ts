@@ -17,6 +17,7 @@ vi.mock('next/headers', () => ({
     set: mocks.cookieSet,
     delete: mocks.cookieDelete,
   })),
+  headers: vi.fn(async () => new Headers({ 'x-forwarded-for': '127.0.0.1' })),
 }));
 
 vi.mock('next/cache', () => ({
