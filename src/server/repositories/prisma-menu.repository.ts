@@ -215,7 +215,7 @@ export class PrismaMenuRepository implements IMenuRepository {
       specialPrice?: number | null;
       currency: string;
       imageUrl: string | null;
-      isAvailable: boolean;
+      isAvailable?: boolean;
       sortOrder: number;
     } = {
       categoryId: input.categoryId ?? null,
@@ -224,9 +224,12 @@ export class PrismaMenuRepository implements IMenuRepository {
       priceCents: input.priceCents ?? 0,
       currency: input.currency ?? 'MXN',
       imageUrl: input.imageUrl ?? null,
-      isAvailable: input.isAvailable ?? true,
       sortOrder: input.sortOrder ?? 999,
     };
+
+    if (!input.id || 'isAvailable' in input) {
+      payload.isAvailable = input.isAvailable ?? true;
+    }
 
     if (!input.id || 'isSpecialToday' in input) {
       payload.isSpecialToday = input.isSpecialToday ?? false;

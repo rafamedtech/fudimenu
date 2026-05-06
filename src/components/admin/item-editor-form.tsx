@@ -7,6 +7,7 @@ import { useEffect, useMemo, useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { SaveIndicator, type SaveIndicatorStatus } from '@/components/ui/save-indicator';
 import { Sheet } from '@/components/ui/sheet';
@@ -40,6 +41,7 @@ export function ItemEditorForm({ initial, categories }: Props) {
   const [isStockPending, startStockTransition] = useTransition();
   const [isDeletePending, startDeleteTransition] = useTransition();
   const [saveStatus, setSaveStatus] = useState<SaveIndicatorStatus>('idle');
+  const [stockAvailable, setStockAvailable] = useState(initial?.isAvailable ?? true);
   const [conflictDraft, setConflictDraft] = useState<ItemInput | null>(null);
   const [conflictMutationId, setConflictMutationId] = useState<number | null>(null);
   const fallbackCategoryId = categories[0]?.id ?? null;
@@ -63,11 +65,9 @@ export function ItemEditorForm({ initial, categories }: Props) {
       priceCents: initial?.priceCents ?? 0,
       currency: initial?.currency ?? 'MXN',
       imageUrl: initial?.imageUrl ?? null,
-      isAvailable: initial?.isAvailable ?? true,
     },
   });
 
-  const isAvailable = watch('isAvailable');
   const priceCents = watch('priceCents');
   const selectedCategoryId = watch('categoryId');
   const selectedCategory = categories.find((category) => category.id === selectedCategoryId);
@@ -106,6 +106,7 @@ export function ItemEditorForm({ initial, categories }: Props) {
       const res = await upsertItemAction({
         ...data,
         categoryId: data.categoryId ?? fallbackCategoryId,
+        ...(!initial?.id ? { isAvailable: stockAvailable } : {}),
       });
       if (!res.ok) {
         setSaveStatus('idle');
@@ -128,24 +129,27 @@ export function ItemEditorForm({ initial, categories }: Props) {
   }
 
   function handleAvailabilityChange(next: boolean) {
-    const previous = !!isAvailable;
-    setValue('isAvailable', next, { shouldDirty: true });
+    const previous = stockAvailable;
+    setStockAvailable(next);
 
-    if (!initial?.id) return;
+    if (!initial?.id) {
+      toast.success(next ? 'Disponible' : 'Marcado agotado');
+      return;
+    }
 
     track('stock_toggled', { itemId: initial.id, available: next });
     startStockTransition(async () => {
       try {
         const res = await toggleItemAvailabilityAction(initial.id, next);
         if (!res.ok) {
-          setValue('isAvailable', previous, { shouldDirty: true });
+          setStockAvailable(previous);
           toast.error(toUserMessage(actionErrorToApiError(res.code), locale));
           return;
         }
 
         toast.success(next ? 'Disponible' : 'Marcado agotado');
       } catch (err) {
-        setValue('isAvailable', previous, { shouldDirty: true });
+        setStockAvailable(previous);
         toast.error(toUserMessage(err, locale));
       }
     });
@@ -192,8 +196,28 @@ export function ItemEditorForm({ initial, categories }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="relative flex flex-col gap-4 pt-4">
-      <SaveIndicator status={saveStatus} className="absolute right-0 top-1 z-10" />
+    <div className="flex flex-col gap-5 pt-4">
+      <Card className="border border-mostaza-300 bg-mostaza-50 shadow-sm">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <p className="font-bold text-ink-900">Disponible para clientes</p>
+            <p className="text-xs text-ink-500">
+              {initial?.id
+                ? 'Se actualiza al instante en el menú público'
+                : 'Se aplicará cuando guardes el platillo'}
+            </p>
+          </div>
+          <Toggle
+            checked={stockAvailable}
+            onChange={handleAvailabilityChange}
+            disabled={isStockPending}
+            ariaLabel="Disponible para clientes"
+          />
+        </div>
+      </Card>
+
+      <form onSubmit={handleSubmit(onSubmit)} className="relative flex flex-col gap-4">
+        <SaveIndicator status={saveStatus} className="absolute right-0 top-1 z-10" />
       <Sheet
         open={!!conflictDraft}
         onOpenChange={(open) => {
@@ -247,21 +271,6 @@ export function ItemEditorForm({ initial, categories }: Props) {
           </div>
         </div>
       </Sheet>
-
-      <div className="flex items-center justify-between rounded-md bg-white p-4 shadow-sm">
-        <div>
-          <p className="font-semibold">Stock</p>
-          <p className="text-xs text-ink-500">
-            {initial?.id ? 'Cambia al instante, sin guardar' : 'Se aplicará al guardar'}
-          </p>
-        </div>
-        <Toggle
-          checked={!!isAvailable}
-          onChange={handleAvailabilityChange}
-          disabled={isStockPending}
-          ariaLabel="Disponible"
-        />
-      </div>
 
       <button
         type="button"
@@ -350,7 +359,8 @@ export function ItemEditorForm({ initial, categories }: Props) {
           Guardar
         </Button>
       </div>
-    </form>
+      </form>
+    </div>
   );
 }
 
@@ -390,11 +400,6 @@ function buildConflictRows(
       label: 'Categoría',
       current: current?.categoryId ? (categoryNames.get(current.categoryId) ?? 'Sin categoría') : 'Sin categoría',
       local: local?.categoryId ? (categoryNames.get(local.categoryId) ?? 'Sin categoría') : 'Sin categoría',
-    },
-    {
-      label: 'Stock',
-      current: current?.isAvailable ? 'Disponible' : 'Agotado',
-      local: local?.isAvailable ? 'Disponible' : 'Agotado',
     },
     {
       label: 'Descripción',

@@ -10,7 +10,7 @@ export const itemSchema = z.object({
   specialPrice: z.number().int().min(0).max(10_000_00).nullable().optional(),
   currency: z.string().length(3).default('MXN'),
   imageUrl: z.string().url().nullable().optional(),
-  isAvailable: z.boolean().default(true),
+  isAvailable: z.boolean().optional(),
 });
 
 export const categorySchema = z.object({
