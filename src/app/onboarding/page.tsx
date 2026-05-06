@@ -1,5 +1,4 @@
 'use client';
-import Image from 'next/image';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
@@ -8,7 +7,6 @@ import { Input } from '@/components/ui/input';
 import { track } from '@/lib/analytics/events';
 import { completeOnboardingAction } from '@/server/actions/onboarding.actions';
 
-const TOTAL_STEPS = 2;
 const POST_ONBOARDING_PATH = '/menu?welcome=1';
 
 const cuisines = [
@@ -22,125 +20,111 @@ const cuisines = [
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const [step, setStep] = useState(1);
   const [name, setName] = useState('');
   const [cuisine, setCuisine] = useState<string>('');
   const [itemName, setItemName] = useState('');
   const [price, setPrice] = useState<number>(0);
+  const [isDishOpen, setIsDishOpen] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [menuSlug, setMenuSlug] = useState<string | null>(null);
-  const [menuUrl, setMenuUrl] = useState('');
   const trimmedName = name.trim();
   const trimmedItemName = itemName.trim();
-  const showCelebration = Boolean(menuSlug && menuUrl);
-
-  function next() {
-    track('onboarding_step', { step });
-    setStep((s) => Math.min(TOTAL_STEPS, s + 1));
-  }
-  function back() {
-    setStep((s) => Math.max(1, s - 1));
-  }
+  const includeFirstItem = trimmedItemName.length > 0 && price > 0;
+  const progress = Math.round(
+    ((trimmedName.length > 0 ? 1 : 0) + (cuisine.length > 0 ? 1 : 0) + (includeFirstItem ? 1 : 0)) / 3 * 100,
+  );
+  const canSubmit = trimmedName.length > 0 && cuisine.length > 0;
 
   async function finish() {
     setLoading(true);
     try {
-      const res = await completeOnboardingAction({
+      const payload = {
         name: trimmedName,
         cuisine,
-        itemName: trimmedItemName,
-        priceCents: Math.round(price * 100),
-      });
+        ...(includeFirstItem
+          ? {
+              itemName: trimmedItemName,
+              priceCents: Math.round(price * 100),
+            }
+          : {}),
+      };
+      const res = await completeOnboardingAction(payload);
       track('onboarding_completed', { tenantId: res.tenantId });
-      setMenuSlug(res.slug);
-      setMenuUrl(`${window.location.origin}/m/${res.slug}`);
-      toast.success('¡Tu menú ya vive online! 🎉');
+      toast.success('Tu menú ya vive online.');
+      router.push(POST_ONBOARDING_PATH);
     } catch {
-      toast.error('No pude crear el platillo. Reintenta.');
+      toast.error('No pude crear el menú. Reintenta.');
     } finally {
       setLoading(false);
     }
   }
 
-  async function copyMenuLink() {
-    try {
-      await navigator.clipboard.writeText(menuUrl);
-      toast.success('Link copiado');
-    } catch {
-      toast.error('No pude copiar el link.');
-    }
+  function skipFirstItem() {
+    setItemName('');
+    setPrice(0);
+    setIsDishOpen(false);
   }
-
-  async function shareMenu() {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: trimmedName || 'Mi menú',
-          text: 'Ya puedes ver mi menú aquí:',
-          url: menuUrl,
-        });
-        return;
-      } catch (err) {
-        if (err instanceof DOMException && err.name === 'AbortError') return;
-      }
-    }
-
-    await copyMenuLink();
-  }
-
-  const canNext =
-    (step === 1 && trimmedName.length > 0 && cuisine.length > 0) ||
-    (step === 2 && trimmedItemName.length > 0 && price > 0);
 
   return (
     <main className="mx-auto flex min-h-dvh max-w-md flex-col px-6 pb-6 pt-8">
-      <div className="mb-6 flex gap-1.5">
-        {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
-          <div
-            key={i}
-            className={`h-1.5 flex-1 rounded-full transition-colors ${
-              i < step ? 'bg-mostaza-500' : 'bg-ink-100'
-            }`}
-          />
-        ))}
+      <div className="mb-6 h-1.5 overflow-hidden rounded-full bg-ink-100" aria-label="Progreso de onboarding">
+        <div
+          className="h-full rounded-full bg-mostaza-500 transition-all"
+          style={{ width: `${progress}%` }}
+        />
       </div>
 
-      <div className="flex flex-1 flex-col gap-6">
-        {step === 1 && (
-          <>
-            <h2 className="text-3xl font-extrabold">¿Cómo se llama tu changarro?</h2>
-            <p className="text-ink-500">Dinos el nombre y el tipo de comida. Después puedes cambiarlo.</p>
-            <Input
-              autoFocus
-              label="Nombre del restaurante"
-              placeholder="Taquería Don Pepe"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-            <div className="grid grid-cols-2 gap-3" aria-label="Tipo de cocina">
-              {cuisines.map((c) => (
-                <button
-                  key={c.id}
-                  type="button"
-                  aria-pressed={cuisine === c.id}
-                  onClick={() => setCuisine(c.id)}
-                  className={`flex h-20 items-center justify-center rounded-md border-2 text-base font-semibold transition-all ${
-                    cuisine === c.id
-                      ? 'border-mostaza-500 bg-mostaza-50'
-                      : 'border-ink-300 bg-white'
-                  }`}
-                >
-                  {c.label}
-                </button>
-              ))}
-            </div>
-          </>
-        )}
+      <div className="flex flex-1 flex-col gap-5">
+        <section className="flex flex-col gap-4">
+          <h2 className="text-3xl font-extrabold">¿Cómo se llama tu changarro?</h2>
+          <p className="text-ink-500">Dinos lo básico y FudiMenu arranca con platillos listos para editar.</p>
+          <Input
+            autoFocus
+            label="Nombre del restaurante"
+            placeholder="Taquería Don Pepe"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </section>
 
-        {step === 2 && (
-          <>
-            <h2 className="text-3xl font-extrabold">Tu primer platillo</h2>
-            <p className="text-ink-500">Solo necesitamos nombre y precio. La foto va después, desde el editor.</p>
+        <section className="flex flex-col gap-3">
+          <h3 className="text-xl font-extrabold">¿Qué tipo de comida?</h3>
+          <div className="grid grid-cols-2 gap-3" aria-label="Tipo de cocina">
+            {cuisines.map((c) => (
+              <button
+                key={c.id}
+                type="button"
+                aria-pressed={cuisine === c.id}
+                onClick={() => setCuisine(c.id)}
+                className={`flex h-16 items-center justify-center rounded-md border-2 text-base font-semibold transition-all ${
+                  cuisine === c.id
+                    ? 'border-mostaza-500 bg-mostaza-50'
+                    : 'border-ink-300 bg-white'
+                }`}
+              >
+                {c.label}
+              </button>
+            ))}
+          </div>
+        </section>
+
+        <section className="rounded-md border border-ink-200 bg-white">
+          <button
+            type="button"
+            className="flex w-full items-center justify-between gap-3 px-4 py-4 text-left"
+            aria-expanded={isDishOpen}
+            onClick={() => setIsDishOpen((open) => !open)}
+          >
+            <span>
+              <span className="block text-xl font-extrabold">Tu primer platillo</span>
+              <span className="text-sm text-ink-500">Opcional, sin foto obligatoria.</span>
+            </span>
+            <span className="text-2xl font-bold text-mostaza-600" aria-hidden>
+              {isDishOpen ? '−' : '+'}
+            </span>
+          </button>
+
+          {isDishOpen && (
+            <div className="flex flex-col gap-4 border-t border-ink-100 px-4 py-4">
             <Input
               autoFocus
               label="Nombre"
@@ -158,75 +142,19 @@ export default function OnboardingPage() {
               value={price || ''}
               onChange={(e) => setPrice(Number(e.target.value))}
             />
-          </>
-        )}
-      </div>
-
-      <div className="mt-6 flex gap-3">
-        {step > 1 && (
-          <Button variant="outline" size="lg" onClick={back}>
-            Atrás
-          </Button>
-        )}
-        {step < TOTAL_STEPS ? (
-          <Button size="lg" className="flex-1" disabled={!canNext} onClick={next}>
-            Siguiente →
-          </Button>
-        ) : (
-          <Button size="lg" className="flex-1" disabled={!canNext} loading={loading} onClick={finish}>
-            Crear mi menú
-          </Button>
-        )}
-      </div>
-
-      {showCelebration && (
-        <div
-          className="fixed inset-0 z-50 flex items-end bg-ink-900/40 px-4 py-6 sm:items-center sm:justify-center"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="onboarding-celebration-title"
-        >
-          <div className="w-full max-w-sm rounded-md bg-white p-6 shadow-xl">
-            <div className="text-5xl" aria-hidden>
-              🎉
-            </div>
-            <h2 id="onboarding-celebration-title" className="mt-4 text-2xl font-extrabold">
-              ¡Listo, jefe!
-            </h2>
-            <p className="mt-2 text-sm text-ink-500">
-              Tu menú ya vive en internet. Comparte el link o escanea este QR.
-            </p>
-
-            <div className="mt-4 flex items-center gap-4 rounded-md bg-crema-100 p-4">
-              <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-md bg-white">
-                <Image
-                  src={`/api/qr/${menuSlug}`}
-                  alt="QR del menú"
-                  fill
-                  sizes="96px"
-                  className="object-contain p-2"
-                />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-xs font-semibold uppercase text-ink-500">Link de tu menú</p>
-                <p className="mt-1 break-all text-sm font-bold text-ink-900">{menuUrl}</p>
-              </div>
-            </div>
-
-            <div className="mt-5 grid grid-cols-2 gap-3">
-              <Button variant="outline" size="lg" onClick={copyMenuLink}>
-                Copiar link
-              </Button>
-              <Button variant="outline" size="lg" onClick={shareMenu}>
-                Compartir
+              <Button variant="outline" size="lg" className="w-full" onClick={skipFirstItem}>
+                Saltar y agregar después
               </Button>
             </div>
-            <Button size="lg" className="mt-3 w-full" onClick={() => router.push(POST_ONBOARDING_PATH)}>
-              Seguir editando
-            </Button>
-          </div>
-        </div>
-      )}
+          )}
+        </section>
+      </div>
+
+      <div className="mt-6">
+        <Button size="lg" className="w-full" disabled={!canSubmit} loading={loading} onClick={finish}>
+          Crear mi menú
+        </Button>
+      </div>
     </main>
   );
 }

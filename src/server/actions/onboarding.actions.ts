@@ -1,23 +1,48 @@
 'use server';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
+import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { getPrisma } from '@/lib/db/prisma';
+import { mockCategories, mockItems, mockTenant } from '@/lib/mock/data';
 import { createSupabaseServer } from '@/lib/supabase/server';
-import { mockTenant } from '@/lib/mock/data';
+import { getMenuRepository } from '@/server/repositories/get-repository';
 import { tenantService } from '@/server/services/tenant.service';
 
 const onboardingSchema = z.object({
   name: z.string().min(1).max(80),
   cuisine: z.string().min(1).max(40),
-  itemName: z.string().min(1).max(80),
-  priceCents: z.number().int().min(1).max(10_000_00),
+  itemName: z.string().min(1).max(80).optional(),
+  priceCents: z.number().int().min(1).max(10_000_00).optional(),
 });
 
 export async function completeOnboardingAction(input: unknown) {
   const data = onboardingSchema.parse(input);
 
   if (process.env.USE_MOCKS === 'true') {
+    const cookieStore = await cookies();
+    if (data.itemName && data.priceCents) {
+      cookieStore.set('mock_onboarding_item', JSON.stringify({
+        name: data.itemName,
+        priceCents: data.priceCents,
+      }));
+    } else {
+      cookieStore.delete('mock_onboarding_item');
+    }
+
+    const firstMockItem = mockItems[0];
+    await (
+      await getMenuRepository()
+    ).upsertItem(mockTenant.id, {
+      id: 'itm_1',
+      tenantId: mockTenant.id,
+      categoryId: mockCategories[0]?.id ?? null,
+      name: data.itemName && data.priceCents ? data.itemName : firstMockItem?.name,
+      priceCents: data.itemName && data.priceCents ? data.priceCents : firstMockItem?.priceCents,
+      sortOrder: 0,
+    });
+    revalidatePath('/menu');
+
     return { ok: true as const, tenantId: mockTenant.id, slug: mockTenant.slug };
   }
 

@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import { cookies } from 'next/headers';
 import { PlanLimitBanner } from '@/components/admin/plan-limit-banner';
 import { TenantSwitcher } from '@/components/admin/tenant-switcher';
 import { AppHeader } from '@/components/layout/app-header';
@@ -30,7 +31,7 @@ export default async function MenuPage({ searchParams }: MenuPageProps) {
         {showWelcomeBanner && (
           <Card className="mb-4 border-[1.5px] border-mostaza-500 bg-mostaza-50 shadow-sm">
             <p className="text-sm font-extrabold text-ink-900">
-              Agrega 4 platillos más → desbloquea analytics 📊
+              Tu menú arrancó con 6 platillos base. Edita nombres, precios o fotos cuando quieras.
             </p>
           </Card>
         )}
@@ -44,9 +45,10 @@ export default async function MenuPage({ searchParams }: MenuPageProps) {
 
 async function MenuList({ tenantId }: { tenantId: string }) {
   const { tenant, categories, items } = await menuService.getMenuByTenantId(tenantId);
+  const visibleItems = await getVisibleItems(items);
   const categoryNamesById = new Map(categories.map((category) => [category.id, category.name]));
 
-  if (items.length === 0) {
+  if (visibleItems.length === 0) {
     return (
       <>
         <EmptyState
@@ -59,16 +61,16 @@ async function MenuList({ tenantId }: { tenantId: string }) {
             </Link>
           }
         />
-        <PlanLimitBanner plan={tenant.plan} itemCount={items.length} />
+        <PlanLimitBanner plan={tenant.plan} itemCount={visibleItems.length} />
       </>
     );
   }
 
   return (
     <>
-      <PlanLimitBanner plan={tenant.plan} itemCount={items.length} />
+      <PlanLimitBanner plan={tenant.plan} itemCount={visibleItems.length} />
       <ul className="flex flex-col gap-2">
-        {items.map((item) => (
+        {visibleItems.map((item) => (
           <li key={item.id}>
             <ItemCard
               item={item}
@@ -80,6 +82,32 @@ async function MenuList({ tenantId }: { tenantId: string }) {
       </ul>
     </>
   );
+}
+
+async function getVisibleItems(items: Awaited<ReturnType<typeof menuService.getMenuByTenantId>>['items']) {
+  if (process.env.USE_MOCKS !== 'true') return items;
+
+  const mockItem = (await cookies()).get('mock_onboarding_item')?.value;
+  if (!mockItem) return items;
+
+  try {
+    const parsed = JSON.parse(mockItem) as { name?: unknown; priceCents?: unknown };
+    if (typeof parsed.name !== 'string' || typeof parsed.priceCents !== 'number') return items;
+    const name = parsed.name;
+    const priceCents = parsed.priceCents;
+
+    return items.map((item, index) =>
+      index === 0
+        ? {
+            ...item,
+            name,
+            priceCents,
+          }
+        : item,
+    );
+  } catch {
+    return items;
+  }
 }
 
 function MenuListLoading() {

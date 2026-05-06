@@ -96,9 +96,12 @@ describe('tenantService', () => {
       expect.objectContaining({
         data: expect.objectContaining({
           categoryId: 'cat-Tacos',
+          name: 'Taco de asada',
+          sortOrder: 0,
         }),
       }),
     );
+    expect(mocks.tx.menuItem.create).toHaveBeenCalledTimes(6);
   });
 
   it('uses cuisine-specific category presets', async () => {
@@ -121,6 +124,94 @@ describe('tenantService', () => {
       'Pastas',
       'Bebidas',
       'Otros',
+    ]);
+  });
+
+  it('createFromOnboarding sin itemName crea 6 placeholders', async () => {
+    vi.stubGlobal('crypto', { randomUUID: mocks.randomUUID });
+
+    const { tenantService } = await import('../../src/server/services/tenant.service');
+
+    await tenantService.createFromOnboarding({
+      userId: 'user-1',
+      email: 'owner@example.com',
+      name: 'Taquería Norte',
+      cuisine: 'mexicana',
+    });
+
+    expect(mocks.tx.menuItem.create).toHaveBeenCalledTimes(6);
+    expect(mocks.tx.menuItem.create.mock.calls.map(([call]) => call.data.name)).toEqual([
+      'Tacos al pastor',
+      'Quesadillas',
+      'Tortas',
+      'Aguas frescas',
+      'Flan de la casa',
+      'Arroz con leche',
+    ]);
+    expect(mocks.tx.menuItem.create.mock.calls.map(([call]) => call.data.categoryId)).toEqual([
+      'cat-Tacos',
+      'cat-Bebidas',
+      'cat-Postres',
+      'cat-Otros',
+      'cat-Tacos',
+      'cat-Bebidas',
+    ]);
+  });
+
+  it('createFromOnboarding con itemName crea 1 user item + 5 placeholders', async () => {
+    vi.stubGlobal('crypto', { randomUUID: mocks.randomUUID });
+
+    const { tenantService } = await import('../../src/server/services/tenant.service');
+
+    await tenantService.createFromOnboarding({
+      userId: 'user-1',
+      email: 'owner@example.com',
+      name: 'Sushi Norte',
+      cuisine: 'sushi',
+      itemName: 'Rollo especial',
+      priceCents: 18000,
+    });
+
+    expect(mocks.tx.menuItem.create).toHaveBeenCalledTimes(6);
+    expect(mocks.tx.menuItem.create.mock.calls.map(([call]) => ({
+      name: call.data.name,
+      priceCents: call.data.priceCents,
+    }))).toEqual([
+      { name: 'Rollo especial', priceCents: 18000 },
+      { name: 'California roll', priceCents: 14000 },
+      { name: 'Spicy tuna roll', priceCents: 16000 },
+      { name: 'Nigiri de salmon', priceCents: 12000 },
+      { name: 'Edamames', priceCents: 7000 },
+      { name: 'Te helado', priceCents: 5000 },
+    ]);
+  });
+
+  it('cuisine desconocido usa fallback genérico', async () => {
+    vi.stubGlobal('crypto', { randomUUID: mocks.randomUUID });
+
+    const { tenantService } = await import('../../src/server/services/tenant.service');
+
+    await tenantService.createFromOnboarding({
+      userId: 'user-1',
+      email: 'owner@example.com',
+      name: 'Cocina Libre',
+      cuisine: 'mariscos',
+    });
+
+    expect(mocks.tx.category.create.mock.calls.map(([call]) => call.data.name)).toEqual([
+      'Menú',
+      'Bebidas',
+      'Especiales',
+      'Otros',
+    ]);
+    expect(mocks.tx.menuItem.create).toHaveBeenCalledTimes(6);
+    expect(mocks.tx.menuItem.create.mock.calls.map(([call]) => call.data.name)).toEqual([
+      'Platillo de la casa',
+      'Especial del dia',
+      'Entrada para compartir',
+      'Bebida natural',
+      'Postre de la casa',
+      'Combo individual',
     ]);
   });
 });
