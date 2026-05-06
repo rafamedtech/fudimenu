@@ -5,9 +5,19 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { track } from '@/lib/analytics/events';
-import { completeOnboardingAction } from '@/server/actions/onboarding.actions';
+import {
+  completeOnboardingAction,
+  createSecondTenantAction,
+} from '@/server/actions/onboarding.actions';
 
 const POST_ONBOARDING_PATH = '/menu?welcome=1';
+
+type OnboardingPayload = {
+  name: string;
+  cuisine: string;
+  itemName?: string;
+  priceCents?: number;
+};
 
 const cuisines = [
   { id: 'mexicana', label: '🌮 Mexicana' },
@@ -26,6 +36,9 @@ export default function OnboardingPage() {
   const [price, setPrice] = useState<number>(0);
   const [isDishOpen, setIsDishOpen] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [creatingSecondTenant, setCreatingSecondTenant] = useState(false);
+  const [existingTenant, setExistingTenant] = useState<{ tenantId: string; slug: string } | null>(null);
+  const [lastPayload, setLastPayload] = useState<OnboardingPayload | null>(null);
   const trimmedName = name.trim();
   const trimmedItemName = itemName.trim();
   const includeFirstItem = trimmedItemName.length > 0 && price > 0;
@@ -34,23 +47,38 @@ export default function OnboardingPage() {
   );
   const canSubmit = trimmedName.length > 0 && cuisine.length > 0;
 
+  function buildPayload(): OnboardingPayload {
+    return {
+      name: trimmedName,
+      cuisine,
+      ...(includeFirstItem
+        ? {
+            itemName: trimmedItemName,
+            priceCents: Math.round(price * 100),
+          }
+        : {}),
+    };
+  }
+
+  function completeNewTenant(tenantId: string) {
+    track('onboarding_completed', { tenantId });
+    toast.success('Tu menú ya vive online.');
+    router.push(POST_ONBOARDING_PATH);
+  }
+
   async function finish() {
     setLoading(true);
     try {
-      const payload = {
-        name: trimmedName,
-        cuisine,
-        ...(includeFirstItem
-          ? {
-              itemName: trimmedItemName,
-              priceCents: Math.round(price * 100),
-            }
-          : {}),
-      };
+      const payload = buildPayload();
+      setLastPayload(payload);
       const res = await completeOnboardingAction(payload);
-      track('onboarding_completed', { tenantId: res.tenantId });
-      toast.success('Tu menú ya vive online.');
-      router.push(POST_ONBOARDING_PATH);
+
+      if (res.existing) {
+        setExistingTenant({ tenantId: res.tenantId, slug: res.slug });
+        return;
+      }
+
+      completeNewTenant(res.tenantId);
     } catch {
       toast.error('No pude crear el menú. Reintenta.');
     } finally {
@@ -62,6 +90,20 @@ export default function OnboardingPage() {
     setItemName('');
     setPrice(0);
     setIsDishOpen(false);
+  }
+
+  async function createAnotherRestaurant() {
+    const payload = lastPayload ?? buildPayload();
+    setCreatingSecondTenant(true);
+    try {
+      const res = await createSecondTenantAction(payload);
+      setExistingTenant(null);
+      completeNewTenant(res.tenantId);
+    } catch {
+      toast.error('No pude crear otro restaurante. Reintenta.');
+    } finally {
+      setCreatingSecondTenant(false);
+    }
   }
 
   return (
@@ -125,23 +167,23 @@ export default function OnboardingPage() {
 
           {isDishOpen && (
             <div className="flex flex-col gap-4 border-t border-ink-100 px-4 py-4">
-            <Input
-              autoFocus
-              label="Nombre"
-              placeholder="Tacos al pastor"
-              value={itemName}
-              onChange={(e) => setItemName(e.target.value)}
-            />
-            <Input
-              label="Precio"
-              type="number"
-              min="0"
-              inputMode="decimal"
-              prefix="$"
-              placeholder="0"
-              value={price || ''}
-              onChange={(e) => setPrice(Number(e.target.value))}
-            />
+              <Input
+                autoFocus
+                label="Nombre"
+                placeholder="Tacos al pastor"
+                value={itemName}
+                onChange={(e) => setItemName(e.target.value)}
+              />
+              <Input
+                label="Precio"
+                type="number"
+                min="0"
+                inputMode="decimal"
+                prefix="$"
+                placeholder="0"
+                value={price || ''}
+                onChange={(e) => setPrice(Number(e.target.value))}
+              />
               <Button variant="outline" size="lg" className="w-full" onClick={skipFirstItem}>
                 Saltar y agregar después
               </Button>
@@ -155,6 +197,37 @@ export default function OnboardingPage() {
           Crear mi menú
         </Button>
       </div>
+
+      {existingTenant && (
+        <div
+          className="fixed inset-0 z-50 flex items-end bg-ink-900/40 px-4 py-6 sm:items-center sm:justify-center"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="existing-tenant-title"
+        >
+          <div className="w-full max-w-sm rounded-md bg-white p-6 shadow-xl">
+            <h2 id="existing-tenant-title" className="text-2xl font-extrabold text-ink-900">
+              Ya tienes este restaurante: {existingTenant.slug}
+            </h2>
+            <p className="mt-2 text-sm text-ink-500">
+              Puedes ir al panel actual o crear otro restaurante con estos datos.
+            </p>
+            <div className="mt-5 flex flex-col gap-3">
+              <Button size="lg" onClick={() => router.push('/dashboard')}>
+                Ir al panel
+              </Button>
+              <Button
+                variant="outline"
+                size="lg"
+                loading={creatingSecondTenant}
+                onClick={createAnotherRestaurant}
+              >
+                Crear otro restaurante
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

@@ -8,6 +8,10 @@ import { mockCategories, mockItems, mockTenant } from '@/lib/mock/data';
 import { createSupabaseServer } from '@/lib/supabase/server';
 import { getMenuRepository } from '@/server/repositories/get-repository';
 import { tenantService } from '@/server/services/tenant.service';
+import {
+  ACTIVE_TENANT_COOKIE,
+  activeTenantCookieOptions,
+} from '@/server/tenants/active-tenant-cookie';
 
 const onboardingSchema = z.object({
   name: z.string().min(1).max(80),
@@ -16,9 +20,7 @@ const onboardingSchema = z.object({
   priceCents: z.number().int().min(1).max(10_000_00).optional(),
 });
 
-export async function completeOnboardingAction(input: unknown) {
-  const data = onboardingSchema.parse(input);
-
+async function applyMockOnboarding(data: z.infer<typeof onboardingSchema>) {
   if (process.env.USE_MOCKS === 'true') {
     const cookieStore = await cookies();
     if (data.itemName && data.priceCents) {
@@ -43,9 +45,13 @@ export async function completeOnboardingAction(input: unknown) {
     });
     revalidatePath('/menu');
 
-    return { ok: true as const, tenantId: mockTenant.id, slug: mockTenant.slug };
+    return { ok: true as const, existing: false as const, tenantId: mockTenant.id, slug: mockTenant.slug };
   }
 
+  return null;
+}
+
+async function getOnboardingUser() {
   let user: { id: string; email?: string | null } | null = null;
 
   if (process.env.E2E_TEST_AUTH === 'true') {
@@ -69,6 +75,21 @@ export async function completeOnboardingAction(input: unknown) {
 
   if (!user) redirect('/login');
 
+  return user;
+}
+
+async function setActiveTenant(tenantId: string) {
+  const cookieStore = await cookies();
+  cookieStore.set(ACTIVE_TENANT_COOKIE, tenantId, activeTenantCookieOptions);
+  revalidatePath('/', 'layout');
+}
+
+export async function completeOnboardingAction(input: unknown) {
+  const data = onboardingSchema.parse(input);
+  const mockResult = await applyMockOnboarding(data);
+  if (mockResult) return mockResult;
+
+  const user = await getOnboardingUser();
   const prisma = getPrisma();
   const existingMembership = await prisma.membership.findFirst({
     where: { userId: user.id },
@@ -81,6 +102,7 @@ export async function completeOnboardingAction(input: unknown) {
   if (existingMembership) {
     return {
       ok: true as const,
+      existing: true as const,
       tenantId: existingMembership.tenantId,
       slug: existingMembership.tenant.slug,
     };
@@ -95,5 +117,27 @@ export async function completeOnboardingAction(input: unknown) {
     priceCents: data.priceCents,
   });
 
-  return { ok: true as const, tenantId, slug };
+  await setActiveTenant(tenantId);
+
+  return { ok: true as const, existing: false as const, tenantId, slug };
+}
+
+export async function createSecondTenantAction(input: unknown) {
+  const data = onboardingSchema.parse(input);
+  const mockResult = await applyMockOnboarding(data);
+  if (mockResult) return mockResult;
+
+  const user = await getOnboardingUser();
+  const { tenantId, slug } = await tenantService.createFromOnboarding({
+    userId: user.id,
+    email: user.email!,
+    name: data.name,
+    cuisine: data.cuisine,
+    itemName: data.itemName,
+    priceCents: data.priceCents,
+  });
+
+  await setActiveTenant(tenantId);
+
+  return { ok: true as const, existing: false as const, tenantId, slug };
 }
