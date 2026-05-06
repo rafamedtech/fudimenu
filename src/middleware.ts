@@ -12,6 +12,32 @@ const ADMIN_PREFIXES = ['/dashboard', '/menu', '/categories', '/branches', '/ana
 const AUTH_PREFIXES = ['/login', '/signup', '/forgot-password'];
 const LOCALE_HEADER_NAME = 'X-NEXT-INTL-LOCALE';
 
+function generateNonce() {
+  const array = new Uint8Array(16);
+  crypto.getRandomValues(array);
+  return btoa(String.fromCharCode(...array));
+}
+
+function buildCsp(nonce: string) {
+  const isDev = process.env.NODE_ENV === 'development';
+  const devConnectSrc = isDev
+    ? ' http://localhost:* http://127.0.0.1:* ws://localhost:* ws://127.0.0.1:*'
+    : '';
+
+  return [
+    `default-src 'self'`,
+    `script-src 'self' 'nonce-${nonce}' ${isDev ? "'unsafe-eval'" : ''} https://us.i.posthog.com`,
+    `style-src 'self' 'unsafe-inline'`,
+    `img-src 'self' data: blob: https://res.cloudinary.com https://*.supabase.co`,
+    `font-src 'self' data:`,
+    `connect-src 'self' https://*.supabase.co https://api.stripe.com https://us.i.posthog.com https://*.sentry.io wss://*.supabase.co${devConnectSrc}`,
+    `frame-src 'self' https://js.stripe.com https://hooks.stripe.com`,
+    `frame-ancestors 'none'`,
+    `base-uri 'self'`,
+    `form-action 'self' https://checkout.stripe.com`,
+  ].join('; ');
+}
+
 function resolveLocale(request: NextRequest): AppLocale {
   return (
     normalizeLocale(request.nextUrl.searchParams.get(localeQueryParam)) ??
@@ -29,18 +55,25 @@ function setLocaleCookie(response: NextResponse, locale: AppLocale) {
   });
 }
 
+function applyResponseHeaders(response: NextResponse, locale: AppLocale, nonce: string) {
+  setLocaleCookie(response, locale);
+  response.headers.set('Content-Security-Policy', buildCsp(nonce));
+  return response;
+}
+
 export async function middleware(request: NextRequest) {
   const useMocks = process.env.USE_MOCKS === 'true';
   const useE2eAuth = process.env.E2E_TEST_AUTH === 'true';
   const { pathname } = request.nextUrl;
   const locale = resolveLocale(request);
+  const nonce = generateNonce();
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set(LOCALE_HEADER_NAME, locale);
+  requestHeaders.set('x-nonce', nonce);
 
   const createResponse = () => {
     const response = NextResponse.next({ request: { headers: requestHeaders } });
-    setLocaleCookie(response, locale);
-    return response;
+    return applyResponseHeaders(response, locale, nonce);
   };
 
   if (useMocks) return createResponse();
@@ -50,7 +83,7 @@ export async function middleware(request: NextRequest) {
   }
 
   const { response, user } = await updateSession(request, requestHeaders);
-  setLocaleCookie(response, locale);
+  applyResponseHeaders(response, locale, nonce);
 
   const isAdminRoute = ADMIN_PREFIXES.some((p) => pathname.startsWith(p));
   const isAuthRoute = AUTH_PREFIXES.some((p) => pathname.startsWith(p));
@@ -60,16 +93,14 @@ export async function middleware(request: NextRequest) {
     url.pathname = '/login';
     url.searchParams.set('next', pathname);
     const redirectResponse = NextResponse.redirect(url);
-    setLocaleCookie(redirectResponse, locale);
-    return redirectResponse;
+    return applyResponseHeaders(redirectResponse, locale, nonce);
   }
 
   if (isAuthRoute && user) {
     const url = request.nextUrl.clone();
     url.pathname = '/dashboard';
     const redirectResponse = NextResponse.redirect(url);
-    setLocaleCookie(redirectResponse, locale);
-    return redirectResponse;
+    return applyResponseHeaders(redirectResponse, locale, nonce);
   }
 
   return response;
