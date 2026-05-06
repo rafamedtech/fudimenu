@@ -1,9 +1,10 @@
-import { CheckCircle2, Clock3, MessageCircle } from 'lucide-react';
+import { CheckCircle2, ImageIcon, Palette } from 'lucide-react';
 import { AppHeader } from '@/components/layout/app-header';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { getPrisma } from '@/lib/db/prisma';
+import { mockTenant } from '@/lib/mock/data';
 import { updateBrandSettingsFormAction } from '@/server/actions/tenant.actions';
 import { requireAuth } from '@/server/guards/require-auth';
 import { BrandSlugInput } from './brand-slug-input';
@@ -14,18 +15,21 @@ type BrandSettingsPageProps = {
 
 export default async function BrandSettingsPage({ searchParams }: BrandSettingsPageProps) {
   const [{ saved, slugTaken }, ctx] = await Promise.all([searchParams, requireAuth()]);
-  const tenant = await getPrisma().tenant.findUnique({
-    where: { id: ctx.tenantId },
-    select: {
-      slug: true,
-      whatsappPhone: true,
-      businessHours: true,
-    },
-  });
+  const tenant =
+    process.env.USE_MOCKS === 'true'
+      ? mockTenant
+      : await getPrisma().tenant.findUnique({
+          where: { id: ctx.tenantId },
+          select: {
+            slug: true,
+            logoUrl: true,
+            primaryColor: true,
+          },
+        });
 
   return (
     <>
-      <AppHeader title="Marca y contacto" showBack />
+      <AppHeader title="Marca y tema" showBack />
       <main className="flex flex-col gap-4 px-4">
         {saved === '1' && (
           <Card className="flex items-center gap-3 border border-menta-500/40 bg-menta-100 shadow-sm">
@@ -41,11 +45,11 @@ export default async function BrandSettingsPage({ searchParams }: BrandSettingsP
 
         <Card className="space-y-5">
           <div className="flex items-start gap-3">
-            <MessageCircle className="mt-1 h-6 w-6 shrink-0 text-mostaza-600" />
+            <Palette className="mt-1 h-6 w-6 shrink-0 text-mostaza-600" />
             <div>
-              <h2 className="text-lg font-extrabold text-ink-900">WhatsApp Business</h2>
+              <h2 className="text-lg font-extrabold text-ink-900">Identidad del menu</h2>
               <p className="mt-1 text-sm leading-6 text-ink-600">
-                El numero se usa para activar pedidos desde el menu publico.
+                Ajusta como se ve y comparte tu restaurante.
               </p>
             </div>
           </div>
@@ -53,23 +57,29 @@ export default async function BrandSettingsPage({ searchParams }: BrandSettingsP
           <form action={updateBrandSettingsFormAction} className="space-y-4">
             <BrandSlugInput currentSlug={tenant?.slug ?? ''} />
             <Input
-              name="whatsappPhone"
-              type="tel"
-              label="Numero WhatsApp Business"
-              placeholder="+526641234567"
-              defaultValue={tenant?.whatsappPhone ?? ''}
-              pattern="^\+52[0-9]{10}$"
-              title="Usa el formato +52XXXXXXXXXX"
-              hint="Usa +52 seguido de 10 digitos. Dejalo vacio para ocultar el boton."
+              name="logoUrl"
+              type="url"
+              label="Logo"
+              placeholder="https://..."
+              defaultValue={tenant?.logoUrl ?? ''}
+              prefix={<ImageIcon className="h-4 w-4" />}
+              hint="TODO upload Cloudinary. Por ahora puedes pegar una URL publica."
             />
             <Input
-              name="businessHours"
-              label="Horario"
-              placeholder="Lun-Vie 8am-10pm"
-              defaultValue={tenant?.businessHours ?? ''}
-              maxLength={120}
-              prefix={<Clock3 className="h-4 w-4" />}
-              hint="Texto libre para mostrar el horario operativo."
+              name="primaryColor"
+              type="text"
+              label="Color primario"
+              placeholder="#F4B400"
+              defaultValue={tenant?.primaryColor ?? '#F4B400'}
+              pattern="^#[0-9A-Fa-f]{6}$"
+              title="Usa formato hex #RRGGBB"
+              prefix={
+                <span
+                  className="block h-4 w-4 rounded-full border border-ink-200"
+                  style={{ backgroundColor: tenant?.primaryColor ?? '#F4B400' }}
+                />
+              }
+              hint="TODO color picker. Usa formato hex #RRGGBB."
             />
             <Button type="submit" className="w-full">
               Guardar ajustes

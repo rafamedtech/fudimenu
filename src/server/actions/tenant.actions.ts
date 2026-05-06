@@ -8,7 +8,6 @@ import {
   checkTenantSlugAvailability,
   normalizeTenantSlug,
 } from '@/server/services/slug.service';
-import { normalizeWhatsAppPhone } from '@/lib/whatsapp';
 import { requireAuth } from '@/server/guards/require-auth';
 
 function normalizeOptionalText(input: string | null | undefined) {
@@ -24,26 +23,25 @@ const brandSettingsSchema = z.object({
     .refine((value) => /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value), {
       message: 'Usa solo letras, numeros y guiones',
     }),
-  whatsappPhone: z
+  logoUrl: z
     .string()
-    .max(24, 'Usa el formato +52XXXXXXXXXX')
-    .transform((value) => normalizeWhatsAppPhone(value))
-    .refine((value) => value === null || /^\+52\d{10}$/.test(value), {
-      message: 'Usa el formato +52XXXXXXXXXX',
-    }),
-  businessHours: z
-    .string()
-    .max(120, 'Usa máximo 120 caracteres')
+    .url('Usa una URL valida para el logo')
+    .or(z.literal(''))
     .transform((value) => normalizeOptionalText(value)),
+  primaryColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Color hex invalido'),
 });
 
 export async function updateBrandSettingsFormAction(formData: FormData) {
   const ctx = await requireAuth();
   const data = brandSettingsSchema.parse({
     slug: formData.get('slug')?.toString() ?? '',
-    whatsappPhone: formData.get('whatsappPhone')?.toString() ?? '',
-    businessHours: formData.get('businessHours')?.toString() ?? '',
+    logoUrl: formData.get('logoUrl')?.toString() ?? '',
+    primaryColor: formData.get('primaryColor')?.toString() ?? '#F4B400',
   });
+
+  if (process.env.USE_MOCKS === 'true') {
+    redirect('/settings/brand?saved=1');
+  }
 
   const prisma = getPrisma();
   const currentTenant = await prisma.tenant.findUnique({
@@ -69,8 +67,8 @@ export async function updateBrandSettingsFormAction(formData: FormData) {
         where: { id: ctx.tenantId },
         data: {
           slug: newSlug,
-          whatsappPhone: data.whatsappPhone,
-          businessHours: data.businessHours,
+          logoUrl: data.logoUrl,
+          primaryColor: data.primaryColor,
         },
       });
 
@@ -83,8 +81,8 @@ export async function updateBrandSettingsFormAction(formData: FormData) {
     await prisma.tenant.update({
       where: { id: ctx.tenantId },
       data: {
-        whatsappPhone: data.whatsappPhone,
-        businessHours: data.businessHours,
+        logoUrl: data.logoUrl,
+        primaryColor: data.primaryColor,
       },
     });
   }
@@ -97,5 +95,3 @@ export async function updateBrandSettingsFormAction(formData: FormData) {
 
   redirect('/settings/brand?saved=1');
 }
-
-export const updateWhatsAppSettingsFormAction = updateBrandSettingsFormAction;
