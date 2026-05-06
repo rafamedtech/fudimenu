@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { usePriceInput } from '@/hooks/use-price-input';
 import { track } from '@/lib/analytics/events';
 import {
   completeOnboardingAction,
@@ -33,15 +34,19 @@ export default function OnboardingPage() {
   const [name, setName] = useState('');
   const [cuisine, setCuisine] = useState<string>('');
   const [itemName, setItemName] = useState('');
-  const [price, setPrice] = useState<number>(0);
+  const [priceCents, setPriceCents] = useState<number>(0);
   const [isDishOpen, setIsDishOpen] = useState(true);
   const [loading, setLoading] = useState(false);
   const [creatingSecondTenant, setCreatingSecondTenant] = useState(false);
   const [existingTenant, setExistingTenant] = useState<{ tenantId: string; slug: string } | null>(null);
   const [lastPayload, setLastPayload] = useState<OnboardingPayload | null>(null);
+  const { displayValue: priceDisplayValue, handleChange: handlePriceChange } = usePriceInput(
+    0,
+    setPriceCents,
+  );
   const trimmedName = name.trim();
   const trimmedItemName = itemName.trim();
-  const includeFirstItem = trimmedItemName.length > 0 && price > 0;
+  const includeFirstItem = trimmedItemName.length > 0 && priceCents > 0;
   const progress = Math.round(
     ((trimmedName.length > 0 ? 1 : 0) + (cuisine.length > 0 ? 1 : 0) + (includeFirstItem ? 1 : 0)) / 3 * 100,
   );
@@ -54,7 +59,7 @@ export default function OnboardingPage() {
       ...(includeFirstItem
         ? {
             itemName: trimmedItemName,
-            priceCents: Math.round(price * 100),
+            priceCents,
           }
         : {}),
     };
@@ -88,7 +93,7 @@ export default function OnboardingPage() {
 
   function skipFirstItem() {
     setItemName('');
-    setPrice(0);
+    handlePriceChange('');
     setIsDishOpen(false);
   }
 
@@ -176,13 +181,12 @@ export default function OnboardingPage() {
               />
               <Input
                 label="Precio"
-                type="number"
-                min="0"
+                type="text"
                 inputMode="decimal"
                 prefix="$"
                 placeholder="0"
-                value={price || ''}
-                onChange={(e) => setPrice(Number(e.target.value))}
+                value={priceDisplayValue}
+                onChange={(e) => handlePriceChange(e.target.value)}
               />
               <Button variant="outline" size="lg" className="w-full" onClick={skipFirstItem}>
                 Saltar y agregar después

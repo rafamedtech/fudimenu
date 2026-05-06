@@ -12,12 +12,14 @@ import { Input } from '@/components/ui/input';
 import { SaveIndicator, type SaveIndicatorStatus } from '@/components/ui/save-indicator';
 import { Sheet } from '@/components/ui/sheet';
 import { Toggle } from '@/components/ui/toggle';
+import { usePriceInput } from '@/hooks/use-price-input';
 import { getCategoryEmoji } from '@/lib/category-placeholder';
 import {
   getQueuedOfflineMutation,
   keepLocalOfflineMutation,
   type JsonValue,
 } from '@/lib/storage/offline-queue';
+import { cn } from '@/lib/utils';
 import { itemSchema, type ItemInput } from '@/lib/validators/item.schema';
 import {
   restoreItemAction,
@@ -33,6 +35,8 @@ interface Props {
   initial: MenuItem | null;
   categories: Category[];
 }
+
+const DESCRIPTION_MAX_CHARS = 500;
 
 export function ItemEditorForm({ initial, categories }: Props) {
   const locale = useLocale();
@@ -68,7 +72,13 @@ export function ItemEditorForm({ initial, categories }: Props) {
     },
   });
 
-  const priceCents = watch('priceCents');
+  const { displayValue: priceDisplayValue, handleChange: handlePriceChange } = usePriceInput(
+    initial?.priceCents ?? 0,
+    (cents) => setValue('priceCents', cents, { shouldDirty: true, shouldValidate: true }),
+  );
+  const description = watch('description') ?? '';
+  const charCount = description.length;
+  const isNearDescriptionLimit = charCount > DESCRIPTION_MAX_CHARS * 0.9;
   const selectedCategoryId = watch('categoryId');
   const selectedCategory = categories.find((category) => category.id === selectedCategoryId);
   const placeholderEmoji = getCategoryEmoji(selectedCategory?.name);
@@ -314,13 +324,13 @@ export function ItemEditorForm({ initial, categories }: Props) {
 
       <Input
         label="Precio"
-        type="number"
+        type="text"
         prefix="$"
-        inputMode="numeric"
+        inputMode="decimal"
         placeholder="0"
         error={errors.priceCents?.message}
-        value={(priceCents ?? 0) / 100}
-        onChange={(e) => setValue('priceCents', Math.round(Number(e.target.value) * 100))}
+        value={priceDisplayValue}
+        onChange={(e) => handlePriceChange(e.target.value)}
       />
 
       <div>
@@ -328,9 +338,21 @@ export function ItemEditorForm({ initial, categories }: Props) {
         <textarea
           {...register('description')}
           rows={4}
+          maxLength={DESCRIPTION_MAX_CHARS}
           placeholder="¿Qué lleva? ¿Por qué les va a encantar?"
           className="w-full rounded-md border-[1.5px] border-ink-300 bg-white p-4 text-base text-ink-900 outline-none placeholder:text-ink-500 focus-within:border-mostaza-500 focus-within:shadow-glow-mostaza"
         />
+        <div className="mt-1 flex justify-end">
+          <span
+            className={cn(
+              'text-xs tabular-nums',
+              isNearDescriptionLimit ? 'font-bold text-coral-500' : 'text-ink-500',
+              charCount === DESCRIPTION_MAX_CHARS && 'text-red-500',
+            )}
+          >
+            {charCount}/{DESCRIPTION_MAX_CHARS}
+          </span>
+        </div>
       </div>
 
       <div className="sticky bottom-[88px] mt-4 flex gap-3">
