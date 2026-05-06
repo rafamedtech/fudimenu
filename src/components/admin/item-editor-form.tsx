@@ -9,7 +9,6 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { SaveIndicator, type SaveIndicatorStatus } from '@/components/ui/save-indicator';
 import { Sheet } from '@/components/ui/sheet';
 import { Toggle } from '@/components/ui/toggle';
 import { usePriceInput } from '@/hooks/use-price-input';
@@ -44,7 +43,6 @@ export function ItemEditorForm({ initial, categories }: Props) {
   const searchParams = useSearchParams();
   const [isStockPending, startStockTransition] = useTransition();
   const [isDeletePending, startDeleteTransition] = useTransition();
-  const [saveStatus, setSaveStatus] = useState<SaveIndicatorStatus>('idle');
   const [stockAvailable, setStockAvailable] = useState(initial?.isAvailable ?? true);
   const [conflictDraft, setConflictDraft] = useState<ItemInput | null>(null);
   const [conflictMutationId, setConflictMutationId] = useState<number | null>(null);
@@ -110,8 +108,6 @@ export function ItemEditorForm({ initial, categories }: Props) {
   }, [searchParams]);
 
   async function onSubmit(data: ItemInput) {
-    setSaveStatus('saving');
-
     try {
       const res = await upsertItemAction({
         ...data,
@@ -119,21 +115,19 @@ export function ItemEditorForm({ initial, categories }: Props) {
         ...(!initial?.id ? { isAvailable: stockAvailable } : {}),
       });
       if (!res.ok) {
-        setSaveStatus('idle');
         toast.error(toUserMessage(actionErrorToApiError(res.code), locale));
         return;
       }
 
       if (res.ok) {
-        setSaveStatus('saved');
         track(initial ? 'item_edited' : 'item_created', {
           itemId: res.item.id,
           field: 'all',
         } as never);
+        toast.success('✓ Guardado');
         router.push('/menu');
       }
     } catch (err) {
-      setSaveStatus('idle');
       toast.error(toUserMessage(err, locale));
     }
   }
@@ -227,14 +221,13 @@ export function ItemEditorForm({ initial, categories }: Props) {
       </Card>
 
       <form onSubmit={handleSubmit(onSubmit)} className="relative flex flex-col gap-4">
-        <SaveIndicator status={saveStatus} className="absolute right-0 top-1 z-10" />
-      <Sheet
-        open={!!conflictDraft}
-        onOpenChange={(open) => {
-          if (!open) setConflictDraft(null);
-        }}
-        title="Ver ambos"
-      >
+        <Sheet
+          open={!!conflictDraft}
+          onOpenChange={(open) => {
+            if (!open) setConflictDraft(null);
+          }}
+          title="Ver ambos"
+        >
         <div className="space-y-4">
           <p className="text-sm leading-6 text-ink-700">
             Otro usuario guardó una versión nueva mientras estabas offline.
