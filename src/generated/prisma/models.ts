@@ -10,6 +10,7 @@
  */
 export type * from './models/Tenant'
 export type * from './models/Membership'
+export type * from './models/AccountDeleteRequest'
 export type * from './models/Category'
 export type * from './models/MenuItem'
 export type * from './models/ItemTranslation'

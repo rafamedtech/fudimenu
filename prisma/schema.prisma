@@ -85,6 +85,21 @@ model Membership {
   @@map("memberships")
 }
 
+model AccountDeleteRequest {
+  id         String    @id @default(cuid())
+  tenantId   String    @map("tenant_id")
+  userId     String    @map("user_id")
+  codeHash   String    @map("code_hash")
+  expiresAt  DateTime  @map("expires_at") @db.Timestamptz(6)
+  consumedAt DateTime? @map("consumed_at") @db.Timestamptz(6)
+  ipHash     String?   @map("ip_hash")
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([tenantId, userId])
+  @@index([expiresAt])
+  @@map("account_delete_requests")
+}
+
 model Category {
   id        String     @id @default(dbgenerated("extensions.gen_random_uuid()")) @db.Uuid
   tenantId  String     @map("tenant_id") @db.Uuid

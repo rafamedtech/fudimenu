@@ -6,6 +6,7 @@ import { Download, LogOut, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { Sheet } from '@/components/ui/sheet';
 import { signOutAction } from '@/server/actions/auth.actions';
 
@@ -20,6 +21,8 @@ export function AccountClient({ email, tenantName, tenantSlug, plan }: AccountCl
   const router = useRouter();
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [confirmText, setConfirmText] = useState('');
+  const [deleteCode, setDeleteCode] = useState('');
+  const [requestingDeleteCode, setRequestingDeleteCode] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [isSigningOut, startSignOut] = useTransition();
@@ -50,12 +53,33 @@ export function AccountClient({ email, tenantName, tenantSlug, plan }: AccountCl
     }
   }
 
+  async function requestDeleteCode() {
+    setRequestingDeleteCode(true);
+    try {
+      const response = await fetch('/api/account/delete/request', { method: 'POST' });
+      if (!response.ok) {
+        toast.error(response.status === 429 ? 'Intenta de nuevo más tarde' : 'No pude mandar el código');
+        return;
+      }
+
+      toast.success('Código enviado a tu email');
+    } catch {
+      toast.error('No pude mandar el código');
+    } finally {
+      setRequestingDeleteCode(false);
+    }
+  }
+
   async function deleteAccount() {
     setDeleting(true);
     try {
-      const response = await fetch('/api/account/delete', { method: 'DELETE' });
+      const response = await fetch('/api/account/delete', {
+        method: 'DELETE',
+        headers: { 'x-delete-token': deleteCode },
+      });
       if (!response.ok) {
-        toast.error('No pude eliminar la cuenta');
+        const message = response.status === 400 ? 'Código inválido o vencido' : 'No pude eliminar la cuenta';
+        toast.error(message);
         return;
       }
 
@@ -121,24 +145,42 @@ export function AccountClient({ email, tenantName, tenantSlug, plan }: AccountCl
       <Sheet open={deleteOpen} onOpenChange={setDeleteOpen} title="Eliminar cuenta">
         <div className="space-y-4">
           <p className="text-sm font-semibold leading-6 text-ink-700">
-            Esto desactivará el restaurante, sus platillos y el acceso del equipo. Para confirmar,
-            escribe ELIMINAR.
+            Esto desactivará el restaurante, sus platillos y el acceso del equipo. Te mandaremos
+            un código de 6 dígitos a {email}.
           </p>
-          <input
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            loading={requestingDeleteCode}
+            onClick={requestDeleteCode}
+          >
+            Mandar código
+          </Button>
+          <Input
+            inputMode="numeric"
+            maxLength={6}
+            pattern="[0-9]*"
+            label="Código"
+            value={deleteCode}
+            onChange={(event) => setDeleteCode(event.target.value.replace(/\D/g, '').slice(0, 6))}
+            placeholder="000000"
+          />
+          <Input
             value={confirmText}
             onChange={(event) => setConfirmText(event.target.value)}
-            className="h-12 w-full rounded-md border border-ink-200 px-3 font-bold outline-none focus:border-mostaza-500 focus:ring-2 focus:ring-mostaza-100"
+            label="Confirmación"
             placeholder="ELIMINAR"
           />
           <Button
             type="button"
             variant="destructive"
             className="w-full"
-            disabled={confirmText !== 'ELIMINAR'}
+            disabled={confirmText !== 'ELIMINAR' || deleteCode.length !== 6}
             loading={deleting}
             onClick={deleteAccount}
           >
-            Eliminar cuenta
+            Eliminar permanentemente
           </Button>
           <Button type="button" variant="ghost" className="w-full" onClick={() => setDeleteOpen(false)}>
             Cancelar

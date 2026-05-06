@@ -53,6 +53,7 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   Tenant: 'Tenant',
   Membership: 'Membership',
+  AccountDeleteRequest: 'AccountDeleteRequest',
   Category: 'Category',
   MenuItem: 'MenuItem',
   ItemTranslation: 'ItemTranslation',
@@ -111,6 +112,20 @@ export const MembershipScalarFieldEnum = {
 } as const
 
 export type MembershipScalarFieldEnum = (typeof MembershipScalarFieldEnum)[keyof typeof MembershipScalarFieldEnum]
+
+
+export const AccountDeleteRequestScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  userId: 'userId',
+  codeHash: 'codeHash',
+  expiresAt: 'expiresAt',
+  consumedAt: 'consumedAt',
+  ipHash: 'ipHash',
+  createdAt: 'createdAt'
+} as const
+
+export type AccountDeleteRequestScalarFieldEnum = (typeof AccountDeleteRequestScalarFieldEnum)[keyof typeof AccountDeleteRequestScalarFieldEnum]
 
 
 export const CategoryScalarFieldEnum = {

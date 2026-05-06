@@ -386,6 +386,7 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 export const ModelName = {
   Tenant: 'Tenant',
   Membership: 'Membership',
+  AccountDeleteRequest: 'AccountDeleteRequest',
   Category: 'Category',
   MenuItem: 'MenuItem',
   ItemTranslation: 'ItemTranslation',
@@ -410,7 +411,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "tenant" | "membership" | "category" | "menuItem" | "itemTranslation" | "slugHistory" | "menuView" | "itemView" | "auditLog" | "webhookEvent" | "referral"
+    modelProps: "tenant" | "membership" | "accountDeleteRequest" | "category" | "menuItem" | "itemTranslation" | "slugHistory" | "menuView" | "itemView" | "auditLog" | "webhookEvent" | "referral"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -559,6 +560,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.MembershipCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.MembershipCountAggregateOutputType> | number
+        }
+      }
+    }
+    AccountDeleteRequest: {
+      payload: Prisma.$AccountDeleteRequestPayload<ExtArgs>
+      fields: Prisma.AccountDeleteRequestFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AccountDeleteRequestFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountDeleteRequestPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AccountDeleteRequestFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountDeleteRequestPayload>
+        }
+        findFirst: {
+          args: Prisma.AccountDeleteRequestFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountDeleteRequestPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AccountDeleteRequestFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountDeleteRequestPayload>
+        }
+        findMany: {
+          args: Prisma.AccountDeleteRequestFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountDeleteRequestPayload>[]
+        }
+        create: {
+          args: Prisma.AccountDeleteRequestCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountDeleteRequestPayload>
+        }
+        createMany: {
+          args: Prisma.AccountDeleteRequestCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AccountDeleteRequestCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountDeleteRequestPayload>[]
+        }
+        delete: {
+          args: Prisma.AccountDeleteRequestDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountDeleteRequestPayload>
+        }
+        update: {
+          args: Prisma.AccountDeleteRequestUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountDeleteRequestPayload>
+        }
+        deleteMany: {
+          args: Prisma.AccountDeleteRequestDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AccountDeleteRequestUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AccountDeleteRequestUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountDeleteRequestPayload>[]
+        }
+        upsert: {
+          args: Prisma.AccountDeleteRequestUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountDeleteRequestPayload>
+        }
+        aggregate: {
+          args: Prisma.AccountDeleteRequestAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAccountDeleteRequest>
+        }
+        groupBy: {
+          args: Prisma.AccountDeleteRequestGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AccountDeleteRequestGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AccountDeleteRequestCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AccountDeleteRequestCountAggregateOutputType> | number
         }
       }
     }
@@ -1300,6 +1375,20 @@ export const MembershipScalarFieldEnum = {
 export type MembershipScalarFieldEnum = (typeof MembershipScalarFieldEnum)[keyof typeof MembershipScalarFieldEnum]
 
 
+export const AccountDeleteRequestScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  userId: 'userId',
+  codeHash: 'codeHash',
+  expiresAt: 'expiresAt',
+  consumedAt: 'consumedAt',
+  ipHash: 'ipHash',
+  createdAt: 'createdAt'
+} as const
+
+export type AccountDeleteRequestScalarFieldEnum = (typeof AccountDeleteRequestScalarFieldEnum)[keyof typeof AccountDeleteRequestScalarFieldEnum]
+
+
 export const CategoryScalarFieldEnum = {
   id: 'id',
   tenantId: 'tenantId',
@@ -1744,6 +1833,7 @@ export type PrismaClientOptions = ({
 export type GlobalOmitConfig = {
   tenant?: Prisma.TenantOmit
   membership?: Prisma.MembershipOmit
+  accountDeleteRequest?: Prisma.AccountDeleteRequestOmit
   category?: Prisma.CategoryOmit
   menuItem?: Prisma.MenuItemOmit
   itemTranslation?: Prisma.ItemTranslationOmit

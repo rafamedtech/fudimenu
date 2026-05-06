@@ -431,6 +431,22 @@ export const billingService = {
     });
   },
 
+  async sendAccountDeleteCodeEmail(input: { email: string; tenantName: string; code: string }) {
+    return sendEmail({
+      to: input.email,
+      subject: `Confirma eliminación de cuenta — código: ${input.code}`,
+      text: [
+        `Código para eliminar la cuenta de ${input.tenantName}: ${input.code}`,
+        '',
+        'Este código vence en 15 minutos.',
+        '',
+        'La eliminación desactivará el restaurante, sus platillos y el acceso del equipo. También cancelaremos suscripciones activas. Esta acción inicia el proceso irreversible de eliminación.',
+        '',
+        'Si no pediste esto, ignora este correo y cambia tu contraseña.',
+      ].join('\n'),
+    });
+  },
+
   async sendPaymentFailedEmail(input: { email: string; tenantName: string }) {
     return sendEmail({
       to: input.email,

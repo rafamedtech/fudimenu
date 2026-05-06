@@ -52,6 +52,11 @@ export type Tenant = Prisma.TenantModel
  */
 export type Membership = Prisma.MembershipModel
 /**
+ * Model AccountDeleteRequest
+ * 
+ */
+export type AccountDeleteRequest = Prisma.AccountDeleteRequestModel
+/**
  * Model Category
  * 
  */

@@ -1,20 +1,30 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, type NextRequest } from 'next/server';
 import { getPrisma } from '@/lib/db/prisma';
 import { billingService } from '@/server/services/billing.service';
 import { requireAuth } from '@/server/guards/require-auth';
+import {
+  normalizeDeleteToken,
+  verifyDeleteToken,
+} from '@/server/services/account-delete-otp.service';
 
 export const runtime = 'nodejs';
 
 const ACCOUNT_DELETE_ACTION = 'account.delete_requested';
 
-export async function DELETE() {
+function noStore(status = 200) {
+  return { status, headers: { 'Cache-Control': 'no-store' } };
+}
+
+export async function DELETE(request: NextRequest) {
   const ctx = await requireAuth();
 
   if (ctx.role !== 'owner') {
-    return NextResponse.json(
-      { ok: false, error: 'forbidden' },
-      { status: 403, headers: { 'Cache-Control': 'no-store' } },
-    );
+    return NextResponse.json({ ok: false, error: 'forbidden' }, noStore(403));
+  }
+
+  const token = normalizeDeleteToken(request.headers.get('x-delete-token'));
+  if (!token) {
+    return NextResponse.json({ ok: false, error: 'invalid_token' }, noStore(400));
   }
 
   const prisma = getPrisma();
@@ -29,14 +39,49 @@ export async function DELETE() {
   });
 
   if (!tenant || tenant.deletedAt) {
-    return NextResponse.json(
-      { ok: false, error: 'tenant_not_found' },
-      { status: 404, headers: { 'Cache-Control': 'no-store' } },
-    );
+    return NextResponse.json({ ok: false, error: 'tenant_not_found' }, noStore(404));
+  }
+
+  const now = new Date();
+  const activeRequests = await prisma.accountDeleteRequest.findMany({
+    where: {
+      tenantId: ctx.tenantId,
+      userId: ctx.userId,
+      consumedAt: null,
+      expiresAt: { gt: now },
+    },
+    orderBy: { createdAt: 'desc' },
+    take: 5,
+    select: { id: true, codeHash: true },
+  });
+
+  let matchedRequestId: string | null = null;
+  for (const deleteRequest of activeRequests) {
+    if (await verifyDeleteToken(token, deleteRequest.codeHash)) {
+      matchedRequestId = deleteRequest.id;
+      break;
+    }
+  }
+
+  if (!matchedRequestId) {
+    return NextResponse.json({ ok: false, error: 'invalid_token' }, noStore(400));
+  }
+
+  const consumed = await prisma.accountDeleteRequest.updateMany({
+    where: {
+      id: matchedRequestId,
+      consumedAt: null,
+      expiresAt: { gt: now },
+    },
+    data: { consumedAt: now },
+  });
+
+  if (consumed.count !== 1) {
+    return NextResponse.json({ ok: false, error: 'invalid_token' }, noStore(400));
   }
 
   const stripe = await billingService.cancelSubscriptionsForTenant(ctx.tenantId);
-  const deletedAt = new Date();
+  const deletedAt = now;
 
   const [, memberships, items] = await prisma.$transaction([
     prisma.tenant.update({
