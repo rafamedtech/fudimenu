@@ -132,6 +132,29 @@ export async function requireAuth(): Promise<AuthContext> {
     },
     orderBy: { createdAt: 'asc' },
   });
+
+  if (activeTenantId && !memberships.some((membership) => membership.tenantId === activeTenantId)) {
+    await prisma.auditLog.create({
+      data: {
+        tenantId: memberships[0]?.tenantId ?? activeTenantId,
+        actorUserId: user.id,
+        action: 'auth.invalid_tenant_cookie',
+        entityType: 'membership',
+        entityId: activeTenantId,
+        metadata: {
+          attemptedTenantId: activeTenantId,
+          availableTenantIds: memberships.map((membership) => membership.tenantId),
+        },
+      },
+    });
+
+    try {
+      (cookieStore as { delete?: (name: string) => void }).delete?.(ACTIVE_TENANT_COOKIE);
+    } catch {
+      // Request cookies are read-only in Server Components. Audit log still records the bad cookie.
+    }
+  }
+
   const membership =
     memberships.find(({ tenantId }) => tenantId === activeTenantId) ?? memberships[0];
 

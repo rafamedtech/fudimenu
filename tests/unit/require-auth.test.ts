@@ -38,6 +38,7 @@ function mockCookieStore(values: Record<string, string | undefined>) {
       const value = values[name];
       return value ? { name, value } : undefined;
     }),
+    delete: vi.fn(),
   };
 }
 
@@ -141,7 +142,7 @@ describe('requireAuth', () => {
     expect(ctx.role).toBe('owner');
   });
 
-  it('ignores an active tenant cookie that is not one of the user memberships', async () => {
+  it('creates auth.invalid_tenant_cookie audit when activeTenantId does not match memberships', async () => {
     process.env.USE_MOCKS = 'false';
     process.env.E2E_TEST_AUTH = 'false';
     const findMany = vi.fn(async () => [
@@ -156,17 +157,36 @@ describe('requireAuth', () => {
         tenant: { name: 'Tenant B', slug: 'tenant-b', plan: 'pro' },
       },
     ]);
+    const auditCreate = vi.fn(async () => ({ id: 'audit-1' }));
+    const cookieStore = mockCookieStore({ activetenantId: 'tenant-x' });
 
-    mocks.cookies.mockResolvedValue(mockCookieStore({ activetenantId: 'tenant-x' }));
+    mocks.cookies.mockResolvedValue(cookieStore);
     mocks.getUser.mockResolvedValue({
       data: { user: { id: 'user-1', email: 'user@example.com' } },
     });
-    mocks.getPrisma.mockReturnValue({ membership: { findMany } });
+    mocks.getPrisma.mockReturnValue({
+      membership: { findMany },
+      auditLog: { create: auditCreate },
+    });
 
     const requireAuth = await loadRequireAuth();
     const ctx = await requireAuth();
 
     expect(ctx.tenantId).toBe('tenant-a');
     expect(ctx.role).toBe('owner');
+    expect(auditCreate).toHaveBeenCalledWith({
+      data: {
+        tenantId: 'tenant-a',
+        actorUserId: 'user-1',
+        action: 'auth.invalid_tenant_cookie',
+        entityType: 'membership',
+        entityId: 'tenant-x',
+        metadata: {
+          attemptedTenantId: 'tenant-x',
+          availableTenantIds: ['tenant-a', 'tenant-b'],
+        },
+      },
+    });
+    expect(cookieStore.delete).toHaveBeenCalledWith('activetenantId');
   });
 });
