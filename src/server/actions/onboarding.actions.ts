@@ -23,6 +23,7 @@ const onboardingSchema = z.object({
 async function applyMockOnboarding(data: z.infer<typeof onboardingSchema>) {
   if (process.env.USE_MOCKS === 'true') {
     const cookieStore = await cookies();
+    cookieStore.set(ACTIVE_TENANT_COOKIE, mockTenant.id, activeTenantCookieOptions);
     if (data.itemName && data.priceCents) {
       cookieStore.set('mock_onboarding_item', JSON.stringify({
         name: data.itemName,
@@ -100,6 +101,8 @@ export async function completeOnboardingAction(input: unknown) {
   });
 
   if (existingMembership) {
+    await setActiveTenant(existingMembership.tenantId);
+
     return {
       ok: true as const,
       existing: true as const,
