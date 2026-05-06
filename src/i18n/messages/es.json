@@ -31,5 +31,12 @@
   "auth": {
     "magicLinkSent": "Mandamos un link a tu correo 🔮",
     "loginTitle": "Entra a FudiMenu"
+  },
+  "public": {
+    "cookies": {
+      "message": "Usamos cookies para entender qué ven en este menú.",
+      "accept": "OK",
+      "decline": "No, gracias"
+    }
   }
 }

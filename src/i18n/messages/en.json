@@ -31,5 +31,12 @@
   "auth": {
     "magicLinkSent": "Magic link sent to your email 🔮",
     "loginTitle": "Sign in to FudiMenu"
+  },
+  "public": {
+    "cookies": {
+      "message": "We use cookies to understand what people view in this menu.",
+      "accept": "OK",
+      "decline": "No, thanks"
+    }
   }
 }
