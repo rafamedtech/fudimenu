@@ -1,13 +1,13 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useListenForSignIn } from '@/hooks/use-auth-broadcast';
 import { createSupabaseBrowser } from '@/lib/supabase/client';
 import { signInWithMagicLinkAction } from '@/server/actions/auth.actions';
 
-const MAGIC_LINK_POLL_MS = 3000;
 const MAGIC_LINK_POLL_TIMEOUT_MS = 30_000;
 
 export default function LoginPage() {
@@ -18,39 +18,44 @@ export default function LoginPage() {
   const [magicLinkSentAt, setMagicLinkSentAt] = useState<number | null>(null);
   const [magicLinkPollExpired, setMagicLinkPollExpired] = useState(false);
 
+  const handleDetectedSignIn = useCallback(() => {
+    if (!magicLinkSentAt) return;
+
+    router.replace('/dashboard');
+    router.refresh();
+  }, [magicLinkSentAt, router]);
+
+  useListenForSignIn(handleDetectedSignIn);
+
   useEffect(() => {
     if (!magicLinkSentAt) return;
 
     let cancelled = false;
     const supabase = createSupabaseBrowser();
-    let interval: number | undefined;
-    let timeout: number | undefined;
-
-    async function checkSession() {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      if (!cancelled && session) {
-        router.replace('/dashboard');
-        router.refresh();
-      }
-    }
-
     setMagicLinkPollExpired(false);
-    void checkSession();
-    interval = window.setInterval(() => void checkSession(), MAGIC_LINK_POLL_MS);
-    timeout = window.setTimeout(() => {
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (
+        !cancelled &&
+        session &&
+        (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED')
+      ) {
+        handleDetectedSignIn();
+      }
+    });
+
+    const timeout = window.setTimeout(() => {
       if (!cancelled) setMagicLinkPollExpired(true);
-      if (interval) window.clearInterval(interval);
     }, MAGIC_LINK_POLL_TIMEOUT_MS);
 
     return () => {
       cancelled = true;
-      if (interval) window.clearInterval(interval);
-      if (timeout) window.clearTimeout(timeout);
+      subscription.unsubscribe();
+      window.clearTimeout(timeout);
     };
-  }, [magicLinkSentAt, router]);
+  }, [handleDetectedSignIn, magicLinkSentAt]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -129,8 +134,8 @@ export default function LoginPage() {
             {magicLinkPollExpired ? 'Listo, revisa tu correo' : 'Revisando tu correo...'}
           </p>
           <p className="mt-1">
-            Abre el link desde este mismo navegador. Si detectamos tu sesión en los próximos 30
-            segundos, te llevamos directo a tu panel.
+            Abre el link desde este navegador. Si detectamos tu sesión en otra pestaña, te llevamos
+            directo a tu panel.
           </p>
           <p className="mt-2 text-ink-500">
             ¿No llegó? Revisa spam o intenta con Google.
