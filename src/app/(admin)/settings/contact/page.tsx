@@ -52,11 +52,11 @@ export default async function ContactSettingsPage({ searchParams }: ContactSetti
               name="whatsappPhone"
               type="tel"
               label="Numero WhatsApp Business"
-              placeholder="+526641234567"
+              placeholder="+52 664 123 4567"
               defaultValue={tenant?.whatsappPhone ?? ''}
-              pattern="^\+52[0-9]{10}$"
-              title="Usa el formato +52XXXXXXXXXX"
-              hint="Usa +52 seguido de 10 digitos. Dejalo vacio para ocultar el boton."
+              pattern="^\+[1-9]\d{6,14}$"
+              title="Usa formato internacional E.164: +[codigo pais][numero]"
+              hint="Formato internacional E.164: +[código país][número]. Ejemplos: +52 (MX), +57 (CO), +1 (US)"
             />
             <Input
               name="businessHours"

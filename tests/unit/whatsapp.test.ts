@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   buildWhatsAppOrderMessage,
   buildWhatsAppOrderUrl,
+  detectCountryCode,
   normalizeWhatsAppPhone,
   isValidWhatsAppPhone,
 } from '../../src/lib/whatsapp';
@@ -11,10 +12,24 @@ describe('whatsapp helpers', () => {
     expect(normalizeWhatsAppPhone('+52 (664) 123-4567')).toBe('+526641234567');
   });
 
-  it('validates the Mexican international WhatsApp format', () => {
-    expect(isValidWhatsAppPhone('+526641234567')).toBe(true);
-    expect(isValidWhatsAppPhone('6641234567')).toBe(false);
-    expect(isValidWhatsAppPhone('+15551234567')).toBe(false);
+  it('validates E.164 international WhatsApp numbers', () => {
+    expect(isValidWhatsAppPhone('+524444444444')).toBe(true);
+    expect(isValidWhatsAppPhone('+13234567890')).toBe(true);
+    expect(isValidWhatsAppPhone('+5712345678')).toBe(true);
+  });
+
+  it('rejects numbers without E.164 format', () => {
+    expect(isValidWhatsAppPhone('1234567890')).toBe(false);
+    expect(isValidWhatsAppPhone('+0123456789')).toBe(false);
+  });
+
+  it('detects known country codes', () => {
+    expect(detectCountryCode('+524444444444')).toBe('MX');
+    expect(detectCountryCode('+13234567890')).toBe('US');
+    expect(detectCountryCode('+5712345678')).toBe('CO');
+    expect(detectCountryCode('+51987654321')).toBe('PE');
+    expect(detectCountryCode('+441234567890')).toBeNull();
+    expect(detectCountryCode(null)).toBeNull();
   });
 
   it('builds the MVP order message', () => {
@@ -30,7 +45,7 @@ describe('whatsapp helpers', () => {
     );
   });
 
-  it('builds wa.me urls with a valid Mexican WhatsApp phone', () => {
+  it('builds wa.me urls with a valid WhatsApp phone', () => {
     const url = buildWhatsAppOrderUrl({
       phone: '+526641234567',
       slug: 'taqueria-don-pepe',
@@ -43,7 +58,7 @@ describe('whatsapp helpers', () => {
   it('returns null when the tenant has no valid WhatsApp number', () => {
     expect(
       buildWhatsAppOrderUrl({
-        phone: '+15551234567',
+        phone: '6641234567',
         slug: 'taqueria-don-pepe',
         itemName: 'Tacos al pastor',
       }),

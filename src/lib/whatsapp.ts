@@ -1,13 +1,28 @@
-const MEXICO_WHATSAPP_PHONE_PATTERN = /^\+52\d{10}$/;
+const E164_PATTERN = /^\+[1-9]\d{6,14}$/;
 
 export function normalizeWhatsAppPhone(input: string | null | undefined) {
-  const digits = input?.replace(/\D/g, '') ?? '';
-  return digits.length > 0 ? `+${digits}` : null;
+  if (!input) return null;
+
+  const trimmed = input.trim().replace(/[\s\-()]/g, '');
+  if (!trimmed.startsWith('+')) return null;
+
+  const digits = `+${trimmed.slice(1).replace(/\D/g, '')}`;
+  return digits.length > 1 ? digits : null;
 }
 
 export function isValidWhatsAppPhone(input: string | null | undefined) {
   const phone = normalizeWhatsAppPhone(input);
-  return phone !== null && MEXICO_WHATSAPP_PHONE_PATTERN.test(phone);
+  return phone !== null && E164_PATTERN.test(phone);
+}
+
+export function detectCountryCode(phone: string | null) {
+  const normalized = normalizeWhatsAppPhone(phone);
+  if (!normalized) return null;
+  if (normalized.startsWith('+52')) return 'MX';
+  if (normalized.startsWith('+57')) return 'CO';
+  if (normalized.startsWith('+51')) return 'PE';
+  if (normalized.startsWith('+1')) return 'US';
+  return null;
 }
 
 function getBaseUrl() {

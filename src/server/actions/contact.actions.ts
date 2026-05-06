@@ -4,7 +4,7 @@ import { revalidatePath, revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { getPrisma } from '@/lib/db/prisma';
-import { normalizeWhatsAppPhone } from '@/lib/whatsapp';
+import { isValidWhatsAppPhone, normalizeWhatsAppPhone } from '@/lib/whatsapp';
 import { requireAuth } from '@/server/guards/require-auth';
 
 function normalizeOptionalText(input: string | null | undefined) {
@@ -15,10 +15,10 @@ function normalizeOptionalText(input: string | null | undefined) {
 const contactSettingsSchema = z.object({
   whatsappPhone: z
     .string()
-    .max(24, 'Usa el formato +52XXXXXXXXXX')
+    .max(24, 'Usa formato internacional E.164')
     .transform((value) => normalizeWhatsAppPhone(value))
-    .refine((value) => value === null || /^\+52\d{10}$/.test(value), {
-      message: 'Usa el formato +52XXXXXXXXXX',
+    .refine((value) => value === null || isValidWhatsAppPhone(value), {
+      message: 'Usa formato internacional E.164',
     }),
   businessHours: z
     .string()
