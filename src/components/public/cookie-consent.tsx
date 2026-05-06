@@ -7,6 +7,7 @@ import {
   declineAnalyticsConsent,
   getStoredAnalyticsConsent,
 } from '@/lib/analytics/events';
+import { notifyCookieConsentDecided } from '@/components/public/cookie-consent-context';
 
 export function CookieConsent() {
   const [isVisible, setIsVisible] = useState(false);
@@ -18,11 +19,13 @@ export function CookieConsent() {
   const handleAccept = () => {
     acceptAnalyticsConsent();
     setIsVisible(false);
+    notifyCookieConsentDecided();
   };
 
   const handleDecline = () => {
     declineAnalyticsConsent();
     setIsVisible(false);
+    notifyCookieConsentDecided();
   };
 
   if (!isVisible) return null;

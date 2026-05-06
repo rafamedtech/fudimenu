@@ -5,6 +5,10 @@ import { useLocale, useTranslations } from 'next-intl';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState, useTransition } from 'react';
 import { CookieConsent } from '@/components/public/cookie-consent';
+import {
+  CookieConsentProvider,
+  useCookieConsentDecided,
+} from '@/components/public/cookie-consent-context';
 import { Button } from '@/components/ui/button';
 import { usePwaInstall } from '@/hooks/use-pwa-install';
 import { localStore } from '@/lib/storage/local';
@@ -96,7 +100,16 @@ interface PublicMenuPwaWrapperProps {
 }
 
 export function PublicMenuPwaWrapper({ slug, children }: PublicMenuPwaWrapperProps) {
+  return (
+    <CookieConsentProvider>
+      <PublicMenuPwaContent slug={slug}>{children}</PublicMenuPwaContent>
+    </CookieConsentProvider>
+  );
+}
+
+function PublicMenuPwaContent({ slug, children }: PublicMenuPwaWrapperProps) {
   const { canInstall, isInstalled, promptInstall } = usePwaInstall();
+  const consentDecided = useCookieConsentDecided();
   const [isSecondVisit, setIsSecondVisit] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
 
@@ -117,7 +130,8 @@ export function PublicMenuPwaWrapper({ slug, children }: PublicMenuPwaWrapperPro
     setIsDismissed(localStorage.getItem(dismissedKey) === '1');
   }, [slug]);
 
-  const shouldShowPrompt = canInstall && !isInstalled && isSecondVisit && !isDismissed;
+  const shouldShowPrompt =
+    canInstall && !isInstalled && isSecondVisit && !isDismissed && consentDecided;
 
   const handleDismiss = () => {
     localStorage.setItem(`${PUBLIC_MENU_DISMISSED_PREFIX}${slug}`, '1');
@@ -128,7 +142,7 @@ export function PublicMenuPwaWrapper({ slug, children }: PublicMenuPwaWrapperPro
     <>
       {children}
       {shouldShowPrompt && (
-        <div className="fixed inset-x-0 bottom-0 z-40 px-4 pb-4">
+        <div className="fixed inset-x-0 bottom-0 z-40 animate-fade-in px-4 pb-4">
           <div className="mx-auto flex max-w-md items-center gap-3 rounded-md border border-mostaza-500/30 bg-white p-3 shadow-lg">
             <p className="min-w-0 flex-1 text-sm font-semibold leading-snug text-ink-900">
               Guarda este menú en tu inicio — acceso en 1 tap 📱
