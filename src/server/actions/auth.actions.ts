@@ -23,22 +23,26 @@ export async function signInWithMagicLinkAction(formData: FormData) {
     return { ok: true as const, message: 'Mock: link mágico enviado.' };
   }
 
-  const requestHeaders = await headers();
-  const [emailRateLimit, ipRateLimit] = await Promise.all([
-    checkRateLimit(email, {
-      identifier: 'magic-link-email',
-      requests: 5,
-      windowSec: 3600,
-    }),
-    checkRateLimit(getClientIp(requestHeaders), {
-      identifier: 'magic-link-ip',
-      requests: 20,
-      windowSec: 3600,
-    }),
-  ]);
+  const emailRateLimit = await checkRateLimit(email, {
+    identifier: 'magic-link-email',
+    requests: 5,
+    windowSec: 3600,
+  });
+  if (!emailRateLimit.allowed) {
+    return {
+      ok: false as const,
+      error: `Demasiados intentos. Espera ${Math.ceil(emailRateLimit.resetSec / 60)} min.`,
+    };
+  }
 
-  if (!emailRateLimit.allowed || !ipRateLimit.allowed) {
-    return { ok: false as const, error: 'Demasiados intentos, espera unos minutos' };
+  const requestHeaders = await headers();
+  const ipRateLimit = await checkRateLimit(getClientIp(requestHeaders), {
+    identifier: 'magic-link-ip',
+    requests: 20,
+    windowSec: 3600,
+  });
+  if (!ipRateLimit.allowed) {
+    return { ok: false as const, error: 'Demasiados intentos desde esta red.' };
   }
 
   const supabase = await createSupabaseServer();

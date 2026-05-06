@@ -1,5 +1,6 @@
 import 'server-only';
 import { getPrisma } from '@/lib/db/prisma';
+import { sanitizePlainText } from '@/lib/sanitize';
 import { slugify } from '@/lib/utils';
 import { billingService } from '@/server/services/billing.service';
 
@@ -115,11 +116,14 @@ function getStarterMenuItems(input: CompleteOnboardingTenantInput) {
 
 export const tenantService = {
   async createFromOnboarding(input: CompleteOnboardingTenantInput) {
+    const tenantName = sanitizePlainText(input.name, 80) ?? 'Sin nombre';
+    const itemName = sanitizePlainText(input.itemName, 80) ?? undefined;
+    const sanitizedInput = { ...input, name: tenantName, itemName };
     const prisma = getPrisma();
     const tenantId = crypto.randomUUID();
-    const slug = `${slugify(input.name) || 'restaurante'}-${tenantId.slice(0, 8)}`;
-    const starterCategories = getStarterCategories(input.cuisine);
-    const starterMenuItems = getStarterMenuItems(input);
+    const slug = `${slugify(tenantName) || 'restaurante'}-${tenantId.slice(0, 8)}`;
+    const starterCategories = getStarterCategories(sanitizedInput.cuisine);
+    const starterMenuItems = getStarterMenuItems(sanitizedInput);
 
     await prisma.$transaction(async (tx) => {
       await tx.tenant.create({
@@ -127,7 +131,7 @@ export const tenantService = {
           id: tenantId,
           createdBy: input.userId,
           slug,
-          name: input.name,
+          name: tenantName,
           cuisineType: input.cuisine,
           currency: 'MXN',
           defaultLocale: 'es',
@@ -175,7 +179,7 @@ export const tenantService = {
 
     await billingService.startProTrialForTenant({
       tenantId,
-      tenantName: input.name,
+      tenantName,
       tenantSlug: slug,
       userId: input.userId,
       email: input.email,

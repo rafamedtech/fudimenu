@@ -41,6 +41,8 @@ export function StockToggle({ itemId, initial }: StockToggleProps) {
   return <Toggle checked={available} onChange={handleChange} disabled={isPending} ariaLabel="Disponible" />;
 }
 
-function actionErrorToApiError(code: 'unauthorized') {
-  return new ApiError(401, code, 'Unauthorized');
+function actionErrorToApiError(code: string) {
+  return code === 'rate_limited'
+    ? new ApiError(429, code, 'Rate limited')
+    : new ApiError(401, code, 'Unauthorized');
 }

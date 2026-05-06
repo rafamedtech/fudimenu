@@ -5,10 +5,12 @@ const mocks = vi.hoisted(() => ({
   cookieDelete: vi.fn(),
   findFirst: vi.fn(),
   getUser: vi.fn(),
+  checkRateLimit: vi.fn(),
   revalidatePath: vi.fn(),
   redirect: vi.fn((path: string) => {
     throw new Error(`redirect:${path}`);
   }),
+  signInWithOtp: vi.fn(),
   signOut: vi.fn(),
 }));
 
@@ -36,10 +38,16 @@ vi.mock('@/lib/db/prisma', () => ({
   })),
 }));
 
+vi.mock('@/lib/ratelimit', () => ({
+  checkRateLimit: mocks.checkRateLimit,
+  getClientIp: vi.fn((headers: Headers) => headers.get('x-forwarded-for') ?? 'unknown'),
+}));
+
 vi.mock('@/lib/supabase/server', () => ({
   createSupabaseServer: vi.fn(async () => ({
     auth: {
       getUser: mocks.getUser,
+      signInWithOtp: mocks.signInWithOtp,
       signOut: mocks.signOut,
     },
   })),
@@ -56,6 +64,54 @@ describe('auth actions', () => {
     process.env.USE_MOCKS = originalUseMocks;
     vi.clearAllMocks();
     vi.resetModules();
+  });
+
+  it('returns reset minutes when magic link email rate limit is reached', async () => {
+    process.env.USE_MOCKS = 'false';
+    mocks.checkRateLimit.mockResolvedValueOnce({
+      allowed: false,
+      remaining: 0,
+      resetSec: 181,
+    });
+
+    const { signInWithMagicLinkAction } = await loadAuthActions();
+    const formData = new FormData();
+    formData.set('email', 'owner@example.com');
+    const result = await signInWithMagicLinkAction(formData);
+
+    expect(result).toEqual({
+      ok: false,
+      error: 'Demasiados intentos. Espera 4 min.',
+    });
+    expect(mocks.checkRateLimit).toHaveBeenCalledWith('owner@example.com', {
+      identifier: 'magic-link-email',
+      requests: 5,
+      windowSec: 3600,
+    });
+    expect(mocks.signInWithOtp).not.toHaveBeenCalled();
+  });
+
+  it('blocks magic links when IP rate limit is reached', async () => {
+    process.env.USE_MOCKS = 'false';
+    mocks.checkRateLimit
+      .mockResolvedValueOnce({ allowed: true, remaining: 4, resetSec: 0 })
+      .mockResolvedValueOnce({ allowed: false, remaining: 0, resetSec: 3600 });
+
+    const { signInWithMagicLinkAction } = await loadAuthActions();
+    const formData = new FormData();
+    formData.set('email', 'owner@example.com');
+    const result = await signInWithMagicLinkAction(formData);
+
+    expect(result).toEqual({
+      ok: false,
+      error: 'Demasiados intentos desde esta red.',
+    });
+    expect(mocks.checkRateLimit).toHaveBeenNthCalledWith(2, '127.0.0.1', {
+      identifier: 'magic-link-ip',
+      requests: 20,
+      windowSec: 3600,
+    });
+    expect(mocks.signInWithOtp).not.toHaveBeenCalled();
   });
 
   it('updates the active tenant cookie when the user has access to the tenant', async () => {

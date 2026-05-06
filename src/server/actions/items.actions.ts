@@ -1,13 +1,14 @@
 'use server';
 import { revalidatePath, revalidateTag } from 'next/cache';
 import { PLAN_CONFIG } from '@/config/plans';
+import { checkRateLimit } from '@/lib/ratelimit';
 import { itemSchema } from '@/lib/validators/item.schema';
 import { requireAuth, type AuthContext } from '@/server/guards/require-auth';
 import { menuService } from '@/server/services/menu.service';
 
 type ItemActionError = {
   ok: false;
-  code: 'unauthorized';
+  code: 'unauthorized' | 'rate_limited';
 };
 
 function revalidateMenu(ctx: AuthContext) {
@@ -46,6 +47,15 @@ function isRedirectError(error: unknown) {
 export async function upsertItemAction(input: unknown) {
   const ctx = await requireActionAuth();
   if ('ok' in ctx) return ctx;
+
+  const limit = await checkRateLimit(ctx.tenantId, {
+    identifier: 'item-upsert',
+    requests: 200,
+    windowSec: 60,
+  });
+  if (!limit.allowed) {
+    return { ok: false as const, code: 'rate_limited' };
+  }
 
   const data = itemSchema.parse(input);
 

@@ -389,8 +389,10 @@ function isItemInputPayload(payload: JsonValue): payload is ItemInput {
   );
 }
 
-function actionErrorToApiError(code: 'unauthorized') {
-  return new ApiError(401, code, 'Unauthorized');
+function actionErrorToApiError(code: string) {
+  return code === 'rate_limited'
+    ? new ApiError(429, code, 'Rate limited')
+    : new ApiError(401, code, 'Unauthorized');
 }
 
 function buildConflictRows(

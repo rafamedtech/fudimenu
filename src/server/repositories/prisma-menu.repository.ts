@@ -1,5 +1,6 @@
 import 'server-only';
 import { getPrisma } from '@/lib/db/prisma';
+import { sanitizePlainText } from '@/lib/sanitize';
 import type { MenuData, IMenuRepository } from '@/server/repositories/menu.repository';
 import type { Category, MenuItem, Tenant } from '@/types/domain';
 
@@ -89,11 +90,6 @@ function mapMenuItem(row: MenuItemRow): MenuItem {
     updatedAt: row.updatedAt.toISOString(),
     deletedAt: row.deletedAt?.toISOString() ?? null,
   };
-}
-
-function normalizeText(value: string | null | undefined) {
-  const trimmed = value?.trim();
-  return trimmed ? trimmed : null;
 }
 
 export class PrismaMenuRepository implements IMenuRepository {
@@ -219,8 +215,8 @@ export class PrismaMenuRepository implements IMenuRepository {
       sortOrder: number;
     } = {
       categoryId: input.categoryId ?? null,
-      name: input.name ?? 'Sin nombre',
-      description: normalizeText(input.description),
+      name: sanitizePlainText(input.name, 80) ?? 'Sin nombre',
+      description: sanitizePlainText(input.description, 500),
       priceCents: input.priceCents ?? 0,
       currency: input.currency ?? 'MXN',
       imageUrl: input.imageUrl ?? null,

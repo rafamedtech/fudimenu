@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { getPrisma } from '@/lib/db/prisma';
 import { mockCategories, mockItems, mockTenant } from '@/lib/mock/data';
+import { checkRateLimit } from '@/lib/ratelimit';
 import { createSupabaseServer } from '@/lib/supabase/server';
 import { getMenuRepository } from '@/server/repositories/get-repository';
 import { tenantService } from '@/server/services/tenant.service';
@@ -91,6 +92,15 @@ export async function completeOnboardingAction(input: unknown) {
   if (mockResult) return mockResult;
 
   const user = await getOnboardingUser();
+  const limit = await checkRateLimit(user.id, {
+    identifier: 'onboarding-complete',
+    requests: 5,
+    windowSec: 3600,
+  });
+  if (!limit.allowed) {
+    throw new Error('rate_limited');
+  }
+
   const prisma = getPrisma();
   const existingMembership = await prisma.membership.findFirst({
     where: { userId: user.id },

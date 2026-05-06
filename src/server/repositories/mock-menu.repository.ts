@@ -1,5 +1,6 @@
 import 'server-only';
 import { mockCategories, mockItems, mockTenant } from '@/lib/mock/data';
+import { sanitizePlainText } from '@/lib/sanitize';
 import type { IMenuRepository, MenuData } from '@/server/repositories/menu.repository';
 import type { Category, MenuItem, Tenant } from '@/types/domain';
 
@@ -110,6 +111,12 @@ export class MockMenuRepository implements IMenuRepository {
   }
 
   async upsertItem(tenantId: string, input: Partial<MenuItem>): Promise<MenuItem> {
+    const sanitizedInput = {
+      ...input,
+      name: sanitizePlainText(input.name, 80) ?? 'Sin nombre',
+      description: sanitizePlainText(input.description, 500),
+    };
+
     if (input.id) {
       const idx = this.items.findIndex(
         (item) => item.id === input.id && item.tenantId === tenantId && isActive(item),
@@ -117,7 +124,7 @@ export class MockMenuRepository implements IMenuRepository {
       if (idx >= 0) {
         this.items[idx] = {
           ...this.items[idx],
-          ...input,
+          ...sanitizedInput,
           tenantId,
           updatedAt: new Date().toISOString(),
         };
@@ -129,9 +136,9 @@ export class MockMenuRepository implements IMenuRepository {
     const created: MenuItem = {
       id: `itm_${crypto.randomUUID().slice(0, 8)}`,
       tenantId,
-      categoryId: input.categoryId ?? null,
-      name: input.name ?? 'Sin nombre',
-      description: input.description ?? null,
+      categoryId: sanitizedInput.categoryId ?? null,
+      name: sanitizedInput.name,
+      description: sanitizedInput.description,
       priceCents: input.priceCents ?? 0,
       isSpecialToday: input.isSpecialToday ?? false,
       specialPrice: input.specialPrice ?? null,
