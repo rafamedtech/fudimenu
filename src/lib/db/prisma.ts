@@ -6,18 +6,25 @@ const globalForPrisma = globalThis as unknown as {
   prisma?: PrismaClient;
 };
 
-export function getPrisma() {
+function createPrismaClient() {
   const databaseUrl = process.env.DATABASE_URL ?? process.env.DIRECT_URL;
 
   if (!databaseUrl) {
     throw new Error('Missing DATABASE_URL or DIRECT_URL. Add your Supabase Postgres URL to .env.');
   }
 
-  if (!globalForPrisma.prisma) {
-    globalForPrisma.prisma = new PrismaClient({
-      adapter: new PrismaPg({ connectionString: databaseUrl }),
-    });
-  }
+  return new PrismaClient({
+    adapter: new PrismaPg({ connectionString: databaseUrl }),
+  });
+}
 
+export function getPrisma() {
+  if (!globalForPrisma.prisma) {
+    globalForPrisma.prisma = createPrismaClient();
+  }
   return globalForPrisma.prisma;
+}
+
+export function resetPrisma() {
+  globalForPrisma.prisma = undefined;
 }

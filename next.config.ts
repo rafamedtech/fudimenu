@@ -14,6 +14,11 @@ const config: NextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react'],
   },
+  serverExternalPackages: [
+    '@sentry/nextjs',
+    '@opentelemetry/instrumentation',
+    'require-in-the-middle',
+  ],
   async headers() {
     return [
       {

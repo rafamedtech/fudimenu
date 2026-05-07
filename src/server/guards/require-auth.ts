@@ -1,7 +1,7 @@
 import 'server-only';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { getPrisma } from '@/lib/db/prisma';
+import { getPrisma, resetPrisma } from '@/lib/db/prisma';
 import { createSupabaseServer } from '@/lib/supabase/server';
 import { mockTenant } from '@/lib/mock/data';
 import { ACTIVE_TENANT_COOKIE } from '@/server/tenants/active-tenant-cookie';
@@ -26,6 +26,31 @@ export type AuthContext = {
   }>;
 };
 
+async function queryMemberships(userId: string, retry = false) {
+  const prisma = getPrisma();
+  try {
+    // eslint-disable-next-line fudimenu/require-tenant-id-in-prisma-findmany -- Auth bootstrap must discover the user's allowed tenants before a trusted tenantId exists.
+    return await prisma.membership.findMany({
+      where: { userId, deletedAt: null },
+      select: {
+        tenantId: true,
+        role: true,
+        tenant: {
+          select: { name: true, slug: true, plan: true },
+        },
+      },
+      orderBy: { createdAt: 'asc' },
+    });
+  } catch (err) {
+    const code = (err as { code?: string }).code;
+    if (!retry && (code === 'P1001' || code === 'P1017')) {
+      resetPrisma();
+      return queryMemberships(userId, true);
+    }
+    throw err;
+  }
+}
+
 export async function requireAuth(): Promise<AuthContext> {
   if (process.env.E2E_TEST_AUTH === 'true') {
     const cookieStore = await cookies();
@@ -34,7 +59,6 @@ export async function requireAuth(): Promise<AuthContext> {
     if (tenantId) {
       const e2eUserId = cookieStore.get('e2e_user_id')?.value ?? 'e2e-user';
       const prisma = getPrisma();
-      // eslint-disable-next-line fudimenu/require-tenant-id-in-prisma-findmany -- E2E auth must load the test user's memberships before enforcing the requested tenant.
       const e2eMemberships = await prisma.membership.findMany({
         where: { userId: e2eUserId, deletedAt: null },
         select: {
@@ -119,34 +143,26 @@ export async function requireAuth(): Promise<AuthContext> {
 
   const cookieStore = await cookies();
   const activeTenantId = cookieStore.get(ACTIVE_TENANT_COOKIE)?.value;
-  const prisma = getPrisma();
-  // eslint-disable-next-line fudimenu/require-tenant-id-in-prisma-findmany -- Auth bootstrap must discover the user's allowed tenants before a trusted tenantId exists.
-  const memberships = await prisma.membership.findMany({
-    where: { userId: user.id, deletedAt: null },
-    select: {
-      tenantId: true,
-      role: true,
-      tenant: {
-        select: { name: true, slug: true, plan: true },
-      },
-    },
-    orderBy: { createdAt: 'asc' },
-  });
+
+  const memberships = await queryMemberships(user.id);
 
   if (activeTenantId && !memberships.some((membership) => membership.tenantId === activeTenantId)) {
-    await prisma.auditLog.create({
-      data: {
-        tenantId: memberships[0]?.tenantId ?? activeTenantId,
-        actorUserId: user.id,
-        action: 'auth.invalid_tenant_cookie',
-        entityType: 'membership',
-        entityId: activeTenantId,
-        metadata: {
-          attemptedTenantId: activeTenantId,
-          availableTenantIds: memberships.map((membership) => membership.tenantId),
+    const auditTenantId = memberships[0]?.tenantId;
+    if (auditTenantId) {
+      await getPrisma().auditLog.create({
+        data: {
+          tenantId: auditTenantId,
+          actorUserId: user.id,
+          action: 'auth.invalid_tenant_cookie',
+          entityType: 'membership',
+          entityId: activeTenantId,
+          metadata: {
+            attemptedTenantId: activeTenantId,
+            availableTenantIds: memberships.map((membership) => membership.tenantId),
+          },
         },
-      },
-    });
+      });
+    }
 
     try {
       (cookieStore as { delete?: (name: string) => void }).delete?.(ACTIVE_TENANT_COOKIE);
