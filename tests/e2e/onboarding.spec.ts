@@ -66,15 +66,12 @@ test.describe('onboarding golden path', () => {
 
     await page.getByLabel('Nombre del restaurante').fill(restaurantName);
     await page.getByRole('button', { name: /Mexicana/ }).click();
-    await page.getByRole('button', { name: /Siguiente/ }).click();
-
-    await expect(page.getByRole('heading', { name: 'Tu primer platillo' })).toBeVisible();
-    await page.getByLabel('Nombre').fill(itemName);
+    await expect(page.getByText('Tu primer platillo')).toBeVisible();
+    await page.getByLabel('Nombre', { exact: true }).fill(itemName);
     await page.getByLabel('Precio').fill('123.45');
     await page.getByRole('button', { name: 'Crear mi menú' }).click();
 
-    await expect(page.getByRole('dialog', { name: '¡Listo, jefe!' })).toBeVisible();
-    await expect(page.getByText('Tu menú ya vive en internet.')).toBeVisible();
+    await expect(page).toHaveURL(/\/menu\?welcome=1/);
 
     await expect
       .poll(async () => {
@@ -93,7 +90,7 @@ test.describe('onboarding golden path', () => {
 
     await page.goto(`/m/${tenant!.slug}`);
     await expect(page.getByRole('heading', { name: restaurantName })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Tacos' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Tacos', exact: true })).toBeVisible();
     await expect(page.getByRole('heading', { name: itemName })).toBeVisible();
     await expect(page.getByText('$123.45')).toBeVisible();
   });

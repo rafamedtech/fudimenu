@@ -6,6 +6,7 @@ import { PrismaClient } from '../../src/generated/prisma/client';
 
 const databaseUrl = process.env.DATABASE_URL ?? process.env.DIRECT_URL;
 const PUBLIC_VISIBILITY_TIMEOUT_MS = 65_000;
+const soldOutText = /Agotado|Sold out/;
 
 let prisma: PrismaClient | null = null;
 
@@ -101,7 +102,7 @@ test.describe('stock toggle public visibility', () => {
     await page.goto(`/m/${slug}`);
     await expect(page.getByRole('heading', { name: restaurantName })).toBeVisible();
     await expect(page.getByRole('heading', { name: itemName })).toBeVisible();
-    await expect(page.getByText('Agotado')).toHaveCount(0);
+    await expect(page.getByText(soldOutText)).toHaveCount(0);
 
     await page.goto(`/menu/${itemId}`);
     const stockSwitch = page.getByRole('switch', { name: 'Disponible' });
@@ -123,7 +124,7 @@ test.describe('stock toggle public visibility', () => {
       .poll(
         async () => {
           await page.goto(`/m/${slug}`);
-          return await page.getByText('Agotado').count();
+          return await page.getByText(soldOutText).count();
         },
         { timeout: PUBLIC_VISIBILITY_TIMEOUT_MS, intervals: [500, 1000, 2000, 5000] },
       )

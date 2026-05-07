@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
   tenantUpdate: vi.fn(async () => ({})),
   tenantFindUnique: vi.fn(async () => ({ name: 'Taqueria Norte' })),
   auditLogCreate: vi.fn(async () => ({})),
+  sendPaymentFailedEmail: vi.fn(async () => ({ sent: true, reason: null })),
 }));
 
 vi.mock('stripe', () => ({
@@ -33,7 +34,7 @@ vi.mock('@/lib/db/prisma', () => ({
 
 vi.mock('@/server/services/billing.service', () => ({
   billingService: {
-    sendPaymentFailedEmail: vi.fn(async () => ({ sent: true, reason: null })),
+    sendPaymentFailedEmail: mocks.sendPaymentFailedEmail,
   },
 }));
 
@@ -143,5 +144,46 @@ describe('Stripe webhook route', () => {
       where: { id: 'tenant-1' },
       data: { plan: 'free' },
     });
+  });
+
+  it('sends email for invoice.payment_failed', async () => {
+    process.env.STRIPE_SECRET_KEY = 'sk_test_123';
+    process.env.STRIPE_WEBHOOK_SECRET = 'whsec_test';
+    mocks.constructEvent.mockReturnValue(
+      eventFor('invoice.payment_failed', {
+        metadata: { tenantId: 'tenant-1' },
+        customer_email: 'owner@example.com',
+      }),
+    );
+
+    const { POST } = await import('../../src/app/api/webhooks/stripe/route');
+    const response = await POST(stripeRequest());
+
+    expect(response.status).toBe(200);
+    expect(mocks.tenantFindUnique).toHaveBeenCalledWith({
+      where: { id: 'tenant-1' },
+      select: { name: true },
+    });
+    expect(mocks.sendPaymentFailedEmail).toHaveBeenCalledWith({
+      email: 'owner@example.com',
+      tenantName: 'Taqueria Norte',
+    });
+  });
+
+  it('returns 200 without error for unhandled event types', async () => {
+    process.env.STRIPE_SECRET_KEY = 'sk_test_123';
+    process.env.STRIPE_WEBHOOK_SECRET = 'whsec_test';
+    mocks.constructEvent.mockReturnValue(
+      eventFor('customer.created', {
+        metadata: { tenantId: 'tenant-1' },
+      }),
+    );
+
+    const { POST } = await import('../../src/app/api/webhooks/stripe/route');
+    const response = await POST(stripeRequest());
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ received: true });
+    expect(mocks.tenantUpdate).not.toHaveBeenCalled();
   });
 });

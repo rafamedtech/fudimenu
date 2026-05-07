@@ -22,14 +22,116 @@ function authCookie(tenantId: string, userId: string) {
   return `e2e_tenant_id=${tenantId}; e2e_user_id=${userId}`;
 }
 
+type TenantIsolationFixture = {
+  tenantAId: string;
+  tenantBId: string;
+  tenantASlug: string;
+  tenantBSlug: string;
+  userAId: string;
+  userBId: string;
+  itemAId: string;
+  itemBId: string;
+};
+
+async function createTenantIsolationFixture(): Promise<TenantIsolationFixture> {
+  const db = getTestPrisma();
+  const tenantAId = randomUUID();
+  const tenantBId = randomUUID();
+  const userAId = randomUUID();
+  const userBId = randomUUID();
+  const tenantSuffix = randomUUID().slice(0, 8);
+  const tenantASlug = `tenant-a-${tenantSuffix}`;
+  const tenantBSlug = `tenant-b-${tenantSuffix}`;
+  const itemAId = randomUUID();
+  const itemBId = randomUUID();
+
+  await db.tenant.createMany({
+    data: [
+      {
+        id: tenantAId,
+        slug: tenantASlug,
+        name: 'Tenant A',
+        currency: 'MXN',
+      },
+      {
+        id: tenantBId,
+        slug: tenantBSlug,
+        name: 'Tenant B',
+        currency: 'MXN',
+      },
+    ],
+  });
+
+  await db.menuItem.createMany({
+    data: [
+      {
+        id: itemAId,
+        tenantId: tenantAId,
+        name: 'Tenant A taco',
+        priceCents: 12000,
+        currency: 'MXN',
+      },
+      {
+        id: itemBId,
+        tenantId: tenantBId,
+        name: 'Tenant B ramen',
+        priceCents: 18000,
+        currency: 'MXN',
+      },
+    ],
+  });
+
+  await db.membership.createMany({
+    data: [
+      {
+        tenantId: tenantAId,
+        userId: userAId,
+        role: 'owner',
+      },
+      {
+        tenantId: tenantBId,
+        userId: userBId,
+        role: 'owner',
+      },
+    ],
+  });
+
+  return {
+    tenantAId,
+    tenantBId,
+    tenantASlug,
+    tenantBSlug,
+    userAId,
+    userBId,
+    itemAId,
+    itemBId,
+  };
+}
+
 test.describe('tenant isolation', () => {
-  const tenantIds: string[] = [];
+  test.describe.configure({ mode: 'serial' });
+
+  let fixture: TenantIsolationFixture;
+
+  test.beforeEach(async () => {
+    test.skip(!databaseUrl, 'Missing DATABASE_URL or DIRECT_URL for E2E tenant isolation test.');
+    fixture = await createTenantIsolationFixture();
+  });
 
   test.afterEach(async () => {
-    if (!databaseUrl) return;
+    if (!databaseUrl || !fixture) return;
 
-    await getTestPrisma().tenant.deleteMany({
-      where: { id: { in: tenantIds.splice(0) } },
+    const db = getTestPrisma();
+    await db.auditLog.deleteMany({
+      where: {
+        OR: [
+          { tenantId: { in: [fixture.tenantAId, fixture.tenantBId] } },
+          { actorUserId: { in: [fixture.userAId, fixture.userBId] } },
+        ],
+      },
+    });
+    await db.tenant.deleteMany({
+      where: { id: { in: [fixture.tenantAId, fixture.tenantBId] } },
     });
   });
 
@@ -37,104 +139,38 @@ test.describe('tenant isolation', () => {
     await prisma?.$disconnect();
   });
 
-  test('keeps two accounts scoped to their own tenant data', async ({
-    request,
-  }) => {
-    test.skip(!databaseUrl, 'Missing DATABASE_URL or DIRECT_URL for E2E tenant isolation test.');
-
-    const db = getTestPrisma();
-    const tenantAId = randomUUID();
-    const tenantBId = randomUUID();
-    const userAId = randomUUID();
-    const userBId = randomUUID();
-    const tenantSuffix = randomUUID().slice(0, 8);
-    tenantIds.push(tenantAId, tenantBId);
-
-    const itemAId = randomUUID();
-    const itemBId = randomUUID();
-
-    await db.tenant.createMany({
-      data: [
-        {
-          id: tenantAId,
-          slug: `tenant-a-${tenantSuffix}`,
-          name: 'Tenant A',
-          currency: 'MXN',
-        },
-        {
-          id: tenantBId,
-          slug: `tenant-b-${tenantSuffix}`,
-          name: 'Tenant B',
-          currency: 'MXN',
-        },
-      ],
-    });
-
-    await db.menuItem.createMany({
-      data: [
-        {
-          id: itemAId,
-          tenantId: tenantAId,
-          name: 'Tenant A taco',
-          priceCents: 12000,
-          currency: 'MXN',
-        },
-        {
-          id: itemBId,
-          tenantId: tenantBId,
-          name: 'Tenant B ramen',
-          priceCents: 18000,
-          currency: 'MXN',
-        },
-      ],
-    });
-
-    await db.membership.createMany({
-      data: [
-        {
-          tenantId: tenantAId,
-          userId: userAId,
-          role: 'owner',
-        },
-        {
-          tenantId: tenantBId,
-          userId: userBId,
-          role: 'owner',
-        },
-      ],
-    });
-
+  test('tenant A cannot see tenant B items via /api/items', async ({ request }) => {
     const itemsResponse = await request.get('/api/items', {
-      headers: { cookie: authCookie(tenantAId, userAId) },
+      headers: { cookie: authCookie(fixture.tenantAId, fixture.userAId) },
     });
     expect(itemsResponse.ok()).toBe(true);
 
     const itemNames = ((await itemsResponse.json()) as Array<{ name: string }>).map((item) => item.name);
-    expect(itemNames).toContain('Tenant A taco');
-    expect(itemNames).not.toContain('Tenant B ramen');
-
-    const tenantBItemsResponse = await request.get('/api/items', {
-      headers: { cookie: authCookie(tenantBId, userBId) },
-    });
-    expect(tenantBItemsResponse.ok()).toBe(true);
-
-    const tenantBItemNames = ((await tenantBItemsResponse.json()) as Array<{ name: string }>).map(
-      (item) => item.name,
-    );
-    expect(tenantBItemNames).toContain('Tenant B ramen');
-    expect(tenantBItemNames).not.toContain('Tenant A taco');
+    expect(itemNames).toEqual(['Tenant A taco']);
 
     const forgedTenantAccess = await request.get('/api/items', {
-      headers: { cookie: authCookie(tenantBId, userAId) },
-      maxRedirects: 0,
+      headers: { cookie: authCookie(fixture.tenantBId, fixture.userAId) },
     });
-    expect(forgedTenantAccess.status()).toBeGreaterThanOrEqual(300);
-    expect(forgedTenantAccess.status()).toBeLessThan(400);
+    expect(forgedTenantAccess.ok()).toBe(true);
 
+    const forgedItemNames = ((await forgedTenantAccess.json()) as Array<{ name: string }>).map((item) => item.name);
+    expect(forgedItemNames).toEqual(['Tenant A taco']);
+
+    const invalidCookieAudit = await getTestPrisma().auditLog.findFirst({
+      where: {
+        actorUserId: fixture.userAId,
+        action: 'auth.invalid_tenant_cookie',
+        entityId: fixture.tenantBId,
+      },
+    });
+    expect(invalidCookieAudit).not.toBeNull();
+  });
+
+  test('tenant A cannot mutate tenant B items via Server Action', async ({ request }) => {
     const crossTenantWrite = await request.post('/api/e2e/upsert-item-action', {
-      headers: { cookie: authCookie(tenantAId, userAId) },
+      headers: { cookie: authCookie(fixture.tenantAId, fixture.userAId) },
       data: {
-        id: itemBId,
+        id: fixture.itemBId,
         categoryId: null,
         name: 'Tenant A overwrite attempt',
         description: null,
@@ -147,9 +183,23 @@ test.describe('tenant isolation', () => {
 
     expect(crossTenantWrite.status()).toBe(404);
 
-    const tenantBItem = await db.menuItem.findUniqueOrThrow({ where: { id: itemBId } });
-    expect(tenantBItem.tenantId).toBe(tenantBId);
+    const tenantBItem = await getTestPrisma().menuItem.findUniqueOrThrow({ where: { id: fixture.itemBId } });
+    expect(tenantBItem.tenantId).toBe(fixture.tenantBId);
     expect(tenantBItem.name).toBe('Tenant B ramen');
     expect(tenantBItem.priceCents).toBe(18000);
+  });
+
+  test('public /m/[slug] view is isolated by slug', async ({ request }) => {
+    const tenantAPage = await request.get(`/m/${fixture.tenantASlug}`);
+    expect(tenantAPage.ok()).toBe(true);
+    const tenantAHtml = await tenantAPage.text();
+    expect(tenantAHtml).toContain('Tenant A taco');
+    expect(tenantAHtml).not.toContain('Tenant B ramen');
+
+    const tenantBPage = await request.get(`/m/${fixture.tenantBSlug}`);
+    expect(tenantBPage.ok()).toBe(true);
+    const tenantBHtml = await tenantBPage.text();
+    expect(tenantBHtml).toContain('Tenant B ramen');
+    expect(tenantBHtml).not.toContain('Tenant A taco');
   });
 });

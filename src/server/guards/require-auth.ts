@@ -72,8 +72,23 @@ export async function requireAuth(): Promise<AuthContext> {
       });
 
       if (e2eMemberships.length > 0) {
-        const membership = e2eMemberships.find((item) => item.tenantId === tenantId);
-        if (!membership) redirect('/login');
+        let membership = e2eMemberships.find((item) => item.tenantId === tenantId);
+        if (!membership) {
+          await prisma.auditLog.create({
+            data: {
+              tenantId: e2eMemberships[0]?.tenantId ?? tenantId,
+              actorUserId: e2eUserId,
+              action: 'auth.invalid_tenant_cookie',
+              entityType: 'membership',
+              entityId: tenantId,
+              metadata: {
+                attemptedTenantId: tenantId,
+                availableTenantIds: e2eMemberships.map((item) => item.tenantId),
+              },
+            },
+          });
+          membership = e2eMemberships[0];
+        }
 
         return {
           userId: e2eUserId,
