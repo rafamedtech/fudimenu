@@ -56,8 +56,12 @@
 - CRON_SECRET — protege endpoints /api/cron/*
 - USE_MOCKS — true en dev sin DB
 
-## Bundle baseline (a la fecha)
-- TODO: completar tras F4-06
+## Bundle baseline (2026-05-07)
+- `/m/[slug]` First Load JS: 195 KB; analyzer route client gzip: 91.2 KB
+- `/menu` First Load JS: 209 KB; analyzer route client gzip: 105.3 KB
+- `/onboarding` First Load JS: 182 KB; analyzer route client gzip: 78.9 KB
+- Shared `_app`/main contributors: React/Next runtime, `posthog-js` (~59 KB gzip), Supabase browser/auth chunk on login (~49 KB gzip).
+- Watchlist: public menu stays under 100 KB route gzip, but PostHog is loaded from root layout and dominates public route client cost.
 
 ## Runbook ops
 - Spike traffic → Vercel auto-scale, monitor Supabase pool size

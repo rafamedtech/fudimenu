@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "next dev --hostname 127.0.0.1",
+    "analyze": "ANALYZE=true next build",
     "build": "next build",
     "start": "next start",
     "lint": "next lint --rulesdir eslint-rules",
@@ -54,6 +55,7 @@
     "zustand": "^5.0.0"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^16.2.6",
     "@playwright/test": "^1.48.0",
     "@types/node": "^22.7.4",
     "@types/pg": "^8.20.0",
