@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
     throw new Error(`redirect:${path}`);
   }),
   getPrisma: vi.fn(),
+  resetPrisma: vi.fn(),
   getUser: vi.fn(),
 }));
 
@@ -19,6 +20,7 @@ vi.mock('next/navigation', () => ({
 
 vi.mock('@/lib/db/prisma', () => ({
   getPrisma: mocks.getPrisma,
+  resetPrisma: mocks.resetPrisma,
 }));
 
 vi.mock('@/lib/supabase/server', () => ({

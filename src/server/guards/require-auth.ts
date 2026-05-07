@@ -1,9 +1,10 @@
 import 'server-only';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { getPrisma, resetPrisma } from '@/lib/db/prisma';
+import { getPrisma } from '@/lib/db/prisma';
 import { createSupabaseServer } from '@/lib/supabase/server';
 import { mockTenant } from '@/lib/mock/data';
+import { getUserMemberships } from '@/server/guards/get-user-memberships';
 import { ACTIVE_TENANT_COOKIE } from '@/server/tenants/active-tenant-cookie';
 import type { Plan } from '@/types/domain';
 
@@ -26,31 +27,6 @@ export type AuthContext = {
   }>;
 };
 
-async function queryMemberships(userId: string, retry = false) {
-  const prisma = getPrisma();
-  try {
-    // eslint-disable-next-line fudimenu/require-tenant-id-in-prisma-findmany -- Auth bootstrap must discover the user's allowed tenants before a trusted tenantId exists.
-    return await prisma.membership.findMany({
-      where: { userId, deletedAt: null },
-      select: {
-        tenantId: true,
-        role: true,
-        tenant: {
-          select: { name: true, slug: true, plan: true },
-        },
-      },
-      orderBy: { createdAt: 'asc' },
-    });
-  } catch (err) {
-    const code = (err as { code?: string }).code;
-    if (!retry && (code === 'P1001' || code === 'P1017')) {
-      resetPrisma();
-      return queryMemberships(userId, true);
-    }
-    throw err;
-  }
-}
-
 export async function requireAuth(): Promise<AuthContext> {
   if (process.env.E2E_TEST_AUTH === 'true') {
     const cookieStore = await cookies();
@@ -59,17 +35,7 @@ export async function requireAuth(): Promise<AuthContext> {
     if (tenantId) {
       const e2eUserId = cookieStore.get('e2e_user_id')?.value ?? 'e2e-user';
       const prisma = getPrisma();
-      const e2eMemberships = await prisma.membership.findMany({
-        where: { userId: e2eUserId, deletedAt: null },
-        select: {
-          tenantId: true,
-          role: true,
-          tenant: {
-            select: { name: true, slug: true, plan: true },
-          },
-        },
-        orderBy: { createdAt: 'asc' },
-      });
+      const e2eMemberships = await getUserMemberships(e2eUserId);
 
       if (e2eMemberships.length > 0) {
         let membership = e2eMemberships.find((item) => item.tenantId === tenantId);
@@ -159,7 +125,7 @@ export async function requireAuth(): Promise<AuthContext> {
   const cookieStore = await cookies();
   const activeTenantId = cookieStore.get(ACTIVE_TENANT_COOKIE)?.value;
 
-  const memberships = await queryMemberships(user.id);
+  const memberships = await getUserMemberships(user.id);
 
   if (activeTenantId && !memberships.some((membership) => membership.tenantId === activeTenantId)) {
     const auditTenantId = memberships[0]?.tenantId;
