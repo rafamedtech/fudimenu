@@ -23,6 +23,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang={locale} suppressHydrationWarning>
+      <head>
+        <meta
+          name="description"
+          content="Crea y comparte un menú online rápido para tu restaurante, sin PDFs lentos."
+        />
+      </head>
       <body className="font-sans" suppressHydrationWarning>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <Providers>{children}</Providers>

@@ -1,5 +1,11 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'FudiMenu - Tu menú online en segundos',
+  description: 'Crea y comparte un menú online rápido para tu restaurante, sin PDFs lentos.',
+};
 
 export default function LandingPage() {
   return (

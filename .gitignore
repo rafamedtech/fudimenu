@@ -11,5 +11,6 @@ build/
 .vercel
 .turbo
 coverage/
+.lighthouseci/
 playwright-report/
 test-results/
