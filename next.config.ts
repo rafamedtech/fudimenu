@@ -5,6 +5,7 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 const config: NextConfig = {
   reactStrictMode: true,
+  htmlLimitedBots: /HeadlessChrome|Chrome-Lighthouse|Lighthouse/,
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: 'res.cloudinary.com' },
