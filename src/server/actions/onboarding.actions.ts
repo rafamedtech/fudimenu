@@ -83,6 +83,9 @@ async function getOnboardingUser() {
 async function setActiveTenant(tenantId: string) {
   const cookieStore = await cookies();
   cookieStore.set(ACTIVE_TENANT_COOKIE, tenantId, activeTenantCookieOptions);
+  if (process.env.E2E_TEST_AUTH === 'true') {
+    cookieStore.set('e2e_tenant_id', tenantId, activeTenantCookieOptions);
+  }
   revalidatePath('/', 'layout');
 }
 

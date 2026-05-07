@@ -160,7 +160,7 @@ async function main() {
     for (const item of items) {
       await client.query(
         `
-          INSERT INTO items (
+          INSERT INTO menu_items (
             id,
             tenant_id,
             category_id,
