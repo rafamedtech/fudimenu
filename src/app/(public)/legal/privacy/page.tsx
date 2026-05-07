@@ -105,6 +105,12 @@ export default function PrivacyPage() {
             </section>
           ))}
         </div>
+
+        <footer className="mt-10 border-t border-ink-200 pt-5 text-sm font-semibold text-ink-500">
+          <Link href="/legal/dpa" className="underline">
+            Acuerdo de Procesamiento de Datos (DPA)
+          </Link>
+        </footer>
       </article>
     </main>
   );
