@@ -8,7 +8,17 @@
     "empty": "Nothing here yet 👀",
     "error": "Something went wrong. Retry.",
     "saved": "✓ Saved",
-    "offline": "Offline — changes will sync"
+    "offline": "Offline — changes will sync",
+    "retry": "Retry",
+    "backHome": "Go home"
+  },
+  "errors": {
+    "notFound": "Nothing here",
+    "notFoundDesc": "This page doesn't exist or moved.",
+    "menuUnavailable": "Menu unavailable",
+    "menuUnavailableDesc": "Check back soon.",
+    "kitchenBurned": "Something went wrong",
+    "unexpected": "Unexpected error."
   },
   "menu": {
     "addItem": "Add item",
@@ -19,6 +29,10 @@
     "orderWhatsApp": "Order on WhatsApp",
     "otherCategory": "Other",
     "madeWith": "Made with",
+    "skipToMenu": "Skip to menu",
+    "pwaPrompt": "Save this menu to your home screen — 1-tap access 📱",
+    "pwaInstall": "Add menu to home screen",
+    "pwaClose": "Close suggestion",
     "language": {
       "label": "Menu language"
     },

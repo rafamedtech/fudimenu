@@ -198,7 +198,7 @@ function PublicMenuContent({
           href="#menu-content"
           className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-white focus:px-4 focus:py-3 focus:font-bold focus:text-ink-900"
         >
-          Saltar al menú
+          {t('skipToMenu')}
         </a>
         <header className="relative bg-white px-6 py-8 text-center shadow-sm">
           <div className="absolute right-4 top-4">
