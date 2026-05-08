@@ -4,6 +4,7 @@ type AnalyticsAccess = 'none' | 'basic';
 
 export type PlanLimits = {
   branches: number | null;
+  sections: number | null;
   items: number | null;
 };
 
@@ -34,6 +35,7 @@ export const PLAN_CONFIG: Record<Plan, PlanConfig> = {
     interval: 'month',
     limits: {
       branches: 1,
+      sections: 5,
       items: 20,
     },
     features: {
@@ -52,6 +54,7 @@ export const PLAN_CONFIG: Record<Plan, PlanConfig> = {
     interval: 'month',
     limits: {
       branches: null,
+      sections: null,
       items: null,
     },
     features: {
@@ -70,6 +73,7 @@ export const PLAN_CONFIG: Record<Plan, PlanConfig> = {
     interval: 'month',
     limits: {
       branches: 3,
+      sections: null,
       items: null,
     },
     features: {

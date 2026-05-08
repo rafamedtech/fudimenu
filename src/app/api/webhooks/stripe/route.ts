@@ -83,12 +83,22 @@ async function writeAuditLog(event: Stripe.Event, tenantId: string | null) {
   });
 }
 
-async function updateTenantPlan(tenantId: string | null, plan: 'pro' | 'business' | 'free' | null) {
+async function updateTenantPlan(
+  tenantId: string | null,
+  plan: 'pro' | 'business' | 'free' | null,
+  extra: { stripeCustomerId?: string | null; stripeSubscriptionId?: string | null } = {},
+) {
   if (!tenantId || !plan) return;
 
   await getPrisma().tenant.update({
     where: { id: tenantId },
-    data: { plan },
+    data: {
+      plan,
+      ...(extra.stripeCustomerId !== undefined ? { stripeCustomerId: extra.stripeCustomerId } : {}),
+      ...(extra.stripeSubscriptionId !== undefined
+        ? { stripeSubscriptionId: extra.stripeSubscriptionId }
+        : {}),
+    },
   });
 }
 
@@ -117,9 +127,22 @@ async function processEvent(event: Stripe.Event) {
     case 'checkout.session.completed': {
       const session = event.data.object as Stripe.Checkout.Session;
       const tenantId = getTenantId(session.metadata);
+      const customerId = typeof session.customer === 'string' ? session.customer : session.customer?.id ?? null;
+      const subscriptionId = typeof session.subscription === 'string'
+        ? session.subscription
+        : session.subscription?.id ?? null;
+
+      if (session.mode === 'subscription') {
+        await updateTenantPlan(tenantId, getPaidPlan(session.metadata), {
+          ...(customerId ? { stripeCustomerId: customerId } : {}),
+          ...(subscriptionId ? { stripeSubscriptionId: subscriptionId } : {}),
+        });
+      }
 
       if (session.mode === 'payment' && session.payment_status === 'paid') {
-        await updateTenantPlan(tenantId, getPaidPlan(session.metadata));
+        await updateTenantPlan(tenantId, getPaidPlan(session.metadata), {
+          ...(customerId ? { stripeCustomerId: customerId } : {}),
+        });
       }
 
       return tenantId;
@@ -142,9 +165,17 @@ async function processEvent(event: Stripe.Event) {
     case 'customer.subscription.updated': {
       const subscription = event.data.object as Stripe.Subscription;
       const tenantId = getTenantId(subscription.metadata);
+      const customerId = typeof subscription.customer === 'string'
+        ? subscription.customer
+        : subscription.customer.id;
 
       if (subscription.status === 'canceled' || (subscription.cancel_at_period_end && isSubscriptionPeriodEnded(subscription))) {
         await updateTenantPlan(tenantId, 'free');
+      } else if (subscription.status === 'active' || subscription.status === 'trialing') {
+        await updateTenantPlan(tenantId, getPaidPlan(subscription.metadata), {
+          stripeCustomerId: customerId,
+          stripeSubscriptionId: subscription.id,
+        });
       }
 
       return tenantId;

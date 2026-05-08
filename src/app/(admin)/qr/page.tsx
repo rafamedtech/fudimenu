@@ -1,10 +1,7 @@
 import Image from 'next/image';
-import Link from 'next/link';
-import { Download } from 'lucide-react';
 import { AppHeader } from '@/components/layout/app-header';
 import { TenantSwitcher } from '@/components/admin/tenant-switcher';
 import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { requireAuth } from '@/server/guards/require-auth';
 import { menuService } from '@/server/services/menu.service';
 import { QrShareActions } from './qr-share-actions';
@@ -55,13 +52,11 @@ export default async function QrPage() {
             <p className="text-xs font-semibold uppercase text-ink-500">Link del menú</p>
             <p className="mt-1 break-all text-sm font-bold text-ink-900">{menuUrl}</p>
           </div>
-          <QrShareActions menuUrl={menuUrl} />
-          <Link href={`${qrUrl}?download=1`} className="w-full" prefetch={false}>
-            <Button type="button" className="w-full">
-              <Download size={18} />
-              Descargar PNG
-            </Button>
-          </Link>
+          <QrShareActions
+            menuUrl={menuUrl}
+            downloadUrl={`${qrUrl}?download=1`}
+            tenantId={tenant.id}
+          />
         </Card>
       </main>
     </>

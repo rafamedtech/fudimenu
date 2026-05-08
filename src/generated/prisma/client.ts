@@ -57,6 +57,11 @@ export type Membership = Prisma.MembershipModel
  */
 export type AccountDeleteRequest = Prisma.AccountDeleteRequestModel
 /**
+ * Model MenuSection
+ * 
+ */
+export type MenuSection = Prisma.MenuSectionModel
+/**
  * Model Category
  * 
  */

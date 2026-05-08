@@ -16,8 +16,14 @@ export const itemSchema = z.object({
 export const categorySchema = z.object({
   id: z.string().uuid().optional(),
   name: z.string().min(1).max(40),
+  sectionId: z.string().uuid().nullable().optional(),
   sortOrder: z.number().int().default(0),
   isVisible: z.boolean().default(true),
+});
+
+export const reorderCategoriesSchema = z.object({
+  sectionId: z.string().uuid().nullable(),
+  categoryIds: z.array(z.string().uuid()).min(1).max(100),
 });
 
 export const tenantUpdateSchema = z.object({
@@ -39,4 +45,5 @@ export const tenantUpdateSchema = z.object({
 
 export type ItemInput = z.infer<typeof itemSchema>;
 export type CategoryInput = z.infer<typeof categorySchema>;
+export type ReorderCategoriesInput = z.infer<typeof reorderCategoriesSchema>;
 export type TenantUpdateInput = z.infer<typeof tenantUpdateSchema>;

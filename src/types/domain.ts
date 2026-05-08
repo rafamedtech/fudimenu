@@ -14,6 +14,8 @@ export type Tenant = {
   defaultLocale: Locale;
   currency: string;
   plan: Plan;
+  stripeCustomerId?: string | null;
+  stripeSubscriptionId?: string | null;
   createdAt: string;
 };
 
@@ -26,6 +28,8 @@ export type MenuSection = {
   sortOrder: number;
   isVisible: boolean;
   createdAt: string;
+  updatedAt?: string;
+  deletedAt?: string | null;
 };
 
 export type Category = {

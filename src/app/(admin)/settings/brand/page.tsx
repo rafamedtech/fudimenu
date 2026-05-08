@@ -1,13 +1,10 @@
-import { CheckCircle2, ImageIcon, Palette } from 'lucide-react';
+import { CheckCircle2, Palette } from 'lucide-react';
+import { BrandSettingsForm } from '@/components/admin/brand-settings-form';
 import { AppHeader } from '@/components/layout/app-header';
-import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { getPrisma } from '@/lib/db/prisma';
 import { mockTenant } from '@/lib/mock/data';
-import { updateBrandSettingsFormAction } from '@/server/actions/tenant.actions';
 import { requireAuth } from '@/server/guards/require-auth';
-import { BrandSlugInput } from './brand-slug-input';
 
 type BrandSettingsPageProps = {
   searchParams: Promise<{ saved?: string; slugTaken?: string }>;
@@ -54,37 +51,11 @@ export default async function BrandSettingsPage({ searchParams }: BrandSettingsP
             </div>
           </div>
 
-          <form action={updateBrandSettingsFormAction} className="space-y-4">
-            <BrandSlugInput currentSlug={tenant?.slug ?? ''} />
-            <Input
-              name="logoUrl"
-              type="url"
-              label="Logo"
-              placeholder="https://..."
-              defaultValue={tenant?.logoUrl ?? ''}
-              prefix={<ImageIcon className="h-4 w-4" />}
-              hint="TODO upload Cloudinary. Por ahora puedes pegar una URL publica."
-            />
-            <Input
-              name="primaryColor"
-              type="text"
-              label="Color primario"
-              placeholder="#F4B400"
-              defaultValue={tenant?.primaryColor ?? '#F4B400'}
-              pattern="^#[0-9A-Fa-f]{6}$"
-              title="Usa formato hex #RRGGBB"
-              prefix={
-                <span
-                  className="block h-4 w-4 rounded-full border border-ink-200"
-                  style={{ backgroundColor: tenant?.primaryColor ?? '#F4B400' }}
-                />
-              }
-              hint="TODO color picker. Usa formato hex #RRGGBB."
-            />
-            <Button type="submit" className="w-full">
-              Guardar ajustes
-            </Button>
-          </form>
+          <BrandSettingsForm
+            currentSlug={tenant?.slug ?? ''}
+            logoUrl={tenant?.logoUrl ?? null}
+            primaryColor={tenant?.primaryColor ?? '#F4B400'}
+          />
         </Card>
       </main>
     </>

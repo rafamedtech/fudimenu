@@ -2,12 +2,13 @@ import { Suspense } from 'react';
 import { cookies } from 'next/headers';
 import { PlanLimitBanner } from '@/components/admin/plan-limit-banner';
 import { TenantSwitcher } from '@/components/admin/tenant-switcher';
+import { SectionGrid } from '@/components/admin/section-grid';
 import { AppHeader } from '@/components/layout/app-header';
 import { ItemCard } from '@/components/menu/item-card';
 import { Card } from '@/components/ui/card';
-import { ItemCardSkeleton } from '@/components/ui/skeleton';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Button } from '@/components/ui/button';
+import { PLAN_CONFIG } from '@/config/plans';
 import { requireAuth } from '@/server/guards/require-auth';
 import { menuService } from '@/server/services/menu.service';
 import Link from 'next/link';
@@ -44,20 +45,25 @@ export default async function MenuPage({ searchParams }: MenuPageProps) {
 }
 
 async function MenuList({ tenantId }: { tenantId: string }) {
-  const { tenant, categories, items } = await menuService.getMenuByTenantId(tenantId);
+  const { tenant, sections, categories, items } = await menuService.getMenuByTenantId(tenantId);
   const visibleItems = await getVisibleItems(items);
   const categoryNamesById = new Map(categories.map((category) => [category.id, category.name]));
+  const freeSectionLimit = PLAN_CONFIG.free.limits.sections ?? 5;
+  const canCreateSection = tenant.plan !== 'free' || sections.length < freeSectionLimit;
 
-  if (visibleItems.length === 0) {
+  const hasSections = sections.length > 0;
+  const hasItems = visibleItems.length > 0;
+
+  if (!hasSections && !hasItems) {
     return (
       <>
         <EmptyState
           emoji="🍽️"
           title="Tu menú está vacío"
-          description="Agrega tu primer platillo, ese que más venden."
+          description="Crea una sección y después agrega platillos dentro."
           action={
-            <Link href="/menu/new">
-              <Button size="lg">+ Agregar platillo</Button>
+            <Link href="/menu/sections/new">
+              <Button size="lg">+ Crear primera sección</Button>
             </Link>
           }
         />
@@ -69,17 +75,22 @@ async function MenuList({ tenantId }: { tenantId: string }) {
   return (
     <>
       <PlanLimitBanner plan={tenant.plan} itemCount={visibleItems.length} />
-      <ul className="flex flex-col gap-2">
-        {visibleItems.map((item) => (
-          <li key={item.id}>
-            <ItemCard
-              item={item}
-              categoryName={item.categoryId ? categoryNamesById.get(item.categoryId) : null}
-              href={`/menu/${item.id}`}
-            />
-          </li>
-        ))}
-      </ul>
+
+      {hasSections && <SectionGrid sections={sections} canCreateSection={canCreateSection} />}
+
+      {!hasSections && hasItems && (
+        <ul className="mt-4 flex flex-col gap-2">
+          {visibleItems.map((item) => (
+            <li key={item.id}>
+              <ItemCard
+                item={item}
+                categoryName={item.categoryId ? categoryNamesById.get(item.categoryId) : null}
+                href={`/menu/${item.id}`}
+              />
+            </li>
+          ))}
+        </ul>
+      )}
     </>
   );
 }
@@ -112,10 +123,10 @@ async function getVisibleItems(items: Awaited<ReturnType<typeof menuService.getM
 
 function MenuListLoading() {
   return (
-    <ul className="flex flex-col gap-2">
-      {Array.from({ length: 5 }).map((_, i) => (
+    <ul className="grid grid-cols-2 gap-3">
+      {Array.from({ length: 4 }).map((_, i) => (
         <li key={i}>
-          <ItemCardSkeleton />
+          <div className="aspect-[4/5] animate-pulse rounded-lg bg-ink-100" />
         </li>
       ))}
     </ul>

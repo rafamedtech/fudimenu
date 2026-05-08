@@ -1,15 +1,24 @@
 'use client';
 
-import { Copy, Share2 } from 'lucide-react';
+import { Copy, Download, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
+import { track } from '@/lib/analytics/events';
 import { getShareMenuUrlAction } from './actions';
 
 async function copyText(text: string) {
   await navigator.clipboard.writeText(text);
 }
 
-export function QrShareActions({ menuUrl }: { menuUrl: string }) {
+export function QrShareActions({
+  menuUrl,
+  downloadUrl,
+  tenantId,
+}: {
+  menuUrl: string;
+  downloadUrl: string;
+  tenantId: string;
+}) {
   async function copyMenuLink() {
     try {
       await copyText(menuUrl);
@@ -44,7 +53,7 @@ export function QrShareActions({ menuUrl }: { menuUrl: string }) {
   }
 
   return (
-    <div className="grid grid-cols-2 gap-3">
+    <div className="grid w-full grid-cols-2 gap-3">
       <Button type="button" variant="outline" onClick={copyMenuLink}>
         <Copy size={18} />
         Copiar
@@ -52,6 +61,17 @@ export function QrShareActions({ menuUrl }: { menuUrl: string }) {
       <Button type="button" variant="outline" onClick={shareMenu}>
         <Share2 size={18} />
         Compartir
+      </Button>
+      <Button
+        type="button"
+        className="col-span-2 w-full"
+        onClick={() => {
+          track('qr_downloaded', { tenantId, format: 'png' });
+          window.location.href = downloadUrl;
+        }}
+      >
+        <Download size={18} />
+        Descargar PNG
       </Button>
     </div>
   );

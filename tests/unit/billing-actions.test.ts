@@ -47,7 +47,7 @@ describe('billing actions', () => {
     vi.resetModules();
   });
 
-  it('creates a Stripe Checkout Session with card, OXXO, and SPEI bank transfer support', async () => {
+  it('creates a card subscription Checkout Session by default', async () => {
     process.env.STRIPE_SECRET_KEY = 'sk_test_123';
     process.env.NEXT_PUBLIC_APP_URL = 'https://app.fudimenu.test';
 
@@ -63,20 +63,22 @@ describe('billing actions', () => {
         tenantId: 'tenant-1',
         userId: 'user-1',
         plan: 'pro',
+        cycle: 'monthly',
+        method: 'card',
       },
     });
     expect(mocks.checkoutSessionsCreate).toHaveBeenCalledWith(
       expect.objectContaining({
-        mode: 'payment',
-        payment_method_types: ['card', 'oxxo', 'customer_balance'],
+        mode: 'subscription',
+        payment_method_types: ['card'],
         customer: 'cus_123',
-        payment_method_options: {
-          customer_balance: {
-            funding_type: 'bank_transfer',
-            bank_transfer: {
-              type: 'mx_bank_transfer',
-              requested_address_types: ['spei'],
-            },
+        subscription_data: {
+          metadata: {
+            tenantId: 'tenant-1',
+            userId: 'user-1',
+            plan: 'pro',
+            cycle: 'monthly',
+            method: 'card',
           },
         },
         success_url:
@@ -86,6 +88,35 @@ describe('billing actions', () => {
           tenantId: 'tenant-1',
           userId: 'user-1',
           plan: 'pro',
+          cycle: 'monthly',
+          method: 'card',
+        },
+      }),
+    );
+  });
+
+  it('creates a one-time OXXO/SPEI Checkout Session for manual cash payment', async () => {
+    process.env.STRIPE_SECRET_KEY = 'sk_test_123';
+    process.env.NEXT_PUBLIC_APP_URL = 'https://app.fudimenu.test';
+
+    const { createBillingCheckoutAction } = await import(
+      '../../src/server/actions/billing.actions'
+    );
+    const result = await createBillingCheckoutAction({ plan: 'pro', method: 'cash' });
+
+    expect(result).toEqual({ ok: true, url: 'https://checkout.stripe.test/session' });
+    expect(mocks.checkoutSessionsCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        mode: 'payment',
+        payment_method_types: ['oxxo', 'customer_balance'],
+        payment_method_options: {
+          customer_balance: {
+            funding_type: 'bank_transfer',
+            bank_transfer: {
+              type: 'mx_bank_transfer',
+              requested_address_types: ['spei'],
+            },
+          },
         },
       }),
     );

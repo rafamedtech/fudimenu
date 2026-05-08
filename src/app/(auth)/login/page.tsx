@@ -1,6 +1,6 @@
 'use client';
 import { useCallback, useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,6 +12,10 @@ const MAGIC_LINK_POLL_TIMEOUT_MS = 30_000;
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const nextPath = searchParams.get('next')?.startsWith('/')
+    ? searchParams.get('next')!
+    : '/dashboard';
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
@@ -21,9 +25,9 @@ export default function LoginPage() {
   const handleDetectedSignIn = useCallback(() => {
     if (!magicLinkSentAt) return;
 
-    router.replace('/dashboard');
+    router.replace(nextPath);
     router.refresh();
-  }, [magicLinkSentAt, router]);
+  }, [magicLinkSentAt, nextPath, router]);
 
   useListenForSignIn(handleDetectedSignIn);
 
@@ -63,6 +67,7 @@ export default function LoginPage() {
     try {
       const fd = new FormData();
       fd.set('email', email);
+      fd.set('next', nextPath);
       const res = await signInWithMagicLinkAction(fd);
       if (res.ok) {
         setMagicLinkSentAt(Date.now());
@@ -84,7 +89,7 @@ export default function LoginPage() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`,
           queryParams: {
             prompt: 'select_account',
           },

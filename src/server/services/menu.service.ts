@@ -1,8 +1,9 @@
 import 'server-only';
 import { getMenuRepository } from '@/server/repositories/get-repository';
 import type { MenuData } from '@/server/repositories/menu.repository';
-import type { MenuItem, MenuSection, Tenant } from '@/types/domain';
+import type { MenuItem, MenuSection, Category, Tenant } from '@/types/domain';
 import type { SectionInput } from '@/lib/validators/section.schema';
+import type { CategoryInput } from '@/lib/validators/item.schema';
 
 export const menuService = {
   async getTenantBySlug(slug: string): Promise<Tenant | null> {
@@ -45,15 +46,31 @@ export const menuService = {
     return (await getMenuRepository()).upsertItem(tenantId, input);
   },
 
-  async upsertSection(_tenantId: string, _input: SectionInput): Promise<MenuSection> {
-    throw new Error('not implemented');
+  async upsertSection(tenantId: string, input: SectionInput): Promise<MenuSection> {
+    return (await getMenuRepository()).upsertSection(tenantId, input);
   },
 
-  async deleteSection(_tenantId: string, _sectionId: string): Promise<void> {
-    throw new Error('not implemented');
+  async deleteSection(tenantId: string, sectionId: string): Promise<void> {
+    return (await getMenuRepository()).deleteSection(tenantId, sectionId);
   },
 
-  async reorderSections(_tenantId: string, _sectionIds: string[]): Promise<void> {
-    throw new Error('not implemented');
+  async reorderSections(tenantId: string, sectionIds: string[]): Promise<void> {
+    return (await getMenuRepository()).reorderSections(tenantId, sectionIds);
+  },
+
+  async upsertCategory(tenantId: string, input: CategoryInput): Promise<Category> {
+    return (await getMenuRepository()).upsertCategory(tenantId, input);
+  },
+
+  async deleteCategory(tenantId: string, categoryId: string): Promise<void> {
+    return (await getMenuRepository()).deleteCategory(tenantId, categoryId);
+  },
+
+  async reorderCategories(
+    tenantId: string,
+    sectionId: string | null,
+    categoryIds: string[],
+  ): Promise<void> {
+    return (await getMenuRepository()).reorderCategories(tenantId, sectionId, categoryIds);
   },
 };

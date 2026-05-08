@@ -57,7 +57,6 @@ export async function GET(request: NextRequest) {
   let totalDeleted = 0;
 
   while (true) {
-    // eslint-disable-next-line fudimenu/require-tenant-id-in-prisma-findmany -- Cron de retencion borra entre tenants por diseno.
     const batch = await prisma.auditLog.findMany({
       where: { createdAt: { lt: cutoff } },
       select: { id: true },

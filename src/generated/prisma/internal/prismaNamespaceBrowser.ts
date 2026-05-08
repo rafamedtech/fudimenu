@@ -54,6 +54,7 @@ export const ModelName = {
   Tenant: 'Tenant',
   Membership: 'Membership',
   AccountDeleteRequest: 'AccountDeleteRequest',
+  MenuSection: 'MenuSection',
   Category: 'Category',
   MenuItem: 'MenuItem',
   ItemTranslation: 'ItemTranslation',
@@ -94,6 +95,8 @@ export const TenantScalarFieldEnum = {
   defaultLocale: 'defaultLocale',
   currency: 'currency',
   plan: 'plan',
+  stripeCustomerId: 'stripeCustomerId',
+  stripeSubscriptionId: 'stripeSubscriptionId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   deletedAt: 'deletedAt'
@@ -128,9 +131,26 @@ export const AccountDeleteRequestScalarFieldEnum = {
 export type AccountDeleteRequestScalarFieldEnum = (typeof AccountDeleteRequestScalarFieldEnum)[keyof typeof AccountDeleteRequestScalarFieldEnum]
 
 
+export const MenuSectionScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  name: 'name',
+  coverImageUrl: 'coverImageUrl',
+  accentColor: 'accentColor',
+  sortOrder: 'sortOrder',
+  isVisible: 'isVisible',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
+} as const
+
+export type MenuSectionScalarFieldEnum = (typeof MenuSectionScalarFieldEnum)[keyof typeof MenuSectionScalarFieldEnum]
+
+
 export const CategoryScalarFieldEnum = {
   id: 'id',
   tenantId: 'tenantId',
+  sectionId: 'sectionId',
   name: 'name',
   sortOrder: 'sortOrder',
   isVisible: 'isVisible',

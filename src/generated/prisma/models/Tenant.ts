@@ -37,6 +37,8 @@ export type TenantMinAggregateOutputType = {
   defaultLocale: $Enums.Locale | null
   currency: string | null
   plan: $Enums.TenantPlan | null
+  stripeCustomerId: string | null
+  stripeSubscriptionId: string | null
   createdAt: Date | null
   updatedAt: Date | null
   deletedAt: Date | null
@@ -55,6 +57,8 @@ export type TenantMaxAggregateOutputType = {
   defaultLocale: $Enums.Locale | null
   currency: string | null
   plan: $Enums.TenantPlan | null
+  stripeCustomerId: string | null
+  stripeSubscriptionId: string | null
   createdAt: Date | null
   updatedAt: Date | null
   deletedAt: Date | null
@@ -73,6 +77,8 @@ export type TenantCountAggregateOutputType = {
   defaultLocale: number
   currency: number
   plan: number
+  stripeCustomerId: number
+  stripeSubscriptionId: number
   createdAt: number
   updatedAt: number
   deletedAt: number
@@ -93,6 +99,8 @@ export type TenantMinAggregateInputType = {
   defaultLocale?: true
   currency?: true
   plan?: true
+  stripeCustomerId?: true
+  stripeSubscriptionId?: true
   createdAt?: true
   updatedAt?: true
   deletedAt?: true
@@ -111,6 +119,8 @@ export type TenantMaxAggregateInputType = {
   defaultLocale?: true
   currency?: true
   plan?: true
+  stripeCustomerId?: true
+  stripeSubscriptionId?: true
   createdAt?: true
   updatedAt?: true
   deletedAt?: true
@@ -129,6 +139,8 @@ export type TenantCountAggregateInputType = {
   defaultLocale?: true
   currency?: true
   plan?: true
+  stripeCustomerId?: true
+  stripeSubscriptionId?: true
   createdAt?: true
   updatedAt?: true
   deletedAt?: true
@@ -220,6 +232,8 @@ export type TenantGroupByOutputType = {
   defaultLocale: $Enums.Locale
   currency: string
   plan: $Enums.TenantPlan
+  stripeCustomerId: string | null
+  stripeSubscriptionId: string | null
   createdAt: Date
   updatedAt: Date
   deletedAt: Date | null
@@ -259,10 +273,13 @@ export type TenantWhereInput = {
   defaultLocale?: Prisma.EnumLocaleFilter<"Tenant"> | $Enums.Locale
   currency?: Prisma.StringFilter<"Tenant"> | string
   plan?: Prisma.EnumTenantPlanFilter<"Tenant"> | $Enums.TenantPlan
+  stripeCustomerId?: Prisma.StringNullableFilter<"Tenant"> | string | null
+  stripeSubscriptionId?: Prisma.StringNullableFilter<"Tenant"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Tenant"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Tenant"> | Date | string
   deletedAt?: Prisma.DateTimeNullableFilter<"Tenant"> | Date | string | null
   memberships?: Prisma.MembershipListRelationFilter
+  sections?: Prisma.MenuSectionListRelationFilter
   categories?: Prisma.CategoryListRelationFilter
   items?: Prisma.MenuItemListRelationFilter
   slugHistory?: Prisma.SlugHistoryListRelationFilter
@@ -286,10 +303,13 @@ export type TenantOrderByWithRelationInput = {
   defaultLocale?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   plan?: Prisma.SortOrder
+  stripeCustomerId?: Prisma.SortOrderInput | Prisma.SortOrder
+  stripeSubscriptionId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   memberships?: Prisma.MembershipOrderByRelationAggregateInput
+  sections?: Prisma.MenuSectionOrderByRelationAggregateInput
   categories?: Prisma.CategoryOrderByRelationAggregateInput
   items?: Prisma.MenuItemOrderByRelationAggregateInput
   slugHistory?: Prisma.SlugHistoryOrderByRelationAggregateInput
@@ -316,10 +336,13 @@ export type TenantWhereUniqueInput = Prisma.AtLeast<{
   defaultLocale?: Prisma.EnumLocaleFilter<"Tenant"> | $Enums.Locale
   currency?: Prisma.StringFilter<"Tenant"> | string
   plan?: Prisma.EnumTenantPlanFilter<"Tenant"> | $Enums.TenantPlan
+  stripeCustomerId?: Prisma.StringNullableFilter<"Tenant"> | string | null
+  stripeSubscriptionId?: Prisma.StringNullableFilter<"Tenant"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Tenant"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Tenant"> | Date | string
   deletedAt?: Prisma.DateTimeNullableFilter<"Tenant"> | Date | string | null
   memberships?: Prisma.MembershipListRelationFilter
+  sections?: Prisma.MenuSectionListRelationFilter
   categories?: Prisma.CategoryListRelationFilter
   items?: Prisma.MenuItemListRelationFilter
   slugHistory?: Prisma.SlugHistoryListRelationFilter
@@ -343,6 +366,8 @@ export type TenantOrderByWithAggregationInput = {
   defaultLocale?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   plan?: Prisma.SortOrder
+  stripeCustomerId?: Prisma.SortOrderInput | Prisma.SortOrder
+  stripeSubscriptionId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -367,6 +392,8 @@ export type TenantScalarWhereWithAggregatesInput = {
   defaultLocale?: Prisma.EnumLocaleWithAggregatesFilter<"Tenant"> | $Enums.Locale
   currency?: Prisma.StringWithAggregatesFilter<"Tenant"> | string
   plan?: Prisma.EnumTenantPlanWithAggregatesFilter<"Tenant"> | $Enums.TenantPlan
+  stripeCustomerId?: Prisma.StringNullableWithAggregatesFilter<"Tenant"> | string | null
+  stripeSubscriptionId?: Prisma.StringNullableWithAggregatesFilter<"Tenant"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Tenant"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Tenant"> | Date | string
   deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Tenant"> | Date | string | null
@@ -385,10 +412,13 @@ export type TenantCreateInput = {
   defaultLocale?: $Enums.Locale
   currency?: string
   plan?: $Enums.TenantPlan
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   memberships?: Prisma.MembershipCreateNestedManyWithoutTenantInput
+  sections?: Prisma.MenuSectionCreateNestedManyWithoutTenantInput
   categories?: Prisma.CategoryCreateNestedManyWithoutTenantInput
   items?: Prisma.MenuItemCreateNestedManyWithoutTenantInput
   slugHistory?: Prisma.SlugHistoryCreateNestedManyWithoutTenantInput
@@ -412,10 +442,13 @@ export type TenantUncheckedCreateInput = {
   defaultLocale?: $Enums.Locale
   currency?: string
   plan?: $Enums.TenantPlan
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutTenantInput
+  sections?: Prisma.MenuSectionUncheckedCreateNestedManyWithoutTenantInput
   categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutTenantInput
   items?: Prisma.MenuItemUncheckedCreateNestedManyWithoutTenantInput
   slugHistory?: Prisma.SlugHistoryUncheckedCreateNestedManyWithoutTenantInput
@@ -439,10 +472,13 @@ export type TenantUpdateInput = {
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   memberships?: Prisma.MembershipUpdateManyWithoutTenantNestedInput
+  sections?: Prisma.MenuSectionUpdateManyWithoutTenantNestedInput
   categories?: Prisma.CategoryUpdateManyWithoutTenantNestedInput
   items?: Prisma.MenuItemUpdateManyWithoutTenantNestedInput
   slugHistory?: Prisma.SlugHistoryUpdateManyWithoutTenantNestedInput
@@ -466,10 +502,13 @@ export type TenantUncheckedUpdateInput = {
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutTenantNestedInput
+  sections?: Prisma.MenuSectionUncheckedUpdateManyWithoutTenantNestedInput
   categories?: Prisma.CategoryUncheckedUpdateManyWithoutTenantNestedInput
   items?: Prisma.MenuItemUncheckedUpdateManyWithoutTenantNestedInput
   slugHistory?: Prisma.SlugHistoryUncheckedUpdateManyWithoutTenantNestedInput
@@ -493,6 +532,8 @@ export type TenantCreateManyInput = {
   defaultLocale?: $Enums.Locale
   currency?: string
   plan?: $Enums.TenantPlan
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
@@ -511,6 +552,8 @@ export type TenantUpdateManyMutationInput = {
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -529,6 +572,8 @@ export type TenantUncheckedUpdateManyInput = {
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -547,6 +592,8 @@ export type TenantCountOrderByAggregateInput = {
   defaultLocale?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   plan?: Prisma.SortOrder
+  stripeCustomerId?: Prisma.SortOrder
+  stripeSubscriptionId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
@@ -565,6 +612,8 @@ export type TenantMaxOrderByAggregateInput = {
   defaultLocale?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   plan?: Prisma.SortOrder
+  stripeCustomerId?: Prisma.SortOrder
+  stripeSubscriptionId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
@@ -583,6 +632,8 @@ export type TenantMinOrderByAggregateInput = {
   defaultLocale?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   plan?: Prisma.SortOrder
+  stripeCustomerId?: Prisma.SortOrder
+  stripeSubscriptionId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
@@ -634,6 +685,20 @@ export type TenantUpdateOneRequiredWithoutMembershipsNestedInput = {
   upsert?: Prisma.TenantUpsertWithoutMembershipsInput
   connect?: Prisma.TenantWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutMembershipsInput, Prisma.TenantUpdateWithoutMembershipsInput>, Prisma.TenantUncheckedUpdateWithoutMembershipsInput>
+}
+
+export type TenantCreateNestedOneWithoutSectionsInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutSectionsInput, Prisma.TenantUncheckedCreateWithoutSectionsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutSectionsInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutSectionsNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutSectionsInput, Prisma.TenantUncheckedCreateWithoutSectionsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutSectionsInput
+  upsert?: Prisma.TenantUpsertWithoutSectionsInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutSectionsInput, Prisma.TenantUpdateWithoutSectionsInput>, Prisma.TenantUncheckedUpdateWithoutSectionsInput>
 }
 
 export type TenantCreateNestedOneWithoutCategoriesInput = {
@@ -765,9 +830,12 @@ export type TenantCreateWithoutMembershipsInput = {
   defaultLocale?: $Enums.Locale
   currency?: string
   plan?: $Enums.TenantPlan
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
+  sections?: Prisma.MenuSectionCreateNestedManyWithoutTenantInput
   categories?: Prisma.CategoryCreateNestedManyWithoutTenantInput
   items?: Prisma.MenuItemCreateNestedManyWithoutTenantInput
   slugHistory?: Prisma.SlugHistoryCreateNestedManyWithoutTenantInput
@@ -791,9 +859,12 @@ export type TenantUncheckedCreateWithoutMembershipsInput = {
   defaultLocale?: $Enums.Locale
   currency?: string
   plan?: $Enums.TenantPlan
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
+  sections?: Prisma.MenuSectionUncheckedCreateNestedManyWithoutTenantInput
   categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutTenantInput
   items?: Prisma.MenuItemUncheckedCreateNestedManyWithoutTenantInput
   slugHistory?: Prisma.SlugHistoryUncheckedCreateNestedManyWithoutTenantInput
@@ -833,9 +904,12 @@ export type TenantUpdateWithoutMembershipsInput = {
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sections?: Prisma.MenuSectionUpdateManyWithoutTenantNestedInput
   categories?: Prisma.CategoryUpdateManyWithoutTenantNestedInput
   items?: Prisma.MenuItemUpdateManyWithoutTenantNestedInput
   slugHistory?: Prisma.SlugHistoryUpdateManyWithoutTenantNestedInput
@@ -859,9 +933,144 @@ export type TenantUncheckedUpdateWithoutMembershipsInput = {
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sections?: Prisma.MenuSectionUncheckedUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUncheckedUpdateManyWithoutTenantNestedInput
+  items?: Prisma.MenuItemUncheckedUpdateManyWithoutTenantNestedInput
+  slugHistory?: Prisma.SlugHistoryUncheckedUpdateManyWithoutTenantNestedInput
+  menuViews?: Prisma.MenuViewUncheckedUpdateManyWithoutTenantNestedInput
+  itemViews?: Prisma.ItemViewUncheckedUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  webhookEvents?: Prisma.WebhookEventUncheckedUpdateManyWithoutTenantNestedInput
+  referrals?: Prisma.ReferralUncheckedUpdateManyWithoutReferredTenantNestedInput
+}
+
+export type TenantCreateWithoutSectionsInput = {
+  id?: string
+  createdBy?: string | null
+  slug: string
+  name: string
+  logoUrl?: string | null
+  whatsappPhone?: string | null
+  businessHours?: string | null
+  primaryColor?: string
+  cuisineType?: string | null
+  defaultLocale?: $Enums.Locale
+  currency?: string
+  plan?: $Enums.TenantPlan
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  memberships?: Prisma.MembershipCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryCreateNestedManyWithoutTenantInput
+  items?: Prisma.MenuItemCreateNestedManyWithoutTenantInput
+  slugHistory?: Prisma.SlugHistoryCreateNestedManyWithoutTenantInput
+  menuViews?: Prisma.MenuViewCreateNestedManyWithoutTenantInput
+  itemViews?: Prisma.ItemViewCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  webhookEvents?: Prisma.WebhookEventCreateNestedManyWithoutTenantInput
+  referrals?: Prisma.ReferralCreateNestedManyWithoutReferredTenantInput
+}
+
+export type TenantUncheckedCreateWithoutSectionsInput = {
+  id?: string
+  createdBy?: string | null
+  slug: string
+  name: string
+  logoUrl?: string | null
+  whatsappPhone?: string | null
+  businessHours?: string | null
+  primaryColor?: string
+  cuisineType?: string | null
+  defaultLocale?: $Enums.Locale
+  currency?: string
+  plan?: $Enums.TenantPlan
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutTenantInput
+  items?: Prisma.MenuItemUncheckedCreateNestedManyWithoutTenantInput
+  slugHistory?: Prisma.SlugHistoryUncheckedCreateNestedManyWithoutTenantInput
+  menuViews?: Prisma.MenuViewUncheckedCreateNestedManyWithoutTenantInput
+  itemViews?: Prisma.ItemViewUncheckedCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  webhookEvents?: Prisma.WebhookEventUncheckedCreateNestedManyWithoutTenantInput
+  referrals?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredTenantInput
+}
+
+export type TenantCreateOrConnectWithoutSectionsInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutSectionsInput, Prisma.TenantUncheckedCreateWithoutSectionsInput>
+}
+
+export type TenantUpsertWithoutSectionsInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutSectionsInput, Prisma.TenantUncheckedUpdateWithoutSectionsInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutSectionsInput, Prisma.TenantUncheckedCreateWithoutSectionsInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutSectionsInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutSectionsInput, Prisma.TenantUncheckedUpdateWithoutSectionsInput>
+}
+
+export type TenantUpdateWithoutSectionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  memberships?: Prisma.MembershipUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUpdateManyWithoutTenantNestedInput
+  items?: Prisma.MenuItemUpdateManyWithoutTenantNestedInput
+  slugHistory?: Prisma.SlugHistoryUpdateManyWithoutTenantNestedInput
+  menuViews?: Prisma.MenuViewUpdateManyWithoutTenantNestedInput
+  itemViews?: Prisma.ItemViewUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  webhookEvents?: Prisma.WebhookEventUpdateManyWithoutTenantNestedInput
+  referrals?: Prisma.ReferralUpdateManyWithoutReferredTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutSectionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  memberships?: Prisma.MembershipUncheckedUpdateManyWithoutTenantNestedInput
   categories?: Prisma.CategoryUncheckedUpdateManyWithoutTenantNestedInput
   items?: Prisma.MenuItemUncheckedUpdateManyWithoutTenantNestedInput
   slugHistory?: Prisma.SlugHistoryUncheckedUpdateManyWithoutTenantNestedInput
@@ -885,10 +1094,13 @@ export type TenantCreateWithoutCategoriesInput = {
   defaultLocale?: $Enums.Locale
   currency?: string
   plan?: $Enums.TenantPlan
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   memberships?: Prisma.MembershipCreateNestedManyWithoutTenantInput
+  sections?: Prisma.MenuSectionCreateNestedManyWithoutTenantInput
   items?: Prisma.MenuItemCreateNestedManyWithoutTenantInput
   slugHistory?: Prisma.SlugHistoryCreateNestedManyWithoutTenantInput
   menuViews?: Prisma.MenuViewCreateNestedManyWithoutTenantInput
@@ -911,10 +1123,13 @@ export type TenantUncheckedCreateWithoutCategoriesInput = {
   defaultLocale?: $Enums.Locale
   currency?: string
   plan?: $Enums.TenantPlan
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutTenantInput
+  sections?: Prisma.MenuSectionUncheckedCreateNestedManyWithoutTenantInput
   items?: Prisma.MenuItemUncheckedCreateNestedManyWithoutTenantInput
   slugHistory?: Prisma.SlugHistoryUncheckedCreateNestedManyWithoutTenantInput
   menuViews?: Prisma.MenuViewUncheckedCreateNestedManyWithoutTenantInput
@@ -953,10 +1168,13 @@ export type TenantUpdateWithoutCategoriesInput = {
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   memberships?: Prisma.MembershipUpdateManyWithoutTenantNestedInput
+  sections?: Prisma.MenuSectionUpdateManyWithoutTenantNestedInput
   items?: Prisma.MenuItemUpdateManyWithoutTenantNestedInput
   slugHistory?: Prisma.SlugHistoryUpdateManyWithoutTenantNestedInput
   menuViews?: Prisma.MenuViewUpdateManyWithoutTenantNestedInput
@@ -979,10 +1197,13 @@ export type TenantUncheckedUpdateWithoutCategoriesInput = {
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutTenantNestedInput
+  sections?: Prisma.MenuSectionUncheckedUpdateManyWithoutTenantNestedInput
   items?: Prisma.MenuItemUncheckedUpdateManyWithoutTenantNestedInput
   slugHistory?: Prisma.SlugHistoryUncheckedUpdateManyWithoutTenantNestedInput
   menuViews?: Prisma.MenuViewUncheckedUpdateManyWithoutTenantNestedInput
@@ -1005,10 +1226,13 @@ export type TenantCreateWithoutItemsInput = {
   defaultLocale?: $Enums.Locale
   currency?: string
   plan?: $Enums.TenantPlan
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   memberships?: Prisma.MembershipCreateNestedManyWithoutTenantInput
+  sections?: Prisma.MenuSectionCreateNestedManyWithoutTenantInput
   categories?: Prisma.CategoryCreateNestedManyWithoutTenantInput
   slugHistory?: Prisma.SlugHistoryCreateNestedManyWithoutTenantInput
   menuViews?: Prisma.MenuViewCreateNestedManyWithoutTenantInput
@@ -1031,10 +1255,13 @@ export type TenantUncheckedCreateWithoutItemsInput = {
   defaultLocale?: $Enums.Locale
   currency?: string
   plan?: $Enums.TenantPlan
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutTenantInput
+  sections?: Prisma.MenuSectionUncheckedCreateNestedManyWithoutTenantInput
   categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutTenantInput
   slugHistory?: Prisma.SlugHistoryUncheckedCreateNestedManyWithoutTenantInput
   menuViews?: Prisma.MenuViewUncheckedCreateNestedManyWithoutTenantInput
@@ -1073,10 +1300,13 @@ export type TenantUpdateWithoutItemsInput = {
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   memberships?: Prisma.MembershipUpdateManyWithoutTenantNestedInput
+  sections?: Prisma.MenuSectionUpdateManyWithoutTenantNestedInput
   categories?: Prisma.CategoryUpdateManyWithoutTenantNestedInput
   slugHistory?: Prisma.SlugHistoryUpdateManyWithoutTenantNestedInput
   menuViews?: Prisma.MenuViewUpdateManyWithoutTenantNestedInput
@@ -1099,10 +1329,13 @@ export type TenantUncheckedUpdateWithoutItemsInput = {
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutTenantNestedInput
+  sections?: Prisma.MenuSectionUncheckedUpdateManyWithoutTenantNestedInput
   categories?: Prisma.CategoryUncheckedUpdateManyWithoutTenantNestedInput
   slugHistory?: Prisma.SlugHistoryUncheckedUpdateManyWithoutTenantNestedInput
   menuViews?: Prisma.MenuViewUncheckedUpdateManyWithoutTenantNestedInput
@@ -1125,10 +1358,13 @@ export type TenantCreateWithoutSlugHistoryInput = {
   defaultLocale?: $Enums.Locale
   currency?: string
   plan?: $Enums.TenantPlan
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   memberships?: Prisma.MembershipCreateNestedManyWithoutTenantInput
+  sections?: Prisma.MenuSectionCreateNestedManyWithoutTenantInput
   categories?: Prisma.CategoryCreateNestedManyWithoutTenantInput
   items?: Prisma.MenuItemCreateNestedManyWithoutTenantInput
   menuViews?: Prisma.MenuViewCreateNestedManyWithoutTenantInput
@@ -1151,10 +1387,13 @@ export type TenantUncheckedCreateWithoutSlugHistoryInput = {
   defaultLocale?: $Enums.Locale
   currency?: string
   plan?: $Enums.TenantPlan
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutTenantInput
+  sections?: Prisma.MenuSectionUncheckedCreateNestedManyWithoutTenantInput
   categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutTenantInput
   items?: Prisma.MenuItemUncheckedCreateNestedManyWithoutTenantInput
   menuViews?: Prisma.MenuViewUncheckedCreateNestedManyWithoutTenantInput
@@ -1193,10 +1432,13 @@ export type TenantUpdateWithoutSlugHistoryInput = {
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   memberships?: Prisma.MembershipUpdateManyWithoutTenantNestedInput
+  sections?: Prisma.MenuSectionUpdateManyWithoutTenantNestedInput
   categories?: Prisma.CategoryUpdateManyWithoutTenantNestedInput
   items?: Prisma.MenuItemUpdateManyWithoutTenantNestedInput
   menuViews?: Prisma.MenuViewUpdateManyWithoutTenantNestedInput
@@ -1219,10 +1461,13 @@ export type TenantUncheckedUpdateWithoutSlugHistoryInput = {
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutTenantNestedInput
+  sections?: Prisma.MenuSectionUncheckedUpdateManyWithoutTenantNestedInput
   categories?: Prisma.CategoryUncheckedUpdateManyWithoutTenantNestedInput
   items?: Prisma.MenuItemUncheckedUpdateManyWithoutTenantNestedInput
   menuViews?: Prisma.MenuViewUncheckedUpdateManyWithoutTenantNestedInput
@@ -1245,10 +1490,13 @@ export type TenantCreateWithoutMenuViewsInput = {
   defaultLocale?: $Enums.Locale
   currency?: string
   plan?: $Enums.TenantPlan
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   memberships?: Prisma.MembershipCreateNestedManyWithoutTenantInput
+  sections?: Prisma.MenuSectionCreateNestedManyWithoutTenantInput
   categories?: Prisma.CategoryCreateNestedManyWithoutTenantInput
   items?: Prisma.MenuItemCreateNestedManyWithoutTenantInput
   slugHistory?: Prisma.SlugHistoryCreateNestedManyWithoutTenantInput
@@ -1271,10 +1519,13 @@ export type TenantUncheckedCreateWithoutMenuViewsInput = {
   defaultLocale?: $Enums.Locale
   currency?: string
   plan?: $Enums.TenantPlan
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutTenantInput
+  sections?: Prisma.MenuSectionUncheckedCreateNestedManyWithoutTenantInput
   categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutTenantInput
   items?: Prisma.MenuItemUncheckedCreateNestedManyWithoutTenantInput
   slugHistory?: Prisma.SlugHistoryUncheckedCreateNestedManyWithoutTenantInput
@@ -1313,10 +1564,13 @@ export type TenantUpdateWithoutMenuViewsInput = {
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   memberships?: Prisma.MembershipUpdateManyWithoutTenantNestedInput
+  sections?: Prisma.MenuSectionUpdateManyWithoutTenantNestedInput
   categories?: Prisma.CategoryUpdateManyWithoutTenantNestedInput
   items?: Prisma.MenuItemUpdateManyWithoutTenantNestedInput
   slugHistory?: Prisma.SlugHistoryUpdateManyWithoutTenantNestedInput
@@ -1339,10 +1593,13 @@ export type TenantUncheckedUpdateWithoutMenuViewsInput = {
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutTenantNestedInput
+  sections?: Prisma.MenuSectionUncheckedUpdateManyWithoutTenantNestedInput
   categories?: Prisma.CategoryUncheckedUpdateManyWithoutTenantNestedInput
   items?: Prisma.MenuItemUncheckedUpdateManyWithoutTenantNestedInput
   slugHistory?: Prisma.SlugHistoryUncheckedUpdateManyWithoutTenantNestedInput
@@ -1365,10 +1622,13 @@ export type TenantCreateWithoutItemViewsInput = {
   defaultLocale?: $Enums.Locale
   currency?: string
   plan?: $Enums.TenantPlan
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   memberships?: Prisma.MembershipCreateNestedManyWithoutTenantInput
+  sections?: Prisma.MenuSectionCreateNestedManyWithoutTenantInput
   categories?: Prisma.CategoryCreateNestedManyWithoutTenantInput
   items?: Prisma.MenuItemCreateNestedManyWithoutTenantInput
   slugHistory?: Prisma.SlugHistoryCreateNestedManyWithoutTenantInput
@@ -1391,10 +1651,13 @@ export type TenantUncheckedCreateWithoutItemViewsInput = {
   defaultLocale?: $Enums.Locale
   currency?: string
   plan?: $Enums.TenantPlan
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutTenantInput
+  sections?: Prisma.MenuSectionUncheckedCreateNestedManyWithoutTenantInput
   categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutTenantInput
   items?: Prisma.MenuItemUncheckedCreateNestedManyWithoutTenantInput
   slugHistory?: Prisma.SlugHistoryUncheckedCreateNestedManyWithoutTenantInput
@@ -1433,10 +1696,13 @@ export type TenantUpdateWithoutItemViewsInput = {
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   memberships?: Prisma.MembershipUpdateManyWithoutTenantNestedInput
+  sections?: Prisma.MenuSectionUpdateManyWithoutTenantNestedInput
   categories?: Prisma.CategoryUpdateManyWithoutTenantNestedInput
   items?: Prisma.MenuItemUpdateManyWithoutTenantNestedInput
   slugHistory?: Prisma.SlugHistoryUpdateManyWithoutTenantNestedInput
@@ -1459,10 +1725,13 @@ export type TenantUncheckedUpdateWithoutItemViewsInput = {
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutTenantNestedInput
+  sections?: Prisma.MenuSectionUncheckedUpdateManyWithoutTenantNestedInput
   categories?: Prisma.CategoryUncheckedUpdateManyWithoutTenantNestedInput
   items?: Prisma.MenuItemUncheckedUpdateManyWithoutTenantNestedInput
   slugHistory?: Prisma.SlugHistoryUncheckedUpdateManyWithoutTenantNestedInput
@@ -1485,10 +1754,13 @@ export type TenantCreateWithoutAuditLogsInput = {
   defaultLocale?: $Enums.Locale
   currency?: string
   plan?: $Enums.TenantPlan
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   memberships?: Prisma.MembershipCreateNestedManyWithoutTenantInput
+  sections?: Prisma.MenuSectionCreateNestedManyWithoutTenantInput
   categories?: Prisma.CategoryCreateNestedManyWithoutTenantInput
   items?: Prisma.MenuItemCreateNestedManyWithoutTenantInput
   slugHistory?: Prisma.SlugHistoryCreateNestedManyWithoutTenantInput
@@ -1511,10 +1783,13 @@ export type TenantUncheckedCreateWithoutAuditLogsInput = {
   defaultLocale?: $Enums.Locale
   currency?: string
   plan?: $Enums.TenantPlan
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutTenantInput
+  sections?: Prisma.MenuSectionUncheckedCreateNestedManyWithoutTenantInput
   categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutTenantInput
   items?: Prisma.MenuItemUncheckedCreateNestedManyWithoutTenantInput
   slugHistory?: Prisma.SlugHistoryUncheckedCreateNestedManyWithoutTenantInput
@@ -1553,10 +1828,13 @@ export type TenantUpdateWithoutAuditLogsInput = {
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   memberships?: Prisma.MembershipUpdateManyWithoutTenantNestedInput
+  sections?: Prisma.MenuSectionUpdateManyWithoutTenantNestedInput
   categories?: Prisma.CategoryUpdateManyWithoutTenantNestedInput
   items?: Prisma.MenuItemUpdateManyWithoutTenantNestedInput
   slugHistory?: Prisma.SlugHistoryUpdateManyWithoutTenantNestedInput
@@ -1579,10 +1857,13 @@ export type TenantUncheckedUpdateWithoutAuditLogsInput = {
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutTenantNestedInput
+  sections?: Prisma.MenuSectionUncheckedUpdateManyWithoutTenantNestedInput
   categories?: Prisma.CategoryUncheckedUpdateManyWithoutTenantNestedInput
   items?: Prisma.MenuItemUncheckedUpdateManyWithoutTenantNestedInput
   slugHistory?: Prisma.SlugHistoryUncheckedUpdateManyWithoutTenantNestedInput
@@ -1605,10 +1886,13 @@ export type TenantCreateWithoutWebhookEventsInput = {
   defaultLocale?: $Enums.Locale
   currency?: string
   plan?: $Enums.TenantPlan
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   memberships?: Prisma.MembershipCreateNestedManyWithoutTenantInput
+  sections?: Prisma.MenuSectionCreateNestedManyWithoutTenantInput
   categories?: Prisma.CategoryCreateNestedManyWithoutTenantInput
   items?: Prisma.MenuItemCreateNestedManyWithoutTenantInput
   slugHistory?: Prisma.SlugHistoryCreateNestedManyWithoutTenantInput
@@ -1631,10 +1915,13 @@ export type TenantUncheckedCreateWithoutWebhookEventsInput = {
   defaultLocale?: $Enums.Locale
   currency?: string
   plan?: $Enums.TenantPlan
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutTenantInput
+  sections?: Prisma.MenuSectionUncheckedCreateNestedManyWithoutTenantInput
   categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutTenantInput
   items?: Prisma.MenuItemUncheckedCreateNestedManyWithoutTenantInput
   slugHistory?: Prisma.SlugHistoryUncheckedCreateNestedManyWithoutTenantInput
@@ -1673,10 +1960,13 @@ export type TenantUpdateWithoutWebhookEventsInput = {
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   memberships?: Prisma.MembershipUpdateManyWithoutTenantNestedInput
+  sections?: Prisma.MenuSectionUpdateManyWithoutTenantNestedInput
   categories?: Prisma.CategoryUpdateManyWithoutTenantNestedInput
   items?: Prisma.MenuItemUpdateManyWithoutTenantNestedInput
   slugHistory?: Prisma.SlugHistoryUpdateManyWithoutTenantNestedInput
@@ -1699,10 +1989,13 @@ export type TenantUncheckedUpdateWithoutWebhookEventsInput = {
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutTenantNestedInput
+  sections?: Prisma.MenuSectionUncheckedUpdateManyWithoutTenantNestedInput
   categories?: Prisma.CategoryUncheckedUpdateManyWithoutTenantNestedInput
   items?: Prisma.MenuItemUncheckedUpdateManyWithoutTenantNestedInput
   slugHistory?: Prisma.SlugHistoryUncheckedUpdateManyWithoutTenantNestedInput
@@ -1725,10 +2018,13 @@ export type TenantCreateWithoutReferralsInput = {
   defaultLocale?: $Enums.Locale
   currency?: string
   plan?: $Enums.TenantPlan
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   memberships?: Prisma.MembershipCreateNestedManyWithoutTenantInput
+  sections?: Prisma.MenuSectionCreateNestedManyWithoutTenantInput
   categories?: Prisma.CategoryCreateNestedManyWithoutTenantInput
   items?: Prisma.MenuItemCreateNestedManyWithoutTenantInput
   slugHistory?: Prisma.SlugHistoryCreateNestedManyWithoutTenantInput
@@ -1751,10 +2047,13 @@ export type TenantUncheckedCreateWithoutReferralsInput = {
   defaultLocale?: $Enums.Locale
   currency?: string
   plan?: $Enums.TenantPlan
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutTenantInput
+  sections?: Prisma.MenuSectionUncheckedCreateNestedManyWithoutTenantInput
   categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutTenantInput
   items?: Prisma.MenuItemUncheckedCreateNestedManyWithoutTenantInput
   slugHistory?: Prisma.SlugHistoryUncheckedCreateNestedManyWithoutTenantInput
@@ -1793,10 +2092,13 @@ export type TenantUpdateWithoutReferralsInput = {
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   memberships?: Prisma.MembershipUpdateManyWithoutTenantNestedInput
+  sections?: Prisma.MenuSectionUpdateManyWithoutTenantNestedInput
   categories?: Prisma.CategoryUpdateManyWithoutTenantNestedInput
   items?: Prisma.MenuItemUpdateManyWithoutTenantNestedInput
   slugHistory?: Prisma.SlugHistoryUpdateManyWithoutTenantNestedInput
@@ -1819,10 +2121,13 @@ export type TenantUncheckedUpdateWithoutReferralsInput = {
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutTenantNestedInput
+  sections?: Prisma.MenuSectionUncheckedUpdateManyWithoutTenantNestedInput
   categories?: Prisma.CategoryUncheckedUpdateManyWithoutTenantNestedInput
   items?: Prisma.MenuItemUncheckedUpdateManyWithoutTenantNestedInput
   slugHistory?: Prisma.SlugHistoryUncheckedUpdateManyWithoutTenantNestedInput
@@ -1839,6 +2144,7 @@ export type TenantUncheckedUpdateWithoutReferralsInput = {
 
 export type TenantCountOutputType = {
   memberships: number
+  sections: number
   categories: number
   items: number
   slugHistory: number
@@ -1851,6 +2157,7 @@ export type TenantCountOutputType = {
 
 export type TenantCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   memberships?: boolean | TenantCountOutputTypeCountMembershipsArgs
+  sections?: boolean | TenantCountOutputTypeCountSectionsArgs
   categories?: boolean | TenantCountOutputTypeCountCategoriesArgs
   items?: boolean | TenantCountOutputTypeCountItemsArgs
   slugHistory?: boolean | TenantCountOutputTypeCountSlugHistoryArgs
@@ -1876,6 +2183,13 @@ export type TenantCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Exten
  */
 export type TenantCountOutputTypeCountMembershipsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.MembershipWhereInput
+}
+
+/**
+ * TenantCountOutputType without action
+ */
+export type TenantCountOutputTypeCountSectionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.MenuSectionWhereInput
 }
 
 /**
@@ -1948,10 +2262,13 @@ export type TenantSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   defaultLocale?: boolean
   currency?: boolean
   plan?: boolean
+  stripeCustomerId?: boolean
+  stripeSubscriptionId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   deletedAt?: boolean
   memberships?: boolean | Prisma.Tenant$membershipsArgs<ExtArgs>
+  sections?: boolean | Prisma.Tenant$sectionsArgs<ExtArgs>
   categories?: boolean | Prisma.Tenant$categoriesArgs<ExtArgs>
   items?: boolean | Prisma.Tenant$itemsArgs<ExtArgs>
   slugHistory?: boolean | Prisma.Tenant$slugHistoryArgs<ExtArgs>
@@ -1976,6 +2293,8 @@ export type TenantSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   defaultLocale?: boolean
   currency?: boolean
   plan?: boolean
+  stripeCustomerId?: boolean
+  stripeSubscriptionId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   deletedAt?: boolean
@@ -1994,6 +2313,8 @@ export type TenantSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   defaultLocale?: boolean
   currency?: boolean
   plan?: boolean
+  stripeCustomerId?: boolean
+  stripeSubscriptionId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   deletedAt?: boolean
@@ -2012,14 +2333,17 @@ export type TenantSelectScalar = {
   defaultLocale?: boolean
   currency?: boolean
   plan?: boolean
+  stripeCustomerId?: boolean
+  stripeSubscriptionId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   deletedAt?: boolean
 }
 
-export type TenantOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "createdBy" | "slug" | "name" | "logoUrl" | "whatsappPhone" | "businessHours" | "primaryColor" | "cuisineType" | "defaultLocale" | "currency" | "plan" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["tenant"]>
+export type TenantOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "createdBy" | "slug" | "name" | "logoUrl" | "whatsappPhone" | "businessHours" | "primaryColor" | "cuisineType" | "defaultLocale" | "currency" | "plan" | "stripeCustomerId" | "stripeSubscriptionId" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["tenant"]>
 export type TenantInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   memberships?: boolean | Prisma.Tenant$membershipsArgs<ExtArgs>
+  sections?: boolean | Prisma.Tenant$sectionsArgs<ExtArgs>
   categories?: boolean | Prisma.Tenant$categoriesArgs<ExtArgs>
   items?: boolean | Prisma.Tenant$itemsArgs<ExtArgs>
   slugHistory?: boolean | Prisma.Tenant$slugHistoryArgs<ExtArgs>
@@ -2037,6 +2361,7 @@ export type $TenantPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
   name: "Tenant"
   objects: {
     memberships: Prisma.$MembershipPayload<ExtArgs>[]
+    sections: Prisma.$MenuSectionPayload<ExtArgs>[]
     categories: Prisma.$CategoryPayload<ExtArgs>[]
     items: Prisma.$MenuItemPayload<ExtArgs>[]
     slugHistory: Prisma.$SlugHistoryPayload<ExtArgs>[]
@@ -2059,6 +2384,8 @@ export type $TenantPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     defaultLocale: $Enums.Locale
     currency: string
     plan: $Enums.TenantPlan
+    stripeCustomerId: string | null
+    stripeSubscriptionId: string | null
     createdAt: Date
     updatedAt: Date
     deletedAt: Date | null
@@ -2457,6 +2784,7 @@ readonly fields: TenantFieldRefs;
 export interface Prisma__TenantClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   memberships<T extends Prisma.Tenant$membershipsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$membershipsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MembershipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  sections<T extends Prisma.Tenant$sectionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$sectionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MenuSectionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   categories<T extends Prisma.Tenant$categoriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$categoriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CategoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   items<T extends Prisma.Tenant$itemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$itemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MenuItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   slugHistory<T extends Prisma.Tenant$slugHistoryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$slugHistoryArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SlugHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -2506,6 +2834,8 @@ export interface TenantFieldRefs {
   readonly defaultLocale: Prisma.FieldRef<"Tenant", 'Locale'>
   readonly currency: Prisma.FieldRef<"Tenant", 'String'>
   readonly plan: Prisma.FieldRef<"Tenant", 'TenantPlan'>
+  readonly stripeCustomerId: Prisma.FieldRef<"Tenant", 'String'>
+  readonly stripeSubscriptionId: Prisma.FieldRef<"Tenant", 'String'>
   readonly createdAt: Prisma.FieldRef<"Tenant", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Tenant", 'DateTime'>
   readonly deletedAt: Prisma.FieldRef<"Tenant", 'DateTime'>
@@ -2923,6 +3253,30 @@ export type Tenant$membershipsArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.MembershipScalarFieldEnum | Prisma.MembershipScalarFieldEnum[]
+}
+
+/**
+ * Tenant.sections
+ */
+export type Tenant$sectionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MenuSection
+   */
+  select?: Prisma.MenuSectionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the MenuSection
+   */
+  omit?: Prisma.MenuSectionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MenuSectionInclude<ExtArgs> | null
+  where?: Prisma.MenuSectionWhereInput
+  orderBy?: Prisma.MenuSectionOrderByWithRelationInput | Prisma.MenuSectionOrderByWithRelationInput[]
+  cursor?: Prisma.MenuSectionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MenuSectionScalarFieldEnum | Prisma.MenuSectionScalarFieldEnum[]
 }
 
 /**

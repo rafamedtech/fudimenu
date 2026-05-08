@@ -18,8 +18,12 @@ function normalizeOptionalText(input: string | null | undefined) {
 const brandSettingsSchema = z.object({
   slug: z
     .string()
-    .max(80, 'Usa maximo 80 caracteres')
+    .min(4, 'Usa minimo 4 caracteres')
+    .max(48, 'Usa maximo 48 caracteres')
     .transform((value) => normalizeTenantSlug(value))
+    .refine((value) => value.length >= 4 && value.length <= 48, {
+      message: 'Usa entre 4 y 48 caracteres',
+    })
     .refine((value) => /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value), {
       message: 'Usa solo letras, numeros y guiones',
     }),

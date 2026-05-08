@@ -18,6 +18,9 @@ const BRANCH_STORAGE_KEY = 'fudi:branch';
 
 export async function signInWithMagicLinkAction(formData: FormData) {
   const email = emailSchema.parse(formData.get('email'));
+  const nextValue = formData.get('next');
+  const next = typeof nextValue === 'string' ? nextValue : null;
+  const nextParam = next && next.startsWith('/') ? `?next=${encodeURIComponent(next)}` : '';
 
   if (process.env.USE_MOCKS === 'true') {
     return { ok: true as const, message: 'Mock: link mágico enviado.' };
@@ -49,7 +52,7 @@ export async function signInWithMagicLinkAction(formData: FormData) {
   const { error } = await supabase.auth.signInWithOtp({
     email,
     options: {
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback${nextParam}`,
     },
   });
 

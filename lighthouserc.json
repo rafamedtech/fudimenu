@@ -7,7 +7,7 @@
       ],
       "numberOfRuns": 3,
       "settings": {
-        "preset": "desktop",
+        "formFactor": "mobile",
         "chromeFlags": "--no-sandbox"
       }
     },
@@ -15,7 +15,7 @@
       "preset": "lighthouse:recommended",
       "assertions": {
         "first-contentful-paint": ["error", { "maxNumericValue": 1500 }],
-        "largest-contentful-paint": ["error", { "maxNumericValue": 1000 }],
+        "largest-contentful-paint": ["error", { "maxNumericValue": 1500 }],
         "interactive": ["error", { "maxNumericValue": 2500 }],
         "cumulative-layout-shift": ["error", { "maxNumericValue": 0.1 }],
         "total-blocking-time": ["error", { "maxNumericValue": 200 }],

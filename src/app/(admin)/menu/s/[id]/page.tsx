@@ -1,0 +1,83 @@
+import { notFound } from 'next/navigation';
+import Link from 'next/link';
+import { Settings2 } from 'lucide-react';
+import { AppHeader } from '@/components/layout/app-header';
+import { TenantSwitcher } from '@/components/admin/tenant-switcher';
+import { AddItemFab } from '@/components/admin/add-item-fab';
+import { SectionCategoryList } from '@/components/admin/section-category-list';
+import { EmptyState } from '@/components/ui/empty-state';
+import { Button } from '@/components/ui/button';
+import { requireAuth } from '@/server/guards/require-auth';
+import { menuService } from '@/server/services/menu.service';
+
+interface Props {
+  params: Promise<{ id: string }>;
+}
+
+export default async function SectionDetailPage({ params }: Props) {
+  const { id } = await params;
+  const ctx = await requireAuth();
+  const { sections, categories, items } = await menuService.getMenuByTenantId(ctx.tenantId);
+
+  const section = sections.find((s) => s.id === id);
+  if (!section) notFound();
+
+  const sectionCategories = categories.filter((c) => c.sectionId === section.id);
+  const groups = sectionCategories
+    .map((cat) => ({
+      category: cat,
+      items: items.filter((i) => i.categoryId === cat.id),
+    }))
+    .filter((g) => g.items.length > 0);
+
+  const hasItems = groups.length > 0;
+
+  return (
+    <>
+      <AppHeader
+        title={section.name}
+        showBack
+        right={
+          <div className="flex items-center gap-1">
+            <Link
+              href={`/menu/sections/${section.id}/edit`}
+              aria-label="Editar sección"
+              className="flex h-12 w-12 items-center justify-center rounded-md text-ink-700 hover:bg-ink-100"
+            >
+              <Settings2 className="h-5 w-5" aria-hidden />
+            </Link>
+            <TenantSwitcher activeTenantId={ctx.tenantId} memberships={ctx.memberships} />
+          </div>
+        }
+      />
+      <main className="flex-1 px-4 pb-24">
+        {sectionCategories.length === 0 ? (
+          <EmptyState
+            emoji="🏷️"
+            title="Crea una categoría primero"
+            description="Las categorías ordenan los platillos dentro de esta sección."
+            action={
+              <Link href={`/menu/categories/new?sectionId=${section.id}`}>
+                <Button size="lg">+ Crear categoría</Button>
+              </Link>
+            }
+          />
+        ) : !hasItems ? (
+          <EmptyState
+            emoji="🍽️"
+            title="Sin platillos"
+            description="Agrega el primer platillo de esta sección."
+            action={
+              <Link href={`/menu/new?sectionId=${section.id}`}>
+                <Button size="lg">+ Agregar platillo</Button>
+              </Link>
+            }
+          />
+        ) : (
+          <SectionCategoryList sectionId={section.id} groups={groups} />
+        )}
+        <AddItemFab sectionId={section.id} />
+      </main>
+    </>
+  );
+}

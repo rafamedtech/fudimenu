@@ -7,6 +7,7 @@ import {
   reorderSectionsSchema,
 } from '@/lib/validators/section.schema';
 import { checkRateLimit } from '@/lib/ratelimit';
+import { PLAN_CONFIG } from '@/config/plans';
 
 type SectionActionError = 'unauthorized' | 'validation' | 'not_found' | 'rate_limited';
 
@@ -57,6 +58,14 @@ export async function upsertSectionAction(input: unknown) {
   if (!parsed.success) return fail('validation', parsed.error.message);
 
   try {
+    if (!parsed.data.id && typeof menuService.getMenuByTenantId === 'function') {
+      const { tenant, sections } = await menuService.getMenuByTenantId(ctx.tenantId);
+      const freeSectionLimit = PLAN_CONFIG.free.limits.sections ?? 5;
+      if (tenant.plan === 'free' && sections.length >= freeSectionLimit) {
+        return fail('validation', 'free_section_limit_reached');
+      }
+    }
+
     const section = await menuService.upsertSection(ctx.tenantId, parsed.data);
     revalidateMenu(ctx);
     return { ok: true as const, section };

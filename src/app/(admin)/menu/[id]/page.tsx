@@ -11,10 +11,11 @@ import { menuService } from '@/server/services/menu.service';
 
 interface Props {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ sectionId?: string }>;
 }
 
-export default async function ItemEditPage({ params }: Props) {
-  const { id } = await params;
+export default async function ItemEditPage({ params, searchParams }: Props) {
+  const [{ id }, { sectionId }] = await Promise.all([params, searchParams]);
   const ctx = await requireAuth();
   const { tenant, categories, items } = await menuService.getMenuByTenantId(ctx.tenantId);
   const item = items.find((i) => i.id === id);
@@ -53,6 +54,10 @@ export default async function ItemEditPage({ params }: Props) {
     );
   }
 
+  const filteredCategories = sectionId
+    ? categories.filter((category) => category.sectionId === sectionId)
+    : categories;
+
   return (
     <>
       <AppHeader
@@ -61,7 +66,11 @@ export default async function ItemEditPage({ params }: Props) {
         right={<TenantSwitcher activeTenantId={ctx.tenantId} memberships={ctx.memberships} />}
       />
       <main className="flex-1 px-4 pb-24">
-        <ItemEditorForm initial={item ?? null} categories={categories} />
+        <ItemEditorForm
+          initial={item ?? null}
+          categories={filteredCategories}
+          sectionId={sectionId ?? null}
+        />
       </main>
     </>
   );

@@ -23,6 +23,15 @@ cp .env.example .env.local
 pnpm dev
 ```
 
+## Checks
+
+```bash
+pnpm typecheck
+pnpm lint
+pnpm test --run   # unit tests only: tests/unit/**/*.test.ts
+pnpm build
+```
+
 Abre:
 - http://localhost:3000 — landing
 - http://localhost:3000/m/taqueria-don-pepe — vista comensal demo

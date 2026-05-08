@@ -2,10 +2,16 @@ import 'server-only';
 import { mockCategories, mockItems, mockSections, mockTenant } from '@/lib/mock/data';
 import { sanitizePlainText } from '@/lib/sanitize';
 import type { IMenuRepository, MenuData } from '@/server/repositories/menu.repository';
-import type { Category, MenuItem, Tenant } from '@/types/domain';
+import type { Category, MenuItem, MenuSection, Tenant } from '@/types/domain';
+import type { SectionInput } from '@/lib/validators/section.schema';
+import type { CategoryInput } from '@/lib/validators/item.schema';
 
 function cloneTenant(tenant: Tenant): Tenant {
   return { ...tenant };
+}
+
+function cloneSection(section: MenuSection): MenuSection {
+  return { ...section };
 }
 
 function cloneCategory(category: Category): Category {
@@ -20,8 +26,13 @@ function isActive(item: MenuItem) {
   return !item.deletedAt;
 }
 
+function isActiveSection(section: MenuSection) {
+  return section.isVisible && !section.deletedAt;
+}
+
 export class MockMenuRepository implements IMenuRepository {
   private readonly tenant = cloneTenant(mockTenant);
+  private readonly sections = mockSections.map(cloneSection);
   private readonly categories = mockCategories.map(cloneCategory);
   private readonly items = mockItems.map(cloneMenuItem);
 
@@ -34,7 +45,9 @@ export class MockMenuRepository implements IMenuRepository {
 
     return {
       tenant: cloneTenant(this.tenant),
-      sections: mockSections.filter((s) => s.tenantId === tenantId).map((s) => ({ ...s })),
+      sections: this.sections
+        .filter((s) => s.tenantId === tenantId && isActiveSection(s))
+        .map(cloneSection),
       categories: this.categories.map(cloneCategory),
       items: this.items
         .filter((item) => item.tenantId === tenantId && isActive(item))
@@ -152,5 +165,123 @@ export class MockMenuRepository implements IMenuRepository {
     };
     this.items.push(created);
     return cloneMenuItem(created);
+  }
+
+  async upsertSection(tenantId: string, input: SectionInput): Promise<MenuSection> {
+    if (input.id) {
+      const idx = this.sections.findIndex(
+        (s) => s.id === input.id && s.tenantId === tenantId && !s.deletedAt,
+      );
+      if (idx < 0) throw new Error('not_found');
+      this.sections[idx] = {
+        ...this.sections[idx],
+        name: input.name,
+        coverImageUrl: input.coverImageUrl ?? null,
+        accentColor: input.accentColor,
+        sortOrder: input.sortOrder,
+        isVisible: input.isVisible,
+        updatedAt: new Date().toISOString(),
+      };
+      return cloneSection(this.sections[idx]);
+    }
+
+    const created: MenuSection = {
+      id: `sec_${crypto.randomUUID().slice(0, 8)}`,
+      tenantId,
+      name: input.name,
+      coverImageUrl: input.coverImageUrl ?? null,
+      accentColor: input.accentColor,
+      sortOrder: input.sortOrder,
+      isVisible: input.isVisible,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      deletedAt: null,
+    };
+    this.sections.push(created);
+    return cloneSection(created);
+  }
+
+  async deleteSection(tenantId: string, sectionId: string): Promise<void> {
+    const idx = this.sections.findIndex(
+      (s) => s.id === sectionId && s.tenantId === tenantId && !s.deletedAt,
+    );
+    if (idx < 0) throw new Error('not_found');
+    const now = new Date().toISOString();
+    this.sections[idx] = { ...this.sections[idx], isVisible: false, deletedAt: now, updatedAt: now };
+  }
+
+  async reorderSections(tenantId: string, sectionIds: string[]): Promise<void> {
+    sectionIds.forEach((id, index) => {
+      const idx = this.sections.findIndex(
+        (s) => s.id === id && s.tenantId === tenantId && !s.deletedAt,
+      );
+      if (idx >= 0) {
+        this.sections[idx] = {
+          ...this.sections[idx],
+          sortOrder: index,
+          updatedAt: new Date().toISOString(),
+        };
+      }
+    });
+  }
+
+  async upsertCategory(tenantId: string, input: CategoryInput): Promise<Category> {
+    const name = sanitizePlainText(input.name, 40) ?? input.name;
+
+    if (input.id) {
+      const idx = this.categories.findIndex(
+        (c) => c.id === input.id && c.tenantId === tenantId,
+      );
+      if (idx < 0) throw new Error('not_found');
+      this.categories[idx] = {
+        ...this.categories[idx],
+        name,
+        sectionId: input.sectionId ?? null,
+        sortOrder: input.sortOrder ?? 0,
+        isVisible: input.isVisible ?? true,
+      };
+      return cloneCategory(this.categories[idx]);
+    }
+
+    const created: Category = {
+      id: `cat_${crypto.randomUUID().slice(0, 8)}`,
+      tenantId,
+      sectionId: input.sectionId ?? null,
+      name,
+      coverImageUrl: null,
+      sortOrder: input.sortOrder ?? 0,
+      isVisible: input.isVisible ?? true,
+    };
+    this.categories.push(created);
+    return cloneCategory(created);
+  }
+
+  async deleteCategory(tenantId: string, categoryId: string): Promise<void> {
+    const idx = this.categories.findIndex((c) => c.id === categoryId && c.tenantId === tenantId);
+    if (idx < 0) throw new Error('not_found');
+
+    this.categories.splice(idx, 1);
+    this.items.forEach((item, itemIndex) => {
+      if (item.tenantId === tenantId && item.categoryId === categoryId) {
+        this.items[itemIndex] = {
+          ...item,
+          categoryId: null,
+          updatedAt: new Date().toISOString(),
+        };
+      }
+    });
+  }
+
+  async reorderCategories(
+    tenantId: string,
+    sectionId: string | null,
+    categoryIds: string[],
+  ): Promise<void> {
+    categoryIds.forEach((id, index) => {
+      const idx = this.categories.findIndex(
+        (c) => c.id === id && c.tenantId === tenantId && (c.sectionId ?? null) === sectionId,
+      );
+      if (idx >= 0) this.categories[idx] = { ...this.categories[idx], sortOrder: index };
+    });
   }
 }

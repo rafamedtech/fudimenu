@@ -387,6 +387,7 @@ export const ModelName = {
   Tenant: 'Tenant',
   Membership: 'Membership',
   AccountDeleteRequest: 'AccountDeleteRequest',
+  MenuSection: 'MenuSection',
   Category: 'Category',
   MenuItem: 'MenuItem',
   ItemTranslation: 'ItemTranslation',
@@ -411,7 +412,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "tenant" | "membership" | "accountDeleteRequest" | "category" | "menuItem" | "itemTranslation" | "slugHistory" | "menuView" | "itemView" | "auditLog" | "webhookEvent" | "referral"
+    modelProps: "tenant" | "membership" | "accountDeleteRequest" | "menuSection" | "category" | "menuItem" | "itemTranslation" | "slugHistory" | "menuView" | "itemView" | "auditLog" | "webhookEvent" | "referral"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -634,6 +635,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.AccountDeleteRequestCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.AccountDeleteRequestCountAggregateOutputType> | number
+        }
+      }
+    }
+    MenuSection: {
+      payload: Prisma.$MenuSectionPayload<ExtArgs>
+      fields: Prisma.MenuSectionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.MenuSectionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MenuSectionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.MenuSectionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MenuSectionPayload>
+        }
+        findFirst: {
+          args: Prisma.MenuSectionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MenuSectionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.MenuSectionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MenuSectionPayload>
+        }
+        findMany: {
+          args: Prisma.MenuSectionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MenuSectionPayload>[]
+        }
+        create: {
+          args: Prisma.MenuSectionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MenuSectionPayload>
+        }
+        createMany: {
+          args: Prisma.MenuSectionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.MenuSectionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MenuSectionPayload>[]
+        }
+        delete: {
+          args: Prisma.MenuSectionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MenuSectionPayload>
+        }
+        update: {
+          args: Prisma.MenuSectionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MenuSectionPayload>
+        }
+        deleteMany: {
+          args: Prisma.MenuSectionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.MenuSectionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.MenuSectionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MenuSectionPayload>[]
+        }
+        upsert: {
+          args: Prisma.MenuSectionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MenuSectionPayload>
+        }
+        aggregate: {
+          args: Prisma.MenuSectionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMenuSection>
+        }
+        groupBy: {
+          args: Prisma.MenuSectionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MenuSectionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.MenuSectionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MenuSectionCountAggregateOutputType> | number
         }
       }
     }
@@ -1355,6 +1430,8 @@ export const TenantScalarFieldEnum = {
   defaultLocale: 'defaultLocale',
   currency: 'currency',
   plan: 'plan',
+  stripeCustomerId: 'stripeCustomerId',
+  stripeSubscriptionId: 'stripeSubscriptionId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   deletedAt: 'deletedAt'
@@ -1389,9 +1466,26 @@ export const AccountDeleteRequestScalarFieldEnum = {
 export type AccountDeleteRequestScalarFieldEnum = (typeof AccountDeleteRequestScalarFieldEnum)[keyof typeof AccountDeleteRequestScalarFieldEnum]
 
 
+export const MenuSectionScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  name: 'name',
+  coverImageUrl: 'coverImageUrl',
+  accentColor: 'accentColor',
+  sortOrder: 'sortOrder',
+  isVisible: 'isVisible',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
+} as const
+
+export type MenuSectionScalarFieldEnum = (typeof MenuSectionScalarFieldEnum)[keyof typeof MenuSectionScalarFieldEnum]
+
+
 export const CategoryScalarFieldEnum = {
   id: 'id',
   tenantId: 'tenantId',
+  sectionId: 'sectionId',
   name: 'name',
   sortOrder: 'sortOrder',
   isVisible: 'isVisible',
@@ -1834,6 +1928,7 @@ export type GlobalOmitConfig = {
   tenant?: Prisma.TenantOmit
   membership?: Prisma.MembershipOmit
   accountDeleteRequest?: Prisma.AccountDeleteRequestOmit
+  menuSection?: Prisma.MenuSectionOmit
   category?: Prisma.CategoryOmit
   menuItem?: Prisma.MenuItemOmit
   itemTranslation?: Prisma.ItemTranslationOmit

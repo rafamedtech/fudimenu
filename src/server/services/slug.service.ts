@@ -4,6 +4,21 @@ import { slugify } from '@/lib/utils';
 
 const DEFAULT_SLUG = 'restaurante';
 const MAX_SLUG_LENGTH = 48;
+const RESERVED_SLUGS = new Set([
+  'admin',
+  'api',
+  'app',
+  'auth',
+  'dashboard',
+  'login',
+  'logout',
+  'menu',
+  'onboarding',
+  'qr',
+  'settings',
+  'signup',
+  'www',
+]);
 
 function randomSlugSuffix() {
   return crypto.randomUUID().replace(/-/g, '').slice(0, 4);
@@ -16,7 +31,7 @@ function appendSlugSuffix(base: string, suffix: string) {
 }
 
 export function normalizeTenantSlug(input: string) {
-  return slugify(input) || DEFAULT_SLUG;
+  return (slugify(input) || DEFAULT_SLUG).slice(0, MAX_SLUG_LENGTH).replace(/-+$/g, '') || DEFAULT_SLUG;
 }
 
 export function buildSlugSuggestions(
@@ -33,6 +48,8 @@ export function buildSlugSuggestions(
 }
 
 async function isSlugReserved(slug: string, currentTenantId?: string) {
+  if (RESERVED_SLUGS.has(slug)) return true;
+
   const prisma = getPrisma();
   const [tenant, history] = await Promise.all([
     prisma.tenant.findUnique({

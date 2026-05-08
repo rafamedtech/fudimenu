@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { ImageUploadField } from '@/components/admin/image-upload-field';
 import { Sheet } from '@/components/ui/sheet';
 import { Toggle } from '@/components/ui/toggle';
 import { usePriceInput } from '@/hooks/use-price-input';
@@ -26,6 +27,7 @@ import {
   toggleItemAvailabilityAction,
   upsertItemAction,
 } from '@/server/actions/items.actions';
+import { upsertCategoryAction } from '@/server/actions/categories.actions';
 import { ApiError, toUserMessage } from '@/lib/api/errors';
 import { track } from '@/lib/analytics/events';
 import type { Category, MenuItem } from '@/types/domain';
@@ -33,22 +35,27 @@ import type { Category, MenuItem } from '@/types/domain';
 interface Props {
   initial: MenuItem | null;
   categories: Category[];
+  sectionId?: string | null;
 }
 
 const DESCRIPTION_MAX_CHARS = 500;
 
-export function ItemEditorForm({ initial, categories }: Props) {
+export function ItemEditorForm({ initial, categories, sectionId }: Props) {
   const locale = useLocale();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isStockPending, startStockTransition] = useTransition();
   const [isDeletePending, startDeleteTransition] = useTransition();
+  const [isCategoryPending, startCategoryTransition] = useTransition();
   const [stockAvailable, setStockAvailable] = useState(initial?.isAvailable ?? true);
   const [conflictDraft, setConflictDraft] = useState<ItemInput | null>(null);
   const [conflictMutationId, setConflictMutationId] = useState<number | null>(null);
-  const fallbackCategoryId = categories[0]?.id ?? null;
+  const [showCategoryForm, setShowCategoryForm] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [localCategories, setLocalCategories] = useState(categories);
+  const fallbackCategoryId = localCategories[0]?.id ?? null;
   const initialCategoryId =
-    initial?.categoryId && categories.some((category) => category.id === initial.categoryId)
+    initial?.categoryId && localCategories.some((category) => category.id === initial.categoryId)
       ? initial.categoryId
       : fallbackCategoryId;
   const {
@@ -67,6 +74,8 @@ export function ItemEditorForm({ initial, categories }: Props) {
       priceCents: initial?.priceCents ?? 0,
       currency: initial?.currency ?? 'MXN',
       imageUrl: initial?.imageUrl ?? null,
+      isSpecialToday: initial?.isSpecialToday ?? false,
+      specialPrice: initial?.specialPrice ?? null,
     },
   });
 
@@ -74,16 +83,39 @@ export function ItemEditorForm({ initial, categories }: Props) {
     initial?.priceCents ?? 0,
     (cents) => setValue('priceCents', cents, { shouldDirty: true, shouldValidate: true }),
   );
+  const {
+    displayValue: specialPriceDisplayValue,
+    handleChange: handleSpecialPriceChange,
+  } = usePriceInput(
+    initial?.specialPrice ?? 0,
+    (cents) => setValue('specialPrice', cents > 0 ? cents : null, {
+      shouldDirty: true,
+      shouldValidate: true,
+    }),
+  );
   const description = watch('description') ?? '';
   const charCount = description.length;
   const isNearDescriptionLimit = charCount > DESCRIPTION_MAX_CHARS * 0.9;
   const selectedCategoryId = watch('categoryId');
-  const selectedCategory = categories.find((category) => category.id === selectedCategoryId);
+  const selectedCategory = localCategories.find((category) => category.id === selectedCategoryId);
   const placeholderEmoji = getCategoryEmoji(selectedCategory?.name);
+  const imageUrl = watch('imageUrl');
+  const isSpecialToday = watch('isSpecialToday') ?? false;
   const conflictRows = useMemo(
-    () => buildConflictRows(initial, conflictDraft, categories),
-    [categories, conflictDraft, initial],
+    () => buildConflictRows(initial, conflictDraft, localCategories),
+    [localCategories, conflictDraft, initial],
   );
+
+  useEffect(() => {
+    setLocalCategories(categories);
+  }, [categories]);
+
+  useEffect(() => {
+    if (localCategories.length > 0) {
+      setValue('categoryId', localCategories[0].id, { shouldDirty: true, shouldValidate: true });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [localCategories.length]);
 
   useEffect(() => {
     const conflictId = Number(searchParams.get('offlineConflict'));
@@ -125,16 +157,38 @@ export function ItemEditorForm({ initial, categories }: Props) {
           field: 'all',
         } as never);
         toast.success('✓ Guardado');
-        router.push('/menu');
+        router.push(sectionId ? `/menu/s/${sectionId}` : '/menu');
       }
     } catch (err) {
       toast.error(toUserMessage(err, locale));
     }
   }
 
+  function handleCreateCategory() {
+    if (!newCategoryName.trim()) return;
+    const activeSectionId = sectionId ?? searchParams.get('sectionId');
+    startCategoryTransition(async () => {
+      const res = await upsertCategoryAction({
+        name: newCategoryName.trim(),
+        sectionId: activeSectionId ?? null,
+      });
+      if (!res.ok) {
+        toast.error('No se pudo crear la categoría');
+        return;
+      }
+      setLocalCategories((prev) => [...prev, res.category]);
+      setValue('categoryId', res.category.id, { shouldDirty: true, shouldValidate: true });
+      toast.success('Categoría creada');
+      setShowCategoryForm(false);
+      setNewCategoryName('');
+      router.refresh();
+    });
+  }
+
   function handleAvailabilityChange(next: boolean) {
     const previous = stockAvailable;
     setStockAvailable(next);
+    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) navigator.vibrate(10);
 
     if (!initial?.id) {
       toast.success(next ? 'Disponible' : 'Marcado agotado');
@@ -170,7 +224,7 @@ export function ItemEditorForm({ initial, categories }: Props) {
           return;
         }
 
-        router.push('/menu');
+        router.push(sectionId ? `/menu/s/${sectionId}` : '/menu');
         router.refresh();
 
         toast.success('Platillo eliminado', {
@@ -275,19 +329,16 @@ export function ItemEditorForm({ initial, categories }: Props) {
         </div>
       </Sheet>
 
-      <button
-        type="button"
-        className="flex h-44 w-full flex-col items-center justify-center gap-2 rounded-lg bg-crema-100 text-ink-500"
-        onClick={() => toast.info('Upload conectado a Cloudinary próximamente')}
-      >
-        <span className="text-6xl" aria-hidden>
-          {placeholderEmoji}
-        </span>
-        <span className="text-sm font-semibold text-ink-700">Foto opcional</span>
-      </button>
+      <ImageUploadField
+        kind="item"
+        label="Foto opcional"
+        value={imageUrl}
+        onChange={(url) => setValue('imageUrl', url, { shouldDirty: true, shouldValidate: true })}
+        fallback={<span className="text-6xl" aria-hidden>{placeholderEmoji}</span>}
+      />
 
       <Input
-        label="Nombre"
+        label="Nombre del platillo"
         placeholder="Ej: Tacos al pastor"
         error={errors.name?.message}
         {...register('name')}
@@ -297,21 +348,72 @@ export function ItemEditorForm({ initial, categories }: Props) {
         <label className="mb-1.5 block text-sm font-medium text-ink-700" htmlFor="categoryId">
           Categoría
         </label>
-        <select
-          id="categoryId"
-          required={categories.length > 0}
-          disabled={categories.length === 0}
-          className="h-14 w-full rounded-md border-[1.5px] border-ink-300 bg-white px-4 text-base text-ink-900 outline-none focus-within:border-mostaza-500 focus-within:shadow-glow-mostaza disabled:cursor-not-allowed disabled:bg-crema-100 disabled:text-ink-500"
-          {...register('categoryId')}
-        >
-          {categories.map((category) => (
-            <option key={category.id} value={category.id}>
-              {category.name}
-            </option>
-          ))}
-        </select>
-        {errors.categoryId?.message && (
-          <p className="mt-1 text-sm text-red-600">{errors.categoryId.message}</p>
+        {localCategories.length === 0 ? (
+          <div className="flex flex-col gap-2 rounded-md border border-ink-200 bg-crema-50 p-4">
+            <p className="text-sm text-ink-700">Crea categoría primero</p>
+            {!showCategoryForm ? (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowCategoryForm(true)}
+              >
+                Crear categoría
+              </Button>
+            ) : (
+              <div className="flex flex-col gap-3">
+                <Input
+                  label="Nombre de categoría"
+                  value={newCategoryName}
+                  onChange={(e) => setNewCategoryName(e.target.value)}
+                  placeholder="Ej: Tacos"
+                  autoFocus
+                />
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    className="flex-1"
+                    onClick={handleCreateCategory}
+                    loading={isCategoryPending}
+                  >
+                    Guardar
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => {
+                      setShowCategoryForm(false);
+                      setNewCategoryName('');
+                    }}
+                  >
+                    Cancelar
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        ) : localCategories.length === 1 ? (
+          <div className="flex h-14 items-center rounded-md border-[1.5px] border-ink-300 bg-crema-50 px-4 text-base text-ink-900">
+            {localCategories[0].name}
+          </div>
+        ) : (
+          <>
+            <select
+              id="categoryId"
+              required
+              className="h-14 w-full rounded-md border-[1.5px] border-ink-300 bg-white px-4 text-base text-ink-900 outline-none focus-within:border-mostaza-500 focus-within:shadow-glow-mostaza"
+              {...register('categoryId')}
+            >
+              {localCategories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+            {errors.categoryId?.message && (
+              <p className="mt-1 text-sm text-red-600">{errors.categoryId.message}</p>
+            )}
+          </>
         )}
       </div>
 
@@ -325,6 +427,31 @@ export function ItemEditorForm({ initial, categories }: Props) {
         value={priceDisplayValue}
         onChange={(e) => handlePriceChange(e.target.value)}
       />
+
+      <Card className="space-y-3 border border-coral-500/20 bg-coral-50 shadow-sm">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <p className="font-bold text-ink-900">Especial de hoy</p>
+            <p className="text-xs text-ink-500">Aparece arriba en el menú público.</p>
+          </div>
+          <Toggle
+            checked={isSpecialToday}
+            onChange={(next) => setValue('isSpecialToday', next, { shouldDirty: true })}
+            ariaLabel="Especial de hoy"
+          />
+        </div>
+        {isSpecialToday && (
+          <Input
+            label="Precio especial"
+            type="text"
+            prefix="$"
+            inputMode="decimal"
+            placeholder="Opcional"
+            value={specialPriceDisplayValue}
+            onChange={(event) => handleSpecialPriceChange(event.target.value)}
+          />
+        )}
+      </Card>
 
       <div>
         <label className="mb-1.5 block text-sm font-medium text-ink-700">Descripción</label>
@@ -370,9 +497,11 @@ export function ItemEditorForm({ initial, categories }: Props) {
         >
           Cancelar
         </Button>
-        <Button type="submit" size="lg" className="flex-1" loading={isSubmitting}>
-          Guardar
-        </Button>
+        {!showCategoryForm && (
+          <Button type="submit" size="lg" className="flex-1" loading={isSubmitting}>
+            Guardar
+          </Button>
+        )}
       </div>
       </form>
     </div>

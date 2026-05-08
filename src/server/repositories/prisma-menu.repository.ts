@@ -2,7 +2,9 @@ import 'server-only';
 import { getPrisma } from '@/lib/db/prisma';
 import { sanitizePlainText } from '@/lib/sanitize';
 import type { MenuData, IMenuRepository } from '@/server/repositories/menu.repository';
-import type { Category, MenuItem, Tenant } from '@/types/domain';
+import type { Category, MenuItem, MenuSection, Tenant } from '@/types/domain';
+import type { SectionInput } from '@/lib/validators/section.schema';
+import type { CategoryInput } from '@/lib/validators/item.schema';
 
 type TenantRow = {
   id: string;
@@ -16,12 +18,28 @@ type TenantRow = {
   defaultLocale: string;
   currency: string;
   plan: string;
+  stripeCustomerId: string | null;
+  stripeSubscriptionId: string | null;
   createdAt: Date;
+};
+
+type SectionRow = {
+  id: string;
+  tenantId: string;
+  name: string;
+  coverImageUrl: string | null;
+  accentColor: string;
+  sortOrder: number;
+  isVisible: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
 };
 
 type CategoryRow = {
   id: string;
   tenantId: string;
+  sectionId: string | null;
   name: string;
   sortOrder: number;
   isVisible: boolean;
@@ -58,7 +76,24 @@ function mapTenant(row: TenantRow): Tenant {
     defaultLocale: row.defaultLocale as Tenant['defaultLocale'],
     currency: row.currency,
     plan: row.plan as Tenant['plan'],
+    stripeCustomerId: row.stripeCustomerId,
+    stripeSubscriptionId: row.stripeSubscriptionId,
     createdAt: row.createdAt.toISOString(),
+  };
+}
+
+function mapSection(row: SectionRow): MenuSection {
+  return {
+    id: row.id,
+    tenantId: row.tenantId,
+    name: row.name,
+    coverImageUrl: row.coverImageUrl,
+    accentColor: row.accentColor,
+    sortOrder: row.sortOrder,
+    isVisible: row.isVisible,
+    createdAt: row.createdAt.toISOString(),
+    updatedAt: row.updatedAt.toISOString(),
+    deletedAt: row.deletedAt?.toISOString() ?? null,
   };
 }
 
@@ -66,7 +101,7 @@ function mapCategory(row: CategoryRow): Category {
   return {
     id: row.id,
     tenantId: row.tenantId,
-    sectionId: null,
+    sectionId: row.sectionId ?? null,
     name: row.name,
     coverImageUrl: null,
     sortOrder: row.sortOrder,
@@ -103,8 +138,12 @@ export class PrismaMenuRepository implements IMenuRepository {
 
   async getMenuByTenantId(tenantId: string): Promise<MenuData> {
     const prisma = getPrisma();
-    const [tenant, categories, items] = await Promise.all([
+    const [tenant, sections, categories, items] = await Promise.all([
       prisma.tenant.findUnique({ where: { id: tenantId } }),
+      prisma.menuSection.findMany({
+        where: { tenantId, isVisible: true, deletedAt: null },
+        orderBy: { sortOrder: 'asc' },
+      }),
       prisma.category.findMany({
         where: { tenantId, isVisible: true, deletedAt: null },
         orderBy: { sortOrder: 'asc' },
@@ -119,7 +158,7 @@ export class PrismaMenuRepository implements IMenuRepository {
 
     return {
       tenant: mapTenant(tenant),
-      sections: [],
+      sections: sections.map(mapSection),
       categories: categories.map(mapCategory),
       items: items.map(mapMenuItem),
     };
@@ -259,5 +298,134 @@ export class PrismaMenuRepository implements IMenuRepository {
       data: { ...payload, tenantId },
     });
     return mapMenuItem(item);
+  }
+
+  async upsertSection(tenantId: string, input: SectionInput): Promise<MenuSection> {
+    const prisma = getPrisma();
+
+    if (input.id) {
+      const result = await prisma.menuSection.updateMany({
+        where: { id: input.id, tenantId, deletedAt: null },
+        data: {
+          name: input.name,
+          coverImageUrl: input.coverImageUrl ?? null,
+          accentColor: input.accentColor,
+          sortOrder: input.sortOrder,
+          isVisible: input.isVisible,
+        },
+      });
+      if (result.count === 0) throw new Error('not_found');
+
+      const row = await prisma.menuSection.findFirst({
+        where: { id: input.id, tenantId, deletedAt: null },
+      });
+      if (!row) throw new Error('not_found');
+      return mapSection(row);
+    }
+
+    const row = await prisma.menuSection.create({
+      data: {
+        tenantId,
+        name: input.name,
+        coverImageUrl: input.coverImageUrl ?? null,
+        accentColor: input.accentColor,
+        sortOrder: input.sortOrder,
+        isVisible: input.isVisible,
+      },
+    });
+    return mapSection(row);
+  }
+
+  async deleteSection(tenantId: string, sectionId: string): Promise<void> {
+    const prisma = getPrisma();
+    const result = await prisma.menuSection.updateMany({
+      where: { id: sectionId, tenantId, deletedAt: null },
+      data: { isVisible: false, deletedAt: new Date() },
+    });
+    if (result.count === 0) throw new Error('not_found');
+  }
+
+  async reorderSections(tenantId: string, sectionIds: string[]): Promise<void> {
+    const prisma = getPrisma();
+    await prisma.$transaction(
+      sectionIds.map((id, index) =>
+        prisma.menuSection.updateMany({
+          where: { id, tenantId, deletedAt: null },
+          data: { sortOrder: index },
+        }),
+      ),
+    );
+  }
+
+  async upsertCategory(tenantId: string, input: CategoryInput): Promise<Category> {
+    const prisma = getPrisma();
+    const name = sanitizePlainText(input.name, 40) ?? input.name;
+
+    if (input.id) {
+      const result = await prisma.category.updateMany({
+        where: { id: input.id, tenantId, deletedAt: null },
+        data: {
+          name,
+          sectionId: input.sectionId ?? null,
+          sortOrder: input.sortOrder ?? 0,
+          isVisible: input.isVisible ?? true,
+        },
+      });
+      if (result.count === 0) throw new Error('not_found');
+
+      const row = await prisma.category.findFirst({
+        where: { id: input.id, tenantId, deletedAt: null },
+      });
+      if (!row) throw new Error('not_found');
+      return mapCategory(row);
+    }
+
+    const row = await prisma.category.create({
+      data: {
+        tenantId,
+        name,
+        sectionId: input.sectionId ?? null,
+        sortOrder: input.sortOrder ?? 0,
+        isVisible: input.isVisible ?? true,
+      },
+    });
+    return mapCategory(row);
+  }
+
+  async deleteCategory(tenantId: string, categoryId: string): Promise<void> {
+    const prisma = getPrisma();
+    const result = await prisma.$transaction(async (tx) => {
+      const deleted = await tx.category.updateMany({
+        where: { id: categoryId, tenantId, deletedAt: null },
+        data: { deletedAt: new Date(), isVisible: false },
+      });
+
+      if (deleted.count === 0) return deleted;
+
+      await tx.menuItem.updateMany({
+        where: { tenantId, categoryId, deletedAt: null },
+        data: { categoryId: null },
+      });
+
+      return deleted;
+    });
+
+    if (result.count === 0) throw new Error('not_found');
+  }
+
+  async reorderCategories(
+    tenantId: string,
+    sectionId: string | null,
+    categoryIds: string[],
+  ): Promise<void> {
+    const prisma = getPrisma();
+    await prisma.$transaction(
+      categoryIds.map((id, index) =>
+        prisma.category.updateMany({
+          where: { id, tenantId, sectionId, deletedAt: null },
+          data: { sortOrder: index },
+        }),
+      ),
+    );
   }
 }

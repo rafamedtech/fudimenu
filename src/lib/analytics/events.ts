@@ -50,6 +50,7 @@ export type AnalyticsEvent =
   | { name: 'item_edited'; props: { itemId: string; field: string } }
   | { name: 'stock_toggled'; props: { itemId: string; available: boolean } }
   | { name: 'qr_downloaded'; props: { tenantId: string; format: 'png' | 'pdf' } }
+  | { name: 'whatsapp_clicked'; props: { itemId: string } }
   | { name: 'onboarding_step'; props: { step: number } }
   | { name: 'onboarding_completed'; props: { tenantId: string } }
   | { name: 'plan_upgrade_started'; props: { from: string; to: string } }

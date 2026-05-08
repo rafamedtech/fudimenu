@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { getLocale, getTranslations } from 'next-intl/server';
@@ -6,7 +6,9 @@ import { getCategoryEmoji } from '@/lib/category-placeholder';
 import { formatPrice } from '@/lib/utils';
 import { buildWhatsAppOrderUrl } from '@/lib/whatsapp';
 import { menuService } from '@/server/services/menu.service';
+import { getPrisma } from '@/lib/db/prisma';
 import { PublicMenuLanguageSwitcher, PublicMenuPwaWrapper } from './public-menu-pwa-wrapper';
+import { PublicMenuTracker, WhatsAppOrderLink } from '@/components/public/public-menu-tracking';
 import type { Metadata } from 'next';
 import type { Category, MenuItem, MenuSection, Tenant } from '@/types/domain';
 
@@ -78,14 +80,13 @@ function PublicMenuItemCard({
           {formatPrice(getItemPrice(item), item.currency, priceLocale)}
         </p>
         {whatsappHref && item.isAvailable && (
-          <a
+          <WhatsAppOrderLink
             href={whatsappHref}
-            target="_blank"
-            rel="noopener noreferrer"
+            itemId={item.id}
             className="mt-3 inline-flex min-h-11 items-center justify-center rounded-md bg-menta-500 px-3 text-sm font-extrabold text-ink-900 shadow-sm transition-all hover:opacity-90 active:scale-[0.98]"
           >
             {t('orderWhatsApp')}
-          </a>
+          </WhatsAppOrderLink>
         )}
       </div>
     </article>
@@ -166,14 +167,26 @@ function PublicMenuContent({
     : [];
 
   const buildWhatsapp = (itemName: string) =>
-    buildWhatsAppOrderUrl({ phone: tenant.whatsappPhone, slug, itemName });
+    buildWhatsAppOrderUrl({
+      phone: tenant.whatsappPhone,
+      slug,
+      itemName,
+      locale: priceLocale === 'en-US' ? 'en' : 'es',
+    });
 
   return (
     <PublicMenuPwaWrapper slug={slug}>
+      <PublicMenuTracker tenantId={tenant.id} slug={slug} />
       <main
-        className="mx-auto min-h-dvh max-w-md bg-crema-50 pb-12"
+        className="mx-auto min-h-dvh max-w-md scroll-smooth bg-crema-50 pb-12"
         style={{ ['--brand' as string]: tenant.primaryColor }}
       >
+        <a
+          href="#menu-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-white focus:px-4 focus:py-3 focus:font-bold focus:text-ink-900"
+        >
+          Saltar al menú
+        </a>
         <header className="relative bg-white px-6 py-8 text-center shadow-sm">
           <div className="absolute right-4 top-4">
             <PublicMenuLanguageSwitcher />
@@ -227,7 +240,7 @@ function PublicMenuContent({
               ))}
         </nav>
 
-        <div className="flex flex-col gap-8 px-4 pt-4">
+        <div id="menu-content" className="flex flex-col gap-8 px-4 pt-4">
           {dailySpecials.length > 0 && (
             <section id="especiales-hoy">
               <h2 className="mb-3 text-xl font-bold">{t('dailySpecials')}</h2>
@@ -307,7 +320,29 @@ function PublicMenuContent({
 export default async function PublicMenuPage({ params }: Props) {
   const { slug } = await params;
   const tenant = await menuService.getTenantBySlug(slug);
-  if (!tenant) notFound();
+  if (!tenant) {
+    const history = process.env.USE_MOCKS === 'true'
+      ? null
+      : await getPrisma().slugHistory.findUnique({
+          where: { slug },
+          select: {
+            createdAt: true,
+            deletedAt: true,
+            tenant: { select: { slug: true, deletedAt: true } },
+          },
+        });
+
+    if (
+      history &&
+      !history.deletedAt &&
+      !history.tenant.deletedAt &&
+      Date.now() - history.createdAt.getTime() <= 30 * 24 * 60 * 60 * 1000
+    ) {
+      permanentRedirect(`/m/${history.tenant.slug}`);
+    }
+
+    notFound();
+  }
 
   const [{ sections, categories, items }, locale] = await Promise.all([
     menuService.getMenuByTenantId(tenant.id),

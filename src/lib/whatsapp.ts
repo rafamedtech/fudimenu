@@ -33,8 +33,17 @@ export function buildWhatsAppOrderMessage(input: {
   slug: string;
   itemName: string;
   quantity?: number;
+  locale?: 'es' | 'en';
 }) {
   const baseUrl = getBaseUrl().replace(/\/$/, '');
+  if (input.locale === 'en') {
+    return [
+      `Hi! I saw your menu at ${baseUrl}/m/${input.slug} and I want to order:`,
+      `- ${input.itemName} x${input.quantity ?? 1}`,
+      'Is it available?',
+    ].join('\n');
+  }
+
   return [
     `Hola! Vi tu menú en ${baseUrl}/m/${input.slug} y quiero pedir:`,
     `- ${input.itemName} x${input.quantity ?? 1}`,
@@ -47,6 +56,7 @@ export function buildWhatsAppOrderUrl(input: {
   slug: string;
   itemName: string;
   quantity?: number;
+  locale?: 'es' | 'en';
 }) {
   const phone = normalizeWhatsAppPhone(input.phone);
   if (!phone || !isValidWhatsAppPhone(phone)) return null;
@@ -57,6 +67,7 @@ export function buildWhatsAppOrderUrl(input: {
       slug: input.slug,
       itemName: input.itemName,
       quantity: input.quantity,
+      locale: input.locale,
     }),
   );
 
