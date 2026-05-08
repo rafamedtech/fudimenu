@@ -13,19 +13,40 @@ type PlanLimitBannerProps = {
   plan: Plan;
   itemCount: number;
   addHref?: string;
+  sectionCount?: number;
 };
 
 const FREE_ITEM_LIMIT = PLAN_CONFIG.free.limits.items ?? 20;
+const FREE_SECTION_LIMIT = PLAN_CONFIG.free.limits.sections ?? 5;
 
-export function PlanLimitBanner({ plan, itemCount, addHref = '/menu/new' }: PlanLimitBannerProps) {
+export function PlanLimitBanner({
+  plan,
+  itemCount,
+  addHref = '/menu/new',
+  sectionCount,
+}: PlanLimitBannerProps) {
   const [isUpgradeOpen, setIsUpgradeOpen] = useState(false);
   const isFree = plan === 'free';
   const remainingItems = Math.max(FREE_ITEM_LIMIT - itemCount, 0);
   const isAtItemLimit = isFree && remainingItems === 0;
   const shouldWarn = isFree && remainingItems > 0 && remainingItems <= 2;
+  const isAtSectionLimit = isFree && sectionCount !== undefined && sectionCount >= FREE_SECTION_LIMIT;
 
   return (
     <>
+      {isAtSectionLimit && (
+        <Link href="/settings/billing" className="mb-4 block">
+          <Card className="border-[1.5px] border-mostaza-500 bg-mostaza-50 shadow-sm">
+            <div className="flex items-center gap-3">
+              <Sparkles className="h-5 w-5 shrink-0 text-mostaza-600" />
+              <p className="text-sm font-extrabold text-ink-900">
+                Límite de {FREE_SECTION_LIMIT} secciones en Free alcanzado. Upgrade →
+              </p>
+            </div>
+          </Card>
+        </Link>
+      )}
+
       {shouldWarn && (
         <Link href="/settings/billing" className="mb-4 block">
           <Card className="border-[1.5px] border-mostaza-500 bg-mostaza-50 shadow-sm">

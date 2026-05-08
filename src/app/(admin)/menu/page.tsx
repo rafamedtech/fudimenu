@@ -74,7 +74,11 @@ async function MenuList({ tenantId }: { tenantId: string }) {
 
   return (
     <>
-      <PlanLimitBanner plan={tenant.plan} itemCount={visibleItems.length} />
+      <PlanLimitBanner
+        plan={tenant.plan}
+        itemCount={visibleItems.length}
+        sectionCount={sections.length}
+      />
 
       {hasSections && <SectionGrid sections={sections} canCreateSection={canCreateSection} />}
 

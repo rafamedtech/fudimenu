@@ -153,7 +153,226 @@ test.describe('admin crea sección, agrega categoría e item, vista pública mue
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Test 2: Tenant isolation para secciones
+// Test 2: Reorder sections via E2E API, verify DB + UI
+// ─────────────────────────────────────────────────────────────────────────────
+test.describe('reorder secciones persiste sortOrder', () => {
+  test.describe.configure({ mode: 'serial' });
+
+  let schemaReady: boolean;
+
+  test.beforeAll(async () => {
+    schemaReady = databaseUrl ? await sectionsSchemaReady() : false;
+  });
+
+  test.afterAll(async () => {
+    await prisma?.$disconnect();
+  });
+
+  test('reorderSectionsAction persiste nuevo orden en DB', async ({ request }) => {
+    test.skip(!databaseUrl, 'Missing DATABASE_URL or DIRECT_URL.');
+    test.skip(!schemaReady, 'Requires menu_sections table — run migration first.');
+
+    const db = getTestPrisma();
+    const suffix = randomUUID().slice(0, 8);
+    const { tenantId, userId } = await createTenantWithMembership(db, suffix);
+
+    const secAId = randomUUID();
+    const secBId = randomUUID();
+    await db.$executeRaw`
+      INSERT INTO menu_sections (id, tenant_id, name, accent_color, sort_order, is_visible)
+      VALUES
+        (${secAId}::uuid, ${tenantId}::uuid, 'Primero', '#FFF8E7', 0, true),
+        (${secBId}::uuid, ${tenantId}::uuid, 'Segundo', '#FFF8E7', 1, true)
+    `;
+
+    const res = await request.post('/api/e2e/reorder-sections-action', {
+      headers: { cookie: authCookies(tenantId, userId) },
+      data: { sectionIds: [secBId, secAId] },
+    });
+    expect(res.ok()).toBe(true);
+
+    const rows = await db.$queryRaw<Array<{ id: string; sort_order: number }>>`
+      SELECT id, sort_order FROM menu_sections
+      WHERE tenant_id = ${tenantId}::uuid AND deleted_at IS NULL
+      ORDER BY sort_order ASC
+    `;
+    expect(rows[0]?.id).toBe(secBId);
+    expect(rows[1]?.id).toBe(secAId);
+
+    await db.$executeRaw`DELETE FROM menu_sections WHERE tenant_id = ${tenantId}::uuid`;
+    await db.tenant.delete({ where: { id: tenantId } });
+  });
+
+  test('UI mostra handles en modo reorder', async ({ page, context }) => {
+    test.skip(!databaseUrl, 'Missing DATABASE_URL or DIRECT_URL.');
+    test.skip(!schemaReady, 'Requires menu_sections table — run migration first.');
+
+    const db = getTestPrisma();
+    const suffix = randomUUID().slice(0, 8);
+    const { tenantId, userId } = await createTenantWithMembership(db, suffix);
+
+    const secAId = randomUUID();
+    const secBId = randomUUID();
+    await db.$executeRaw`
+      INSERT INTO menu_sections (id, tenant_id, name, accent_color, sort_order, is_visible)
+      VALUES
+        (${secAId}::uuid, ${tenantId}::uuid, 'Sec A', '#FFF8E7', 0, true),
+        (${secBId}::uuid, ${tenantId}::uuid, 'Sec B', '#E7F8EF', 1, true)
+    `;
+
+    await context.addCookies([
+      { name: 'e2e_tenant_id', value: tenantId, domain: '127.0.0.1', path: '/', httpOnly: true, sameSite: 'Lax' },
+      { name: 'e2e_user_id', value: userId, domain: '127.0.0.1', path: '/', httpOnly: true, sameSite: 'Lax' },
+    ]);
+
+    await page.goto('/menu');
+    await expect(page.getByRole('heading', { name: 'Sec A' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Sec B' })).toBeVisible();
+
+    await page.getByRole('button', { name: 'Reordenar' }).click();
+    await expect(page.getByRole('button', { name: 'Mover Sec A' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Mover Sec B' })).toBeVisible();
+
+    await db.$executeRaw`DELETE FROM menu_sections WHERE tenant_id = ${tenantId}::uuid`;
+    await db.tenant.delete({ where: { id: tenantId } });
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Test 3: Reorder categories via E2E API
+// ─────────────────────────────────────────────────────────────────────────────
+test.describe('reorder categorías persiste sortOrder', () => {
+  test.describe.configure({ mode: 'serial' });
+
+  let schemaReady: boolean;
+
+  test.beforeAll(async () => {
+    schemaReady = databaseUrl ? await sectionsSchemaReady() : false;
+  });
+
+  test.afterAll(async () => {
+    await prisma?.$disconnect();
+  });
+
+  test('reorderCategoriesAction persiste nuevo orden en DB', async ({ request }) => {
+    test.skip(!databaseUrl, 'Missing DATABASE_URL or DIRECT_URL.');
+    test.skip(!schemaReady, 'Requires menu_sections table — run migration first.');
+
+    const db = getTestPrisma();
+    const suffix = randomUUID().slice(0, 8);
+    const { tenantId, userId } = await createTenantWithMembership(db, suffix);
+
+    const sectionId = randomUUID();
+    await db.$executeRaw`
+      INSERT INTO menu_sections (id, tenant_id, name, accent_color, sort_order, is_visible)
+      VALUES (${sectionId}::uuid, ${tenantId}::uuid, 'Sec', '#FFF8E7', 0, true)
+    `;
+
+    const catAId = randomUUID();
+    const catBId = randomUUID();
+    await db.$executeRaw`
+      INSERT INTO categories (id, tenant_id, section_id, name, sort_order)
+      VALUES
+        (${catAId}::uuid, ${tenantId}::uuid, ${sectionId}::uuid, 'Cat A', 0),
+        (${catBId}::uuid, ${tenantId}::uuid, ${sectionId}::uuid, 'Cat B', 1)
+    `;
+
+    const res = await request.post('/api/e2e/reorder-categories-action', {
+      headers: { cookie: authCookies(tenantId, userId) },
+      data: { sectionId, categoryIds: [catBId, catAId] },
+    });
+    expect(res.ok()).toBe(true);
+
+    const rows = await db.$queryRaw<Array<{ id: string; sort_order: number }>>`
+      SELECT id, sort_order FROM categories
+      WHERE tenant_id = ${tenantId}::uuid AND deleted_at IS NULL
+      ORDER BY sort_order ASC
+    `;
+    expect(rows[0]?.id).toBe(catBId);
+    expect(rows[1]?.id).toBe(catAId);
+
+    await db.$executeRaw`DELETE FROM menu_sections WHERE tenant_id = ${tenantId}::uuid`;
+    await db.tenant.delete({ where: { id: tenantId } });
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Test 4: Delete item + undo (restaurar)
+// ─────────────────────────────────────────────────────────────────────────────
+test.describe('eliminar item con undo lo restaura', () => {
+  test.setTimeout(30_000);
+
+  test.afterAll(async () => {
+    await prisma?.$disconnect();
+  });
+
+  test('borrar platillo → Deshacer → platillo visible de nuevo', async ({ page, context }) => {
+    test.skip(!databaseUrl, 'Missing DATABASE_URL or DIRECT_URL.');
+
+    const db = getTestPrisma();
+    const suffix = randomUUID().slice(0, 8);
+    const { tenantId, userId } = await createTenantWithMembership(db, suffix);
+
+    const sectionId = randomUUID();
+    await db.$executeRaw`
+      INSERT INTO menu_sections (id, tenant_id, name, accent_color, sort_order, is_visible)
+      VALUES (${sectionId}::uuid, ${tenantId}::uuid, 'Sec Undo', '#FFF8E7', 0, true)
+    `;
+
+    const categoryId = randomUUID();
+    await db.$executeRaw`
+      INSERT INTO categories (id, tenant_id, section_id, name, sort_order)
+      VALUES (${categoryId}::uuid, ${tenantId}::uuid, ${sectionId}::uuid, 'Cat Undo', 0)
+    `;
+
+    const itemId = randomUUID();
+    await db.menuItem.create({
+      data: {
+        id: itemId,
+        tenantId,
+        categoryId,
+        name: 'Platillo undo test',
+        priceCents: 5000,
+        currency: 'MXN',
+        isAvailable: true,
+        sortOrder: 0,
+      },
+    });
+
+    await context.addCookies([
+      { name: 'e2e_tenant_id', value: tenantId, domain: '127.0.0.1', path: '/', httpOnly: true, sameSite: 'Lax' },
+      { name: 'e2e_user_id', value: userId, domain: '127.0.0.1', path: '/', httpOnly: true, sameSite: 'Lax' },
+    ]);
+
+    // Navigate to item editor
+    await page.goto(`/menu/${itemId}?sectionId=${sectionId}`);
+    await expect(page.getByRole('textbox', { name: 'Nombre del platillo' })).toHaveValue('Platillo undo test');
+
+    // Delete
+    await page.getByRole('button', { name: 'Eliminar platillo' }).click();
+
+    // Wait for redirect to section detail
+    await page.waitForURL(new RegExp(`/menu/s/${sectionId}`));
+
+    // Toast with undo button
+    await expect(page.getByRole('button', { name: 'Deshacer' })).toBeVisible();
+    await page.getByRole('button', { name: 'Deshacer' }).click();
+
+    // Item reappears in section list after refresh
+    await expect(page.getByText('Platillo undo test')).toBeVisible({ timeout: 10_000 });
+
+    // Verify item not soft-deleted in DB
+    const item = await db.menuItem.findUnique({ where: { id: itemId } });
+    expect(item?.deletedAt).toBeNull();
+
+    await db.menuItem.delete({ where: { id: itemId } });
+    await db.$executeRaw`DELETE FROM menu_sections WHERE tenant_id = ${tenantId}::uuid`;
+    await db.tenant.delete({ where: { id: tenantId } });
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Test 5: Tenant isolation para secciones
 // ─────────────────────────────────────────────────────────────────────────────
 test.describe('tenant A no puede ver/editar secciones de tenant B', () => {
   test.describe.configure({ mode: 'serial' });
