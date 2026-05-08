@@ -1,16 +1,14 @@
 'use client';
 import posthog from 'posthog-js';
+import {
+  ANALYTICS_CONSENT_KEY,
+  type AnalyticsConsent,
+  getStoredAnalyticsConsent,
+} from './consent';
+
+export { ANALYTICS_CONSENT_KEY, type AnalyticsConsent, getStoredAnalyticsConsent };
 
 let initialized = false;
-
-export const ANALYTICS_CONSENT_KEY = 'fudi:consent';
-export type AnalyticsConsent = 'accepted' | 'declined';
-
-export function getStoredAnalyticsConsent(): AnalyticsConsent | null {
-  if (typeof window === 'undefined') return null;
-  const value = window.localStorage.getItem(ANALYTICS_CONSENT_KEY);
-  return value === 'accepted' || value === 'declined' ? value : null;
-}
 
 export function initAnalytics() {
   if (initialized || typeof window === 'undefined') return;
@@ -33,14 +31,14 @@ export function acceptAnalyticsConsent() {
   if (typeof window !== 'undefined') {
     window.localStorage.setItem(ANALYTICS_CONSENT_KEY, 'accepted');
   }
-  posthog.opt_in_capturing();
+  if (initialized) posthog.opt_in_capturing();
 }
 
 export function declineAnalyticsConsent() {
   if (typeof window !== 'undefined') {
     window.localStorage.setItem(ANALYTICS_CONSENT_KEY, 'declined');
   }
-  posthog.opt_out_capturing();
+  if (initialized) posthog.opt_out_capturing();
 }
 
 export type AnalyticsEvent =

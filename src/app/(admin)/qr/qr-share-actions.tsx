@@ -1,6 +1,6 @@
 'use client';
 
-import { Copy, Download, Share2 } from 'lucide-react';
+import { Copy, Download, FileDown, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { track } from '@/lib/analytics/events';
@@ -12,10 +12,12 @@ async function copyText(text: string) {
 
 export function QrShareActions({
   menuUrl,
+  qrImageUrl,
   downloadUrl,
   tenantId,
 }: {
   menuUrl: string;
+  qrImageUrl: string;
   downloadUrl: string;
   tenantId: string;
 }) {
@@ -52,6 +54,24 @@ export function QrShareActions({
     }
   }
 
+  function downloadPdf() {
+    track('qr_downloaded', { tenantId, format: 'pdf' });
+    const win = window.open('', '_blank');
+    if (!win) {
+      toast.error('Activa ventanas emergentes para descargar el PDF');
+      return;
+    }
+    win.document.write(
+      `<!DOCTYPE html><html><head><meta charset="utf-8"><title>QR</title>` +
+        `<style>body{margin:2cm;display:flex;flex-direction:column;align-items:center;font-family:sans-serif}` +
+        `img{width:280px;height:280px}.url{font-size:11px;word-break:break-all;max-width:280px;` +
+        `text-align:center;margin-top:12px;color:#333}@media print{@page{margin:2cm}}</style></head>` +
+        `<body><img src="${qrImageUrl}" onload="window.print()"/>` +
+        `<p class="url">${menuUrl}</p></body></html>`,
+    );
+    win.document.close();
+  }
+
   return (
     <div className="grid w-full grid-cols-2 gap-3">
       <Button type="button" variant="outline" onClick={copyMenuLink}>
@@ -64,14 +84,18 @@ export function QrShareActions({
       </Button>
       <Button
         type="button"
-        className="col-span-2 w-full"
+        variant="outline"
         onClick={() => {
           track('qr_downloaded', { tenantId, format: 'png' });
           window.location.href = downloadUrl;
         }}
       >
         <Download size={18} />
-        Descargar PNG
+        PNG
+      </Button>
+      <Button type="button" onClick={downloadPdf}>
+        <FileDown size={18} />
+        PDF
       </Button>
     </div>
   );

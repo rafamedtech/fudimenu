@@ -82,4 +82,50 @@ describe('slug service', () => {
       suggestion: 'taqueria-pepe',
     });
   });
+
+  it('reports reserved blocklist slug as unavailable and suggests variant', async () => {
+    mocks.tenantFindUnique.mockResolvedValue(null);
+    mocks.slugHistoryFindUnique.mockResolvedValue(null);
+
+    const { checkTenantSlugAvailability } = await import('../../src/server/services/slug.service');
+
+    // 'admin' is in RESERVED_SLUGS — all variants must avoid it
+    const result = await checkTenantSlugAvailability('admin', {
+      createRandomSuffix: () => 'a1b2',
+    });
+    expect(result.available).toBe(false);
+    expect(result.suggestion).not.toBe('admin');
+  });
+
+  it('treats an active slug_history entry as unavailable', async () => {
+    mocks.tenantFindUnique.mockResolvedValue(null);
+    // active history: no deletedAt, different tenant
+    mocks.slugHistoryFindUnique.mockImplementation(({ where }: { where: { slug: string } }) =>
+      where.slug === 'old-slug' ? { tenantId: 'tenant-other', deletedAt: null } : null,
+    );
+
+    const { checkTenantSlugAvailability } = await import('../../src/server/services/slug.service');
+
+    const result = await checkTenantSlugAvailability('old-slug', {
+      createRandomSuffix: () => 'z9y8',
+    });
+    expect(result.available).toBe(false);
+    expect(result.suggestion).not.toBe('old-slug');
+  });
+
+  it('treats a soft-deleted slug_history entry as available', async () => {
+    mocks.tenantFindUnique.mockResolvedValue(null);
+    mocks.slugHistoryFindUnique.mockImplementation(({ where }: { where: { slug: string } }) =>
+      where.slug === 'old-slug'
+        ? { tenantId: 'tenant-other', deletedAt: new Date() }
+        : null,
+    );
+
+    const { checkTenantSlugAvailability } = await import('../../src/server/services/slug.service');
+
+    await expect(checkTenantSlugAvailability('old-slug')).resolves.toEqual({
+      available: true,
+      suggestion: 'old-slug',
+    });
+  });
 });

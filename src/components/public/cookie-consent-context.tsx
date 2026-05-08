@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
-import { getStoredAnalyticsConsent } from '@/lib/analytics/events';
+import { getStoredAnalyticsConsent } from '@/lib/analytics/consent';
 
 const COOKIE_CONSENT_DECIDED_EVENT = 'fudi:cookie-consent-decided';
 

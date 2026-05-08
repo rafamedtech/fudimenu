@@ -1,44 +1,6 @@
-'use client';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
-import { Toaster } from 'sonner';
-import { OfflineConflictListener } from '@/components/admin/offline-conflict-listener';
-import { initAnalytics } from '@/lib/analytics/events';
-
+// Root provider is intentionally minimal — no admin-only deps (QueryClient, Toaster, PostHog)
+// so the public menu route stays under 100 KB First Load JS.
+// Admin-specific providers live in src/components/admin-providers.tsx.
 export function Providers({ children }: { children: React.ReactNode }) {
-  const [client] = useState(
-    () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: {
-            staleTime: 60_000,
-            retry: 1,
-            refetchOnWindowFocus: false,
-          },
-        },
-      }),
-  );
-
-  useEffect(() => {
-    initAnalytics();
-  }, []);
-
-  return (
-    <QueryClientProvider client={client}>
-      {children}
-      <OfflineConflictListener />
-      <Toaster
-        position="top-center"
-        toastOptions={{
-          style: {
-            background: '#FFFCF5',
-            color: '#1A1611',
-            border: '1px solid #EDE7DB',
-            borderRadius: '14px',
-            fontFamily: 'inherit',
-          },
-        }}
-      />
-    </QueryClientProvider>
-  );
+  return <>{children}</>;
 }

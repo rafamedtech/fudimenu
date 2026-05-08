@@ -1,3 +1,4 @@
+import dynamic from 'next/dynamic';
 import { notFound, permanentRedirect } from 'next/navigation';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
@@ -8,11 +9,17 @@ import { buildWhatsAppOrderUrl } from '@/lib/whatsapp';
 import { menuService } from '@/server/services/menu.service';
 import { getPrisma } from '@/lib/db/prisma';
 import { PublicMenuLanguageSwitcher, PublicMenuPwaWrapper } from './public-menu-pwa-wrapper';
-import { PublicMenuTracker, WhatsAppOrderLink } from '@/components/public/public-menu-tracking';
 import type { Metadata } from 'next';
 import type { Category, MenuItem, MenuSection, Tenant } from '@/types/domain';
 
+// Node.js runtime (not Edge) — Prisma requires Node.js APIs.
 export const revalidate = 60;
+
+// Deferred: loads posthog + fetch tracker after hydration, not on initial paint.
+const PublicMenuTracker = dynamic(
+  () => import('@/components/public/public-menu-tracking').then((m) => m.PublicMenuTracker),
+  { ssr: false },
+);
 const OTHER_CATEGORY_NAME = 'Otros';
 
 interface Props {
@@ -49,7 +56,11 @@ function PublicMenuItemCard({
   const t = useTranslations('menu');
 
   return (
-    <article className="flex gap-3 rounded-lg bg-white p-3 shadow-sm">
+    <article
+      className="flex gap-3 rounded-lg bg-white p-3 shadow-sm"
+      data-item-id={item.id}
+      data-item-category={categoryName}
+    >
       <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-md bg-crema-100">
         {item.imageUrl ? (
           <Image src={item.imageUrl} alt={item.name} fill sizes="80px" className="object-cover" />
@@ -80,13 +91,15 @@ function PublicMenuItemCard({
           {formatPrice(getItemPrice(item), item.currency, priceLocale)}
         </p>
         {whatsappHref && item.isAvailable && (
-          <WhatsAppOrderLink
+          <a
             href={whatsappHref}
-            itemId={item.id}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-track-wa={item.id}
             className="mt-3 inline-flex min-h-11 items-center justify-center rounded-md bg-menta-500 px-3 text-sm font-extrabold text-ink-900 shadow-sm transition-all hover:opacity-90 active:scale-[0.98]"
           >
             {t('orderWhatsApp')}
-          </WhatsAppOrderLink>
+          </a>
         )}
       </div>
     </article>
@@ -309,7 +322,10 @@ function PublicMenuContent({
 
         {tenant.plan === 'free' && (
           <footer className="mt-12 text-center text-xs text-ink-500">
-            {t('madeWith')} <span className="font-bold text-mostaza-500">FudiMenu</span>
+            {t('madeWith')}{' '}
+            <a href="/" className="font-bold text-mostaza-500 hover:underline">
+              FudiMenu
+            </a>
           </footer>
         )}
       </main>

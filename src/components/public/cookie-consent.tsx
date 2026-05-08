@@ -3,10 +3,10 @@
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
+import { getStoredAnalyticsConsent } from '@/lib/analytics/consent';
 import {
   acceptAnalyticsConsent,
   declineAnalyticsConsent,
-  getStoredAnalyticsConsent,
 } from '@/lib/analytics/events';
 import { notifyCookieConsentDecided } from '@/components/public/cookie-consent-context';
 

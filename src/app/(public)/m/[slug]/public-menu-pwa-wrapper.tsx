@@ -1,10 +1,10 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { Download, X } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState, useTransition } from 'react';
-import { CookieConsent } from '@/components/public/cookie-consent';
 import {
   CookieConsentProvider,
   useCookieConsentDecided,
@@ -12,6 +12,12 @@ import {
 import { Button } from '@/components/ui/button';
 import { usePwaInstall } from '@/hooks/use-pwa-install';
 import { localStore } from '@/lib/storage/local';
+
+// Deferred: keeps posthog-js out of the initial public-menu bundle
+const CookieConsent = dynamic(
+  () => import('@/components/public/cookie-consent').then((m) => m.CookieConsent),
+  { ssr: false },
+);
 
 const PUBLIC_MENU_VISITS_PREFIX = 'fudimenu:public-menu-visits:';
 const PUBLIC_MENU_SESSION_PREFIX = 'fudimenu:public-menu-session-counted:';

@@ -22,7 +22,7 @@ export default async function QrPage() {
   }
 
   const menuUrl = `${getBaseUrl()}/m/${tenant.slug}`;
-  const qrUrl = `/api/qr/${tenant.slug}`;
+  const qrImageUrl = `${getBaseUrl()}/api/qr/${tenant.slug}`;
 
   return (
     <>
@@ -40,7 +40,7 @@ export default async function QrPage() {
         <Card className="flex flex-col items-center gap-4">
           <div className="relative h-[280px] w-[280px] overflow-hidden rounded-md border border-ink-100 bg-white">
             <Image
-              src={qrUrl}
+              src={qrImageUrl}
               alt={`QR del menú de ${tenant.name}`}
               fill
               sizes="280px"
@@ -54,7 +54,8 @@ export default async function QrPage() {
           </div>
           <QrShareActions
             menuUrl={menuUrl}
-            downloadUrl={`${qrUrl}?download=1`}
+            qrImageUrl={qrImageUrl}
+            downloadUrl={`${qrImageUrl}?download=1`}
             tenantId={tenant.id}
           />
         </Card>

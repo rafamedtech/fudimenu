@@ -62,7 +62,7 @@ async function isSlugReserved(slug: string, currentTenantId?: string) {
     }),
   ]);
 
-  if (tenant?.id === currentTenantId) return false;
+  if (currentTenantId && tenant?.id === currentTenantId) return false;
   if (tenant) return true;
   return Boolean(history && !history.deletedAt && history.tenantId !== currentTenantId);
 }
