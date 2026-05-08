@@ -1,5 +1,5 @@
 'use client';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { Toggle } from '@/components/ui/toggle';
@@ -14,12 +14,14 @@ interface StockToggleProps {
 
 export function StockToggle({ itemId, initial }: StockToggleProps) {
   const locale = useLocale();
+  const t = useTranslations('menu');
   const [available, setAvailable] = useState(initial);
   const [isPending, startTransition] = useTransition();
 
   function handleChange(next: boolean) {
     const previous = available;
     setAvailable(next);
+    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) navigator.vibrate(10);
     track('stock_toggled', { itemId, available: next });
     startTransition(async () => {
       try {
@@ -30,7 +32,7 @@ export function StockToggle({ itemId, initial }: StockToggleProps) {
           return;
         }
 
-        toast.success(next ? 'Disponible' : 'Marcado agotado');
+        toast.success(next ? t('available') : t('soldOut'));
       } catch (err) {
         setAvailable(previous);
         toast.error(toUserMessage(err, locale));
@@ -38,7 +40,7 @@ export function StockToggle({ itemId, initial }: StockToggleProps) {
     });
   }
 
-  return <Toggle checked={available} onChange={handleChange} disabled={isPending} ariaLabel="Disponible" />;
+  return <Toggle checked={available} onChange={handleChange} disabled={isPending} ariaLabel={t('available')} />;
 }
 
 function actionErrorToApiError(code: string) {

@@ -1,7 +1,7 @@
 'use client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trash2 } from 'lucide-react';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
@@ -42,6 +42,7 @@ const DESCRIPTION_MAX_CHARS = 500;
 
 export function ItemEditorForm({ initial, categories, sectionId }: Props) {
   const locale = useLocale();
+  const t = useTranslations('menu');
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isStockPending, startStockTransition] = useTransition();
@@ -191,7 +192,7 @@ export function ItemEditorForm({ initial, categories, sectionId }: Props) {
     if (typeof navigator !== 'undefined' && 'vibrate' in navigator) navigator.vibrate(10);
 
     if (!initial?.id) {
-      toast.success(next ? 'Disponible' : 'Marcado agotado');
+      toast.success(next ? t('available') : t('soldOut'));
       return;
     }
 
@@ -205,7 +206,7 @@ export function ItemEditorForm({ initial, categories, sectionId }: Props) {
           return;
         }
 
-        toast.success(next ? 'Disponible' : 'Marcado agotado');
+        toast.success(next ? t('available') : t('soldOut'));
       } catch (err) {
         setStockAvailable(previous);
         toast.error(toUserMessage(err, locale));
