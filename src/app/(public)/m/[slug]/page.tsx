@@ -179,12 +179,14 @@ function PublicMenuContent({
         .filter(({ items: its }) => its.length > 0)
     : [];
 
-  const buildWhatsapp = (itemName: string) =>
+  const buildWhatsapp = (item: MenuItem) =>
     buildWhatsAppOrderUrl({
       phone: tenant.whatsappPhone,
       slug,
-      itemName,
+      itemName: item.name,
       locale: priceLocale === 'en-US' ? 'en' : 'es',
+      restaurantName: tenant.name,
+      price: formatPrice(getItemPrice(item), item.currency, priceLocale),
     });
 
   return (
@@ -262,7 +264,7 @@ function PublicMenuContent({
                   <PublicMenuItemCard
                     key={item.id}
                     item={item}
-                    whatsappHref={buildWhatsapp(item.name)}
+                    whatsappHref={buildWhatsapp(item)}
                     categoryName={
                       item.categoryId ? (categoryNamesById.get(item.categoryId) ?? '') : t('otherCategory')
                     }
@@ -292,7 +294,7 @@ function PublicMenuContent({
                           <PublicMenuItemCard
                             key={item.id}
                             item={item}
-                            whatsappHref={buildWhatsapp(item.name)}
+                            whatsappHref={buildWhatsapp(item)}
                             categoryName={category.name}
                             priceLocale={priceLocale}
                           />
@@ -310,7 +312,7 @@ function PublicMenuContent({
                       <PublicMenuItemCard
                         key={item.id}
                         item={item}
-                        whatsappHref={buildWhatsapp(item.name)}
+                        whatsappHref={buildWhatsapp(item)}
                         categoryName={category.name}
                         priceLocale={priceLocale}
                       />
