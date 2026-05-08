@@ -8,7 +8,7 @@ import { buildWhatsAppOrderUrl } from '@/lib/whatsapp';
 import { menuService } from '@/server/services/menu.service';
 import { PublicMenuLanguageSwitcher, PublicMenuPwaWrapper } from './public-menu-pwa-wrapper';
 import type { Metadata } from 'next';
-import type { Category, MenuItem, Tenant } from '@/types/domain';
+import type { Category, MenuItem, MenuSection, Tenant } from '@/types/domain';
 
 export const revalidate = 60;
 const OTHER_CATEGORY_NAME = 'Otros';
@@ -95,27 +95,50 @@ function PublicMenuItemCard({
 function PublicMenuContent({
   slug,
   tenant,
+  sections,
   categories,
   items,
   priceLocale,
 }: {
   slug: string;
   tenant: Tenant;
+  sections: MenuSection[];
   categories: Category[];
   items: MenuItem[];
   priceLocale: string;
 }) {
   const t = useTranslations('menu');
 
-  const categoryNamesById = new Map(categories.map((category) => [category.id, category.name]));
+  const categoryNamesById = new Map(categories.map((c) => [c.id, c.name]));
   const dailySpecials = items.filter((item) => item.isSpecialToday);
   const regularItems = items.filter((item) => !item.isSpecialToday);
+
+  const hasSections = sections.length > 0;
+
+  // Section → category → items grouping
+  const sectionedMenu = hasSections
+    ? sections
+        .filter((s) => s.isVisible)
+        .map((section) => ({
+          section,
+          groups: categories
+            .filter((c) => c.sectionId === section.id && c.isVisible)
+            .map((category) => ({
+              category,
+              items: regularItems.filter((i) => i.categoryId === category.id),
+            }))
+            .filter(({ items: its }) => its.length > 0),
+        }))
+        .filter(({ groups }) => groups.length > 0)
+    : [];
+
+  // Legacy fallback: flat category grouping (no sections)
   const uncategorizedItems = regularItems.filter((item) => item.categoryId === null);
   const otherCategory = categories.find(
-    (category) => category.name.trim().toLocaleLowerCase() === OTHER_CATEGORY_NAME.toLocaleLowerCase(),
+    (c) => c.name.trim().toLocaleLowerCase() === OTHER_CATEGORY_NAME.toLocaleLowerCase(),
   );
   const visibleCategories =
-    uncategorizedItems.length > 0 && !otherCategory
+    !hasSections && uncategorizedItems.length > 0 && !otherCategory
       ? [
           ...categories,
           {
@@ -124,18 +147,26 @@ function PublicMenuContent({
             name: t('otherCategory'),
             sortOrder: 999,
             isVisible: true,
-          },
+          } as Category,
         ]
       : categories;
+  const itemsByCategory = !hasSections
+    ? visibleCategories
+        .map((cat) => ({
+          category: cat,
+          items: regularItems
+            .filter((item) => item.categoryId === cat.id)
+            .concat(
+              cat.id === otherCategory?.id || (cat.id === 'uncategorized' && !otherCategory)
+                ? uncategorizedItems
+                : [],
+            ),
+        }))
+        .filter(({ items: its }) => its.length > 0)
+    : [];
 
-  const itemsByCategory = visibleCategories.map((cat) => ({
-    category: cat,
-    items: regularItems.filter((item) => item.categoryId === cat.id).concat(
-      cat.id === otherCategory?.id || (cat.id === 'uncategorized' && !otherCategory)
-        ? uncategorizedItems
-        : [],
-    ),
-  })).filter(({ items }) => items.length > 0);
+  const buildWhatsapp = (itemName: string) =>
+    buildWhatsAppOrderUrl({ phone: tenant.whatsappPhone, slug, itemName });
 
   return (
     <PublicMenuPwaWrapper slug={slug}>
@@ -175,15 +206,25 @@ function PublicMenuContent({
               {t('dailySpecials')}
             </a>
           )}
-          {itemsByCategory.map(({ category }) => (
-            <a
-              key={category.id}
-              href={`#cat-${category.id}`}
-              className="whitespace-nowrap rounded-full bg-white px-4 py-2 text-sm font-semibold text-ink-700 shadow-sm"
-            >
-              {category.name}
-            </a>
-          ))}
+          {hasSections
+            ? sectionedMenu.map(({ section }) => (
+                <a
+                  key={section.id}
+                  href={`#sec-${section.id}`}
+                  className="whitespace-nowrap rounded-full bg-white px-4 py-2 text-sm font-semibold text-ink-700 shadow-sm"
+                >
+                  {section.name}
+                </a>
+              ))
+            : itemsByCategory.map(({ category }) => (
+                <a
+                  key={category.id}
+                  href={`#cat-${category.id}`}
+                  className="whitespace-nowrap rounded-full bg-white px-4 py-2 text-sm font-semibold text-ink-700 shadow-sm"
+                >
+                  {category.name}
+                </a>
+              ))}
         </nav>
 
         <div className="flex flex-col gap-8 px-4 pt-4">
@@ -195,13 +236,9 @@ function PublicMenuContent({
                   <PublicMenuItemCard
                     key={item.id}
                     item={item}
-                    whatsappHref={buildWhatsAppOrderUrl({
-                      phone: tenant.whatsappPhone,
-                      slug,
-                      itemName: item.name,
-                    })}
+                    whatsappHref={buildWhatsapp(item.name)}
                     categoryName={
-                      item.categoryId ? categoryNamesById.get(item.categoryId) ?? '' : t('otherCategory')
+                      item.categoryId ? (categoryNamesById.get(item.categoryId) ?? '') : t('otherCategory')
                     }
                     priceLocale={priceLocale}
                   />
@@ -210,26 +247,51 @@ function PublicMenuContent({
             </section>
           )}
 
-          {itemsByCategory.map(({ category, items: catItems }) => (
-            <section key={category.id} id={`cat-${category.id}`}>
-              <h2 className="mb-3 text-xl font-bold">{category.name}</h2>
-              <div className="flex flex-col gap-3">
-                {catItems.map((item) => (
-                  <PublicMenuItemCard
-                    key={item.id}
-                    item={item}
-                    whatsappHref={buildWhatsAppOrderUrl({
-                      phone: tenant.whatsappPhone,
-                      slug,
-                      itemName: item.name,
-                    })}
-                    categoryName={category.name}
-                    priceLocale={priceLocale}
-                  />
-                ))}
-              </div>
-            </section>
-          ))}
+          {hasSections
+            ? sectionedMenu.map(({ section, groups }) => (
+                <section key={section.id} id={`sec-${section.id}`}>
+                  <div
+                    className="mb-3 rounded-lg px-4 py-3"
+                    style={{ backgroundColor: section.accentColor }}
+                  >
+                    <h2 className="text-2xl font-extrabold text-ink-900">{section.name}</h2>
+                  </div>
+                  {groups.map(({ category, items: catItems }) => (
+                    <div key={category.id} className="mb-4">
+                      <h3 className="mb-2 px-1 text-base font-bold text-ink-700">
+                        {category.name}
+                      </h3>
+                      <div className="flex flex-col gap-3">
+                        {catItems.map((item) => (
+                          <PublicMenuItemCard
+                            key={item.id}
+                            item={item}
+                            whatsappHref={buildWhatsapp(item.name)}
+                            categoryName={category.name}
+                            priceLocale={priceLocale}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </section>
+              ))
+            : itemsByCategory.map(({ category, items: catItems }) => (
+                <section key={category.id} id={`cat-${category.id}`}>
+                  <h2 className="mb-3 text-xl font-bold">{category.name}</h2>
+                  <div className="flex flex-col gap-3">
+                    {catItems.map((item) => (
+                      <PublicMenuItemCard
+                        key={item.id}
+                        item={item}
+                        whatsappHref={buildWhatsapp(item.name)}
+                        categoryName={category.name}
+                        priceLocale={priceLocale}
+                      />
+                    ))}
+                  </div>
+                </section>
+              ))}
         </div>
 
         {tenant.plan === 'free' && (
@@ -247,7 +309,7 @@ export default async function PublicMenuPage({ params }: Props) {
   const tenant = await menuService.getTenantBySlug(slug);
   if (!tenant) notFound();
 
-  const [{ categories, items }, locale] = await Promise.all([
+  const [{ sections, categories, items }, locale] = await Promise.all([
     menuService.getMenuByTenantId(tenant.id),
     getLocale(),
   ]);
@@ -256,6 +318,7 @@ export default async function PublicMenuPage({ params }: Props) {
     <PublicMenuContent
       slug={slug}
       tenant={tenant}
+      sections={sections}
       categories={categories}
       items={items}
       priceLocale={locale === 'en' ? 'en-US' : 'es-MX'}

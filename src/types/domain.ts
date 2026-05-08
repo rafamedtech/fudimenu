@@ -17,10 +17,23 @@ export type Tenant = {
   createdAt: string;
 };
 
-export type Category = {
+export type MenuSection = {
   id: string;
   tenantId: string;
   name: string;
+  coverImageUrl: string | null;
+  accentColor: string;
+  sortOrder: number;
+  isVisible: boolean;
+  createdAt: string;
+};
+
+export type Category = {
+  id: string;
+  tenantId: string;
+  sectionId: string | null;
+  name: string;
+  coverImageUrl: string | null;
   sortOrder: number;
   isVisible: boolean;
 };

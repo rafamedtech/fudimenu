@@ -1,4 +1,4 @@
-import type { Category, MenuItem, Tenant } from '@/types/domain';
+import type { Category, MenuSection, MenuItem, Tenant } from '@/types/domain';
 
 export const mockTenant: Tenant = {
   id: 'tnt_demo',
@@ -15,10 +15,17 @@ export const mockTenant: Tenant = {
   createdAt: new Date().toISOString(),
 };
 
+export const mockSections: MenuSection[] = [
+  { id: 'sec_1', tenantId: 'tnt_demo', name: 'Desayunos', coverImageUrl: null, accentColor: '#FFF8E7', sortOrder: 0, isVisible: true, createdAt: new Date().toISOString() },
+  { id: 'sec_2', tenantId: 'tnt_demo', name: 'Comidas', coverImageUrl: null, accentColor: '#E8F5E9', sortOrder: 1, isVisible: true, createdAt: new Date().toISOString() },
+  { id: 'sec_3', tenantId: 'tnt_demo', name: 'Cenas', coverImageUrl: null, accentColor: '#EDE7F6', sortOrder: 2, isVisible: true, createdAt: new Date().toISOString() },
+  { id: 'sec_4', tenantId: 'tnt_demo', name: 'Bebidas', coverImageUrl: null, accentColor: '#E3F2FD', sortOrder: 3, isVisible: true, createdAt: new Date().toISOString() },
+];
+
 export const mockCategories: Category[] = [
-  { id: 'cat_1', tenantId: 'tnt_demo', name: 'Tacos', sortOrder: 0, isVisible: true },
-  { id: 'cat_2', tenantId: 'tnt_demo', name: 'Bebidas', sortOrder: 1, isVisible: true },
-  { id: 'cat_3', tenantId: 'tnt_demo', name: 'Postres', sortOrder: 2, isVisible: true },
+  { id: 'cat_1', tenantId: 'tnt_demo', sectionId: 'sec_2', name: 'Tacos', coverImageUrl: null, sortOrder: 0, isVisible: true },
+  { id: 'cat_2', tenantId: 'tnt_demo', sectionId: 'sec_4', name: 'Bebidas', coverImageUrl: null, sortOrder: 1, isVisible: true },
+  { id: 'cat_3', tenantId: 'tnt_demo', sectionId: 'sec_3', name: 'Postres', coverImageUrl: null, sortOrder: 2, isVisible: true },
 ];
 
 export const mockItems: MenuItem[] = [

@@ -1,7 +1,8 @@
 import 'server-only';
 import { getMenuRepository } from '@/server/repositories/get-repository';
 import type { MenuData } from '@/server/repositories/menu.repository';
-import type { MenuItem, Tenant } from '@/types/domain';
+import type { MenuItem, MenuSection, Tenant } from '@/types/domain';
+import type { SectionInput } from '@/lib/validators/section.schema';
 
 export const menuService = {
   async getTenantBySlug(slug: string): Promise<Tenant | null> {
@@ -42,5 +43,17 @@ export const menuService = {
 
   async upsertItem(tenantId: string, input: Partial<MenuItem>): Promise<MenuItem> {
     return (await getMenuRepository()).upsertItem(tenantId, input);
+  },
+
+  async upsertSection(_tenantId: string, _input: SectionInput): Promise<MenuSection> {
+    throw new Error('not implemented');
+  },
+
+  async deleteSection(_tenantId: string, _sectionId: string): Promise<void> {
+    throw new Error('not implemented');
+  },
+
+  async reorderSections(_tenantId: string, _sectionIds: string[]): Promise<void> {
+    throw new Error('not implemented');
   },
 };

@@ -1,12 +1,8 @@
-import { cookies } from 'next/headers';
 import Link from 'next/link';
-import { notFound, redirect } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import {
-  REFERRAL_COOKIE,
-  REFERRAL_COOKIE_MAX_AGE,
-  referralService,
-} from '@/server/services/referral.service';
+import { startReferralSignupAction } from '@/server/actions/referral.actions';
+import { referralService } from '@/server/services/referral.service';
 
 type ReferralPageProps = {
   params: Promise<{
@@ -36,31 +32,6 @@ export default async function ReferralLandingPage({ params }: ReferralPageProps)
   const landing = referral;
   const signupUrl = getSignupUrl(landing.code, landing.restaurantSlug);
 
-  async function startSignupAction() {
-    'use server';
-
-    const cookieStore = await cookies();
-    cookieStore.set(
-      REFERRAL_COOKIE,
-      encodeURIComponent(
-        JSON.stringify({
-          code: landing.code,
-          referrerId: landing.referrerId,
-          restaurantSlug: landing.restaurantSlug,
-        }),
-      ),
-      {
-        httpOnly: true,
-        maxAge: REFERRAL_COOKIE_MAX_AGE,
-        path: '/',
-        sameSite: 'lax',
-        secure: process.env.NODE_ENV === 'production',
-      },
-    );
-
-    redirect(signupUrl);
-  }
-
   return (
     <main className="mx-auto flex min-h-dvh max-w-md flex-col justify-center px-6 py-10">
       <div className="rounded-md border-[1.5px] border-ink-100 bg-white p-6 shadow-md">
@@ -73,7 +44,11 @@ export default async function ReferralLandingPage({ params }: ReferralPageProps)
           especiales desde cualquier QR.
         </p>
 
-        <form action={startSignupAction} className="mt-6">
+        <form action={startReferralSignupAction} className="mt-6">
+          <input type="hidden" name="code" value={landing.code} />
+          <input type="hidden" name="referrerId" value={landing.referrerId} />
+          <input type="hidden" name="restaurantSlug" value={landing.restaurantSlug} />
+          <input type="hidden" name="signupUrl" value={signupUrl} />
           <Button type="submit" size="lg" className="w-full">
             Crear mi menu gratis
           </Button>

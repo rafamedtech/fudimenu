@@ -1,5 +1,5 @@
 import 'server-only';
-import { mockCategories, mockItems, mockTenant } from '@/lib/mock/data';
+import { mockCategories, mockItems, mockSections, mockTenant } from '@/lib/mock/data';
 import { sanitizePlainText } from '@/lib/sanitize';
 import type { IMenuRepository, MenuData } from '@/server/repositories/menu.repository';
 import type { Category, MenuItem, Tenant } from '@/types/domain';
@@ -34,6 +34,7 @@ export class MockMenuRepository implements IMenuRepository {
 
     return {
       tenant: cloneTenant(this.tenant),
+      sections: mockSections.filter((s) => s.tenantId === tenantId).map((s) => ({ ...s })),
       categories: this.categories.map(cloneCategory),
       items: this.items
         .filter((item) => item.tenantId === tenantId && isActive(item))

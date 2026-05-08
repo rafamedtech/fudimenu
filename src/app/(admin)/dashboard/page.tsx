@@ -3,7 +3,7 @@ import { ProFeatureLock, ProBadge } from '@/components/admin/pro-feature-lock';
 import { TenantSwitcher } from '@/components/admin/tenant-switcher';
 import { AppHeader } from '@/components/layout/app-header';
 import { formatPrice } from '@/lib/utils';
-import { setItemSpecialTodayAction } from '@/server/actions/items.actions';
+import { removeItemSpecialTodayFormAction } from '@/server/actions/items.actions';
 import { requireAuth } from '@/server/guards/require-auth';
 import { menuService } from '@/server/services/menu.service';
 import type { MenuItem } from '@/types/domain';
@@ -19,16 +19,6 @@ function greeting() {
 
 function findDailySpecial(items: MenuItem[]) {
   return items.find((item) => item.isAvailable && item.isSpecialToday) ?? null;
-}
-
-async function removeDailySpecialAction(formData: FormData) {
-  'use server';
-
-  const itemId = formData.get('itemId');
-  if (typeof itemId !== 'string' || itemId.length === 0) return;
-
-  const result = await setItemSpecialTodayAction(itemId, false);
-  if (!result.ok) return;
 }
 
 export default async function DashboardPage() {
@@ -118,7 +108,7 @@ export default async function DashboardPage() {
                 >
                   Cambiar
                 </Link>
-                <form action={removeDailySpecialAction} className="flex-1 sm:flex-none">
+                <form action={removeItemSpecialTodayFormAction} className="flex-1 sm:flex-none">
                   <input type="hidden" name="itemId" value={dailySpecial.id} />
                   <button
                     type="submit"

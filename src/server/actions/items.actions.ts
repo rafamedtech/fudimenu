@@ -108,3 +108,10 @@ export async function restoreItemAction(itemId: string) {
   revalidateMenu(ctx);
   return { ok: true as const, item };
 }
+
+export async function removeItemSpecialTodayFormAction(formData: FormData) {
+  const itemId = formData.get('itemId');
+  if (typeof itemId !== 'string' || itemId.length === 0) return;
+
+  await setItemSpecialTodayAction(itemId, false);
+}

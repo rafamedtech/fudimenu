@@ -66,7 +66,9 @@ function mapCategory(row: CategoryRow): Category {
   return {
     id: row.id,
     tenantId: row.tenantId,
+    sectionId: null,
     name: row.name,
+    coverImageUrl: null,
     sortOrder: row.sortOrder,
     isVisible: row.isVisible,
   };
@@ -117,6 +119,7 @@ export class PrismaMenuRepository implements IMenuRepository {
 
     return {
       tenant: mapTenant(tenant),
+      sections: [],
       categories: categories.map(mapCategory),
       items: items.map(mapMenuItem),
     };

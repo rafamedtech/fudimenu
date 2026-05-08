@@ -1,8 +1,9 @@
 import 'server-only';
-import type { Category, MenuItem, Tenant } from '@/types/domain';
+import type { Category, MenuItem, MenuSection, Tenant } from '@/types/domain';
 
 export type MenuData = {
   tenant: Tenant;
+  sections: MenuSection[];
   categories: Category[];
   items: MenuItem[];
 };
