@@ -144,6 +144,33 @@ describe('requireAuth', () => {
     expect(ctx.role).toBe('owner');
   });
 
+  it('redirects to /login when Supabase returns no user', async () => {
+    process.env.USE_MOCKS = 'false';
+    process.env.E2E_TEST_AUTH = 'false';
+
+    mocks.cookies.mockResolvedValue(mockCookieStore({}));
+    mocks.getUser.mockResolvedValue({ data: { user: null } });
+
+    const requireAuth = await loadRequireAuth();
+
+    await expect(requireAuth()).rejects.toThrow('redirect:/login');
+  });
+
+  it('redirects to /onboarding when user has no memberships', async () => {
+    process.env.USE_MOCKS = 'false';
+    process.env.E2E_TEST_AUTH = 'false';
+
+    mocks.cookies.mockResolvedValue(mockCookieStore({}));
+    mocks.getUser.mockResolvedValue({
+      data: { user: { id: 'user-1', email: 'user@example.com' } },
+    });
+    mocks.getPrisma.mockReturnValue({ membership: { findMany: vi.fn(async () => []) } });
+
+    const requireAuth = await loadRequireAuth();
+
+    await expect(requireAuth()).rejects.toThrow('redirect:/onboarding');
+  });
+
   it('creates auth.invalid_tenant_cookie audit when activeTenantId does not match memberships', async () => {
     process.env.USE_MOCKS = 'false';
     process.env.E2E_TEST_AUTH = 'false';

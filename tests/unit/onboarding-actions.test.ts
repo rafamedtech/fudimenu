@@ -104,4 +104,82 @@ describe('onboarding actions', () => {
     expect(mocks.membershipFindFirst).not.toHaveBeenCalled();
     expect(mocks.createFromOnboarding).not.toHaveBeenCalled();
   });
+
+  it('returns existing:true and sets cookie when user already has a membership', async () => {
+    process.env.USE_MOCKS = 'false';
+    process.env.E2E_TEST_AUTH = 'false';
+    mocks.getUser.mockResolvedValue({
+      data: { user: { id: 'user-1', email: 'owner@example.com' } },
+    });
+    mocks.checkRateLimit.mockResolvedValue({ allowed: true, remaining: 4, resetSec: 0 });
+    mocks.membershipFindFirst.mockResolvedValue({
+      tenantId: 'tenant-exists',
+      tenant: { slug: 'taqueria-norte' },
+    });
+
+    const { completeOnboardingAction } = await loadOnboardingActions();
+    const result = await completeOnboardingAction({
+      name: 'Taqueria Norte',
+      cuisine: 'mexicana',
+    });
+
+    expect(result).toEqual({
+      ok: true,
+      existing: true,
+      tenantId: 'tenant-exists',
+      slug: 'taqueria-norte',
+    });
+    expect(mocks.cookieSet).toHaveBeenCalledWith(
+      'activetenantId',
+      'tenant-exists',
+      expect.objectContaining({ httpOnly: true }),
+    );
+    expect(mocks.createFromOnboarding).not.toHaveBeenCalled();
+  });
+
+  it('creates a new tenant and sets cookie for a fresh user', async () => {
+    process.env.USE_MOCKS = 'false';
+    process.env.E2E_TEST_AUTH = 'false';
+    mocks.getUser.mockResolvedValue({
+      data: { user: { id: 'user-new', email: 'new@example.com' } },
+    });
+    mocks.checkRateLimit.mockResolvedValue({ allowed: true, remaining: 4, resetSec: 0 });
+    mocks.membershipFindFirst.mockResolvedValue(null);
+    mocks.createFromOnboarding.mockResolvedValue({ tenantId: 'tenant-new', slug: 'taqueria-nueva' });
+
+    const { completeOnboardingAction } = await loadOnboardingActions();
+    const result = await completeOnboardingAction({
+      name: 'Taqueria Nueva',
+      cuisine: 'mexicana',
+    });
+
+    expect(result).toEqual({ ok: true, existing: false, tenantId: 'tenant-new', slug: 'taqueria-nueva' });
+    expect(mocks.createFromOnboarding).toHaveBeenCalledWith(
+      expect.objectContaining({ userId: 'user-new', name: 'Taqueria Nueva', cuisine: 'mexicana' }),
+    );
+    expect(mocks.cookieSet).toHaveBeenCalledWith(
+      'activetenantId',
+      'tenant-new',
+      expect.objectContaining({ httpOnly: true }),
+    );
+  });
+
+  it('createSecondTenantAction creates a tenant even when membership exists', async () => {
+    process.env.USE_MOCKS = 'false';
+    process.env.E2E_TEST_AUTH = 'false';
+    mocks.getUser.mockResolvedValue({
+      data: { user: { id: 'user-1', email: 'owner@example.com' } },
+    });
+    mocks.createFromOnboarding.mockResolvedValue({ tenantId: 'tenant-2', slug: 'taqueria-2' });
+
+    const { createSecondTenantAction } = await loadOnboardingActions();
+    const result = await createSecondTenantAction({ name: 'Taqueria 2', cuisine: 'pizza' });
+
+    expect(result).toEqual({ ok: true, existing: false, tenantId: 'tenant-2', slug: 'taqueria-2' });
+    expect(mocks.cookieSet).toHaveBeenCalledWith(
+      'activetenantId',
+      'tenant-2',
+      expect.objectContaining({ httpOnly: true }),
+    );
+  });
 });

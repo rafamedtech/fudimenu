@@ -147,11 +147,17 @@ export const tenantService = {
         },
       });
 
+      const section = await tx.menuSection.create({
+        data: { tenantId, name: 'Menú', sortOrder: 0 },
+        select: { id: true },
+      });
+
       const categories = await Promise.all(
         starterCategories.map((category) =>
           tx.category.create({
             data: {
               tenantId,
+              sectionId: section.id,
               name: category.name,
               sortOrder: category.sortOrder,
             },

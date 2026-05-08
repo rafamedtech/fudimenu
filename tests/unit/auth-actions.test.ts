@@ -162,4 +162,51 @@ describe('auth actions', () => {
     expect(mocks.cookieDelete).toHaveBeenCalledWith('activetenantId');
     expect(mocks.signOut).toHaveBeenCalled();
   });
+
+  it('sends magic link and returns ok when Supabase succeeds', async () => {
+    process.env.USE_MOCKS = 'false';
+    mocks.checkRateLimit
+      .mockResolvedValueOnce({ allowed: true, remaining: 4, resetSec: 0 })
+      .mockResolvedValueOnce({ allowed: true, remaining: 19, resetSec: 0 });
+    mocks.signInWithOtp.mockResolvedValue({ error: null });
+
+    const { signInWithMagicLinkAction } = await loadAuthActions();
+    const formData = new FormData();
+    formData.set('email', 'owner@example.com');
+    formData.set('next', '/dashboard');
+    const result = await signInWithMagicLinkAction(formData);
+
+    expect(result).toEqual({ ok: true, message: 'Mandamos un link a tu correo 🔮' });
+    expect(mocks.signInWithOtp).toHaveBeenCalledWith({
+      email: 'owner@example.com',
+      options: expect.objectContaining({ emailRedirectTo: expect.stringContaining('/auth/callback?next=') }),
+    });
+  });
+
+  it('passes next param through magic link emailRedirectTo', async () => {
+    process.env.USE_MOCKS = 'false';
+    mocks.checkRateLimit
+      .mockResolvedValueOnce({ allowed: true, remaining: 4, resetSec: 0 })
+      .mockResolvedValueOnce({ allowed: true, remaining: 19, resetSec: 0 });
+    mocks.signInWithOtp.mockResolvedValue({ error: null });
+
+    const { signInWithMagicLinkAction } = await loadAuthActions();
+    const formData = new FormData();
+    formData.set('email', 'owner@example.com');
+    formData.set('next', '/menu');
+    await signInWithMagicLinkAction(formData);
+
+    const call = mocks.signInWithOtp.mock.calls[0]?.[0];
+    expect(call.options.emailRedirectTo).toContain('%2Fmenu');
+  });
+
+  it('skips Supabase signOut in mock mode', async () => {
+    process.env.USE_MOCKS = 'true';
+
+    const { signOutAction } = await loadAuthActions();
+    const result = await signOutAction();
+
+    expect(result.ok).toBe(true);
+    expect(mocks.signOut).not.toHaveBeenCalled();
+  });
 });

@@ -7,6 +7,7 @@ const mocks = vi.hoisted(() => ({
   tx: {
     tenant: { create: vi.fn() },
     membership: { create: vi.fn() },
+    menuSection: { create: vi.fn(async () => ({ id: 'section-1' })) },
     category: {
       create: vi.fn(async ({ data }: { data: { name: string } }) => ({
         id: `cat-${data.name}`,
@@ -67,29 +68,32 @@ describe('tenantService', () => {
       userId: 'user-1',
       email: 'owner@example.com',
     });
+    expect(mocks.tx.menuSection.create).toHaveBeenCalledWith(
+      expect.objectContaining({ data: expect.objectContaining({ name: 'Menú', sortOrder: 0 }) }),
+    );
     expect(mocks.tx.category.create).toHaveBeenCalledTimes(4);
     expect(mocks.tx.category.create).toHaveBeenNthCalledWith(
       1,
       expect.objectContaining({
-        data: expect.objectContaining({ name: 'Tacos', sortOrder: 0 }),
+        data: expect.objectContaining({ name: 'Tacos', sortOrder: 0, sectionId: 'section-1' }),
       }),
     );
     expect(mocks.tx.category.create).toHaveBeenNthCalledWith(
       2,
       expect.objectContaining({
-        data: expect.objectContaining({ name: 'Bebidas', sortOrder: 1 }),
+        data: expect.objectContaining({ name: 'Bebidas', sortOrder: 1, sectionId: 'section-1' }),
       }),
     );
     expect(mocks.tx.category.create).toHaveBeenNthCalledWith(
       3,
       expect.objectContaining({
-        data: expect.objectContaining({ name: 'Postres', sortOrder: 2 }),
+        data: expect.objectContaining({ name: 'Postres', sortOrder: 2, sectionId: 'section-1' }),
       }),
     );
     expect(mocks.tx.category.create).toHaveBeenNthCalledWith(
       4,
       expect.objectContaining({
-        data: expect.objectContaining({ name: 'Otros', sortOrder: 3 }),
+        data: expect.objectContaining({ name: 'Otros', sortOrder: 3, sectionId: 'section-1' }),
       }),
     );
     expect(mocks.tx.menuItem.create).toHaveBeenCalledWith(

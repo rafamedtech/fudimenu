@@ -68,4 +68,30 @@ describe('auth callback', () => {
     expect(response.headers.get('set-cookie')).toBeNull();
     expect(mocks.findFirst).not.toHaveBeenCalled();
   });
+
+  it('redirects to login?error=auth when no code is present', async () => {
+    const GET = await loadCallback();
+    const response = await GET(new NextRequest('http://localhost/auth/callback'));
+
+    expect(response.headers.get('location')).toBe('http://localhost/login?error=auth');
+    expect(mocks.exchangeCodeForSession).not.toHaveBeenCalled();
+  });
+
+  it('deletes the active tenant cookie when user has no membership (new user)', async () => {
+    mocks.exchangeCodeForSession.mockResolvedValue({ error: null });
+    mocks.getUser.mockResolvedValue({
+      data: { user: { id: 'user-new', email: 'new@example.com' } },
+    });
+    mocks.findFirst.mockResolvedValue(null);
+
+    const GET = await loadCallback();
+    const response = await GET(
+      new NextRequest('http://localhost/auth/callback?code=ok&next=/dashboard'),
+    );
+
+    expect(response.headers.get('location')).toBe('http://localhost/dashboard');
+    const setCookie = response.headers.get('set-cookie') ?? '';
+    expect(setCookie).toMatch(/activetenantId=;/);
+    expect(setCookie).toMatch(/Expires=Thu, 01 Jan 1970/i);
+  });
 });
