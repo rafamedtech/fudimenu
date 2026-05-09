@@ -19,6 +19,13 @@ const CookieConsent = dynamic(
   { ssr: false },
 );
 
+// Deferred: loads posthog + fetch tracker after hydration, not on initial paint.
+// Must live in a Client Component — `ssr: false` is not allowed in Server Components.
+export const PublicMenuTracker = dynamic(
+  () => import('@/components/public/public-menu-tracking').then((m) => m.PublicMenuTracker),
+  { ssr: false },
+);
+
 const PUBLIC_MENU_VISITS_PREFIX = 'fudimenu:public-menu-visits:';
 const PUBLIC_MENU_SESSION_PREFIX = 'fudimenu:public-menu-session-counted:';
 const PUBLIC_MENU_DISMISSED_PREFIX = 'fudimenu:public-menu-pwa-dismissed:';

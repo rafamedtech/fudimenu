@@ -131,8 +131,7 @@ describe('createBillingCheckoutAction', () => {
     const { createBillingCheckoutAction } = await loadActions();
     await createBillingCheckoutAction({ plan: 'pro', cycle: 'monthly', method: 'card' });
 
-    const call = // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (mocks.checkoutSessionsCreate.mock.calls as any)[0][0];
+    const call = (mocks.checkoutSessionsCreate.mock.calls as any)[0][0];
     expect(call.line_items[0]).toHaveProperty('price_data');
     expect(call.line_items[0]).not.toHaveProperty('price');
   });
@@ -143,8 +142,7 @@ describe('createBillingCheckoutAction', () => {
     const { createBillingCheckoutAction } = await loadActions();
     await createBillingCheckoutAction({ plan: 'pro', cycle: 'annual', method: 'card' });
 
-    const call = // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (mocks.checkoutSessionsCreate.mock.calls as any)[0][0];
+    const call = (mocks.checkoutSessionsCreate.mock.calls as any)[0][0];
     const unitAmount = call.line_items[0].price_data.unit_amount;
     // Pro: 14900 * 12 * 0.75 = 134100
     expect(unitAmount).toBe(Math.round(14900 * 12 * 0.75));
@@ -181,8 +179,7 @@ describe('createBillingCheckoutAction', () => {
     const { createBillingCheckoutAction } = await loadActions();
     await createBillingCheckoutAction({ plan: 'pro', method: 'cash' });
 
-    const call = // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (mocks.checkoutSessionsCreate.mock.calls as any)[0][0];
+    const call = (mocks.checkoutSessionsCreate.mock.calls as any)[0][0];
     expect(call.line_items[0]).toHaveProperty('price_data');
   });
 
@@ -199,8 +196,7 @@ describe('createBillingCheckoutAction', () => {
       cycle: 'annual',
       method: 'card',
     });
-    const call = // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (mocks.checkoutSessionsCreate.mock.calls as any)[0][0];
+    const call = (mocks.checkoutSessionsCreate.mock.calls as any)[0][0];
     expect(call.metadata).toEqual(expected);
     expect(call.subscription_data.metadata).toEqual(expected);
   });

@@ -1,6 +1,6 @@
-import dynamic from 'next/dynamic';
 import { notFound, permanentRedirect } from 'next/navigation';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { getCategoryEmoji } from '@/lib/category-placeholder';
@@ -8,18 +8,12 @@ import { formatPrice } from '@/lib/utils';
 import { buildWhatsAppOrderUrl } from '@/lib/whatsapp';
 import { menuService } from '@/server/services/menu.service';
 import { getPrisma } from '@/lib/db/prisma';
-import { PublicMenuLanguageSwitcher, PublicMenuPwaWrapper } from './public-menu-pwa-wrapper';
+import { PublicMenuLanguageSwitcher, PublicMenuPwaWrapper, PublicMenuTracker } from './public-menu-pwa-wrapper';
 import type { Metadata } from 'next';
 import type { Category, MenuItem, MenuSection, Tenant } from '@/types/domain';
 
 // Node.js runtime (not Edge) — Prisma requires Node.js APIs.
 export const revalidate = 60;
-
-// Deferred: loads posthog + fetch tracker after hydration, not on initial paint.
-const PublicMenuTracker = dynamic(
-  () => import('@/components/public/public-menu-tracking').then((m) => m.PublicMenuTracker),
-  { ssr: false },
-);
 const OTHER_CATEGORY_NAME = 'Otros';
 
 interface Props {
@@ -325,9 +319,9 @@ function PublicMenuContent({
         {tenant.plan === 'free' && (
           <footer className="mt-12 text-center text-xs text-ink-500">
             {t('madeWith')}{' '}
-            <a href="/" className="font-bold text-mostaza-500 hover:underline">
+            <Link href="/" className="font-bold text-mostaza-500 hover:underline">
               FudiMenu
-            </a>
+            </Link>
           </footer>
         )}
       </main>
