@@ -164,6 +164,21 @@ describe('onboarding actions', () => {
     );
   });
 
+  it('redirects to /login when user is not authenticated', async () => {
+    process.env.USE_MOCKS = 'false';
+    process.env.E2E_TEST_AUTH = 'false';
+    mocks.getUser.mockResolvedValue({ data: { user: null } });
+    mocks.checkRateLimit.mockResolvedValue({ allowed: true, remaining: 4, resetSec: 0 });
+    mocks.membershipFindFirst.mockResolvedValue(null);
+
+    const { completeOnboardingAction } = await loadOnboardingActions();
+
+    await expect(
+      completeOnboardingAction({ name: 'Taqueria', cuisine: 'mexicana' }),
+    ).rejects.toThrow('redirect:/login');
+    expect(mocks.createFromOnboarding).not.toHaveBeenCalled();
+  });
+
   it('createSecondTenantAction creates a tenant even when membership exists', async () => {
     process.env.USE_MOCKS = 'false';
     process.env.E2E_TEST_AUTH = 'false';
