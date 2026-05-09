@@ -12,6 +12,10 @@ jobs:
     env:
       USE_MOCKS: "true"
       NEXT_PUBLIC_APP_URL: "http://localhost:3000"
+      # prisma.config.ts calls env('DIRECT_URL') at load time even for `prisma generate`.
+      # generate does not open a connection; a placeholder satisfies the resolver.
+      DIRECT_URL: "postgresql://ci:ci@localhost:5432/ci"
+      DATABASE_URL: "postgresql://ci:ci@localhost:5432/ci"
     steps:
       - uses: actions/checkout@v4
 
