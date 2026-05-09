@@ -353,49 +353,49 @@ Este doc es **especificación + checklist de auditoría** del MVP. Cada sección
 
 ### 10.1 Stripe Checkout
 
-- [ ] `createBillingCheckoutAction` genera Stripe session
-- [ ] Payment methods: `['card', 'oxxo', 'customer_balance']`
-- [ ] customer_balance config: bank_transfer.type='mx_bank_transfer', requested_address_types=['spei']
-- [ ] success_url + cancel_url respetan `NEXT_PUBLIC_APP_URL`
-- [ ] metadata.tenantId presente para mapping post-pago
+- [x] `createBillingCheckoutAction` genera Stripe session
+- [x] Payment methods: `['card', 'oxxo', 'customer_balance']`
+- [x] customer_balance config: bank_transfer.type='mx_bank_transfer', requested_address_types=['spei']
+- [x] success_url + cancel_url respetan `NEXT_PUBLIC_APP_URL`
+- [x] metadata.tenantId presente para mapping post-pago
 
 ### 10.2 Stripe Customer Portal
 
-- [ ] `createCustomerPortalAction` redirect a Stripe portal
-- [ ] User puede: cancel, update payment method, ver invoices
+- [x] `createCustomerPortalAction` redirect a Stripe portal — gated on stripeCustomerId + stripeSubscriptionId
+- [x] User puede: cancel, update payment method, ver invoices
 
 ### 10.3 Webhook
 
-- [ ] `POST /api/webhooks/stripe` con runtime nodejs
-- [ ] Verify signature con `STRIPE_WEBHOOK_SECRET`
-- [ ] Idempotency vía tabla `webhookEvent` (id+type+processedAt)
-- [ ] Maneja: `checkout.session.completed`, `subscription.updated`, `subscription.deleted`, `invoice.payment_failed`
-- [ ] Actualiza `tenant.plan` según evento
-- [ ] OXXO/SPEI: solo actualiza si `payment_status = 'paid'`
-- [ ] Failed payment: email automático via `billingService.sendPaymentFailedEmail`
-- [ ] Audit log cada evento procesado
+- [x] `POST /api/webhooks/stripe` con runtime nodejs
+- [x] Verify signature con `STRIPE_WEBHOOK_SECRET`
+- [x] Idempotency vía tabla `webhookEvent` (id+type+processedAt)
+- [x] Maneja: `checkout.session.completed`, `subscription.updated`, `subscription.deleted`, `invoice.payment_failed`
+- [x] Actualiza `tenant.plan` según evento
+- [x] OXXO/SPEI: solo actualiza si `payment_status = 'paid'` — async via `payment_intent.succeeded`
+- [x] Failed payment: email automático via `billingService.sendPaymentFailedEmail`
+- [x] Audit log cada evento procesado
 
 ### 10.4 Plan limits enforcement
 
-- [ ] Free: 20 items, 5 secciones, marca FudiMenu visible, sin analytics
-- [ ] Pro: ilimitado, sin marca, analytics
-- [ ] Business: + multi-sucursal (UI deferred)
+- [x] Free: 20 items, 5 secciones, marca FudiMenu visible, sin analytics
+- [x] Pro: ilimitado, sin marca, analytics
+- [x] Business: + multi-sucursal (UI deferred)
 - [ ] Enforcement server-side en mutations
 - [ ] UI muestra upsell contextual al hit límite
 
 ### 10.5 Trial
 
-- [ ] Signup automático trial 14 días Pro
-- [ ] Email D12: "2 días para terminar trial"
-- [ ] Sin tarjeta al final → downgrade Free automático
+- [x] Signup automático trial 14 días Pro
+- [x] Email D12: "2 días para terminar trial"
+- [x] Sin tarjeta al final → downgrade Free automático
 
 ### 10.6 `/settings/billing`
 
-- [ ] Lista 3 planes con features
-- [ ] Plan actual marcado con badge
-- [ ] Toggle mensual/anual con descuento 25% (3m gratis)
-- [ ] Botón "Upgrade" o "Manage" según estado
-- [ ] Métodos pago aceptados visibles (Card, OXXO, SPEI badges)
+- [x] Lista 3 planes con features
+- [x] Plan actual marcado con badge
+- [x] Toggle mensual/anual con descuento 25% (3m gratis)
+- [x] Botón "Upgrade" o "Manage" según estado
+- [x] Métodos pago aceptados visibles — copy en UI + button labels (OXXO/SPEI/card)
 
 ---
 

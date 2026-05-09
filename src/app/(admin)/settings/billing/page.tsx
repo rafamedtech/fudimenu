@@ -14,7 +14,7 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
 
   const tenant = await getPrisma().tenant.findUnique({
     where: { id: ctx.tenantId },
-    select: { stripeCustomerId: true },
+    select: { stripeCustomerId: true, stripeSubscriptionId: true },
   });
 
   return (
@@ -53,6 +53,7 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
         <BillingPlans
           currentPlan={ctx.plan}
           hasStripeCustomer={!!tenant?.stripeCustomerId}
+          hasStripeSubscription={!!tenant?.stripeSubscriptionId}
         />
       </main>
     </>
