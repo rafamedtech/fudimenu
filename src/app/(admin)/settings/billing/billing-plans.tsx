@@ -36,9 +36,10 @@ function annualSavings(monthlyCents: number) {
 interface Props {
   currentPlan: Plan;
   hasStripeCustomer: boolean;
+  hasStripeSubscription: boolean;
 }
 
-export function BillingPlans({ currentPlan, hasStripeCustomer }: Props) {
+export function BillingPlans({ currentPlan, hasStripeCustomer, hasStripeSubscription }: Props) {
   const [cycle, setCycle] = useState<Cycle>('monthly');
   const plans = [PLAN_CONFIG.free, PLAN_CONFIG.pro, PLAN_CONFIG.business];
 
@@ -146,7 +147,7 @@ export function BillingPlans({ currentPlan, hasStripeCustomer }: Props) {
             </ul>
 
             {/* Actions */}
-            {plan.id === 'free' ? null : isCurrent && hasStripeCustomer ? (
+            {plan.id === 'free' ? null : isCurrent && hasStripeCustomer && hasStripeSubscription ? (
               <form action={createCustomerPortalAction}>
                 <Button type="submit" variant="outline" className="w-full">
                   Administrar suscripción

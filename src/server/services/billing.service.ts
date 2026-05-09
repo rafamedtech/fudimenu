@@ -453,11 +453,9 @@ export const billingService = {
       to: input.email,
       subject: 'Falló el cobro de FudiMenu',
       text: [
-        `Falló el cobro de ${input.tenantName}.`,
+        `No pudimos cobrar la suscripción de ${input.tenantName}.`,
         '',
-        'Falló el cobro, actualiza tu tarjeta.',
-        '',
-        `Actualiza tu método de pago: ${getAppUrl()}/settings/billing`,
+        `Actualiza tu método de pago antes de que tu plan se cancele: ${getAppUrl()}/settings/billing`,
       ].join('\n'),
     });
   },
