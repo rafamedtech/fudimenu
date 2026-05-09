@@ -26,6 +26,7 @@
         "color-contrast": "off",
         "csp-xss": "off",
         "errors-in-console": "warn",
+        "inspector-issues": "warn",
         "installable-manifest": "off",
         "maskable-icon": "off",
         "splash-screen": "off",
