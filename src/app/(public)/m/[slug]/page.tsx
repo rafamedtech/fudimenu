@@ -2,6 +2,7 @@ import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 import { notFound, permanentRedirect } from 'next/navigation';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { getCategoryEmoji } from '@/lib/category-placeholder';
@@ -329,9 +330,9 @@ function PublicMenuContent({
         {tenant.plan === 'free' && (
           <footer className="mt-12 text-center text-xs text-ink-500">
             {t('madeWith')}{' '}
-            <a href="/" className="font-bold text-mostaza-500 hover:underline">
+            <Link href="/" className="font-bold text-mostaza-500 hover:underline">
               FudiMenu
-            </a>
+            </Link>
           </footer>
         )}
       </main>
