@@ -91,7 +91,7 @@ export function BrandSlugInput({ currentSlug }: BrandSlugInputProps) {
         label="Slug publico"
         value={slug}
         onChange={(event) => setSlug(event.target.value)}
-        maxLength={80}
+        maxLength={48}
         autoComplete="off"
         prefix={<Link2 className="h-4 w-4" />}
       />
