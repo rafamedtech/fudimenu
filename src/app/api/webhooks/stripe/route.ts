@@ -155,6 +155,14 @@ async function processEvent(event: Stripe.Event): Promise<ProcessResult> {
       return { tenantId, auditAction: defaultAction };
     }
 
+    case 'charge.succeeded': {
+      const charge = event.data.object as Stripe.Charge;
+      const tenantId = getTenantId(charge.metadata);
+      const paidPlan = getPaidPlan(charge.metadata);
+      if (paidPlan) await updateTenantPlan(tenantId, paidPlan);
+      return { tenantId, auditAction: paidPlan ? 'plan.upgraded' : defaultAction };
+    }
+
     case 'payment_intent.succeeded': {
       const pi = event.data.object as Stripe.PaymentIntent;
       const tenantId = getTenantId(pi.metadata);
