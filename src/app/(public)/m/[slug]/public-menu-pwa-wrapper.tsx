@@ -109,18 +109,19 @@ export function PublicMenuLanguageSwitcher() {
 
 interface PublicMenuPwaWrapperProps {
   slug: string;
+  tenantId: string;
   children: React.ReactNode;
 }
 
-export function PublicMenuPwaWrapper({ slug, children }: PublicMenuPwaWrapperProps) {
+export function PublicMenuPwaWrapper({ slug, tenantId, children }: PublicMenuPwaWrapperProps) {
   return (
     <CookieConsentProvider>
-      <PublicMenuPwaContent slug={slug}>{children}</PublicMenuPwaContent>
+      <PublicMenuPwaContent slug={slug} tenantId={tenantId}>{children}</PublicMenuPwaContent>
     </CookieConsentProvider>
   );
 }
 
-function PublicMenuPwaContent({ slug, children }: PublicMenuPwaWrapperProps) {
+function PublicMenuPwaContent({ slug, tenantId, children }: PublicMenuPwaWrapperProps) {
   const t = useTranslations('menu');
   const { canInstall, isInstalled, promptInstall } = usePwaInstall();
   const consentDecided = useCookieConsentDecided();
@@ -154,6 +155,7 @@ function PublicMenuPwaContent({ slug, children }: PublicMenuPwaWrapperProps) {
 
   return (
     <>
+      <PublicMenuTracker tenantId={tenantId} slug={slug} />
       {children}
       {shouldShowPrompt && (
         <div className="fixed inset-x-0 bottom-0 z-40 animate-fade-in px-4 pb-4">

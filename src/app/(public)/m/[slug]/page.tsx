@@ -1,4 +1,3 @@
-import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 import { notFound, permanentRedirect } from 'next/navigation';
 import Image from 'next/image';
@@ -17,12 +16,6 @@ import type { Category, MenuItem, MenuSection, Tenant } from '@/types/domain';
 // Prisma requires Node.js runtime — Edge is incompatible.
 export const runtime = 'nodejs';
 export const revalidate = 60;
-
-// Deferred: loads posthog + fetch tracker after hydration, not on initial paint.
-const PublicMenuTracker = dynamic(
-  () => import('@/components/public/public-menu-tracking').then((m) => m.PublicMenuTracker),
-  { ssr: false },
-);
 const OTHER_CATEGORY_NAME = 'Otros';
 
 interface Props {
@@ -193,8 +186,7 @@ function PublicMenuContent({
     });
 
   return (
-    <PublicMenuPwaWrapper slug={slug}>
-      <PublicMenuTracker tenantId={tenant.id} slug={slug} />
+    <PublicMenuPwaWrapper slug={slug} tenantId={tenant.id}>
       <main
         className="mx-auto min-h-dvh max-w-md scroll-smooth bg-crema-50 pb-12"
         style={{ ['--brand' as string]: tenant.primaryColor }}
