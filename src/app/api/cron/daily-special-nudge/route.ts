@@ -1,15 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
 import { getPrisma } from '@/lib/db/prisma';
+import { getTodayNudgeWindow, SPECIALS_TIME_ZONE } from '@/lib/specials-time';
 
-const APP_TIME_ZONE = 'America/Tijuana';
 const RESEND_API_URL = 'https://api.resend.com/emails';
 const EMAIL_FROM = 'FudiMenu <noreply@fudimenu.app>';
-
-type LocalDateParts = {
-  year: number;
-  month: number;
-  day: number;
-};
 
 type NudgeRecipient = {
   email: string;
@@ -19,57 +13,6 @@ type NudgeRecipient = {
 
 function authenticateCron(request: Request) {
   return request.headers.get('authorization') === `Bearer ${process.env.CRON_SECRET}`;
-}
-
-function getLocalDateParts(date: Date, timeZone: string): LocalDateParts {
-  const parts = new Intl.DateTimeFormat('en-US', {
-    timeZone,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).formatToParts(date);
-
-  return {
-    year: Number(parts.find((part) => part.type === 'year')?.value),
-    month: Number(parts.find((part) => part.type === 'month')?.value),
-    day: Number(parts.find((part) => part.type === 'day')?.value),
-  };
-}
-
-function getTimeZoneOffsetMs(date: Date, timeZone: string) {
-  const part = new Intl.DateTimeFormat('en-US', {
-    timeZone,
-    timeZoneName: 'longOffset',
-  })
-    .formatToParts(date)
-    .find((item) => item.type === 'timeZoneName')?.value;
-
-  const match = part?.match(/^GMT([+-])(\d{1,2})(?::(\d{2}))?$/);
-  if (!match) return 0;
-
-  const sign = match[1] === '-' ? -1 : 1;
-  const hours = Number(match[2]);
-  const minutes = Number(match[3] ?? '0');
-  return sign * (hours * 60 + minutes) * 60 * 1000;
-}
-
-function localTimeToUtc(
-  { year, month, day }: LocalDateParts,
-  hour: number,
-  minute: number,
-  timeZone: string,
-) {
-  const utcGuess = new Date(Date.UTC(year, month - 1, day, hour, minute));
-  return new Date(utcGuess.getTime() - getTimeZoneOffsetMs(utcGuess, timeZone));
-}
-
-function getTodayNudgeWindow(now = new Date()) {
-  const localDate = getLocalDateParts(now, APP_TIME_ZONE);
-
-  return {
-    startOfDay: localTimeToUtc(localDate, 0, 0, APP_TIME_ZONE),
-    tenAm: localTimeToUtc(localDate, 10, 0, APP_TIME_ZONE),
-  };
 }
 
 async function getUserEmail(userId: string) {
@@ -192,7 +135,7 @@ export async function GET(request: Request) {
     window: {
       startOfDay: startOfDay.toISOString(),
       tenAm: tenAm.toISOString(),
-      timeZone: APP_TIME_ZONE,
+      timeZone: SPECIALS_TIME_ZONE,
     },
   });
 }

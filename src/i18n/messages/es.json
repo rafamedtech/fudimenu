@@ -8,7 +8,17 @@
     "empty": "Aún no hay nada por aquí 👀",
     "error": "Algo no salió. Reintenta.",
     "saved": "✓ Guardado",
-    "offline": "Sin internet — los cambios se guardan al volver"
+    "offline": "Sin internet — los cambios se guardan al volver",
+    "retry": "Reintentar",
+    "backHome": "Volver al inicio"
+  },
+  "errors": {
+    "notFound": "Por aquí no hay nada",
+    "notFoundDesc": "Esta página no existe o se mudó.",
+    "menuUnavailable": "Menú no disponible",
+    "menuUnavailableDesc": "Vuelve pronto.",
+    "kitchenBurned": "Algo se quemó en la cocina",
+    "unexpected": "Error inesperado."
   },
   "menu": {
     "addItem": "Agregar platillo",
@@ -19,6 +29,10 @@
     "orderWhatsApp": "Pedir por WhatsApp",
     "otherCategory": "Otros",
     "madeWith": "Hecho con",
+    "skipToMenu": "Saltar al menú",
+    "pwaPrompt": "Guarda este menú en tu inicio — acceso en 1 tap 📱",
+    "pwaInstall": "Agregar menú a inicio",
+    "pwaClose": "Cerrar sugerencia",
     "language": {
       "label": "Idioma del menú"
     },

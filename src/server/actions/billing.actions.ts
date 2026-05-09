@@ -5,6 +5,7 @@ import Stripe from 'stripe';
 import { z } from 'zod';
 import { PLAN_CONFIG } from '@/config/plans';
 import { getPrisma } from '@/lib/db/prisma';
+import { env } from '@/lib/env';
 import { requireAuth } from '@/server/guards/require-auth';
 import type { Plan } from '@/types/domain';
 
@@ -20,10 +21,7 @@ function getStripe() {
   const secretKey = process.env.STRIPE_SECRET_KEY;
   if (!secretKey) throw new Error('missing_stripe_secret_key');
 
-  stripeClient ??= new Stripe(secretKey, {
-    apiVersion: '2025-02-24.acacia',
-  });
-
+  stripeClient ??= new Stripe(secretKey, { apiVersion: '2025-02-24.acacia' });
   return stripeClient;
 }
 
@@ -31,12 +29,20 @@ function getAppUrl() {
   return process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
 }
 
+function getPriceId(plan: 'pro' | 'business', cycle: 'monthly' | 'annual'): string | null {
+  if (plan === 'pro' && cycle === 'monthly') return env.STRIPE_PRICE_PRO_MONTHLY ?? null;
+  if (plan === 'pro' && cycle === 'annual') return env.STRIPE_PRICE_PRO_ANNUAL ?? null;
+  if (plan === 'business' && cycle === 'monthly') return env.STRIPE_PRICE_BUSINESS_MONTHLY ?? null;
+  if (plan === 'business' && cycle === 'annual') return env.STRIPE_PRICE_BUSINESS_ANNUAL ?? null;
+  return null;
+}
+
 export async function createBillingCheckoutAction(input: unknown) {
   const { plan, cycle, method } = checkoutSchema.parse(input);
   const ctx = await requireAuth();
   const planConfig = PLAN_CONFIG[plan as Plan];
   const appUrl = getAppUrl();
-  const metadata = {
+  const metadata: Record<string, string> = {
     tenantId: ctx.tenantId,
     userId: ctx.userId,
     plan,
@@ -49,11 +55,7 @@ export async function createBillingCheckoutAction(input: unknown) {
     process.env.E2E_STRIPE_CHECKOUT_MOCK === 'true' &&
     process.env.STRIPE_SECRET_KEY?.startsWith('sk_test_')
   ) {
-    await getPrisma().tenant.update({
-      where: { id: ctx.tenantId },
-      data: { plan },
-    });
-
+    await getPrisma().tenant.update({ where: { id: ctx.tenantId }, data: { plan } });
     return {
       ok: true as const,
       url: `${appUrl}/settings/billing?checkout=success&session_id=cs_test_e2e_mock`,
@@ -61,57 +63,70 @@ export async function createBillingCheckoutAction(input: unknown) {
   }
 
   const stripe = getStripe();
-  let tenant: { stripeCustomerId: string | null } | null = null;
+  let existingCustomerId: string | null = null;
   let canPersistCustomer = true;
+
   try {
-    tenant = await getPrisma().tenant.findUnique({
+    const tenant = await getPrisma().tenant.findUnique({
       where: { id: ctx.tenantId },
       select: { stripeCustomerId: true },
     });
+    existingCustomerId = tenant?.stripeCustomerId ?? null;
   } catch {
     canPersistCustomer = false;
   }
 
-  const customerId = tenant?.stripeCustomerId ?? (await stripe.customers.create({
-    email: ctx.email,
-    metadata,
-  })).id;
+  const customerId =
+    existingCustomerId ??
+    (
+      await stripe.customers.create(
+        { email: ctx.email, metadata },
+        { idempotencyKey: `tenant:${ctx.tenantId}:customer` },
+      )
+    ).id;
 
-  if (!tenant?.stripeCustomerId && canPersistCustomer) {
+  if (!existingCustomerId && canPersistCustomer) {
     await getPrisma().tenant.update({
       where: { id: ctx.tenantId },
       data: { stripeCustomerId: customerId },
     });
   }
 
-  const unitAmount = cycle === 'annual'
-    ? Math.round(planConfig.priceCents * 12 * 0.75)
-    : planConfig.priceCents;
+  const unitAmount =
+    cycle === 'annual'
+      ? Math.round(planConfig.priceCents * 12 * 0.75)
+      : planConfig.priceCents;
+
   const successUrl = `${appUrl}/settings/billing?checkout=success&session_id={CHECKOUT_SESSION_ID}`;
   const cancelUrl = `${appUrl}/settings/billing?checkout=cancelled`;
 
   const sessionParams: Stripe.Checkout.SessionCreateParams =
     method === 'card'
-      ? {
-          mode: 'subscription',
-          payment_method_types: ['card'],
-          customer: customerId,
-          line_items: [
-            {
-              price_data: {
-                currency: 'mxn',
-                unit_amount: unitAmount,
-                recurring: { interval: cycle === 'annual' ? 'year' : 'month' },
-                product_data: { name: `FudiMenu ${planConfig.name}` },
-              },
-              quantity: 1,
-            },
-          ],
-          metadata,
-          subscription_data: { metadata },
-          success_url: successUrl,
-          cancel_url: cancelUrl,
-        }
+      ? (() => {
+          const priceId = getPriceId(plan, cycle);
+          return {
+            mode: 'subscription',
+            payment_method_types: ['card'],
+            customer: customerId,
+            line_items: priceId
+              ? [{ price: priceId, quantity: 1 }]
+              : [
+                  {
+                    price_data: {
+                      currency: 'mxn',
+                      unit_amount: unitAmount,
+                      recurring: { interval: cycle === 'annual' ? 'year' : 'month' },
+                      product_data: { name: `FudiMenu ${planConfig.name}` },
+                    },
+                    quantity: 1,
+                  },
+                ],
+            metadata,
+            subscription_data: { metadata },
+            success_url: successUrl,
+            cancel_url: cancelUrl,
+          } satisfies Stripe.Checkout.SessionCreateParams;
+        })()
       : {
           mode: 'payment',
           payment_method_types: ['oxxo', 'customer_balance'],
@@ -130,7 +145,9 @@ export async function createBillingCheckoutAction(input: unknown) {
               price_data: {
                 currency: 'mxn',
                 unit_amount: unitAmount,
-                product_data: { name: `FudiMenu ${planConfig.name} ${cycle === 'annual' ? 'anual' : 'mensual'}` },
+                product_data: {
+                  name: `FudiMenu ${planConfig.name} ${cycle === 'annual' ? 'anual' : 'mensual'}`,
+                },
               },
               quantity: 1,
             },
@@ -142,7 +159,6 @@ export async function createBillingCheckoutAction(input: unknown) {
         };
 
   const session = await stripe.checkout.sessions.create(sessionParams);
-
   return { ok: true as const, url: session.url };
 }
 
@@ -154,7 +170,6 @@ export async function createBillingCheckoutFormAction(formData: FormData) {
   });
 
   if (!result.url) throw new Error('missing_checkout_url');
-
   redirect(result.url);
 }
 
@@ -165,9 +180,7 @@ export async function createCustomerPortalAction() {
     select: { stripeCustomerId: true },
   });
 
-  if (!tenant?.stripeCustomerId) {
-    throw new Error('missing_stripe_customer');
-  }
+  if (!tenant?.stripeCustomerId) throw new Error('missing_stripe_customer');
 
   const session = await getStripe().billingPortal.sessions.create({
     customer: tenant.stripeCustomerId,

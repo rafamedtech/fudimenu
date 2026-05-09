@@ -8,7 +8,7 @@ import { menuService } from '@/server/services/menu.service';
 
 type ItemActionError = {
   ok: false;
-  code: 'unauthorized' | 'rate_limited';
+  code: 'unauthorized' | 'rate_limited' | 'plan_limit_reached';
 };
 
 function revalidateMenu(ctx: AuthContext) {
@@ -59,6 +59,10 @@ export async function upsertItemAction(input: unknown) {
 
   const data = itemSchema.parse(input);
 
+  if (data.isSpecialToday && !PLAN_CONFIG[ctx.plan].features.specials) {
+    return { ok: false as const, code: 'plan_limit_reached' as const };
+  }
+
   if (!data.id) {
     const { tenant, items } = await menuService.getMenuByTenantId(ctx.tenantId);
     const freeItemLimit = PLAN_CONFIG.free.limits.items ?? 20;
@@ -85,6 +89,10 @@ export async function toggleItemAvailabilityAction(itemId: string, available: bo
 export async function setItemSpecialTodayAction(itemId: string, isSpecialToday: boolean) {
   const ctx = await requireActionAuth();
   if ('ok' in ctx) return ctx;
+
+  if (isSpecialToday && !PLAN_CONFIG[ctx.plan].features.specials) {
+    return { ok: false as const, code: 'plan_limit_reached' as const };
+  }
 
   const item = await menuService.setItemSpecialToday(ctx.tenantId, itemId, isSpecialToday);
   revalidateMenu(ctx);

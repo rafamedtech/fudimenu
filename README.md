@@ -55,6 +55,20 @@ pnpm dev
 
 La vista pública demo `/m/taqueria-don-pepe` sigue leyendo `src/lib/mock/data.ts` aunque `USE_MOCKS=false`; el admin, onboarding y `/api/items` usan Prisma contra Supabase Postgres.
 
+## E2E tests
+
+> **Advertencia:** `pnpm test:e2e` ejecuta `db:push --force-reset` que **borra todos los datos** de la base apuntada por `DATABASE_URL`.
+
+Usar siempre un proyecto Supabase dedicado para tests. El setup detecta automáticamente si `DATABASE_URL` parece producción (no contiene `localhost`, `127.0.0.1`, `local`, `test` o `ci`) y falla antes de tocar datos.
+
+```bash
+# Correr solo unit tests (seguro con cualquier entorno):
+pnpm test --run
+
+# Correr E2E (requiere DATABASE_URL de proyecto test):
+DATABASE_URL="postgresql://..." pnpm test:e2e
+```
+
 ## Estructura
 
 ```

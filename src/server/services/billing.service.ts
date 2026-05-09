@@ -2,6 +2,7 @@ import 'server-only';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import { getPrisma } from '@/lib/db/prisma';
+import { env } from '@/lib/env';
 
 const PRO_TRIAL_DAYS = 14;
 const REFERRAL_CREDIT_CENTS = 14_900;
@@ -41,7 +42,7 @@ function getStripe() {
 }
 
 function getProPriceId() {
-  return process.env.STRIPE_PRICE_PRO ?? process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO ?? null;
+  return env.STRIPE_PRICE_PRO ?? null;
 }
 
 function getAppUrl() {

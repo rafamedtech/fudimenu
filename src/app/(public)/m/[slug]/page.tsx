@@ -1,6 +1,6 @@
-import dynamic from 'next/dynamic';
 import { notFound, permanentRedirect } from 'next/navigation';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { getCategoryEmoji } from '@/lib/category-placeholder';
@@ -8,18 +8,12 @@ import { formatPrice } from '@/lib/utils';
 import { buildWhatsAppOrderUrl } from '@/lib/whatsapp';
 import { menuService } from '@/server/services/menu.service';
 import { getPrisma } from '@/lib/db/prisma';
-import { PublicMenuLanguageSwitcher, PublicMenuPwaWrapper } from './public-menu-pwa-wrapper';
+import { PublicMenuLanguageSwitcher, PublicMenuPwaWrapper, PublicMenuTracker } from './public-menu-pwa-wrapper';
 import type { Metadata } from 'next';
 import type { Category, MenuItem, MenuSection, Tenant } from '@/types/domain';
 
 // Node.js runtime (not Edge) — Prisma requires Node.js APIs.
 export const revalidate = 60;
-
-// Deferred: loads posthog + fetch tracker after hydration, not on initial paint.
-const PublicMenuTracker = dynamic(
-  () => import('@/components/public/public-menu-tracking').then((m) => m.PublicMenuTracker),
-  { ssr: false },
-);
 const OTHER_CATEGORY_NAME = 'Otros';
 
 interface Props {
@@ -179,12 +173,14 @@ function PublicMenuContent({
         .filter(({ items: its }) => its.length > 0)
     : [];
 
-  const buildWhatsapp = (itemName: string) =>
+  const buildWhatsapp = (item: MenuItem) =>
     buildWhatsAppOrderUrl({
       phone: tenant.whatsappPhone,
       slug,
-      itemName,
+      itemName: item.name,
       locale: priceLocale === 'en-US' ? 'en' : 'es',
+      restaurantName: tenant.name,
+      price: formatPrice(getItemPrice(item), item.currency, priceLocale),
     });
 
   return (
@@ -198,7 +194,7 @@ function PublicMenuContent({
           href="#menu-content"
           className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-white focus:px-4 focus:py-3 focus:font-bold focus:text-ink-900"
         >
-          Saltar al menú
+          {t('skipToMenu')}
         </a>
         <header className="relative bg-white px-6 py-8 text-center shadow-sm">
           <div className="absolute right-4 top-4">
@@ -262,7 +258,7 @@ function PublicMenuContent({
                   <PublicMenuItemCard
                     key={item.id}
                     item={item}
-                    whatsappHref={buildWhatsapp(item.name)}
+                    whatsappHref={buildWhatsapp(item)}
                     categoryName={
                       item.categoryId ? (categoryNamesById.get(item.categoryId) ?? '') : t('otherCategory')
                     }
@@ -292,7 +288,7 @@ function PublicMenuContent({
                           <PublicMenuItemCard
                             key={item.id}
                             item={item}
-                            whatsappHref={buildWhatsapp(item.name)}
+                            whatsappHref={buildWhatsapp(item)}
                             categoryName={category.name}
                             priceLocale={priceLocale}
                           />
@@ -310,7 +306,7 @@ function PublicMenuContent({
                       <PublicMenuItemCard
                         key={item.id}
                         item={item}
-                        whatsappHref={buildWhatsapp(item.name)}
+                        whatsappHref={buildWhatsapp(item)}
                         categoryName={category.name}
                         priceLocale={priceLocale}
                       />
@@ -323,9 +319,9 @@ function PublicMenuContent({
         {tenant.plan === 'free' && (
           <footer className="mt-12 text-center text-xs text-ink-500">
             {t('madeWith')}{' '}
-            <a href="/" className="font-bold text-mostaza-500 hover:underline">
+            <Link href="/" className="font-bold text-mostaza-500 hover:underline">
               FudiMenu
-            </a>
+            </Link>
           </footer>
         )}
       </main>

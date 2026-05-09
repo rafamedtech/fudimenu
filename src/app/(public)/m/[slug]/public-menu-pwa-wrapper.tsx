@@ -19,6 +19,13 @@ const CookieConsent = dynamic(
   { ssr: false },
 );
 
+// Deferred: loads posthog + fetch tracker after hydration, not on initial paint.
+// Must live in a Client Component — `ssr: false` is not allowed in Server Components.
+export const PublicMenuTracker = dynamic(
+  () => import('@/components/public/public-menu-tracking').then((m) => m.PublicMenuTracker),
+  { ssr: false },
+);
+
 const PUBLIC_MENU_VISITS_PREFIX = 'fudimenu:public-menu-visits:';
 const PUBLIC_MENU_SESSION_PREFIX = 'fudimenu:public-menu-session-counted:';
 const PUBLIC_MENU_DISMISSED_PREFIX = 'fudimenu:public-menu-pwa-dismissed:';
@@ -114,6 +121,7 @@ export function PublicMenuPwaWrapper({ slug, children }: PublicMenuPwaWrapperPro
 }
 
 function PublicMenuPwaContent({ slug, children }: PublicMenuPwaWrapperProps) {
+  const t = useTranslations('menu');
   const { canInstall, isInstalled, promptInstall } = usePwaInstall();
   const consentDecided = useCookieConsentDecided();
   const [isSecondVisit, setIsSecondVisit] = useState(false);
@@ -151,14 +159,14 @@ function PublicMenuPwaContent({ slug, children }: PublicMenuPwaWrapperProps) {
         <div className="fixed inset-x-0 bottom-0 z-40 animate-fade-in px-4 pb-4">
           <div className="mx-auto flex max-w-md items-center gap-3 rounded-md border border-mostaza-500/30 bg-white p-3 shadow-lg">
             <p className="min-w-0 flex-1 text-sm font-semibold leading-snug text-ink-900">
-              Guarda este menú en tu inicio — acceso en 1 tap 📱
+              {t('pwaPrompt')}
             </p>
             <Button
               type="button"
               size="sm"
               className="min-h-10 min-w-10 shrink-0 px-3"
               onClick={promptInstall}
-              aria-label="Agregar menú a inicio"
+              aria-label={t('pwaInstall')}
             >
               <Download size={18} aria-hidden />
             </Button>
@@ -166,7 +174,7 @@ function PublicMenuPwaContent({ slug, children }: PublicMenuPwaWrapperProps) {
               type="button"
               className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md text-ink-500 transition-colors hover:bg-ink-100 hover:text-ink-900 focus-visible:outline-none focus-visible:shadow-glow-mostaza"
               onClick={handleDismiss}
-              aria-label="Cerrar sugerencia"
+              aria-label={t('pwaClose')}
             >
               <X size={18} aria-hidden />
             </button>

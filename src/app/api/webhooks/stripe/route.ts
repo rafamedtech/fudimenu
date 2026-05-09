@@ -15,10 +15,7 @@ function getStripe() {
   const secretKey = process.env.STRIPE_SECRET_KEY;
   if (!secretKey) throw new Error('missing_stripe_secret_key');
 
-  stripeClient ??= new Stripe(secretKey, {
-    apiVersion: STRIPE_API_VERSION,
-  });
-
+  stripeClient ??= new Stripe(secretKey, { apiVersion: STRIPE_API_VERSION });
   return stripeClient;
 }
 
@@ -42,15 +39,13 @@ function isUniqueConstraintError(error: unknown) {
 }
 
 function isSubscriptionPeriodEnded(subscription: Stripe.Subscription) {
-  const currentPeriodEnd = subscription.current_period_end;
-  return typeof currentPeriodEnd === 'number' && currentPeriodEnd <= Math.floor(Date.now() / 1000);
+  const end = subscription.current_period_end;
+  return typeof end === 'number' && end <= Math.floor(Date.now() / 1000);
 }
 
 async function recordWebhookEvent(event: Stripe.Event, tenantId: string | null) {
-  const prisma = getPrisma();
-
   try {
-    await prisma.webhookEvent.create({
+    await getPrisma().webhookEvent.create({
       data: {
         tenantId,
         provider: 'stripe',
@@ -61,7 +56,6 @@ async function recordWebhookEvent(event: Stripe.Event, tenantId: string | null) 
         processedAt: new Date(),
       },
     });
-
     return true;
   } catch (error) {
     if (isUniqueConstraintError(error)) return false;
@@ -69,16 +63,17 @@ async function recordWebhookEvent(event: Stripe.Event, tenantId: string | null) 
   }
 }
 
-async function writeAuditLog(event: Stripe.Event, tenantId: string | null) {
+async function writeAuditLog(
+  event: Stripe.Event,
+  tenantId: string | null,
+  action: string,
+) {
   await getPrisma().auditLog.create({
     data: {
       tenantId,
-      action: `stripe.${event.type}`,
+      action,
       entityType: 'stripe_event',
-      metadata: {
-        eventId: event.id,
-        tenantId,
-      },
+      metadata: { eventId: event.id, tenantId, eventType: event.type },
     },
   });
 }
@@ -113,88 +108,113 @@ async function handlePaymentFailed(invoice: Stripe.Invoice) {
 
   const email = invoice.customer_email;
   if (tenant?.name && email) {
-    await billingService.sendPaymentFailedEmail({
-      email,
-      tenantName: tenant.name,
+    await billingService.sendPaymentFailedEmail({ email, tenantName: tenant.name });
+  } else {
+    console.warn('invoice.payment_failed: could not send email', {
+      tenantId,
+      hasTenantName: !!tenant?.name,
+      hasEmail: !!email,
     });
   }
 
   return tenantId;
 }
 
-async function processEvent(event: Stripe.Event) {
+type ProcessResult = { tenantId: string | null; auditAction: string };
+
+async function processEvent(event: Stripe.Event): Promise<ProcessResult> {
+  const defaultAction = `stripe.${event.type}`;
+
   switch (event.type) {
     case 'checkout.session.completed': {
       const session = event.data.object as Stripe.Checkout.Session;
       const tenantId = getTenantId(session.metadata);
-      const customerId = typeof session.customer === 'string' ? session.customer : session.customer?.id ?? null;
-      const subscriptionId = typeof session.subscription === 'string'
-        ? session.subscription
-        : session.subscription?.id ?? null;
+      const paidPlan = getPaidPlan(session.metadata);
+      const customerId =
+        typeof session.customer === 'string' ? session.customer : session.customer?.id ?? null;
+      const subscriptionId =
+        typeof session.subscription === 'string'
+          ? session.subscription
+          : session.subscription?.id ?? null;
 
-      if (session.mode === 'subscription') {
-        await updateTenantPlan(tenantId, getPaidPlan(session.metadata), {
+      if (session.mode === 'subscription' && paidPlan) {
+        await updateTenantPlan(tenantId, paidPlan, {
           ...(customerId ? { stripeCustomerId: customerId } : {}),
           ...(subscriptionId ? { stripeSubscriptionId: subscriptionId } : {}),
         });
+        return { tenantId, auditAction: 'plan.upgraded' };
       }
 
-      if (session.mode === 'payment' && session.payment_status === 'paid') {
-        await updateTenantPlan(tenantId, getPaidPlan(session.metadata), {
+      if (session.mode === 'payment' && session.payment_status === 'paid' && paidPlan) {
+        await updateTenantPlan(tenantId, paidPlan, {
           ...(customerId ? { stripeCustomerId: customerId } : {}),
         });
+        return { tenantId, auditAction: 'plan.upgraded' };
       }
 
-      return tenantId;
+      return { tenantId, auditAction: defaultAction };
     }
 
     case 'charge.succeeded': {
       const charge = event.data.object as Stripe.Charge;
       const tenantId = getTenantId(charge.metadata);
-      await updateTenantPlan(tenantId, getPaidPlan(charge.metadata));
-      return tenantId;
+      const paidPlan = getPaidPlan(charge.metadata);
+      if (paidPlan) await updateTenantPlan(tenantId, paidPlan);
+      return { tenantId, auditAction: paidPlan ? 'plan.upgraded' : defaultAction };
     }
 
     case 'payment_intent.succeeded': {
-      const paymentIntent = event.data.object as Stripe.PaymentIntent;
-      const tenantId = getTenantId(paymentIntent.metadata);
-      await updateTenantPlan(tenantId, getPaidPlan(paymentIntent.metadata));
-      return tenantId;
+      const pi = event.data.object as Stripe.PaymentIntent;
+      const tenantId = getTenantId(pi.metadata);
+      const paidPlan = getPaidPlan(pi.metadata);
+      if (paidPlan) await updateTenantPlan(tenantId, paidPlan);
+      return { tenantId, auditAction: paidPlan ? 'plan.upgraded' : defaultAction };
     }
 
     case 'customer.subscription.updated': {
       const subscription = event.data.object as Stripe.Subscription;
       const tenantId = getTenantId(subscription.metadata);
-      const customerId = typeof subscription.customer === 'string'
-        ? subscription.customer
-        : subscription.customer.id;
+      const customerId =
+        typeof subscription.customer === 'string'
+          ? subscription.customer
+          : subscription.customer.id;
 
-      if (subscription.status === 'canceled' || (subscription.cancel_at_period_end && isSubscriptionPeriodEnded(subscription))) {
+      const shouldDowngrade =
+        subscription.status === 'canceled' ||
+        (subscription.cancel_at_period_end && isSubscriptionPeriodEnded(subscription));
+
+      if (shouldDowngrade) {
         await updateTenantPlan(tenantId, 'free');
-      } else if (subscription.status === 'active' || subscription.status === 'trialing') {
-        await updateTenantPlan(tenantId, getPaidPlan(subscription.metadata), {
+        return { tenantId, auditAction: 'plan.downgraded' };
+      }
+
+      if (subscription.status === 'active' || subscription.status === 'trialing') {
+        const paidPlan = getPaidPlan(subscription.metadata);
+        await updateTenantPlan(tenantId, paidPlan, {
           stripeCustomerId: customerId,
           stripeSubscriptionId: subscription.id,
         });
+        return { tenantId, auditAction: paidPlan ? 'plan.upgraded' : defaultAction };
       }
 
-      return tenantId;
+      return { tenantId, auditAction: defaultAction };
     }
 
     case 'customer.subscription.deleted': {
       const subscription = event.data.object as Stripe.Subscription;
       const tenantId = getTenantId(subscription.metadata);
       await updateTenantPlan(tenantId, 'free');
-      return tenantId;
+      return { tenantId, auditAction: 'plan.downgraded' };
     }
 
-    case 'invoice.payment_failed':
-      return handlePaymentFailed(event.data.object as Stripe.Invoice);
+    case 'invoice.payment_failed': {
+      const tenantId = await handlePaymentFailed(event.data.object as Stripe.Invoice);
+      return { tenantId, auditAction: 'stripe.invoice.payment_failed' };
+    }
 
-    default: {
+    default:
       console.info('Ignoring Stripe webhook event', { eventId: event.id, type: event.type });
-      return null;
-    }
+      return { tenantId: null, auditAction: defaultAction };
   }
 }
 
@@ -203,19 +223,20 @@ export async function POST(request: Request) {
   const signature = request.headers.get('stripe-signature');
 
   let event: Stripe.Event;
-
   try {
     event = getStripe().webhooks.constructEvent(body, signature ?? '', getWebhookSecret());
   } catch {
     return new NextResponse('invalid_signature', { status: 400 });
   }
 
-  const initialTenantId = getTenantId((event.data.object as { metadata?: Stripe.Metadata | null }).metadata);
+  const initialTenantId = getTenantId(
+    (event.data.object as { metadata?: Stripe.Metadata | null }).metadata,
+  );
   const shouldProcess = await recordWebhookEvent(event, initialTenantId);
   if (!shouldProcess) return NextResponse.json({ received: true }, { status: 200 });
 
-  const tenantId = await processEvent(event);
-  await writeAuditLog(event, tenantId ?? initialTenantId);
+  const { tenantId, auditAction } = await processEvent(event);
+  await writeAuditLog(event, tenantId ?? initialTenantId, auditAction);
 
   return NextResponse.json({ received: true }, { status: 200 });
 }
