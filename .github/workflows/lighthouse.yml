@@ -24,9 +24,16 @@ jobs:
           NEXT_PUBLIC_APP_URL: 'http://localhost:3000'
           DIRECT_URL: "postgresql://ci:ci@localhost:5432/ci"
           DATABASE_URL: "postgresql://ci:ci@localhost:5432/ci"
+          # Stub optional SDKs so they don't log console errors during Lighthouse runs
+          NEXT_PUBLIC_POSTHOG_KEY: 'phc_ci_stub'
+          NEXT_PUBLIC_POSTHOG_HOST: 'https://us.i.posthog.com'
+          NEXT_PUBLIC_SENTRY_DSN: ''
       - run: pnpm start &
         env:
           USE_MOCKS: 'true'
+          NEXT_PUBLIC_POSTHOG_KEY: 'phc_ci_stub'
+          NEXT_PUBLIC_POSTHOG_HOST: 'https://us.i.posthog.com'
+          NEXT_PUBLIC_SENTRY_DSN: ''
       - run: sleep 10
       - run: npx -y @lhci/cli@0.13.x autorun
         env:
