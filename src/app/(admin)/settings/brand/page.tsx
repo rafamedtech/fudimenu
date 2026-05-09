@@ -19,6 +19,7 @@ export default async function BrandSettingsPage({ searchParams }: BrandSettingsP
           where: { id: ctx.tenantId },
           select: {
             slug: true,
+            name: true,
             logoUrl: true,
             primaryColor: true,
           },
@@ -53,6 +54,7 @@ export default async function BrandSettingsPage({ searchParams }: BrandSettingsP
 
           <BrandSettingsForm
             currentSlug={tenant?.slug ?? ''}
+            tenantName={tenant?.name ?? ''}
             logoUrl={tenant?.logoUrl ?? null}
             primaryColor={tenant?.primaryColor ?? '#F4B400'}
           />
