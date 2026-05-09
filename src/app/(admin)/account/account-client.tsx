@@ -9,6 +9,7 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Sheet } from '@/components/ui/sheet';
 import { signOutAction } from '@/server/actions/auth.actions';
+import { track } from '@/lib/analytics/events';
 
 type AccountClientProps = {
   email: string;
@@ -45,6 +46,7 @@ export function AccountClient({ email, tenantName, tenantSlug, plan }: AccountCl
       link.click();
       link.remove();
       URL.revokeObjectURL(url);
+      track('data_exported', {});
       toast.success('Exportación lista');
     } catch {
       toast.error('No pude exportar tus datos');
@@ -83,6 +85,7 @@ export function AccountClient({ email, tenantName, tenantSlug, plan }: AccountCl
         return;
       }
 
+      track('account_deleted', {});
       toast.success('Cuenta eliminada');
       router.push('/login');
       router.refresh();

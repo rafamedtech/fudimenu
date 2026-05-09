@@ -5,6 +5,7 @@ import {
   ACTIVE_TENANT_COOKIE,
   activeTenantCookieOptions,
 } from '@/server/tenants/active-tenant-cookie';
+import { getPostHogClient } from '@/lib/posthog-server';
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
@@ -36,6 +37,10 @@ export async function GET(request: NextRequest) {
         } else {
           response.cookies.delete(ACTIVE_TENANT_COOKIE);
         }
+
+        const posthog = getPostHogClient();
+        posthog.identify({ distinctId: user.id, properties: { email: user.email } });
+        posthog.capture({ distinctId: user.id, event: 'user_signed_in', properties: { provider: user.app_metadata?.provider ?? 'email' } });
       }
 
       return response;

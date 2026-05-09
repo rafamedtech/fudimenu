@@ -24,6 +24,7 @@ export function QrShareActions({
   async function copyMenuLink() {
     try {
       await copyText(menuUrl);
+      track('qr_menu_link_copied', { tenantId });
       toast.success('Link copiado');
     } catch {
       toast.error('No pude copiar el link');
@@ -44,10 +45,12 @@ export function QrShareActions({
           text: 'Mira este menú en FudiMenu',
           url: result.url,
         });
+        track('qr_menu_link_shared', { tenantId });
         return;
       }
 
       await copyText(result.url);
+      track('qr_menu_link_copied', { tenantId });
       toast.success('Link copiado');
     } catch {
       toast.error('No pude compartir el link');

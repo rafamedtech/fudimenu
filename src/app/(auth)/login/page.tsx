@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { useListenForSignIn } from '@/hooks/use-auth-broadcast';
 import { createSupabaseBrowser } from '@/lib/supabase/client';
 import { signInWithMagicLinkAction } from '@/server/actions/auth.actions';
+import { track } from '@/lib/analytics/events';
 
 const MAGIC_LINK_POLL_TIMEOUT_MS = 30_000;
 
@@ -71,6 +72,7 @@ export default function LoginPage() {
       const res = await signInWithMagicLinkAction(fd);
       if (res.ok) {
         setMagicLinkSentAt(Date.now());
+        track('login_magic_link_sent', { email_domain: email.split('@')[1] ?? '' });
         toast.success(res.message);
       } else {
         toast.error(res.error);
@@ -84,6 +86,7 @@ export default function LoginPage() {
 
   async function handleGoogleSignIn() {
     setGoogleLoading(true);
+    track('login_google_started', {});
     try {
       const supabase = createSupabaseBrowser();
       const { error } = await supabase.auth.signInWithOAuth({

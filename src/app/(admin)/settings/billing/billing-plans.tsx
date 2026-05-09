@@ -10,6 +10,7 @@ import {
   createCustomerPortalAction,
 } from '@/server/actions/billing.actions';
 import type { Plan } from '@/types/domain';
+import { track } from '@/lib/analytics/events';
 
 type Cycle = 'monthly' | 'annual';
 
@@ -160,7 +161,11 @@ export function BillingPlans({ currentPlan, hasStripeCustomer, hasStripeSubscrip
                   <input type="hidden" name="plan" value={plan.id} />
                   <input type="hidden" name="cycle" value={planCycle} />
                   <input type="hidden" name="method" value="card" />
-                  <Button type="submit" className="w-full">
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    onClick={() => track('plan_upgrade_started', { from: currentPlan, to: plan.id, method: 'card', cycle: planCycle })}
+                  >
                     Tarjeta — suscripción recurrente
                   </Button>
                 </form>
@@ -169,7 +174,12 @@ export function BillingPlans({ currentPlan, hasStripeCustomer, hasStripeSubscrip
                   <input type="hidden" name="plan" value={plan.id} />
                   <input type="hidden" name="cycle" value={planCycle} />
                   <input type="hidden" name="method" value="cash" />
-                  <Button type="submit" variant="secondary" className="w-full">
+                  <Button
+                    type="submit"
+                    variant="secondary"
+                    className="w-full"
+                    onClick={() => track('plan_upgrade_started', { from: currentPlan, to: plan.id, method: 'cash', cycle: planCycle })}
+                  >
                     OXXO / SPEI — pago único manual
                   </Button>
                 </form>

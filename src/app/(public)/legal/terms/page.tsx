@@ -87,6 +87,9 @@ export default function TermsPage() {
           </p>
           <h1 className="mt-3 text-4xl font-extrabold">Terminos y condiciones</h1>
           <p className="mt-3 text-sm text-ink-500">Ultima actualizacion: {updatedAt}</p>
+          <p className="mt-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded px-3 py-2">
+            Nota: este documento esta en revision legal externa. No constituye asesoramiento juridico definitivo hasta confirmacion formal.
+          </p>
           <p className="mt-5 max-w-2xl text-base leading-7 text-ink-700">
             Estos terminos explican las reglas de uso de FudiMenu para restaurantes,
             administradores y personas que consultan menus publicados.

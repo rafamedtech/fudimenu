@@ -34,3 +34,56 @@ jobs:
       - run: pnpm lint
       - run: pnpm test --run
       - run: pnpm build
+
+  e2e:
+    runs-on: ubuntu-latest
+    needs: checks
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: fudimenu
+          POSTGRES_PASSWORD: fudimenu
+          POSTGRES_DB: fudimenu_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    env:
+      DATABASE_URL: "postgresql://fudimenu:fudimenu@localhost:5432/fudimenu_test?schema=public"
+      DIRECT_URL: "postgresql://fudimenu:fudimenu@localhost:5432/fudimenu_test?schema=public"
+      USE_MOCKS: "false"
+      E2E_TEST_AUTH: "true"
+      E2E_STRIPE_CHECKOUT_MOCK: "true"
+      NEXT_PUBLIC_APP_URL: "http://127.0.0.1:3102"
+      STRIPE_SECRET_KEY: "sk_test_e2e_mock"
+      NEXT_PUBLIC_SUPABASE_URL: "http://localhost"
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: "anon-key-placeholder"
+      CRON_SECRET: "ci-cron-secret"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm db:generate
+
+      - name: Run migrations
+        run: npx prisma migrate deploy
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Run E2E tests
+        run: pnpm test:e2e

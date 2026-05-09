@@ -3,6 +3,7 @@ import Stripe from 'stripe';
 import type { Prisma } from '@/generated/prisma/client';
 import { getPrisma } from '@/lib/db/prisma';
 import { billingService } from '@/server/services/billing.service';
+import { getPostHogClient } from '@/lib/posthog-server';
 
 export const runtime = 'nodejs';
 
@@ -237,6 +238,19 @@ export async function POST(request: Request) {
 
   const { tenantId, auditAction } = await processEvent(event);
   await writeAuditLog(event, tenantId ?? initialTenantId, auditAction);
+
+  const resolvedTenantId = tenantId ?? initialTenantId;
+  if (resolvedTenantId) {
+    const posthog = getPostHogClient();
+    if (auditAction === 'plan.upgraded') {
+      const plan = getPaidPlan((event.data.object as { metadata?: Stripe.Metadata | null }).metadata);
+      posthog.capture({ distinctId: resolvedTenantId, event: 'plan_upgraded', properties: { to: plan ?? 'unknown', stripe_event: event.type } });
+    } else if (auditAction === 'plan.downgraded') {
+      posthog.capture({ distinctId: resolvedTenantId, event: 'plan_downgraded', properties: { to: 'free', stripe_event: event.type } });
+    } else if (auditAction === 'stripe.invoice.payment_failed') {
+      posthog.capture({ distinctId: resolvedTenantId, event: 'payment_failed', properties: { stripe_event: event.type } });
+    }
+  }
 
   return NextResponse.json({ received: true }, { status: 200 });
 }

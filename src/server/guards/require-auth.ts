@@ -1,6 +1,7 @@
 import 'server-only';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import * as Sentry from '@sentry/nextjs';
 import { getPrisma } from '@/lib/db/prisma';
 import { createSupabaseServer } from '@/lib/supabase/server';
 import { mockTenant } from '@/lib/mock/data';
@@ -157,7 +158,7 @@ export async function requireAuth(): Promise<AuthContext> {
 
   if (!membership) redirect('/onboarding');
 
-  return {
+  const ctx = {
     userId: user.id,
     email: user.email!,
     tenantId: membership.tenantId,
@@ -172,4 +173,10 @@ export async function requireAuth(): Promise<AuthContext> {
       },
     })),
   };
+
+  Sentry.setTag('tenant_id', ctx.tenantId);
+  Sentry.setTag('plan', ctx.plan);
+  Sentry.setTag('role', ctx.role);
+
+  return ctx;
 }

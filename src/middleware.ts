@@ -58,6 +58,10 @@ function setLocaleCookie(response: NextResponse, locale: AppLocale) {
 function applyResponseHeaders(response: NextResponse, locale: AppLocale, nonce: string) {
   setLocaleCookie(response, locale);
   response.headers.set('Content-Security-Policy', buildCsp(nonce));
+  response.headers.set('X-Content-Type-Options', 'nosniff');
+  response.headers.set('X-Frame-Options', 'DENY');
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
   return response;
 }
 

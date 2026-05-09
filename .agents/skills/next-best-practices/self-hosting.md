@@ -319,7 +319,6 @@ npx @opennextjs/aws build
 Supports:
 - AWS Lambda + CloudFront
 - Cloudflare Workers
-- Netlify Functions
 - Deno Deploy
 
 ## Health Check Endpoint

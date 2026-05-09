@@ -48,11 +48,17 @@ export type AnalyticsEvent =
   | { name: 'item_edited'; props: { itemId: string; field: string } }
   | { name: 'stock_toggled'; props: { itemId: string; available: boolean } }
   | { name: 'qr_downloaded'; props: { tenantId: string; format: 'png' | 'pdf' } }
+  | { name: 'qr_menu_link_copied'; props: { tenantId: string } }
+  | { name: 'qr_menu_link_shared'; props: { tenantId: string } }
   | { name: 'whatsapp_clicked'; props: { itemId: string } }
   | { name: 'onboarding_step'; props: { step: number } }
   | { name: 'onboarding_completed'; props: { tenantId: string } }
-  | { name: 'plan_upgrade_started'; props: { from: string; to: string } }
-  | { name: 'plan_upgraded'; props: { from: string; to: string } };
+  | { name: 'plan_upgrade_started'; props: { from: string; to: string; method: 'card' | 'cash'; cycle: 'monthly' | 'annual' } }
+  | { name: 'plan_upgraded'; props: { from: string; to: string } }
+  | { name: 'login_magic_link_sent'; props: { email_domain: string } }
+  | { name: 'login_google_started'; props: Record<string, never> }
+  | { name: 'account_deleted'; props: Record<string, never> }
+  | { name: 'data_exported'; props: Record<string, never> };
 
 export function track<E extends AnalyticsEvent>(
   name: E['name'],
