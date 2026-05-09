@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
@@ -80,10 +81,23 @@ export function SectionEditorForm({ initial, nextSortOrder = 0 }: SectionEditorF
       }}
     >
       <Card
-        className="aspect-[4/5] overflow-hidden p-0 shadow-sm"
+        className="relative aspect-[4/5] overflow-hidden p-0 shadow-sm"
         style={{ backgroundColor: accentColor }}
       >
-        <div className="flex h-full flex-col justify-end bg-gradient-to-t from-ink-900/70 to-transparent p-4">
+        {coverImageUrl ? (
+          <Image
+            src={coverImageUrl}
+            alt=""
+            fill
+            sizes="50vw"
+            className="object-cover opacity-80"
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center text-5xl" aria-hidden>
+            🍽️
+          </div>
+        )}
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink-900/80 to-transparent p-4">
           <p className="text-sm font-semibold uppercase text-white/80">Preview</p>
           <h2 className="text-2xl font-extrabold text-white">{name.trim() || 'Nombre sección'}</h2>
         </div>
