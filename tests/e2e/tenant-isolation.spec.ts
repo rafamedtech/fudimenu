@@ -202,4 +202,62 @@ test.describe('tenant isolation', () => {
     expect(tenantBHtml).toContain('Tenant B ramen');
     expect(tenantBHtml).not.toContain('Tenant A taco');
   });
+
+  test('audit log: invalid cookie attempt is written to actor tenant, not the forged tenant', async ({
+    request,
+  }) => {
+    // User A forges tenant B cookie — requireAuth rejects and falls back to tenant A.
+    // The audit log entry must be scoped to tenant A (the real tenant), not tenant B.
+    await request.get('/api/items', {
+      headers: { cookie: authCookie(fixture.tenantBId, fixture.userAId) },
+    });
+
+    const db = getTestPrisma();
+
+    const entryOnActorTenant = await db.auditLog.findFirst({
+      where: {
+        tenantId: fixture.tenantAId,
+        actorUserId: fixture.userAId,
+        action: 'auth.invalid_tenant_cookie',
+        entityId: fixture.tenantBId,
+      },
+    });
+    expect(entryOnActorTenant).not.toBeNull();
+
+    // The audit entry must NOT be attributed to tenant B's scope.
+    const entryOnForgedTenant = await db.auditLog.findFirst({
+      where: {
+        tenantId: fixture.tenantBId,
+        actorUserId: fixture.userAId,
+        action: 'auth.invalid_tenant_cookie',
+      },
+    });
+    expect(entryOnForgedTenant).toBeNull();
+  });
+
+  test('menu_views: tracking write is scoped to correct tenant via slug', async ({ request }) => {
+    const db = getTestPrisma();
+
+    const beforeCount = await db.menuView.count({ where: { tenantId: fixture.tenantAId } });
+
+    // Track a view for tenant A's menu via slug
+    await request.post('/api/track/view', {
+      data: { slug: fixture.tenantASlug, sessionId: randomUUID() },
+    });
+
+    const afterCount = await db.menuView.count({ where: { tenantId: fixture.tenantAId } });
+    expect(afterCount).toBe(beforeCount + 1);
+
+    // Tenant B's view count must not be affected
+    const tenantBViews = await db.menuView.count({ where: { tenantId: fixture.tenantBId } });
+    expect(tenantBViews).toBe(0);
+  });
+
+  test('menu_views: tracking ignores non-existent tenant slug', async ({ request }) => {
+    const res = await request.post('/api/track/view', {
+      data: { slug: 'does-not-exist-ever', sessionId: randomUUID() },
+    });
+    // Should return 404 or error — must not create an orphaned view row
+    expect(res.ok()).toBe(false);
+  });
 });
