@@ -5,6 +5,7 @@ import Stripe from 'stripe';
 import { z } from 'zod';
 import { PLAN_CONFIG } from '@/config/plans';
 import { getPrisma } from '@/lib/db/prisma';
+import { env } from '@/lib/env';
 import { requireAuth } from '@/server/guards/require-auth';
 import type { Plan } from '@/types/domain';
 
@@ -29,10 +30,10 @@ function getAppUrl() {
 }
 
 function getPriceId(plan: 'pro' | 'business', cycle: 'monthly' | 'annual'): string | null {
-  if (plan === 'pro' && cycle === 'monthly') return process.env.STRIPE_PRICE_PRO_MONTHLY ?? null;
-  if (plan === 'pro' && cycle === 'annual') return process.env.STRIPE_PRICE_PRO_ANNUAL ?? null;
-  if (plan === 'business' && cycle === 'monthly') return process.env.STRIPE_PRICE_BUSINESS_MONTHLY ?? null;
-  if (plan === 'business' && cycle === 'annual') return process.env.STRIPE_PRICE_BUSINESS_ANNUAL ?? null;
+  if (plan === 'pro' && cycle === 'monthly') return env.STRIPE_PRICE_PRO_MONTHLY ?? null;
+  if (plan === 'pro' && cycle === 'annual') return env.STRIPE_PRICE_PRO_ANNUAL ?? null;
+  if (plan === 'business' && cycle === 'monthly') return env.STRIPE_PRICE_BUSINESS_MONTHLY ?? null;
+  if (plan === 'business' && cycle === 'annual') return env.STRIPE_PRICE_BUSINESS_ANNUAL ?? null;
   return null;
 }
 

@@ -47,14 +47,23 @@
 ## Env vars críticas
 - DATABASE_URL, DIRECT_URL — Postgres
 - NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY
-- STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, NEXT_PUBLIC_STRIPE_PRICE_PRO, NEXT_PUBLIC_STRIPE_PRICE_BUSINESS
-- CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET, NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
+- STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET
+- STRIPE_PRICE_PRO — trial 14 días (billing.service.ts)
+- STRIPE_PRICE_PRO_MONTHLY, STRIPE_PRICE_PRO_ANNUAL — checkout card Pro
+- STRIPE_PRICE_BUSINESS_MONTHLY, STRIPE_PRICE_BUSINESS_ANNUAL — checkout card Business
+- CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET, NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME — signed upload (no preset)
 - RESEND_API_KEY
 - NEXT_PUBLIC_POSTHOG_KEY, NEXT_PUBLIC_POSTHOG_HOST
 - SENTRY_DSN, NEXT_PUBLIC_SENTRY_DSN
 - UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN
 - CRON_SECRET — protege endpoints /api/cron/*
+- NEXT_PUBLIC_APP_URL — URL base (default http://localhost:3000)
 - USE_MOCKS — true en dev sin DB
+
+## E2E seguridad
+- `pnpm test:e2e` corre `db:push --force-reset` → **borra todos los datos**
+- global-setup.ts falla si DATABASE_URL no contiene "localhost", "127.0.0.1", "local", "test" o "ci"
+- Usar siempre un proyecto Supabase dedicado para tests, nunca producción/staging
 
 ## Bundle baseline (2026-05-07)
 - `/m/[slug]` First Load JS: 195 KB; analyzer route client gzip: 91.2 KB
