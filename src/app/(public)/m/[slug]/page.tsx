@@ -1,6 +1,7 @@
+import dynamic from 'next/dynamic';
+import { Suspense } from 'react';
 import { notFound, permanentRedirect } from 'next/navigation';
 import Image from 'next/image';
-import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { getCategoryEmoji } from '@/lib/category-placeholder';
@@ -8,12 +9,19 @@ import { formatPrice } from '@/lib/utils';
 import { buildWhatsAppOrderUrl } from '@/lib/whatsapp';
 import { menuService } from '@/server/services/menu.service';
 import { getPrisma } from '@/lib/db/prisma';
-import { PublicMenuLanguageSwitcher, PublicMenuPwaWrapper, PublicMenuTracker } from './public-menu-pwa-wrapper';
+import { PublicMenuLanguageSwitcher, PublicMenuPwaWrapper } from './public-menu-pwa-wrapper';
 import type { Metadata } from 'next';
 import type { Category, MenuItem, MenuSection, Tenant } from '@/types/domain';
 
-// Node.js runtime (not Edge) — Prisma requires Node.js APIs.
+// Prisma requires Node.js runtime — Edge is incompatible.
+export const runtime = 'nodejs';
 export const revalidate = 60;
+
+// Deferred: loads posthog + fetch tracker after hydration, not on initial paint.
+const PublicMenuTracker = dynamic(
+  () => import('@/components/public/public-menu-tracking').then((m) => m.PublicMenuTracker),
+  { ssr: false },
+);
 const OTHER_CATEGORY_NAME = 'Otros';
 
 interface Props {
@@ -198,7 +206,9 @@ function PublicMenuContent({
         </a>
         <header className="relative bg-white px-6 py-8 text-center shadow-sm">
           <div className="absolute right-4 top-4">
-            <PublicMenuLanguageSwitcher />
+            <Suspense fallback={null}>
+              <PublicMenuLanguageSwitcher />
+            </Suspense>
           </div>
           {tenant.logoUrl ? (
             <Image
@@ -319,9 +329,9 @@ function PublicMenuContent({
         {tenant.plan === 'free' && (
           <footer className="mt-12 text-center text-xs text-ink-500">
             {t('madeWith')}{' '}
-            <Link href="/" className="font-bold text-mostaza-500 hover:underline">
+            <a href="/" className="font-bold text-mostaza-500 hover:underline">
               FudiMenu
-            </Link>
+            </a>
           </footer>
         )}
       </main>
