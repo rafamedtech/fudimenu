@@ -209,4 +209,28 @@ describe('auth actions', () => {
     expect(result.ok).toBe(true);
     expect(mocks.signOut).not.toHaveBeenCalled();
   });
+
+  it('returns Correo inválido when email is malformed', async () => {
+    process.env.USE_MOCKS = 'false';
+
+    const { signInWithMagicLinkAction } = await loadAuthActions();
+    const formData = new FormData();
+    formData.set('email', 'not-an-email');
+    const result = await signInWithMagicLinkAction(formData);
+
+    expect(result).toEqual({ ok: false, error: 'Correo inválido' });
+    expect(mocks.checkRateLimit).not.toHaveBeenCalled();
+    expect(mocks.signInWithOtp).not.toHaveBeenCalled();
+  });
+
+  it('returns Correo inválido when email field is empty', async () => {
+    process.env.USE_MOCKS = 'false';
+
+    const { signInWithMagicLinkAction } = await loadAuthActions();
+    const formData = new FormData();
+    const result = await signInWithMagicLinkAction(formData);
+
+    expect(result).toEqual({ ok: false, error: 'Correo inválido' });
+    expect(mocks.signInWithOtp).not.toHaveBeenCalled();
+  });
 });

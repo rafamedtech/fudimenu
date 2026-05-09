@@ -17,7 +17,11 @@ const tenantIdSchema = z.string().min(1, 'Restaurante inválido');
 const BRANCH_STORAGE_KEY = 'fudi:branch';
 
 export async function signInWithMagicLinkAction(formData: FormData) {
-  const email = emailSchema.parse(formData.get('email'));
+  const emailResult = emailSchema.safeParse(formData.get('email'));
+  if (!emailResult.success) {
+    return { ok: false as const, error: 'Correo inválido' };
+  }
+  const email = emailResult.data;
   const nextValue = formData.get('next');
   const next = typeof nextValue === 'string' ? nextValue : null;
   const nextParam = next && next.startsWith('/') ? `?next=${encodeURIComponent(next)}` : '';
