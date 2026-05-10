@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v1';
+const CACHE_VERSION = 'v2';
 const STATIC_CACHE = `fudimenu-static-${CACHE_VERSION}`;
 const ADMIN_CACHE = `fudimenu-admin-${CACHE_VERSION}`;
 const OFFLINE_QUEUE_DB = 'fudimenu-admin-offline';
@@ -7,9 +7,16 @@ const OFFLINE_QUEUE_STORE = 'mutations';
 const OFFLINE_QUEUE_SYNC_TAG = 'fudimenu-offline-mutations';
 
 const ADMIN_SHELL_URLS = ['/dashboard', '/menu', '/analytics', '/settings'];
-const STATIC_PATH_PREFIXES = ['/_next/static/', '/icon', '/manifest.webmanifest'];
+const STATIC_PATH_PREFIXES = ['/icon', '/manifest.webmanifest'];
+const IS_LOCAL_DEV =
+  self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1';
 
 self.addEventListener('install', (event) => {
+  if (IS_LOCAL_DEV) {
+    event.waitUntil(self.skipWaiting());
+    return;
+  }
+
   event.waitUntil(
     warmAdminShell()
       .catch(() => undefined)
@@ -24,7 +31,11 @@ self.addEventListener('activate', (event) => {
       .then((keys) =>
         Promise.all(
           keys
-            .filter((key) => key.startsWith('fudimenu-') && ![STATIC_CACHE, ADMIN_CACHE].includes(key))
+            .filter(
+              (key) =>
+                key.startsWith('fudimenu-') &&
+                (IS_LOCAL_DEV || ![STATIC_CACHE, ADMIN_CACHE].includes(key)),
+            )
             .map((key) => caches.delete(key)),
         ),
       )
@@ -33,6 +44,8 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  if (IS_LOCAL_DEV) return;
+
   const { request } = event;
 
   if (request.method !== 'GET') return;
@@ -83,8 +96,6 @@ async function warmAdminShell() {
 
 function isStaticAsset(request, url) {
   return (
-    request.destination === 'script' ||
-    request.destination === 'style' ||
     request.destination === 'font' ||
     request.destination === 'image' ||
     STATIC_PATH_PREFIXES.some((prefix) => url.pathname.startsWith(prefix))

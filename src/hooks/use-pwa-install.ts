@@ -22,13 +22,30 @@ function isRunningInstalled() {
   );
 }
 
+function isLocalDevelopment() {
+  return (
+    process.env.NODE_ENV !== 'production' ||
+    window.location.hostname === 'localhost' ||
+    window.location.hostname === '127.0.0.1'
+  );
+}
+
 export function usePwaInstall() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isInstalled, setIsInstalled] = useState(false);
 
   useEffect(() => {
     if ('serviceWorker' in navigator) {
-      void navigator.serviceWorker.register('/sw.js').catch(() => undefined);
+      if (isLocalDevelopment()) {
+        void navigator.serviceWorker
+          .getRegistrations()
+          .then((registrations) =>
+            Promise.all(registrations.map((registration) => registration.unregister())),
+          )
+          .catch(() => undefined);
+      } else {
+        void navigator.serviceWorker.register('/sw.js').catch(() => undefined);
+      }
     }
 
     if (isRunningInstalled()) setIsInstalled(true);
