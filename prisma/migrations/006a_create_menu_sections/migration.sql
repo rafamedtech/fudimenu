@@ -1,3 +1,24 @@
+-- Stub Supabase's `auth` schema and `auth.uid()` for non-Supabase
+-- environments (CI/local plain Postgres). 007's RLS policies reference
+-- `auth.uid()`; on Supabase the schema/function are provided by GoTrue.
+-- The pg_proc check ensures we never overwrite Supabase's real function.
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_namespace WHERE nspname = 'auth') THEN
+        CREATE SCHEMA "auth";
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1
+        FROM pg_proc p
+        JOIN pg_namespace n ON p.pronamespace = n.oid
+        WHERE n.nspname = 'auth' AND p.proname = 'uid'
+    ) THEN
+        EXECUTE 'CREATE FUNCTION "auth"."uid"() RETURNS UUID LANGUAGE SQL STABLE AS $f$ SELECT NULL::UUID $f$';
+    END IF;
+END $$;
+
 -- Create menu_sections table and link categories.section_id.
 --
 -- The MenuSection Prisma model existed since early development but was never
