@@ -125,7 +125,7 @@ async function main() {
         'taqueria-don-pepe',
         'Taquería Don Pepe',
         null,
-        null,
+        '+525512345678',
         null,
         '#F4B400',
         'mexicana',
