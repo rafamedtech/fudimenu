@@ -58,7 +58,7 @@ test.describe('privacy: export and delete', () => {
 
     const body = await res.json();
     expect(body).toHaveProperty('tenant');
-    expect(body).toHaveProperty('menuItems');
+    expect(body).toHaveProperty('items');
     expect(body).not.toHaveProperty('password');
   });
 

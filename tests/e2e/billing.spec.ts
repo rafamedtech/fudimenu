@@ -89,7 +89,7 @@ test.describe('billing upgrade', () => {
 
     await page.goto('/settings/billing');
     await expect(page.getByRole('heading', { name: 'Pro' })).toBeVisible();
-    await page.getByRole('button', { name: 'Pagar Pro' }).click();
+    await page.getByRole('button', { name: 'Tarjeta — suscripción recurrente' }).first().click();
 
     await expect(page).toHaveURL(/\/settings\/billing\?checkout=success/);
     await expect(page.getByText('Pago iniciado')).toBeVisible();
