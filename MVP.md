@@ -408,9 +408,9 @@ Este doc es **especificación + checklist de auditoría** del MVP. Cada sección
 - [ ] INP <200ms en interacciones críticas (toggle, save)
 - [ ] CLS <0.1 en todas pantallas
 - [ ] Bundle First Load JS:
-  - [ ] `/m/[slug]` <100kb gzipped
-  - [ ] `/menu` <250kb gzipped
-  - [ ] `/onboarding` <200kb gzipped
+  - [ ] `/m/[slug]` <100kb gzipped — **EXCEPCIÓN documentada (2026-05-11)**: baseline Next 15 + React 19 RC = 102 kB gz (react-dom-client 54.2 kB + next router/react 45.4 kB en shared chunks `946d37cc` y `7393`). Optimizado a **115 kB First Load** (de 138 kB) tras: strings i18n pasadas como props desde RSC (elimina `intl-messageformat` ~15.6 kB del initial chunk), reemplazo de `<Button>` y lucide icons por `<button>`+SVG inline (elimina `tailwind-merge` ~6.5 kB). Resto comprimible (page chunk + next/link) ≈ 13 kB. Gate efectivo: LCP/CLS/INP en `.lighthouserc.cjs` (no bundle size).
+  - [ ] `/menu` <250kb gzipped — 226 kB First Load (dentro de budget)
+  - [ ] `/onboarding` <200kb gzipped — 183 kB First Load (dentro de budget)
 - [ ] Lighthouse CI gate en PRs (configurado)
 - [ ] Imágenes via Cloudinary con auto-format + auto-quality
 

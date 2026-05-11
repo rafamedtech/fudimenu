@@ -186,7 +186,16 @@ function PublicMenuContent({
     });
 
   return (
-    <PublicMenuPwaWrapper slug={slug} tenantId={tenant.id}>
+    <PublicMenuPwaWrapper
+      slug={slug}
+      tenantId={tenant.id}
+      locale={priceLocale === 'en-US' ? 'en' : 'es'}
+      pwaStrings={{
+        prompt: t('pwaPrompt'),
+        install: t('pwaInstall'),
+        close: t('pwaClose'),
+      }}
+    >
       <main
         className="mx-auto min-h-dvh max-w-md scroll-smooth bg-crema-50 pb-12"
         style={{ ['--brand' as string]: tenant.primaryColor }}
@@ -200,7 +209,10 @@ function PublicMenuContent({
         <header className="relative bg-white px-6 py-8 text-center shadow-sm">
           <div className="absolute right-4 top-4">
             <Suspense fallback={null}>
-              <PublicMenuLanguageSwitcher />
+              <PublicMenuLanguageSwitcher
+                activeLocale={priceLocale === 'en-US' ? 'en' : 'es'}
+                ariaLabel={t('language.label')}
+              />
             </Suspense>
           </div>
           {tenant.logoUrl ? (

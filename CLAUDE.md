@@ -65,12 +65,13 @@
 - global-setup.ts falla si DATABASE_URL no contiene "localhost", "127.0.0.1", "local", "test" o "ci"
 - Usar siempre un proyecto Supabase dedicado para tests, nunca producción/staging
 
-## Bundle baseline (2026-05-07)
-- `/m/[slug]` First Load JS: 195 KB; analyzer route client gzip: 91.2 KB
-- `/menu` First Load JS: 209 KB; analyzer route client gzip: 105.3 KB
-- `/onboarding` First Load JS: 182 KB; analyzer route client gzip: 78.9 KB
-- Shared `_app`/main contributors: React/Next runtime, `posthog-js` (~59 KB gzip), Supabase browser/auth chunk on login (~49 KB gzip).
-- Watchlist: public menu stays under 100 KB route gzip, but PostHog is loaded from root layout and dominates public route client cost.
+## Bundle baseline (2026-05-11)
+- `/m/[slug]` First Load JS: **115 kB gz** (de 138 kB; -23 kB sprint perf)
+- `/menu` First Load JS: 226 kB gz
+- `/onboarding` First Load JS: 183 kB gz
+- Shared baseline (todas rutas): **102 kB gz** = react-dom-client (54.2) + next router+react (45.4). Irreducible en Next 15 + React 19 RC.
+- /m/[slug] optimizaciones: strings i18n pasadas como props desde RSC (no `useTranslations` en initial client chunk → quita `intl-messageformat` ~15.6 kB), `<Button>` + lucide reemplazados por `<button>`+SVG inline (quita `tailwind-merge` ~6.5 kB), tracker/cookie-consent vía `next/dynamic` `ssr:false`, PostHog deferred (fuera de root layout).
+- Excepción documentada (MVP §11.1): budget <100 kB no viable; gate efectivo = LCP/CLS/INP en `.lighthouserc.cjs`.
 
 ## Runbook ops
 - Spike traffic → Vercel auto-scale, monitor Supabase pool size
