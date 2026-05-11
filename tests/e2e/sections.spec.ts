@@ -474,7 +474,7 @@ test.describe('tenant A no puede ver/editar secciones de tenant B', () => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Test 3: Soft delete oculta sección del menú público
+// Test 6: Soft delete oculta sección del menú público
 // ─────────────────────────────────────────────────────────────────────────────
 test.describe('soft delete sección quita del menú público', () => {
   test.setTimeout(PUBLIC_VISIBILITY_TIMEOUT_MS + 15_000);
