@@ -1,15 +1,12 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { Download, X } from 'lucide-react';
-import { useLocale, useTranslations } from 'next-intl';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState, useTransition } from 'react';
 import {
   CookieConsentProvider,
   useCookieConsentDecided,
 } from '@/components/public/cookie-consent-context';
-import { Button } from '@/components/ui/button';
 import { usePwaInstall } from '@/hooks/use-pwa-install';
 import { localStore } from '@/lib/storage/local';
 
@@ -43,15 +40,18 @@ function getLocalizedHref(pathname: string, searchParams: URLSearchParams, local
   return `${pathname}?${params.toString()}${typeof window === 'undefined' ? '' : window.location.hash}`;
 }
 
-export function PublicMenuLanguageSwitcher() {
-  const locale = useLocale();
-  const t = useTranslations('menu.language');
+interface LanguageSwitcherProps {
+  activeLocale: PublicMenuLocale;
+  ariaLabel: string;
+}
+
+export function PublicMenuLanguageSwitcher({ activeLocale: initialLocale, ariaLabel }: LanguageSwitcherProps) {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
-  const activeLocale = isPublicMenuLocale(locale) ? locale : 'es';
   const queryLocale = searchParams.get(LANG_QUERY_PARAM);
+  const activeLocale = isPublicMenuLocale(queryLocale) ? queryLocale : initialLocale;
 
   useEffect(() => {
     if (isPublicMenuLocale(queryLocale)) {
@@ -60,12 +60,12 @@ export function PublicMenuLanguageSwitcher() {
     }
 
     const storedLocale = localStore.get('fudi:locale');
-    if (storedLocale) {
+    if (storedLocale && storedLocale !== initialLocale) {
       startTransition(() => {
         router.replace(getLocalizedHref(pathname, searchParams, storedLocale), { scroll: false });
       });
     }
-  }, [activeLocale, pathname, queryLocale, router, searchParams]);
+  }, [initialLocale, pathname, queryLocale, router, searchParams]);
 
   function switchLocale(nextLocale: PublicMenuLocale) {
     if (nextLocale === activeLocale && queryLocale === nextLocale) return;
@@ -80,10 +80,13 @@ export function PublicMenuLanguageSwitcher() {
     <div
       className="inline-grid h-9 grid-cols-2 rounded-md border border-ink-900/10 bg-crema-50 p-0.5 shadow-sm"
       role="group"
-      aria-label={t('label')}
+      aria-label={ariaLabel}
     >
       {LOCALES.map((option) => {
         const isActive = option === activeLocale;
+        const className = isActive
+          ? 'h-8 min-w-10 rounded px-2 text-xs font-extrabold uppercase transition-colors disabled:cursor-wait bg-ink-900 text-white shadow-sm'
+          : 'h-8 min-w-10 rounded px-2 text-xs font-extrabold uppercase transition-colors disabled:cursor-wait text-ink-500 hover:bg-white hover:text-ink-900';
 
         return (
           <button
@@ -92,12 +95,7 @@ export function PublicMenuLanguageSwitcher() {
             aria-pressed={isActive}
             disabled={isPending}
             onClick={() => switchLocale(option)}
-            className={[
-              'h-8 min-w-10 rounded px-2 text-xs font-extrabold uppercase transition-colors disabled:cursor-wait',
-              isActive
-                ? 'bg-ink-900 text-white shadow-sm'
-                : 'text-ink-500 hover:bg-white hover:text-ink-900',
-            ].join(' ')}
+            className={className}
           >
             {option}
           </button>
@@ -107,22 +105,31 @@ export function PublicMenuLanguageSwitcher() {
   );
 }
 
+interface PwaPromptStrings {
+  prompt: string;
+  install: string;
+  close: string;
+}
+
 interface PublicMenuPwaWrapperProps {
   slug: string;
   tenantId: string;
+  locale: string;
+  pwaStrings: PwaPromptStrings;
   children: React.ReactNode;
 }
 
-export function PublicMenuPwaWrapper({ slug, tenantId, children }: PublicMenuPwaWrapperProps) {
+export function PublicMenuPwaWrapper({ slug, tenantId, locale, pwaStrings, children }: PublicMenuPwaWrapperProps) {
   return (
     <CookieConsentProvider>
-      <PublicMenuPwaContent slug={slug} tenantId={tenantId}>{children}</PublicMenuPwaContent>
+      <PublicMenuPwaContent slug={slug} tenantId={tenantId} locale={locale} pwaStrings={pwaStrings}>
+        {children}
+      </PublicMenuPwaContent>
     </CookieConsentProvider>
   );
 }
 
-function PublicMenuPwaContent({ slug, tenantId, children }: PublicMenuPwaWrapperProps) {
-  const t = useTranslations('menu');
+function PublicMenuPwaContent({ slug, tenantId, locale, pwaStrings, children }: PublicMenuPwaWrapperProps) {
   const { canInstall, isInstalled, promptInstall } = usePwaInstall();
   const consentDecided = useCookieConsentDecided();
   const [isSecondVisit, setIsSecondVisit] = useState(false);
@@ -155,30 +162,56 @@ function PublicMenuPwaContent({ slug, tenantId, children }: PublicMenuPwaWrapper
 
   return (
     <>
-      <PublicMenuTracker tenantId={tenantId} slug={slug} />
+      <PublicMenuTracker tenantId={tenantId} slug={slug} locale={locale} />
       {children}
       {shouldShowPrompt && (
         <div className="fixed inset-x-0 bottom-0 z-40 animate-fade-in px-4 pb-4">
           <div className="mx-auto flex max-w-md items-center gap-3 rounded-md border border-mostaza-500/30 bg-white p-3 shadow-lg">
             <p className="min-w-0 flex-1 text-sm font-semibold leading-snug text-ink-900">
-              {t('pwaPrompt')}
+              {pwaStrings.prompt}
             </p>
-            <Button
+            <button
               type="button"
-              size="sm"
-              className="min-h-10 min-w-10 shrink-0 px-3"
+              className="inline-flex min-h-10 min-w-10 shrink-0 items-center justify-center rounded-md bg-mostaza-500 px-3 font-semibold text-ink-900 shadow-md transition-all hover:bg-mostaza-400 active:scale-[0.97]"
               onClick={promptInstall}
-              aria-label={t('pwaInstall')}
+              aria-label={pwaStrings.install}
             >
-              <Download size={18} aria-hidden />
-            </Button>
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden
+              >
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+            </button>
             <button
               type="button"
               className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md text-ink-500 transition-colors hover:bg-ink-100 hover:text-ink-900 focus-visible:outline-none focus-visible:shadow-glow-mostaza"
               onClick={handleDismiss}
-              aria-label={t('pwaClose')}
+              aria-label={pwaStrings.close}
             >
-              <X size={18} aria-hidden />
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden
+              >
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
             </button>
           </div>
         </div>

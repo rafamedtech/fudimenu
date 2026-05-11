@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useLocale } from 'next-intl';
 import { initAnalytics, track } from '@/lib/analytics/events';
 
 const SESSION_KEY = 'fudimenu:public-session-id';
@@ -18,9 +17,7 @@ function getSessionId() {
 // Tracks which item IDs have already fired item_viewed this session.
 const viewedItems = new Set<string>();
 
-export function PublicMenuTracker({ tenantId, slug }: { tenantId: string; slug: string }) {
-  const locale = useLocale();
-
+export function PublicMenuTracker({ tenantId, slug, locale }: { tenantId: string; slug: string; locale: string }) {
   useEffect(() => {
     initAnalytics();
 
