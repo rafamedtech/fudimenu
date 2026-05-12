@@ -62,6 +62,10 @@ describe('createBillingCheckoutAction', () => {
   beforeEach(() => {
     vi.stubEnv('STRIPE_SECRET_KEY', 'sk_test_123');
     vi.stubEnv('NEXT_PUBLIC_APP_URL', 'https://app.fudimenu.test');
+    vi.stubEnv('STRIPE_PRICE_PRO_MONTHLY', 'price_pro_monthly_default');
+    vi.stubEnv('STRIPE_PRICE_PRO_ANNUAL', 'price_pro_annual_default');
+    vi.stubEnv('STRIPE_PRICE_BUSINESS_MONTHLY', 'price_business_monthly_default');
+    vi.stubEnv('STRIPE_PRICE_BUSINESS_ANNUAL', 'price_business_annual_default');
   });
 
   it('creates card subscription session (monthly, new customer)', async () => {
@@ -125,27 +129,59 @@ describe('createBillingCheckoutAction', () => {
     );
   });
 
-  it('falls back to price_data when Price ID env var is not set', async () => {
+  it('throws clear error when Price ID env var is missing for card subscription (pro monthly)', async () => {
+    vi.stubEnv('STRIPE_PRICE_PRO_MONTHLY', '');
     mocks.tenantFindUnique.mockResolvedValueOnce({ stripeCustomerId: 'cus_existing' });
 
     const { createBillingCheckoutAction } = await loadActions();
-    await createBillingCheckoutAction({ plan: 'pro', cycle: 'monthly', method: 'card' });
-
-    const call = (mocks.checkoutSessionsCreate.mock.calls as any)[0][0];
-    expect(call.line_items[0]).toHaveProperty('price_data');
-    expect(call.line_items[0]).not.toHaveProperty('price');
+    await expect(
+      createBillingCheckoutAction({ plan: 'pro', cycle: 'monthly', method: 'card' }),
+    ).rejects.toThrow(/missing_stripe_price_id.*STRIPE_PRICE_PRO_MONTHLY/);
+    expect(mocks.checkoutSessionsCreate).not.toHaveBeenCalled();
   });
 
-  it('calculates 25% annual discount in price_data fallback', async () => {
+  it('throws when STRIPE_PRICE_PRO_ANNUAL is missing for card annual', async () => {
+    vi.stubEnv('STRIPE_PRICE_PRO_ANNUAL', '');
     mocks.tenantFindUnique.mockResolvedValueOnce({ stripeCustomerId: 'cus_existing' });
 
     const { createBillingCheckoutAction } = await loadActions();
-    await createBillingCheckoutAction({ plan: 'pro', cycle: 'annual', method: 'card' });
+    await expect(
+      createBillingCheckoutAction({ plan: 'pro', cycle: 'annual', method: 'card' }),
+    ).rejects.toThrow(/STRIPE_PRICE_PRO_ANNUAL/);
+  });
 
+  it('throws when STRIPE_PRICE_BUSINESS_MONTHLY is missing for card business', async () => {
+    vi.stubEnv('STRIPE_PRICE_BUSINESS_MONTHLY', '');
+    mocks.tenantFindUnique.mockResolvedValueOnce({ stripeCustomerId: 'cus_existing' });
+
+    const { createBillingCheckoutAction } = await loadActions();
+    await expect(
+      createBillingCheckoutAction({ plan: 'business', cycle: 'monthly', method: 'card' }),
+    ).rejects.toThrow(/STRIPE_PRICE_BUSINESS_MONTHLY/);
+  });
+
+  it('throws when STRIPE_PRICE_BUSINESS_ANNUAL is missing for card business annual', async () => {
+    vi.stubEnv('STRIPE_PRICE_BUSINESS_ANNUAL', '');
+    mocks.tenantFindUnique.mockResolvedValueOnce({ stripeCustomerId: 'cus_existing' });
+
+    const { createBillingCheckoutAction } = await loadActions();
+    await expect(
+      createBillingCheckoutAction({ plan: 'business', cycle: 'annual', method: 'card' }),
+    ).rejects.toThrow(/STRIPE_PRICE_BUSINESS_ANNUAL/);
+  });
+
+  it('OXXO/SPEI works without Price ID configured (one-time price_data)', async () => {
+    mocks.tenantFindUnique.mockResolvedValueOnce({ stripeCustomerId: 'cus_existing' });
+
+    const { createBillingCheckoutAction } = await loadActions();
+    const result = await createBillingCheckoutAction({ plan: 'pro', cycle: 'annual', method: 'cash' });
+
+    expect(result.ok).toBe(true);
     const call = (mocks.checkoutSessionsCreate.mock.calls as any)[0][0];
-    const unitAmount = call.line_items[0].price_data.unit_amount;
-    // Pro: 14900 * 12 * 0.75 = 134100
-    expect(unitAmount).toBe(Math.round(14900 * 12 * 0.75));
+    expect(call.mode).toBe('payment');
+    expect(call.line_items[0]).toHaveProperty('price_data');
+    expect(call.line_items[0].price_data.unit_amount).toBe(Math.round(14900 * 12 * 0.75));
+    expect(call.line_items[0].price_data).not.toHaveProperty('recurring');
   });
 
   it('creates one-time OXXO/SPEI payment session', async () => {
