@@ -39,8 +39,10 @@ export async function GET(request: NextRequest) {
         }
 
         const posthog = getPostHogClient();
-        posthog.identify({ distinctId: user.id, properties: { email: user.email } });
-        posthog.capture({ distinctId: user.id, event: 'user_signed_in', properties: { provider: user.app_metadata?.provider ?? 'email' } });
+        if (posthog) {
+          posthog.identify({ distinctId: user.id, properties: { email: user.email } });
+          posthog.capture({ distinctId: user.id, event: 'user_signed_in', properties: { provider: user.app_metadata?.provider ?? 'email' } });
+        }
       }
 
       return response;
