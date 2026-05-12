@@ -221,6 +221,14 @@ async function applyReferralCreditForTenant(stripe: Stripe, tenantId: string) {
 
 export const billingService = {
   async startProTrialForTenant(input: TrialTenantInput) {
+    if (
+      process.env.E2E_TEST_AUTH === 'true' &&
+      process.env.E2E_STRIPE_CHECKOUT_MOCK === 'true' &&
+      process.env.STRIPE_SECRET_KEY?.startsWith('sk_test_')
+    ) {
+      return { ok: true as const, stripeEnabled: false as const };
+    }
+
     const stripe = getStripe();
     const priceId = getProPriceId();
 
