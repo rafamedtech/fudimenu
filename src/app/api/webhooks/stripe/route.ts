@@ -242,13 +242,15 @@ export async function POST(request: Request) {
   const resolvedTenantId = tenantId ?? initialTenantId;
   if (resolvedTenantId) {
     const posthog = getPostHogClient();
-    if (auditAction === 'plan.upgraded') {
-      const plan = getPaidPlan((event.data.object as { metadata?: Stripe.Metadata | null }).metadata);
-      posthog.capture({ distinctId: resolvedTenantId, event: 'plan_upgraded', properties: { to: plan ?? 'unknown', stripe_event: event.type } });
-    } else if (auditAction === 'plan.downgraded') {
-      posthog.capture({ distinctId: resolvedTenantId, event: 'plan_downgraded', properties: { to: 'free', stripe_event: event.type } });
-    } else if (auditAction === 'stripe.invoice.payment_failed') {
-      posthog.capture({ distinctId: resolvedTenantId, event: 'payment_failed', properties: { stripe_event: event.type } });
+    if (posthog) {
+      if (auditAction === 'plan.upgraded') {
+        const plan = getPaidPlan((event.data.object as { metadata?: Stripe.Metadata | null }).metadata);
+        posthog.capture({ distinctId: resolvedTenantId, event: 'plan_upgraded', properties: { to: plan ?? 'unknown', stripe_event: event.type } });
+      } else if (auditAction === 'plan.downgraded') {
+        posthog.capture({ distinctId: resolvedTenantId, event: 'plan_downgraded', properties: { to: 'free', stripe_event: event.type } });
+      } else if (auditAction === 'stripe.invoice.payment_failed') {
+        posthog.capture({ distinctId: resolvedTenantId, event: 'payment_failed', properties: { stripe_event: event.type } });
+      }
     }
   }
 
