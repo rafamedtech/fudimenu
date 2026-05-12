@@ -1,11 +1,13 @@
 'use client';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Trash2 } from 'lucide-react';
+import { Lock, Trash2 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
+import { PLAN_CONFIG } from '@/config/plans';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -39,6 +41,7 @@ interface Props {
 }
 
 const DESCRIPTION_MAX_CHARS = 500;
+const FREE_ITEM_LIMIT = PLAN_CONFIG.free.limits.items ?? 20;
 
 export function ItemEditorForm({ initial, categories, sectionId }: Props) {
   const locale = useLocale();
@@ -52,6 +55,7 @@ export function ItemEditorForm({ initial, categories, sectionId }: Props) {
   const [conflictDraft, setConflictDraft] = useState<ItemInput | null>(null);
   const [conflictMutationId, setConflictMutationId] = useState<number | null>(null);
   const [showCategoryForm, setShowCategoryForm] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState('');
   const [localCategories, setLocalCategories] = useState(categories);
   const fallbackCategoryId = localCategories[0]?.id ?? null;
@@ -161,6 +165,10 @@ export function ItemEditorForm({ initial, categories, sectionId }: Props) {
         router.push(sectionId ? `/menu/s/${sectionId}` : '/menu');
       }
     } catch (err) {
+      if (err instanceof Error && err.message === 'free_item_limit_reached') {
+        setShowUpgradeModal(true);
+        return;
+      }
       toast.error(toUserMessage(err, locale));
     }
   }
@@ -346,7 +354,7 @@ export function ItemEditorForm({ initial, categories, sectionId }: Props) {
       />
 
       <div>
-        <label className="mb-1.5 block text-sm font-medium text-ink-700" htmlFor="categoryId">
+        <label id="category-label" className="mb-1.5 block text-sm font-medium text-ink-700" htmlFor="categoryId">
           Categoría
         </label>
         {localCategories.length === 0 ? (
@@ -399,18 +407,29 @@ export function ItemEditorForm({ initial, categories, sectionId }: Props) {
           </div>
         ) : (
           <>
-            <select
-              id="categoryId"
-              required
-              className="h-14 w-full rounded-md border-[1.5px] border-ink-300 bg-white px-4 text-base text-ink-900 outline-none focus-within:border-mostaza-500 focus-within:shadow-glow-mostaza"
-              {...register('categoryId')}
+            <div
+              role="radiogroup"
+              aria-labelledby="category-label"
+              className="flex flex-wrap gap-2"
             >
               {localCategories.map((category) => (
-                <option key={category.id} value={category.id}>
+                <button
+                  key={category.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={selectedCategoryId === category.id}
+                  onClick={() => setValue('categoryId', category.id, { shouldValidate: true })}
+                  className={cn(
+                    'rounded-full border-[1.5px] px-3 py-1.5 text-sm font-medium transition-colors',
+                    selectedCategoryId === category.id
+                      ? 'border-mostaza-500 bg-mostaza-100 text-mostaza-800'
+                      : 'border-ink-300 bg-white text-ink-700 hover:border-mostaza-400 hover:bg-crema-50',
+                  )}
+                >
                   {category.name}
-                </option>
+                </button>
               ))}
-            </select>
+            </div>
             {errors.categoryId?.message && (
               <p className="mt-1 text-sm text-red-600">{errors.categoryId.message}</p>
             )}
@@ -505,6 +524,50 @@ export function ItemEditorForm({ initial, categories, sectionId }: Props) {
         )}
       </div>
       </form>
+
+      {showUpgradeModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-end bg-ink-900/45 px-4 pb-4 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="upgrade-item-limit-title"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setShowUpgradeModal(false);
+          }}
+        >
+          <Card className="w-full space-y-4 rounded-lg border-[1.5px] border-mostaza-500 shadow-xl">
+            <div className="flex items-start gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-mostaza-100 text-ink-900">
+                <Lock className="h-5 w-5" />
+              </div>
+              <div>
+                <h2 id="upgrade-item-limit-title" className="text-lg font-extrabold text-ink-900">
+                  Límite Free alcanzado
+                </h2>
+                <p className="mt-1 text-sm leading-6 text-ink-700">
+                  Tu menú ya tiene {FREE_ITEM_LIMIT} platillos. Sube a Pro para agregar items
+                  ilimitados, quitar la marca FudiMenu y activar analytics.
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                className="flex-1"
+                onClick={() => setShowUpgradeModal(false)}
+              >
+                Ahora no
+              </Button>
+              <Link href="/settings/billing" className="flex-1">
+                <Button type="button" className="w-full">
+                  Upgrade
+                </Button>
+              </Link>
+            </div>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }

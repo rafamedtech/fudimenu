@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import { Lock } from 'lucide-react';
 import { AppHeader } from '@/components/layout/app-header';
 import { ItemEditorForm } from '@/components/admin/item-editor-form';
 import { TenantSwitcher } from '@/components/admin/tenant-switcher';
@@ -32,22 +33,34 @@ export default async function ItemEditPage({ params, searchParams }: Props) {
           right={<TenantSwitcher activeTenantId={ctx.tenantId} memberships={ctx.memberships} />}
         />
         <main className="flex-1 px-4 pt-4">
-          <Card className="space-y-4 border-[1.5px] border-mostaza-500 bg-white shadow-md">
-            <div>
-              <p className="text-sm font-extrabold uppercase text-mostaza-600">Plan Free</p>
-              <h1 className="mt-1 text-xl font-extrabold text-ink-900">
-                Llegaste a {freeItemLimit} platillos
-              </h1>
-              <p className="mt-2 text-sm leading-6 text-ink-700">
-                Pro desbloquea items ilimitados, sucursales ilimitadas, analytics básico y
-                oculta la marca FudiMenu.
-              </p>
+          <Card className="space-y-4 border-[1.5px] border-mostaza-500 shadow-xl">
+            <div className="flex items-start gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-mostaza-100 text-ink-900">
+                <Lock className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-sm font-extrabold uppercase text-mostaza-600">Plan Free</p>
+                <h1 className="mt-0.5 text-xl font-extrabold text-ink-900">
+                  Llegaste a {freeItemLimit} platillos
+                </h1>
+                <p className="mt-2 text-sm leading-6 text-ink-700">
+                  Pro desbloquea items ilimitados, quitar la marca FudiMenu y activar
+                  analytics básico.
+                </p>
+              </div>
             </div>
-            <Link href="/settings/billing" className="block">
-              <Button type="button" className="w-full">
-                Upgrade
-              </Button>
-            </Link>
+            <div className="flex gap-3">
+              <Link href="/menu" className="flex-1">
+                <Button type="button" variant="outline" className="w-full">
+                  Volver
+                </Button>
+              </Link>
+              <Link href="/settings/billing" className="flex-1">
+                <Button type="button" className="w-full">
+                  Upgrade
+                </Button>
+              </Link>
+            </div>
           </Card>
         </main>
       </>
