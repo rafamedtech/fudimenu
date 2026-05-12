@@ -221,6 +221,8 @@ function PublicMenuContent({
               alt={tenant.name}
               width={80}
               height={80}
+              priority
+              fetchPriority="high"
               className="mx-auto mb-3 rounded-full"
             />
           ) : (
@@ -377,13 +379,16 @@ export default async function PublicMenuPage({ params }: Props) {
   ]);
 
   return (
-    <PublicMenuContent
-      slug={slug}
-      tenant={tenant}
-      sections={sections}
-      categories={categories}
-      items={items}
-      priceLocale={locale === 'en' ? 'en-US' : 'es-MX'}
-    />
+    <>
+      <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="anonymous" />
+      <PublicMenuContent
+        slug={slug}
+        tenant={tenant}
+        sections={sections}
+        categories={categories}
+        items={items}
+        priceLocale={locale === 'en' ? 'en-US' : 'es-MX'}
+      />
+    </>
   );
 }
