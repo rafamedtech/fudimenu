@@ -22,7 +22,8 @@ export default async function QrPage() {
   }
 
   const menuUrl = `${getBaseUrl()}/m/${tenant.slug}`;
-  const qrImageUrl = `${getBaseUrl()}/api/qr/${tenant.slug}`;
+  const qrImagePath = `/api/qr/${tenant.slug}`;
+  const qrImageUrl = `${getBaseUrl()}${qrImagePath}`;
 
   return (
     <>
@@ -40,11 +41,12 @@ export default async function QrPage() {
         <Card className="flex flex-col items-center gap-4">
           <div className="relative h-[280px] w-[280px] overflow-hidden rounded-md border border-ink-100 bg-white">
             <Image
-              src={qrImageUrl}
+              src={qrImagePath}
               alt={`QR del menú de ${tenant.name}`}
               fill
               sizes="280px"
               priority
+              unoptimized
               className="object-contain p-4"
             />
           </div>
