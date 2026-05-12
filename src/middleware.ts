@@ -10,6 +10,8 @@ import { updateSession } from '@/lib/supabase/middleware';
 
 const ADMIN_PREFIXES = ['/dashboard', '/menu', '/categories', '/branches', '/analytics', '/settings', '/qr', '/account', '/onboarding'];
 const AUTH_PREFIXES = ['/login', '/signup', '/forgot-password'];
+const ONBOARDING_PATH = '/onboarding';
+const ACTIVE_TENANT_COOKIE_NAME = 'activetenantId';
 const LOCALE_HEADER_NAME = 'X-NEXT-INTL-LOCALE';
 
 function generateNonce() {
@@ -103,6 +105,19 @@ export async function middleware(request: NextRequest) {
   if (isAuthRoute && user) {
     const url = request.nextUrl.clone();
     url.pathname = '/dashboard';
+    const redirectResponse = NextResponse.redirect(url);
+    return applyResponseHeaders(redirectResponse, locale, nonce);
+  }
+
+  if (
+    user &&
+    isAdminRoute &&
+    !pathname.startsWith(ONBOARDING_PATH) &&
+    !request.cookies.get(ACTIVE_TENANT_COOKIE_NAME)?.value
+  ) {
+    const url = request.nextUrl.clone();
+    url.pathname = ONBOARDING_PATH;
+    url.search = '';
     const redirectResponse = NextResponse.redirect(url);
     return applyResponseHeaders(redirectResponse, locale, nonce);
   }
