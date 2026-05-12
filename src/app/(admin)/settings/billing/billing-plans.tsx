@@ -141,8 +141,8 @@ export function BillingPlans({ currentPlan, hasStripeCustomer, hasStripeSubscrip
                 <>
                   <li>· Todo lo de Pro</li>
                   <li>· Menú en español e inglés</li>
-                  <li>· Modificadores (extras, tamaños)</li>
-                  <li>· Multi-sucursal (hasta 3)</li>
+                  <li>· Soporte prioritario</li>
+                  <li>· Multi-sucursal (próximamente, hasta 3)</li>
                 </>
               )}
             </ul>

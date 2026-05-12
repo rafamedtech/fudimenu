@@ -7,6 +7,11 @@ const mocks = vi.hoisted(() => ({
   tenantFindUnique: vi.fn(async () => ({ name: 'Taqueria Norte' } as { name: string | null } | null)),
   auditLogCreate: vi.fn(async () => ({})),
   sendPaymentFailedEmail: vi.fn(async () => ({ sent: true, reason: null })),
+  posthogCapture: vi.fn(),
+}));
+
+vi.mock('@/lib/posthog-server', () => ({
+  getPostHogClient: () => ({ capture: mocks.posthogCapture }),
 }));
 
 vi.mock('stripe', () => ({

@@ -104,23 +104,17 @@ export async function createBillingCheckoutAction(input: unknown) {
     method === 'card'
       ? (() => {
           const priceId = getPriceId(plan, cycle);
+          if (!priceId) {
+            const envVar = `STRIPE_PRICE_${plan.toUpperCase()}_${cycle.toUpperCase()}`;
+            throw new Error(
+              `missing_stripe_price_id: ${envVar} no está configurado. Configura el Price ID de Stripe para ${planConfig.name} ${cycle === 'annual' ? 'anual' : 'mensual'} antes de habilitar checkout con tarjeta.`,
+            );
+          }
           return {
             mode: 'subscription',
             payment_method_types: ['card'],
             customer: customerId,
-            line_items: priceId
-              ? [{ price: priceId, quantity: 1 }]
-              : [
-                  {
-                    price_data: {
-                      currency: 'mxn',
-                      unit_amount: unitAmount,
-                      recurring: { interval: cycle === 'annual' ? 'year' : 'month' },
-                      product_data: { name: `FudiMenu ${planConfig.name}` },
-                    },
-                    quantity: 1,
-                  },
-                ],
+            line_items: [{ price: priceId, quantity: 1 }],
             metadata,
             subscription_data: { metadata },
             success_url: successUrl,
