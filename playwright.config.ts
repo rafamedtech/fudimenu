@@ -1,5 +1,9 @@
-import 'dotenv/config';
+import { config as loadEnv } from 'dotenv';
 import { defineConfig, devices } from '@playwright/test';
+
+// Load .env.test.local first (E2E-specific overrides), then fall back to .env.
+loadEnv({ path: '.env.test.local' });
+loadEnv();
 
 export default defineConfig({
   testDir: './tests/e2e',
