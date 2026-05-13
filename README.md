@@ -34,7 +34,7 @@ pnpm build
 
 Abre:
 - http://localhost:3000 — landing
-- http://localhost:3000/m/taqueria-don-pepe — vista comensal demo
+- http://localhost:3000/m/taqueria-don-pepe — vista comensal demo con menú Marenca
 - http://localhost:3000/onboarding — wizard
 - http://localhost:3000/dashboard — admin (mockeado)
 
@@ -53,7 +53,7 @@ pnpm dev
 
 `DIRECT_URL` es la conexión directa de Supabase que usa Prisma CLI para migraciones. `DATABASE_URL` es la conexión que usa Prisma Client en runtime; puede ser la URL pooled de Supavisor o la misma directa durante desarrollo. La app sigue usando `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY` para Supabase Auth/SSR.
 
-La vista pública demo `/m/taqueria-don-pepe` sigue leyendo `src/lib/mock/data.ts` aunque `USE_MOCKS=false`; el admin, onboarding y `/api/items` usan Prisma contra Supabase Postgres.
+La vista pública demo `/m/taqueria-don-pepe` usa el menú Marenca desde `src/lib/mock/data.ts` en modo mock; el admin, onboarding y `/api/items` usan Prisma contra Supabase Postgres cuando `USE_MOCKS=false`.
 
 ## E2E tests
 

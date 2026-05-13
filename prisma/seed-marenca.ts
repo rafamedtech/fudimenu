@@ -10,9 +10,18 @@ if (!databaseUrl) {
   throw new Error('Missing DATABASE_URL or DIRECT_URL. Add your Supabase Postgres URL to .env.');
 }
 
-const tenantId = '00000000-0000-4000-8000-000000010001';
+const tenantId = process.env.SEED_MARENCA_TENANT_ID ?? '00000000-0000-4000-8000-000000010001';
+const tenantSlug = process.env.SEED_MARENCA_TENANT_SLUG ?? 'marenca-grupo-moderno';
+const tenantName = process.env.SEED_MARENCA_TENANT_NAME ?? 'Marenca';
+const tenantPlan = process.env.SEED_MARENCA_TENANT_PLAN ?? 'business';
+const tenantWhatsappPhone = process.env.SEED_MARENCA_WHATSAPP_PHONE ?? null;
+const dataIdNamespace = process.env.SEED_MARENCA_DATA_ID_NAMESPACE ?? '00000001';
 
-const sections = [
+function scopedDataId(id: string) {
+  return id.replace(/00000001(\d{4})$/, `${dataIdNamespace}$1`);
+}
+
+const rawSections = [
   {
     id: '00000000-0000-4000-8000-000000011001',
     name: 'Tortilla de huevos',
@@ -57,7 +66,12 @@ const sections = [
   },
 ] as const;
 
-const categories = [
+const sections = rawSections.map((section) => ({
+  ...section,
+  id: scopedDataId(section.id),
+}));
+
+const rawCategories = [
   {
     id: '00000000-0000-4000-8000-000000012001',
     sectionId: sections[0].id,
@@ -109,7 +123,12 @@ const categories = [
   },
 ] as const;
 
-const items = [
+const categories = rawCategories.map((category) => ({
+  ...category,
+  id: scopedDataId(category.id),
+}));
+
+const rawItems = [
   {
     id: '00000000-0000-4000-8000-000000013001',
     categoryId: categories[0].id,
@@ -443,6 +462,11 @@ const items = [
   },
 ] as const;
 
+const items = rawItems.map((item) => ({
+  ...item,
+  id: scopedDataId(item.id),
+}));
+
 const client = new Client({
   connectionString: databaseUrl,
   ssl: databaseUrl.includes('supabase.com') ? { rejectUnauthorized: false } : undefined,
@@ -485,16 +509,16 @@ async function main() {
       `,
       [
         tenantId,
-        'marenca-grupo-moderno',
-        'Marenca',
+        tenantSlug,
+        tenantName,
         null,
-        null,
+        tenantWhatsappPhone,
         null,
         '#9E3F2A',
         'cocina mexicana contemporánea',
         'es',
         'MXN',
-        'business',
+        tenantPlan,
       ],
     );
 
@@ -610,6 +634,39 @@ async function main() {
       );
     }
 
+    await client.query(
+      `
+        UPDATE menu_items
+        SET deleted_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
+        WHERE tenant_id = $1
+          AND deleted_at IS NULL
+          AND id <> ALL($2::uuid[])
+      `,
+      [tenantId, items.map((item) => item.id)],
+    );
+
+    await client.query(
+      `
+        UPDATE categories
+        SET deleted_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
+        WHERE tenant_id = $1
+          AND deleted_at IS NULL
+          AND id <> ALL($2::uuid[])
+      `,
+      [tenantId, categories.map((category) => category.id)],
+    );
+
+    await client.query(
+      `
+        UPDATE menu_sections
+        SET deleted_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
+        WHERE tenant_id = $1
+          AND deleted_at IS NULL
+          AND id <> ALL($2::uuid[])
+      `,
+      [tenantId, sections.map((section) => section.id)],
+    );
+
     await client.query('COMMIT');
     const counts = await client.query<{
       sections: string;
@@ -631,7 +688,7 @@ async function main() {
     console.log(
       `Verified database rows: ${counts.rows[0].sections} sections, ${counts.rows[0].categories} categories and ${counts.rows[0].items} items.`,
     );
-    console.log('Public slug: marenca-grupo-moderno');
+    console.log(`Public slug: ${tenantSlug}`);
   } catch (error) {
     await client.query('ROLLBACK');
     throw error;

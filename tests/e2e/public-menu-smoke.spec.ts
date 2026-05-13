@@ -1,5 +1,5 @@
 /**
- * Smoke tests for /m/taqueria-don-pepe.
+ * Smoke tests for the seeded demo menu.
  * Requires the seed to have been run: pnpm db:seed (or prisma db seed).
  * Tests skip automatically when USE_MOCKS=true (seed tenant not available in mock mode).
  */
@@ -9,12 +9,12 @@ const SLUG = 'taqueria-don-pepe';
 const BASE = `/m/${SLUG}`;
 const USE_MOCKS = process.env.USE_MOCKS === 'true';
 
-test.describe('public menu smoke — /m/taqueria-don-pepe', () => {
+test.describe('public menu smoke — seeded demo', () => {
   test.skip(USE_MOCKS, 'Seed not available in mock mode — run against real DB');
 
   test('renders restaurant name as h1', async ({ page }) => {
     await page.goto(BASE);
-    await expect(page.locator('h1')).toContainText('Taquería Don Pepe');
+    await expect(page.locator('h1')).toContainText('Marenca');
   });
 
   test('renders sticky nav with at least one category link', async ({ page }) => {
@@ -28,21 +28,19 @@ test.describe('public menu smoke — /m/taqueria-don-pepe', () => {
     await page.goto(BASE);
     const articles = page.locator('article');
     await expect(articles.first()).toBeVisible();
-    // seed has 4 items
     const count = await articles.count();
-    expect(count).toBeGreaterThanOrEqual(3);
+    expect(count).toBeGreaterThanOrEqual(30);
   });
 
-  test('sold-out item shows Agotado badge', async ({ page }) => {
+  test('renders seeded Marenca dishes', async ({ page }) => {
     await page.goto(BASE);
-    // seed: Agua de horchata isAvailable=false
-    await expect(page.getByText(/Agotado|Sold out/)).toBeVisible();
+    await expect(page.getByText('Azapotzalco')).toBeVisible();
+    await expect(page.getByText('Tlachomolli')).toBeVisible();
   });
 
   test('shows price in MXN format', async ({ page }) => {
     await page.goto(BASE);
-    // Tacos al pastor: $120 MXN
-    await expect(page.locator('body')).toContainText('$120');
+    await expect(page.locator('body')).toContainText('$285');
   });
 
   test('free plan footer links to landing', async ({ page }) => {
@@ -54,7 +52,7 @@ test.describe('public menu smoke — /m/taqueria-don-pepe', () => {
 
   test('page title includes restaurant name', async ({ page }) => {
     await page.goto(BASE);
-    await expect(page).toHaveTitle(/Taquería Don Pepe/);
+    await expect(page).toHaveTitle(/Marenca/);
   });
 
   test('WhatsApp order buttons are server-rendered anchors', async ({ page }) => {
