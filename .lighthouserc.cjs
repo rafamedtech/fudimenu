@@ -32,8 +32,9 @@ module.exports = {
         'categories:seo': ['warn', { minScore: 0.9 }],
         'first-contentful-paint': ['warn', { maxNumericValue: 2000 }],
         'largest-contentful-paint': ['error', { maxNumericValue: 1500 }],
-        'interaction-to-next-paint': ['warn', { maxNumericValue: 200 }],
-        'total-blocking-time': ['warn', { maxNumericValue: 300 }],
+        // INP only available with field data; lab uses TBT as proxy
+        'interaction-to-next-paint': 'off',
+        'total-blocking-time': ['error', { maxNumericValue: 200 }],
         'cumulative-layout-shift': ['error', { maxNumericValue: 0.1 }],
         // PWA checks not required for MVP
         'installable-manifest': 'off',
