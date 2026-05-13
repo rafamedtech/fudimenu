@@ -1,8 +1,12 @@
 import { config as loadEnv } from 'dotenv';
 import { defineConfig, devices } from '@playwright/test';
 
-// Load .env.test.local first (E2E-specific overrides), then fall back to .env.
-loadEnv({ path: '.env.test.local' });
+// E2E env precedence:
+//   1. `.env.test.local` — wins over shell + `.env` (override: true), so a stray
+//      shell DATABASE_URL pointing at a remote DB cannot defeat the safety guard
+//      in tests/e2e/global-setup.ts.
+//   2. `.env` — fallback for anything not set in `.env.test.local`.
+loadEnv({ path: '.env.test.local', override: true });
 loadEnv();
 
 export default defineConfig({
