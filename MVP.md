@@ -759,7 +759,7 @@ Todo debe imprimir ✅. ❌ → bloquea.
   - [ ] Accessibility >90
   - [ ] Best Practices >90
   - [ ] SEO >90
-- [ ] Lighthouse mobile en `/menu`:
+- [ ] Lighthouse mobile en `/menu` (**manual local**, auth-gated — LHCI CI audita `/` landing pública como proxy del shell admin):
   - [ ] Performance >85
 - [ ] LCP P75 <1500ms en WebPageTest 3G fast
 - [ ] Bundle `/m/[slug]` First Load JS <100kb gzipped
