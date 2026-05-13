@@ -10,8 +10,14 @@ export { ANALYTICS_CONSENT_KEY, type AnalyticsConsent, getStoredAnalyticsConsent
 
 let initialized = false;
 
+function isLocalAnalyticsHost() {
+  const { hostname } = window.location;
+  return hostname === 'localhost' || hostname === '127.0.0.1';
+}
+
 export function initAnalytics() {
   if (initialized || typeof window === 'undefined') return;
+  if (isLocalAnalyticsHost()) return;
   const key = process.env.NEXT_PUBLIC_POSTHOG_KEY;
   if (!key) return;
   const consent = getStoredAnalyticsConsent();
