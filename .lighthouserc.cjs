@@ -1,10 +1,17 @@
 /** @type {import('@lhci/cli').LighthouseRcConfig} */
+// MVP decision (2026-05-13): admin `/menu` is auth-gated (redirects to
+// /login?next=/menu without a Supabase session). Scripting a real auth flow in
+// LHCI CI is brittle (magic-link + Google OAuth + tenant cookie), so the
+// automated gate audits two PUBLIC routes that share the admin shell's chunks:
+//   - `/m/[slug]` — comensal critical path (MVP perf SLA)
+//   - `/`        — public landing (uses next/link, shared baseline 102 kB)
+// Admin `/menu` Lighthouse stays a manual local check (see MVP.md §Audit 5).
 module.exports = {
   ci: {
     collect: {
       url: [
         'http://localhost:3000/m/taqueria-don-pepe',
-        'http://localhost:3000/menu',
+        'http://localhost:3000/',
       ],
       settings: {
         formFactor: 'mobile',
