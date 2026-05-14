@@ -8,7 +8,9 @@ Marcadores:
 
 ## 1. Variables por ambiente
 
-🟢 Referencia: `.env.example`, `CLAUDE.md` § "Env vars críticas".
+🟢 Referencia: `.env.example`, `CLAUDE.md` § "Env vars críticas" y
+[`docs/ENVIRONMENT.md`](./ENVIRONMENT.md) para el contrato validado sin
+hardcodear secretos.
 
 | Var | dev | preview | prod |
 |---|---|---|---|

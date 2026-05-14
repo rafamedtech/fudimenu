@@ -102,8 +102,9 @@ test.describe('admin crea sección, agrega categoría e item, vista pública mue
 
     // ── 1. Crear sección desde /menu ──────────────────────────────────────────
     await page.goto('/menu');
-    await page.getByRole('button', { name: '+ Nueva sección' }).click();
-    await page.getByLabel('Nombre de sección').fill('Comida');
+    await page.getByRole('link', { name: /Crear primera sección/i }).click();
+    await expect(page).toHaveURL(/\/menu\/sections\/new$/);
+    await page.getByLabel('Nombre').fill('Comida');
     // color: dejamos default (#FFF8E7)
     await page.getByRole('button', { name: 'Guardar' }).click();
 
@@ -111,13 +112,13 @@ test.describe('admin crea sección, agrega categoría e item, vista pública mue
     await expect(page.getByRole('heading', { name: 'Comida' })).toBeVisible();
 
     // ── 2. Navegar a página de sección ─────────────────────────────────────────
-    await page.getByRole('link', { name: 'Comida' }).click();
+    await page.getByRole('link', { name: 'Comida', exact: true }).click();
     await expect(page).toHaveURL(/\/menu\/s\//);
     const sectionId = page.url().split('/menu/s/')[1]?.split('?')[0];
     expect(sectionId).toBeTruthy();
 
-    // Estado vacío
-    await expect(page.getByText(/sin platillos|vacío|empty/i)).toBeVisible();
+    // Estado vacío sin categorías
+    await expect(page.getByText(/crea una categoría primero/i)).toBeVisible();
 
     // ── 3. FAB → editor de item con sectionId en query param ──────────────────
     await page.getByRole('button', { name: /agregar platillo/i }).click();
@@ -137,7 +138,7 @@ test.describe('admin crea sección, agrega categoría e item, vista pública mue
     await page.getByLabel('Nombre del platillo').fill('Tacos pastor');
     await page.getByLabel('Precio').fill('120');
     await Promise.all([
-      page.waitForURL('/menu'),
+      page.waitForURL(new RegExp(`/menu/s/${sectionId}`)),
       page.getByRole('button', { name: 'Guardar' }).click(),
     ]);
 
