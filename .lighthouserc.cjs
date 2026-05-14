@@ -9,6 +9,10 @@
 module.exports = {
   ci: {
     collect: {
+      startServerCommand:
+        'USE_MOCKS=true NEXT_PUBLIC_APP_URL=http://localhost:3000 pnpm exec next start -H 127.0.0.1 -p 3000',
+      startServerReadyPattern: 'Ready',
+      startServerReadyTimeout: 120000,
       url: [
         'http://localhost:3000/m/taqueria-don-pepe',
         'http://localhost:3000/',
