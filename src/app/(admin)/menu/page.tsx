@@ -88,7 +88,7 @@ async function MenuList({ tenantId }: { tenantId: string }) {
           href={`/m/${tenant.slug}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 rounded-md border border-ink-200 bg-white px-3 py-2 text-sm font-bold text-ink-900 shadow-sm hover:border-mostaza-500"
+          className="inline-flex items-center gap-1.5 rounded-md border border-[var(--brand-primary-border)] bg-[var(--brand-card)] px-3 py-2 text-sm font-bold text-ink-900 shadow-sm transition-colors hover:border-[var(--brand-primary)] hover:bg-[var(--brand-primary-faint)]"
         >
           <ExternalLink className="h-4 w-4" aria-hidden />
           Ver menú público
