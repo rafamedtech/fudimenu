@@ -67,8 +67,33 @@ export async function POST(request: NextRequest) {
     code,
   });
 
+  const isProd = process.env.NODE_ENV === 'production';
+
+  if (!email.sent) {
+    if (isProd) {
+      console.error('account_delete_code: email failed in prod', {
+        tenantId: ctx.tenantId,
+        userId: ctx.userId,
+        reason: email.reason,
+      });
+      return NextResponse.json(
+        { ok: false, error: 'email_send_failed', reason: email.reason },
+        noStore(500),
+      );
+    }
+
+    console.warn(
+      `[dev] account delete code for ${ctx.email}: ${code} (expires ${expiresAt.toISOString()}) — reason: ${email.reason}`,
+    );
+  }
+
   return NextResponse.json(
-    { ok: true, expiresAt: expiresAt.toISOString(), email },
+    {
+      ok: true,
+      expiresAt: expiresAt.toISOString(),
+      email,
+      ...(isProd ? {} : { devCode: email.sent ? undefined : code }),
+    },
     noStore(),
   );
 }

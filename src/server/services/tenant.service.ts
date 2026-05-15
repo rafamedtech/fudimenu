@@ -135,7 +135,7 @@ export const tenantService = {
           cuisineType: input.cuisine,
           currency: 'MXN',
           defaultLocale: 'es',
-          plan: 'pro',
+          plan: 'free',
         },
       });
 

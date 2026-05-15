@@ -8,7 +8,7 @@ const PRO_TRIAL_DAYS = 14;
 const REFERRAL_CREDIT_CENTS = 14_900;
 const REFERRAL_CREDIT_CURRENCY = 'mxn';
 const RESEND_API_URL = 'https://api.resend.com/emails';
-const EMAIL_FROM = 'FudiMenu <noreply@fudimenu.app>';
+const EMAIL_FROM = process.env.RESEND_FROM ?? 'FudiMenu <noreply@fudimenu.app>';
 
 type TrialTenantInput = {
   tenantId: string;
@@ -61,6 +61,11 @@ async function sendEmail({
   const resendApiKey = process.env.RESEND_API_KEY;
   if (!resendApiKey) return { sent: false, reason: 'missing_resend_api_key' as const };
 
+  const override = process.env.DEV_EMAIL_OVERRIDE;
+  const finalTo = override && process.env.NODE_ENV !== 'production' ? override : to;
+  const finalSubject =
+    override && process.env.NODE_ENV !== 'production' ? `[dev → ${to}] ${subject}` : subject;
+
   const response = await fetch(RESEND_API_URL, {
     method: 'POST',
     headers: {
@@ -69,13 +74,17 @@ async function sendEmail({
     },
     body: JSON.stringify({
       from: EMAIL_FROM,
-      to,
-      subject,
+      to: finalTo,
+      subject: finalSubject,
       text,
     }),
   });
 
-  if (!response.ok) return { sent: false, reason: 'resend_error' as const };
+  if (!response.ok) {
+    const body = await response.text().catch(() => '');
+    console.error('resend_error', { status: response.status, body, to, from: EMAIL_FROM });
+    return { sent: false, reason: 'resend_error' as const };
+  }
   return { sent: true, reason: null };
 }
 
@@ -276,6 +285,15 @@ export const billingService = {
       },
       { idempotencyKey: `tenant:${input.tenantId}:pro-trial` },
     );
+
+    await getPrisma().tenant.update({
+      where: { id: input.tenantId },
+      data: {
+        plan: 'pro',
+        stripeCustomerId: customer.id,
+        stripeSubscriptionId: subscription.id,
+      },
+    });
 
     const referralCredit = await applyReferralCreditForTenant(stripe, input.tenantId);
 

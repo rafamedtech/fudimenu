@@ -57,7 +57,7 @@ describe('tenantService', () => {
     expect(mocks.tx.tenant.create).toHaveBeenCalledWith(
       expect.objectContaining({
         data: expect.objectContaining({
-          plan: 'pro',
+          plan: 'free',
         }),
       }),
     );

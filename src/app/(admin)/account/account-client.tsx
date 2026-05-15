@@ -64,7 +64,18 @@ export function AccountClient({ email, tenantName, tenantSlug, plan }: AccountCl
         return;
       }
 
-      toast.success('Código enviado a tu email');
+      const data = (await response.json().catch(() => null)) as
+        | { email?: { sent?: boolean }; devCode?: string }
+        | null;
+
+      if (data?.devCode) {
+        setDeleteCode(data.devCode);
+        toast.success(`Modo dev: código ${data.devCode} (revisa consola server)`);
+      } else if (data?.email?.sent === false) {
+        toast.error('No se pudo enviar el email. Revisa logs del server.');
+      } else {
+        toast.success('Código enviado a tu email');
+      }
     } catch {
       toast.error('No pude mandar el código');
     } finally {
