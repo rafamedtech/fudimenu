@@ -55,7 +55,7 @@ export default async function ReferralSettingsPage() {
             </div>
           </div>
 
-          <div className="rounded-md border-[1.5px] border-ink-100 bg-white p-3">
+          <div className="rounded-md border-[1.5px] border-ink-100 bg-[var(--brand-card)] p-3">
             <div className="flex items-center gap-2 text-xs font-bold uppercase text-ink-500">
               <Link2 className="h-4 w-4" />
               Link referral
@@ -84,8 +84,8 @@ export default async function ReferralSettingsPage() {
             <h2 className="text-lg font-extrabold text-ink-900">QR referral</h2>
           </div>
 
-          <div className="mx-auto w-full max-w-64 rounded-md border-[1.5px] border-ink-100 bg-crema-50 p-4">
-            <div className="relative aspect-square overflow-hidden rounded-md bg-white">
+          <div className="mx-auto w-full max-w-64 rounded-md border-[1.5px] border-ink-100 bg-[var(--brand-surface)] p-4">
+            <div className="relative aspect-square overflow-hidden rounded-md bg-[var(--brand-card)]">
               <Image
                 src={`/api/qr/referral/${dashboard.code}`}
                 alt="QR del link referral"

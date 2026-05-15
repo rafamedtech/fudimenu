@@ -6,16 +6,22 @@ export default {
     extend: {
       colors: {
         mostaza: {
-          50: 'var(--mostaza-50)',
-          100: 'var(--mostaza-100)',
-          400: 'var(--mostaza-400)',
-          500: 'var(--mostaza-500)',
-          600: 'var(--mostaza-600)',
+          50: 'rgb(var(--brand-primary-muted-rgb) / <alpha-value>)',
+          100: 'rgb(var(--brand-primary-soft-rgb) / <alpha-value>)',
+          300: 'rgb(var(--brand-primary-border-rgb) / <alpha-value>)',
+          400: 'rgb(var(--brand-primary-hover-rgb) / <alpha-value>)',
+          500: 'rgb(var(--brand-primary-rgb) / <alpha-value>)',
+          600: 'rgb(var(--brand-primary-pressed-rgb) / <alpha-value>)',
+          700: 'rgb(var(--brand-accent-text-rgb) / <alpha-value>)',
+          800: 'rgb(var(--brand-accent-text-rgb) / <alpha-value>)',
         },
         coral: { 100: '#FFE0DB', 500: '#FF6B5B' },
         menta: { 100: '#D4F2E4', 500: '#6BD4A4' },
         uva: { 100: '#E5DEFF', 500: '#7C5CFF' },
-        crema: { 50: '#FFFCF5', 100: '#FFF8E7' },
+        crema: {
+          50: 'rgb(var(--brand-surface-rgb) / <alpha-value>)',
+          100: 'rgb(var(--brand-surface-strong-rgb) / <alpha-value>)',
+        },
         ink: {
           100: '#EDE7DB',
           300: '#C4BCAE',
@@ -39,7 +45,7 @@ export default {
         md: '0 4px 12px rgba(26,22,17,0.08)',
         lg: '0 12px 32px rgba(26,22,17,0.12)',
         xl: '0 24px 64px rgba(26,22,17,0.16)',
-        'glow-mostaza': '0 0 0 4px color-mix(in srgb, var(--mostaza-500) 20%, transparent)',
+        'glow-mostaza': '0 0 0 4px var(--brand-primary-ring, rgba(244,180,0,0.2))',
       },
       transitionTimingFunction: {
         spring: 'cubic-bezier(0.34, 1.56, 0.64, 1)',

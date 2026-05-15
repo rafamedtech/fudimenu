@@ -76,7 +76,7 @@ const sections = [
 
 export default function TermsPage() {
   return (
-    <main className="min-h-dvh bg-crema-50 px-5 py-10 text-ink-900">
+    <main className="min-h-dvh bg-[var(--brand-surface)] px-5 py-10 text-ink-900">
       <article className="mx-auto max-w-3xl">
         <Link href="/" className="text-sm font-semibold text-ink-500 underline">
           Volver a FudiMenu

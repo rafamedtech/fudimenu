@@ -23,6 +23,7 @@ import { useEffect, useMemo, useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { resolveBrandSurfaceColor } from '@/lib/brand-theme';
 import { reorderSectionsAction } from '@/server/actions/sections.actions';
 import type { MenuSection } from '@/types/domain';
 
@@ -98,7 +99,7 @@ export function SectionGrid({ sections, canCreateSection, itemCountBySectionId }
               <li>
                 <Link
                   href="/menu/sections/new"
-                  className="flex aspect-[4/5] flex-col items-center justify-center gap-3 rounded-lg border-[1.5px] border-dashed border-ink-300 bg-white text-center text-ink-700 shadow-sm transition-colors hover:border-mostaza-500"
+                  className="flex aspect-[4/5] flex-col items-center justify-center gap-3 rounded-lg border-[1.5px] border-dashed border-ink-300 bg-[var(--brand-card)] text-center text-ink-700 shadow-sm transition-colors hover:border-mostaza-500"
                 >
                   <span className="flex h-12 w-12 items-center justify-center rounded-full bg-mostaza-100 text-ink-900">
                     <Plus className="h-6 w-6" aria-hidden />
@@ -136,7 +137,7 @@ function SortableSectionCard({
     <li ref={setNodeRef} style={style} className={isDragging ? 'z-10 opacity-80' : undefined}>
       <Card
         className="relative aspect-[4/5] overflow-hidden p-0 shadow-sm"
-        style={{ backgroundColor: section.accentColor }}
+        style={{ backgroundColor: resolveBrandSurfaceColor(section.accentColor) }}
       >
         {section.coverImageUrl ? (
           <Image
@@ -178,7 +179,7 @@ function SortableSectionCard({
             <Link href={`/menu/s/${section.id}`} className="absolute inset-0" aria-label={section.name} />
             <Link
               href={`/menu/sections/${section.id}/edit`}
-              className="absolute right-2 top-2 flex h-10 w-10 items-center justify-center rounded-md bg-white/90 text-ink-900 shadow-sm"
+              className="absolute right-2 top-2 flex h-10 w-10 items-center justify-center rounded-md bg-[var(--brand-card)] text-ink-900 shadow-sm"
               aria-label={`Editar ${section.name}`}
             >
               <Settings2 className="h-4 w-4" aria-hidden />

@@ -57,7 +57,7 @@ export default async function DashboardPage() {
             </Card>
           </ProFeatureLock>
         ) : (
-          <Card className="bg-gradient-to-br from-mostaza-50 to-white">
+          <Card className="bg-gradient-to-br from-mostaza-50 to-[var(--brand-card)]">
             <div className="flex items-center justify-between">
               <p className="text-sm font-medium text-ink-500">Vistas hoy 👀</p>
             </div>
@@ -104,7 +104,7 @@ export default async function DashboardPage() {
               <div className="flex shrink-0 gap-2">
                 <Link
                   href={`/menu/${dailySpecial.id}`}
-                  className="inline-flex min-h-12 flex-1 items-center justify-center rounded-md border-[1.5px] border-ink-300 bg-white px-4 text-sm font-semibold text-ink-900 transition-all duration-150 active:scale-[0.97] sm:flex-none"
+                  className="inline-flex min-h-12 flex-1 items-center justify-center rounded-md border-[1.5px] border-ink-300 bg-[var(--brand-card)] px-4 text-sm font-semibold text-ink-900 transition-all duration-150 active:scale-[0.97] sm:flex-none"
                 >
                   Cambiar
                 </Link>
@@ -121,7 +121,7 @@ export default async function DashboardPage() {
             ) : (
               <Link
                 href="/menu/new"
-                className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-md bg-mostaza-500 px-4 text-sm font-semibold text-ink-900 shadow-md transition-all duration-150 active:scale-[0.97]"
+                className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-md bg-[var(--brand-primary)] px-4 text-sm font-semibold text-[var(--brand-on-primary)] shadow-md transition-all duration-150 active:scale-[0.97]"
               >
                 + Agregar
               </Link>

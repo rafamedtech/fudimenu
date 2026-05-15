@@ -145,7 +145,7 @@ export default function OnboardingPage() {
                 className={`flex h-16 items-center justify-center rounded-md border-2 text-base font-semibold transition-all ${
                   cuisine === c.id
                     ? 'border-mostaza-500 bg-mostaza-50'
-                    : 'border-ink-300 bg-white'
+                    : 'border-ink-300 bg-[var(--brand-card)]'
                 }`}
               >
                 {c.label}
@@ -154,7 +154,7 @@ export default function OnboardingPage() {
           </div>
         </section>
 
-        <section className="rounded-md border border-ink-200 bg-white">
+        <section className="rounded-md border border-ink-200 bg-[var(--brand-card)]">
           <button
             type="button"
             className="flex w-full items-center justify-between gap-3 px-4 py-4 text-left"
@@ -209,7 +209,7 @@ export default function OnboardingPage() {
           aria-modal="true"
           aria-labelledby="existing-tenant-title"
         >
-          <div className="w-full max-w-sm rounded-md bg-white p-6 shadow-xl">
+          <div className="w-full max-w-sm rounded-md bg-[var(--brand-card)] p-6 shadow-xl">
             <h2 id="existing-tenant-title" className="text-2xl font-extrabold text-ink-900">
               Ya tienes este restaurante: {existingTenant.slug}
             </h2>

@@ -43,7 +43,7 @@ export function SaveIndicator({ status, className }: SaveIndicatorProps) {
       role="status"
       aria-live="polite"
       className={cn(
-        'inline-flex h-7 items-center gap-2 rounded-full bg-white/95 px-3 text-xs font-semibold text-ink-700 shadow-sm ring-1 ring-ink-100 transition-opacity duration-200',
+        'inline-flex h-7 items-center gap-2 rounded-full bg-[var(--brand-card)] px-3 text-xs font-semibold text-ink-700 shadow-sm ring-1 ring-ink-100 transition-opacity duration-200',
         isFading && 'opacity-0',
         className,
       )}

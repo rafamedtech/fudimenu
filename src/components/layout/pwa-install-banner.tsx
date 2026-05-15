@@ -55,7 +55,7 @@ export function PwaInstallBanner() {
 
   return (
     <div className="fixed inset-x-0 bottom-[88px] z-40 px-4 pb-3">
-      <div className="mx-auto flex max-w-md items-center gap-3 rounded-md border border-ink-100 bg-white p-3 shadow-lg">
+      <div className="mx-auto flex max-w-md items-center gap-3 rounded-md border border-ink-100 bg-[var(--brand-card)] p-3 shadow-lg">
         <p className="min-w-0 flex-1 text-sm font-semibold leading-snug text-ink-900">
           Agrega FudiMenu a tu inicio — acceso en 1 tap 📱
         </p>

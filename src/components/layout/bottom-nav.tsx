@@ -24,7 +24,7 @@ export function BottomNav({ plan }: BottomNavProps) {
   return (
     <nav
       aria-label="Navegación principal"
-      className="fixed inset-x-0 bottom-0 z-30 border-t border-ink-100 bg-white/90 pb-safe backdrop-blur"
+      className="fixed inset-x-0 bottom-0 z-30 border-t border-[var(--brand-card-border)] bg-[var(--brand-card)] pb-safe backdrop-blur"
     >
       <ul className="mx-auto flex h-[72px] max-w-md items-center justify-around">
         {tabs.map(({ href, label, Icon }) => {
@@ -39,7 +39,7 @@ export function BottomNav({ plan }: BottomNavProps) {
                   description="Mide vistas, platillos favoritos y señales de demanda para decidir qué vender más."
                   className={cn(
                     'relative flex flex-col items-center gap-1 px-3 py-2 transition-transform',
-                    active ? 'text-mostaza-500 scale-110' : 'text-ink-500',
+                    active ? 'scale-110 text-[var(--brand-accent-text)]' : 'text-ink-500',
                   )}
                 >
                   <Icon size={24} strokeWidth={active ? 2.5 : 2} />
@@ -58,7 +58,7 @@ export function BottomNav({ plan }: BottomNavProps) {
                 href={href}
                 className={cn(
                   'flex flex-col items-center gap-1 px-3 py-2 transition-transform',
-                  active ? 'text-mostaza-500 scale-110' : 'text-ink-500',
+                  active ? 'text-[var(--brand-accent-text)] scale-110' : 'text-ink-500',
                 )}
               >
                 <Icon size={24} strokeWidth={active ? 2.5 : 2} />

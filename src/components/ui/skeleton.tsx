@@ -14,7 +14,7 @@ export function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLDivEl
 
 export function ItemCardSkeleton() {
   return (
-    <div className="flex items-center gap-3 rounded-lg bg-white p-3 shadow-sm">
+    <div className="flex items-center gap-3 rounded-lg bg-[var(--brand-card)] p-3 shadow-sm">
       <Skeleton className="h-16 w-16 rounded-md" />
       <div className="flex flex-1 flex-col gap-2">
         <Skeleton className="h-4 w-2/3" />

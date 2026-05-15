@@ -31,14 +31,14 @@ export default async function AnalyticsPage() {
               description="Activa Pro para ver vistas, top platillos y señales de demanda de tu menú."
               className="block w-full"
             >
-              <span className="flex min-h-12 w-full items-center justify-center rounded-md bg-mostaza-500 px-5 text-base font-semibold text-ink-900 shadow-md transition-all duration-150 active:scale-[0.97]">
+              <span className="flex min-h-12 w-full items-center justify-center rounded-md bg-[var(--brand-primary)] px-5 text-base font-semibold text-[var(--brand-on-primary)] shadow-md transition-all duration-150 active:scale-[0.97]">
                 Upgrade
               </span>
             </ProFeatureLock>
           </Card>
         ) : (
           <>
-        <Card className="bg-gradient-to-br from-mostaza-50 to-white">
+        <Card className="bg-gradient-to-br from-mostaza-50 to-[var(--brand-card)]">
           <p className="text-sm font-medium text-ink-500">Vistas semana 📈</p>
           <p className="mt-1 text-4xl font-extrabold tabular-nums">1,247</p>
           <p className="mt-1 text-sm text-menta-500">▲ +18% vs semana pasada</p>

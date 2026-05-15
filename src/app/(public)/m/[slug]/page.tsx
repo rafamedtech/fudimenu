@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { getLocale, getTranslations } from 'next-intl/server';
+import { buildBrandThemeStyle, resolveBrandSurfaceColor } from '@/lib/brand-theme';
 import { getCategoryEmoji } from '@/lib/category-placeholder';
 import { formatPrice } from '@/lib/utils';
 import { buildWhatsAppOrderUrl } from '@/lib/whatsapp';
@@ -53,11 +54,11 @@ function PublicMenuItemCard({
 
   return (
     <article
-      className="flex gap-3 rounded-lg bg-white p-3 shadow-sm"
+      className="flex gap-3 rounded-lg border border-[var(--brand-card-border)] bg-[var(--brand-card)] p-3 shadow-sm"
       data-item-id={item.id}
       data-item-category={categoryName}
     >
-      <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-md bg-crema-100">
+      <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-md bg-[var(--brand-primary-soft)]">
         {item.imageUrl ? (
           <Image src={item.imageUrl} alt={item.name} fill sizes="80px" className="object-cover" />
         ) : (
@@ -92,7 +93,7 @@ function PublicMenuItemCard({
             target="_blank"
             rel="noopener noreferrer"
             data-track-wa={item.id}
-            className="mt-3 inline-flex min-h-11 items-center justify-center rounded-md bg-menta-500 px-3 text-sm font-extrabold text-ink-900 shadow-sm transition-all hover:opacity-90 active:scale-[0.98]"
+            className="mt-3 inline-flex min-h-11 items-center justify-center rounded-md bg-[var(--brand-primary)] px-3 text-sm font-extrabold text-[var(--brand-on-primary)] shadow-sm transition-all hover:bg-[var(--brand-primary-hover)] active:scale-[0.98]"
           >
             {t('orderWhatsApp')}
           </a>
@@ -122,6 +123,7 @@ function PublicMenuContent({
   const categoryNamesById = new Map(categories.map((c) => [c.id, c.name]));
   const dailySpecials = items.filter((item) => item.isSpecialToday);
   const regularItems = items.filter((item) => !item.isSpecialToday);
+  const brandThemeStyle = buildBrandThemeStyle(tenant.primaryColor);
 
   const hasSections = sections.length > 0;
 
@@ -190,6 +192,7 @@ function PublicMenuContent({
       slug={slug}
       tenantId={tenant.id}
       locale={priceLocale === 'en-US' ? 'en' : 'es'}
+      brandThemeStyle={brandThemeStyle}
       pwaStrings={{
         prompt: t('pwaPrompt'),
         install: t('pwaInstall'),
@@ -197,16 +200,16 @@ function PublicMenuContent({
       }}
     >
       <main
-        className="mx-auto min-h-dvh max-w-md scroll-smooth bg-crema-50 pb-12"
-        style={{ ['--brand' as string]: tenant.primaryColor }}
+        className="mx-auto min-h-dvh max-w-md scroll-smooth bg-[var(--brand-surface)] pb-12"
+        style={brandThemeStyle}
       >
         <a
           href="#menu-content"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-white focus:px-4 focus:py-3 focus:font-bold focus:text-ink-900"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-[var(--brand-card)] focus:px-4 focus:py-3 focus:font-bold focus:text-ink-900"
         >
           {t('skipToMenu')}
         </a>
-        <header className="relative bg-white px-6 py-8 text-center shadow-sm">
+        <header className="relative border-b border-[var(--brand-card-border)] bg-[var(--brand-card)] px-6 py-8 text-center shadow-sm">
           <div className="absolute right-4 top-4">
             <Suspense fallback={null}>
               <PublicMenuLanguageSwitcher
@@ -228,7 +231,7 @@ function PublicMenuContent({
           ) : (
             <div
               className="mx-auto mb-3 flex h-20 w-20 items-center justify-center rounded-full text-3xl"
-              style={{ backgroundColor: tenant.primaryColor + '33' }}
+              style={{ backgroundColor: 'var(--brand-primary-faint)' }}
             >
               🍽️
             </div>
@@ -236,7 +239,7 @@ function PublicMenuContent({
           <h1 className="text-2xl font-extrabold">{tenant.name}</h1>
         </header>
 
-        <nav className="sticky top-0 z-10 flex gap-2 overflow-x-auto bg-crema-50/95 px-4 py-3 backdrop-blur">
+        <nav className="sticky top-0 z-10 flex gap-2 overflow-x-auto bg-[var(--brand-surface-translucent)] px-4 py-3 backdrop-blur">
           {dailySpecials.length > 0 && (
             <a
               href="#especiales-hoy"
@@ -250,7 +253,7 @@ function PublicMenuContent({
                 <a
                   key={section.id}
                   href={`#sec-${section.id}`}
-                  className="whitespace-nowrap rounded-full bg-white px-4 py-2 text-sm font-semibold text-ink-700 shadow-sm"
+                  className="whitespace-nowrap rounded-full bg-[var(--brand-card)] px-4 py-2 text-sm font-semibold text-ink-700 shadow-sm"
                 >
                   {section.name}
                 </a>
@@ -259,7 +262,7 @@ function PublicMenuContent({
                 <a
                   key={category.id}
                   href={`#cat-${category.id}`}
-                  className="whitespace-nowrap rounded-full bg-white px-4 py-2 text-sm font-semibold text-ink-700 shadow-sm"
+                  className="whitespace-nowrap rounded-full bg-[var(--brand-card)] px-4 py-2 text-sm font-semibold text-ink-700 shadow-sm"
                 >
                   {category.name}
                 </a>
@@ -291,7 +294,7 @@ function PublicMenuContent({
                 <section key={section.id} id={`sec-${section.id}`}>
                   <div
                     className="mb-3 rounded-lg px-4 py-3"
-                    style={{ backgroundColor: section.accentColor }}
+                    style={{ backgroundColor: resolveBrandSurfaceColor(section.accentColor) }}
                   >
                     <h2 className="text-2xl font-extrabold text-ink-900">{section.name}</h2>
                   </div>
@@ -336,7 +339,7 @@ function PublicMenuContent({
         {tenant.plan === 'free' && (
           <footer className="mt-12 text-center text-xs text-ink-500">
             {t('madeWith')}{' '}
-            <Link href="/" className="font-bold text-mostaza-500 hover:underline">
+            <Link href="/" className="font-bold text-[var(--brand-accent-text)] hover:underline">
               FudiMenu
             </Link>
           </footer>

@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState, useTransition } from 'react';
+import type { CSSProperties } from 'react';
 import {
   CookieConsentProvider,
   useCookieConsentDecided,
@@ -78,15 +79,15 @@ export function PublicMenuLanguageSwitcher({ activeLocale: initialLocale, ariaLa
 
   return (
     <div
-      className="inline-grid h-9 grid-cols-2 rounded-md border border-ink-900/10 bg-crema-50 p-0.5 shadow-sm"
+      className="inline-grid h-9 grid-cols-2 rounded-md border border-[var(--brand-card-border)] bg-[var(--brand-surface)] p-0.5 shadow-sm"
       role="group"
       aria-label={ariaLabel}
     >
       {LOCALES.map((option) => {
         const isActive = option === activeLocale;
         const className = isActive
-          ? 'h-8 min-w-10 rounded px-2 text-xs font-extrabold uppercase transition-colors disabled:cursor-wait bg-ink-900 text-white shadow-sm'
-          : 'h-8 min-w-10 rounded px-2 text-xs font-extrabold uppercase transition-colors disabled:cursor-wait text-ink-500 hover:bg-white hover:text-ink-900';
+          ? 'h-8 min-w-10 rounded px-2 text-xs font-extrabold uppercase transition-colors disabled:cursor-wait bg-[var(--brand-primary)] text-[var(--brand-on-primary)] shadow-sm'
+          : 'h-8 min-w-10 rounded px-2 text-xs font-extrabold uppercase transition-colors disabled:cursor-wait text-ink-500 hover:bg-[var(--brand-card)] hover:text-ink-900';
 
         return (
           <button
@@ -116,15 +117,25 @@ interface PublicMenuPwaWrapperProps {
   tenantId: string;
   locale: string;
   pwaStrings: PwaPromptStrings;
+  brandThemeStyle?: CSSProperties;
   children: React.ReactNode;
 }
 
-export function PublicMenuPwaWrapper({ slug, tenantId, locale, pwaStrings, children }: PublicMenuPwaWrapperProps) {
+export function PublicMenuPwaWrapper({
+  slug,
+  tenantId,
+  locale,
+  pwaStrings,
+  brandThemeStyle,
+  children,
+}: PublicMenuPwaWrapperProps) {
   return (
     <CookieConsentProvider>
-      <PublicMenuPwaContent slug={slug} tenantId={tenantId} locale={locale} pwaStrings={pwaStrings}>
-        {children}
-      </PublicMenuPwaContent>
+      <div style={brandThemeStyle}>
+        <PublicMenuPwaContent slug={slug} tenantId={tenantId} locale={locale} pwaStrings={pwaStrings}>
+          {children}
+        </PublicMenuPwaContent>
+      </div>
     </CookieConsentProvider>
   );
 }
@@ -166,13 +177,13 @@ function PublicMenuPwaContent({ slug, tenantId, locale, pwaStrings, children }: 
       {children}
       {shouldShowPrompt && (
         <div className="fixed inset-x-0 bottom-0 z-40 animate-fade-in px-4 pb-4">
-          <div className="mx-auto flex max-w-md items-center gap-3 rounded-md border border-mostaza-500/30 bg-white p-3 shadow-lg">
+          <div className="mx-auto flex max-w-md items-center gap-3 rounded-md border border-[var(--brand-primary-border)] bg-[var(--brand-card)] p-3 shadow-lg">
             <p className="min-w-0 flex-1 text-sm font-semibold leading-snug text-ink-900">
               {pwaStrings.prompt}
             </p>
             <button
               type="button"
-              className="inline-flex min-h-10 min-w-10 shrink-0 items-center justify-center rounded-md bg-mostaza-500 px-3 font-semibold text-ink-900 shadow-md transition-all hover:bg-mostaza-400 active:scale-[0.97]"
+              className="inline-flex min-h-10 min-w-10 shrink-0 items-center justify-center rounded-md bg-[var(--brand-primary)] px-3 font-semibold text-[var(--brand-on-primary)] shadow-md transition-all hover:bg-[var(--brand-primary-hover)] active:scale-[0.97]"
               onClick={promptInstall}
               aria-label={pwaStrings.install}
             >
@@ -194,7 +205,7 @@ function PublicMenuPwaContent({ slug, tenantId, locale, pwaStrings, children }: 
             </button>
             <button
               type="button"
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md text-ink-500 transition-colors hover:bg-ink-100 hover:text-ink-900 focus-visible:outline-none focus-visible:shadow-glow-mostaza"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md text-ink-500 transition-colors hover:bg-[var(--brand-primary-faint)] hover:text-ink-900 focus-visible:outline-none focus-visible:shadow-glow-mostaza"
               onClick={handleDismiss}
               aria-label={pwaStrings.close}
             >

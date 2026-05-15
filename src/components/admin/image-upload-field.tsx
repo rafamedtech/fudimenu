@@ -59,7 +59,7 @@ export function ImageUploadField({
   return (
     <div className="space-y-2">
       <p className="text-sm font-medium text-ink-700">{label}</p>
-      <div className="relative flex min-h-40 w-full items-center justify-center overflow-hidden rounded-md border-[1.5px] border-dashed border-ink-300 bg-crema-100">
+      <div className="relative flex min-h-40 w-full items-center justify-center overflow-hidden rounded-md border-[1.5px] border-dashed border-ink-300 bg-[var(--brand-surface-strong)]">
         {value ? (
           <Image src={value} alt="" fill sizes="400px" className="object-cover" />
         ) : (
@@ -69,7 +69,7 @@ export function ImageUploadField({
           </div>
         )}
         {uploading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-white/70">
+          <div className="absolute inset-0 flex items-center justify-center bg-[var(--brand-card)]">
             <Loader2 className="h-7 w-7 animate-spin text-ink-700" aria-hidden />
           </div>
         )}

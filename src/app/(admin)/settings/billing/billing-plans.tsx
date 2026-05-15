@@ -1,8 +1,8 @@
 'use client';
 
-import { Landmark, Store } from 'lucide-react';
+import { Store } from 'lucide-react';
 import { useState } from 'react';
-import { PLAN_CONFIG } from '@/config/plans';
+import { PLANS } from '@/config/plans';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import {
@@ -42,7 +42,7 @@ interface Props {
 
 export function BillingPlans({ currentPlan, hasStripeCustomer, hasStripeSubscription }: Props) {
   const [cycle, setCycle] = useState<Cycle>('monthly');
-  const plans = [PLAN_CONFIG.free, PLAN_CONFIG.pro, PLAN_CONFIG.business];
+  const plans = PLANS;
 
   return (
     <div className="flex flex-col gap-4">
@@ -54,7 +54,7 @@ export function BillingPlans({ currentPlan, hasStripeCustomer, hasStripeSubscrip
           className={[
             'flex-1 rounded-md py-2 text-sm font-semibold transition-colors',
             cycle === 'monthly'
-              ? 'bg-white text-ink-900 shadow-sm'
+              ? 'bg-[var(--brand-card)] text-ink-900 shadow-sm'
               : 'text-ink-500 hover:text-ink-700',
           ].join(' ')}
         >
@@ -66,7 +66,7 @@ export function BillingPlans({ currentPlan, hasStripeCustomer, hasStripeSubscrip
           className={[
             'flex-1 rounded-md py-2 text-sm font-semibold transition-colors',
             cycle === 'annual'
-              ? 'bg-white text-ink-900 shadow-sm'
+              ? 'bg-[var(--brand-card)] text-ink-900 shadow-sm'
               : 'text-ink-500 hover:text-ink-700',
           ].join(' ')}
         >
@@ -112,10 +112,8 @@ export function BillingPlans({ currentPlan, hasStripeCustomer, hasStripeSubscrip
                 <p className="mt-1 text-sm font-semibold text-ink-700">{displayPrice}</p>
                 {savings && <p className="mt-0.5 text-xs text-menta-700">{savings}</p>}
               </div>
-              {plan.id === 'free' ? null : plan.id === 'pro' ? (
+              {plan.id === 'free' ? null : (
                 <Store className="h-5 w-5 shrink-0 text-mostaza-600" />
-              ) : (
-                <Landmark className="h-5 w-5 shrink-0 text-coral-500" />
               )}
             </div>
 
@@ -135,14 +133,6 @@ export function BillingPlans({ currentPlan, hasStripeCustomer, hasStripeSubscrip
                   <li>· Sin marca FudiMenu</li>
                   <li>· Especiales del día</li>
                   <li>· Analytics básico</li>
-                </>
-              )}
-              {plan.id === 'business' && (
-                <>
-                  <li>· Todo lo de Pro</li>
-                  <li>· Menú en español e inglés</li>
-                  <li>· Soporte prioritario</li>
-                  <li>· Multi-sucursal (próximamente, hasta 3)</li>
                 </>
               )}
             </ul>

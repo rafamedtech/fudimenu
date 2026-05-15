@@ -1,6 +1,6 @@
 # Environment variables
 
-Last validated: 2026-05-14.
+Last validated: 2026-05-15.
 
 This document lists the real environment variables required by the application.
 Do not hardcode secret values in source code, docs, or tracked `.env` files.
@@ -44,19 +44,20 @@ stored as encrypted/sensitive values in Vercel.
 
 ## Validation result
 
-Validated against `.env.local` plus `.env` on 2026-05-14 without printing secret
+Validated against `.env.local` plus `.env` on 2026-05-15 without printing secret
 values.
 
 | Status | Variables |
 |---|---|
-| Present and format-valid locally | `DATABASE_URL`, `DIRECT_URL`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `NEXT_PUBLIC_POSTHOG_KEY`, `NEXT_PUBLIC_POSTHOG_HOST`, `RESEND_API_KEY`, `NEXT_PUBLIC_APP_URL` |
-| Missing locally | `SUPABASE_SERVICE_ROLE_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_PRO`, `SENTRY_DSN`, `NEXT_PUBLIC_SENTRY_DSN`, `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`, `CRON_SECRET` |
-| Present locally but invalid format | `STRIPE_PRICE_PRO_MONTHLY`, `STRIPE_PRICE_PRO_ANNUAL`, `STRIPE_PRICE_BUSINESS_MONTHLY`, `STRIPE_PRICE_BUSINESS_ANNUAL` are numeric amounts; the code expects Stripe Price IDs (`price_...`) |
+| Present and format-valid locally | `DATABASE_URL`, `DIRECT_URL`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_PRO`, `STRIPE_PRICE_PRO_MONTHLY`, `STRIPE_PRICE_PRO_ANNUAL`, `STRIPE_PRICE_BUSINESS_MONTHLY`, `STRIPE_PRICE_BUSINESS_ANNUAL`, `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `NEXT_PUBLIC_POSTHOG_KEY`, `NEXT_PUBLIC_POSTHOG_HOST`, `SENTRY_DSN`, `NEXT_PUBLIC_SENTRY_DSN`, `RESEND_API_KEY`, `CRON_SECRET`, `NEXT_PUBLIC_APP_URL` |
+| Missing locally | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` |
+| Deferred by launch decision | Upstash is currently omitted. The app falls back without Redis-backed rate limiting/view tracking, but these variables should be configured before public production traffic. |
+| Present locally but invalid format | None |
 
-Vercel validation for the linked project `fudimenu` reported no configured
-environment variables via `pnpm dlx vercel@latest env ls`. Add every required
-variable above to Vercel for the appropriate `production`, `preview`, and
-`development` scopes before deploying real traffic.
+Vercel validation for the linked project `fudimenu` shows the required
+variables above configured for `Production` and `Preview`, except Upstash, which
+is intentionally deferred. `USE_MOCKS=false` is also configured for both Vercel
+environments so deployed builds use real services.
 
 ## Local validation command
 
