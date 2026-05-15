@@ -38,7 +38,7 @@ export default async function AnalyticsPage() {
           </Card>
         ) : (
           <>
-        <Card className="bg-gradient-to-br from-mostaza-50 to-white">
+        <Card className="bg-gradient-to-br from-mostaza-50 to-[var(--brand-card)]">
           <p className="text-sm font-medium text-ink-500">Vistas semana 📈</p>
           <p className="mt-1 text-4xl font-extrabold tabular-nums">1,247</p>
           <p className="mt-1 text-sm text-menta-500">▲ +18% vs semana pasada</p>

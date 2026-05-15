@@ -131,12 +131,12 @@ function SortableCategoryGroup({
       style={style}
       className={isDragging ? 'relative z-10 opacity-80' : undefined}
     >
-      <div className="sticky top-14 z-10 mb-2 flex items-center justify-between gap-2 bg-crema-50/95 py-2 backdrop-blur">
+      <div className="sticky top-14 z-10 mb-2 flex items-center justify-between gap-2 bg-[var(--brand-surface-translucent)] py-2 backdrop-blur">
         <div className="flex items-center gap-2">
           {reorderMode && (
             <button
               type="button"
-              className="flex h-10 w-10 items-center justify-center rounded-md bg-white text-ink-700 shadow-sm"
+              className="flex h-10 w-10 items-center justify-center rounded-md bg-[var(--brand-card)] text-ink-700 shadow-sm"
               aria-label={`Mover ${group.category.name}`}
               {...attributes}
               {...listeners}
@@ -159,7 +159,7 @@ function SortableCategoryGroup({
         {group.items.map((item) => (
           <li
             key={item.id}
-            className="flex items-center justify-between gap-3 rounded-lg bg-white p-4 shadow-sm"
+            className="flex items-center justify-between gap-3 rounded-lg bg-[var(--brand-card)] p-4 shadow-sm"
           >
             <Link href={`/menu/${item.id}?sectionId=${sectionId}`} className="min-w-0 flex-1">
               <p className="truncate font-semibold text-ink-900">{item.name}</p>

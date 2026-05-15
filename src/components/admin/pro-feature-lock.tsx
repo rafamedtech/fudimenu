@@ -51,7 +51,7 @@ export function ProFeatureLock({
             </div>
           </div>
 
-          <div className="rounded-md bg-crema-100 p-4 text-sm leading-6 text-ink-700">
+          <div className="rounded-md bg-[var(--brand-surface-strong)] p-4 text-sm leading-6 text-ink-700">
             Pro incluye analytics básico, items ilimitados, sucursales ilimitadas, especiales y
             quitar la marca FudiMenu.
           </div>

@@ -296,7 +296,7 @@ export function ItemEditorForm({ initial, categories, sectionId }: Props) {
             Otro usuario guardó una versión nueva mientras estabas offline.
           </p>
           <div className="overflow-hidden rounded-md border border-ink-200">
-            <div className="grid grid-cols-3 bg-crema-100 px-3 py-2 text-xs font-bold uppercase text-ink-500">
+            <div className="grid grid-cols-3 bg-[var(--brand-surface-strong)] px-3 py-2 text-xs font-bold uppercase text-ink-500">
               <span>Campo</span>
               <span>Actual</span>
               <span>Tus cambios</span>
@@ -358,7 +358,7 @@ export function ItemEditorForm({ initial, categories, sectionId }: Props) {
           Categoría
         </label>
         {localCategories.length === 0 ? (
-          <div className="flex flex-col gap-2 rounded-md border border-ink-200 bg-crema-50 p-4">
+          <div className="flex flex-col gap-2 rounded-md border border-ink-200 bg-[var(--brand-surface)] p-4">
             <p className="text-sm text-ink-700">Crea categoría primero</p>
             {!showCategoryForm ? (
               <Button
@@ -402,7 +402,7 @@ export function ItemEditorForm({ initial, categories, sectionId }: Props) {
             )}
           </div>
         ) : localCategories.length === 1 ? (
-          <div className="flex h-14 items-center rounded-md border-[1.5px] border-ink-300 bg-crema-50 px-4 text-base text-ink-900">
+          <div className="flex h-14 items-center rounded-md border-[1.5px] border-ink-300 bg-[var(--brand-surface)] px-4 text-base text-ink-900">
             {localCategories[0].name}
           </div>
         ) : (
@@ -423,7 +423,7 @@ export function ItemEditorForm({ initial, categories, sectionId }: Props) {
                     'rounded-full border-[1.5px] px-3 py-1.5 text-sm font-medium transition-colors',
                     selectedCategoryId === category.id
                       ? 'border-mostaza-500 bg-mostaza-100 text-mostaza-800'
-                      : 'border-ink-300 bg-white text-ink-700 hover:border-mostaza-400 hover:bg-crema-50',
+                      : 'border-ink-300 bg-[var(--brand-card)] text-ink-700 hover:border-mostaza-400 hover:bg-[var(--brand-surface)]',
                   )}
                 >
                   {category.name}
@@ -480,7 +480,7 @@ export function ItemEditorForm({ initial, categories, sectionId }: Props) {
           rows={4}
           maxLength={DESCRIPTION_MAX_CHARS}
           placeholder="¿Qué lleva? ¿Por qué les va a encantar?"
-          className="w-full rounded-md border-[1.5px] border-ink-300 bg-white p-4 text-base text-ink-900 outline-none placeholder:text-ink-500 focus-within:border-mostaza-500 focus-within:shadow-glow-mostaza"
+          className="w-full rounded-md border-[1.5px] border-ink-300 bg-[var(--brand-card)] p-4 text-base text-ink-900 outline-none placeholder:text-ink-500 focus-within:border-mostaza-500 focus-within:shadow-glow-mostaza"
         />
         <div className="mt-1 flex justify-end">
           <span

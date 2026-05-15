@@ -34,7 +34,7 @@ export default async function ReferralLandingPage({ params }: ReferralPageProps)
 
   return (
     <main className="mx-auto flex min-h-dvh max-w-md flex-col justify-center px-6 py-10">
-      <div className="rounded-md border-[1.5px] border-ink-100 bg-white p-6 shadow-md">
+      <div className="rounded-md border-[1.5px] border-ink-100 bg-[var(--brand-card)] p-6 shadow-md">
         <p className="text-sm font-bold uppercase text-mostaza-700">Invitacion de restaurante</p>
         <h1 className="mt-4 text-3xl font-extrabold tracking-tight text-ink-900">
           Recomendado por {landing.restaurantName}

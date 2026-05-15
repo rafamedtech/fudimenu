@@ -9,6 +9,7 @@ import { ImageUploadField } from '@/components/admin/image-upload-field';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { resolveBrandSurfaceColor } from '@/lib/brand-theme';
 import {
   softDeleteSectionAction,
   upsertSectionAction,
@@ -82,7 +83,7 @@ export function SectionEditorForm({ initial, nextSortOrder = 0 }: SectionEditorF
     >
       <Card
         className="relative aspect-[4/5] overflow-hidden p-0 shadow-sm"
-        style={{ backgroundColor: accentColor }}
+        style={{ backgroundColor: resolveBrandSurfaceColor(accentColor) }}
       >
         {coverImageUrl ? (
           <Image

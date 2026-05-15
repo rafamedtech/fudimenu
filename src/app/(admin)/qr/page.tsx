@@ -39,7 +39,7 @@ export default async function QrPage() {
         </Card>
 
         <Card className="flex flex-col items-center gap-4">
-          <div className="relative h-[280px] w-[280px] overflow-hidden rounded-md border border-ink-100 bg-white">
+          <div className="relative h-[280px] w-[280px] overflow-hidden rounded-md border border-ink-100 bg-[var(--brand-card)]">
             <Image
               src={qrImagePath}
               alt={`QR del menú de ${tenant.name}`}
@@ -50,7 +50,7 @@ export default async function QrPage() {
               className="object-contain p-4"
             />
           </div>
-          <div className="w-full rounded-md bg-crema-100 p-3">
+          <div className="w-full rounded-md bg-[var(--brand-surface-strong)] p-3">
             <p className="text-xs font-semibold uppercase text-ink-500">Link del menú</p>
             <p className="mt-1 break-all text-sm font-bold text-ink-900">{menuUrl}</p>
           </div>

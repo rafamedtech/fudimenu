@@ -4,6 +4,7 @@ const DEFAULT_BRAND = '#F4B400';
 const INK = '#1A1611';
 const CREAM = '#FFFCF5';
 const WHITE = '#FFFFFF';
+const LEGACY_SURFACE_COLORS = new Set(['#FFFCF5', '#FFF8E7', '#FFF8E1', '#FFF1C2']);
 
 type Rgb = {
   r: number;
@@ -106,4 +107,11 @@ export function buildBrandThemeStyle(primaryColor: string | null | undefined): B
     '--brand-card-strong-rgb': rgbTriplet(cardStrong),
     '--brand-card-border': rgba(primary, 0.16),
   };
+}
+
+export function resolveBrandSurfaceColor(color: string | null | undefined) {
+  const normalized = color?.trim().toUpperCase();
+  return normalized && !LEGACY_SURFACE_COLORS.has(normalized)
+    ? normalized
+    : 'var(--brand-card-strong)';
 }

@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState, useTransition } from 'react';
+import type { CSSProperties } from 'react';
 import {
   CookieConsentProvider,
   useCookieConsentDecided,
@@ -116,15 +117,25 @@ interface PublicMenuPwaWrapperProps {
   tenantId: string;
   locale: string;
   pwaStrings: PwaPromptStrings;
+  brandThemeStyle?: CSSProperties;
   children: React.ReactNode;
 }
 
-export function PublicMenuPwaWrapper({ slug, tenantId, locale, pwaStrings, children }: PublicMenuPwaWrapperProps) {
+export function PublicMenuPwaWrapper({
+  slug,
+  tenantId,
+  locale,
+  pwaStrings,
+  brandThemeStyle,
+  children,
+}: PublicMenuPwaWrapperProps) {
   return (
     <CookieConsentProvider>
-      <PublicMenuPwaContent slug={slug} tenantId={tenantId} locale={locale} pwaStrings={pwaStrings}>
-        {children}
-      </PublicMenuPwaContent>
+      <div style={brandThemeStyle}>
+        <PublicMenuPwaContent slug={slug} tenantId={tenantId} locale={locale} pwaStrings={pwaStrings}>
+          {children}
+        </PublicMenuPwaContent>
+      </div>
     </CookieConsentProvider>
   );
 }

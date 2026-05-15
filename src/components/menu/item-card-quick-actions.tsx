@@ -61,7 +61,7 @@ export function ItemCardQuickActions({
   return (
     <div className="relative" {...longPressHandlers}>
       {isMenuOpen && (
-        <div className="absolute right-2 top-2 z-20 rounded-md bg-white p-1 shadow-lg ring-1 ring-ink-900/10">
+        <div className="absolute right-2 top-2 z-20 rounded-md bg-[var(--brand-card)] p-1 shadow-lg ring-1 ring-ink-900/10">
           <button
             type="button"
             aria-label={`Marcar como ${actionLabel}`}

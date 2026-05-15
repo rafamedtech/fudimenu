@@ -7,7 +7,7 @@ interface EmptyStateProps {
 
 export function EmptyState({ emoji = '🌮', title, description, action }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center gap-3 rounded-xl bg-crema-100 px-6 py-12 text-center">
+    <div className="flex flex-col items-center gap-3 rounded-xl bg-[var(--brand-surface-strong)] px-6 py-12 text-center">
       <div className="text-5xl" aria-hidden>
         {emoji}
       </div>

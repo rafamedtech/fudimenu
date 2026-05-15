@@ -44,7 +44,7 @@ export function OfflineConflictListener() {
 
         toast.custom(
           (toastId) => (
-            <div className="w-[min(calc(100vw-32px),420px)] rounded-md border border-ink-200 bg-white p-4 text-ink-900 shadow-xl">
+            <div className="w-[min(calc(100vw-32px),420px)] rounded-md border border-ink-200 bg-[var(--brand-card)] p-4 text-ink-900 shadow-xl">
               <p className="text-sm font-bold">Otro usuario editó esto. ¿Mantener tus cambios?</p>
               <div className="mt-3 flex gap-2">
                 <Button

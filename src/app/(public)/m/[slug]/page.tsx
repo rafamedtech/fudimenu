@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { getLocale, getTranslations } from 'next-intl/server';
-import { buildBrandThemeStyle } from '@/lib/brand-theme';
+import { buildBrandThemeStyle, resolveBrandSurfaceColor } from '@/lib/brand-theme';
 import { getCategoryEmoji } from '@/lib/category-placeholder';
 import { formatPrice } from '@/lib/utils';
 import { buildWhatsAppOrderUrl } from '@/lib/whatsapp';
@@ -123,6 +123,7 @@ function PublicMenuContent({
   const categoryNamesById = new Map(categories.map((c) => [c.id, c.name]));
   const dailySpecials = items.filter((item) => item.isSpecialToday);
   const regularItems = items.filter((item) => !item.isSpecialToday);
+  const brandThemeStyle = buildBrandThemeStyle(tenant.primaryColor);
 
   const hasSections = sections.length > 0;
 
@@ -191,6 +192,7 @@ function PublicMenuContent({
       slug={slug}
       tenantId={tenant.id}
       locale={priceLocale === 'en-US' ? 'en' : 'es'}
+      brandThemeStyle={brandThemeStyle}
       pwaStrings={{
         prompt: t('pwaPrompt'),
         install: t('pwaInstall'),
@@ -199,7 +201,7 @@ function PublicMenuContent({
     >
       <main
         className="mx-auto min-h-dvh max-w-md scroll-smooth bg-[var(--brand-surface)] pb-12"
-        style={buildBrandThemeStyle(tenant.primaryColor)}
+        style={brandThemeStyle}
       >
         <a
           href="#menu-content"
@@ -292,7 +294,7 @@ function PublicMenuContent({
                 <section key={section.id} id={`sec-${section.id}`}>
                   <div
                     className="mb-3 rounded-lg px-4 py-3"
-                    style={{ backgroundColor: section.accentColor }}
+                    style={{ backgroundColor: resolveBrandSurfaceColor(section.accentColor) }}
                   >
                     <h2 className="text-2xl font-extrabold text-ink-900">{section.name}</h2>
                   </div>

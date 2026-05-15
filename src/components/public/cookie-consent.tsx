@@ -37,7 +37,7 @@ export function CookieConsent() {
       className="fixed inset-x-0 bottom-0 z-50 px-4 pb-4"
       aria-label={t('message')}
     >
-      <div className="mx-auto flex max-w-md flex-col gap-3 rounded-md border border-ink-200 bg-white p-4 shadow-lg sm:flex-row sm:items-center">
+      <div className="mx-auto flex max-w-md flex-col gap-3 rounded-md border border-ink-200 bg-[var(--brand-card)] p-4 shadow-lg sm:flex-row sm:items-center">
         <p className="min-w-0 flex-1 text-sm font-semibold leading-snug text-ink-900">
           {t('message')}
         </p>

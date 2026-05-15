@@ -30,7 +30,7 @@ export function Toggle({ checked, onChange, disabled, ariaLabel }: ToggleProps) 
       />
       <span
         className={cn(
-          'pointer-events-none absolute top-1/2 inline-block h-7 w-7 -translate-y-1/2 rounded-full bg-white shadow-md transition-transform duration-200',
+          'pointer-events-none absolute top-1/2 inline-block h-7 w-7 -translate-y-1/2 rounded-full bg-[var(--brand-card)] shadow-md transition-transform duration-200',
           checked ? 'translate-x-[22px]' : 'translate-x-0.5',
         )}
       />

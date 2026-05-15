@@ -54,7 +54,7 @@ export function BillingPlans({ currentPlan, hasStripeCustomer, hasStripeSubscrip
           className={[
             'flex-1 rounded-md py-2 text-sm font-semibold transition-colors',
             cycle === 'monthly'
-              ? 'bg-white text-ink-900 shadow-sm'
+              ? 'bg-[var(--brand-card)] text-ink-900 shadow-sm'
               : 'text-ink-500 hover:text-ink-700',
           ].join(' ')}
         >
@@ -66,7 +66,7 @@ export function BillingPlans({ currentPlan, hasStripeCustomer, hasStripeSubscrip
           className={[
             'flex-1 rounded-md py-2 text-sm font-semibold transition-colors',
             cycle === 'annual'
-              ? 'bg-white text-ink-900 shadow-sm'
+              ? 'bg-[var(--brand-card)] text-ink-900 shadow-sm'
               : 'text-ink-500 hover:text-ink-700',
           ].join(' ')}
         >

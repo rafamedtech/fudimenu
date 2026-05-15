@@ -15,8 +15,8 @@ interface ItemCardProps {
 export function ItemCard({ item, categoryName, href, showToggle = true }: ItemCardProps) {
   const placeholderEmoji = getCategoryEmoji(categoryName);
   const content = (
-    <div className="flex items-center gap-3 rounded-lg bg-white p-3 shadow-sm transition-shadow active:shadow-md">
-      <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-md bg-crema-100">
+    <div className="flex items-center gap-3 rounded-lg bg-[var(--brand-card)] p-3 shadow-sm transition-shadow active:shadow-md">
+      <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-md bg-[var(--brand-surface-strong)]">
         {item.imageUrl ? (
           <Image src={item.imageUrl} alt={item.name} fill sizes="64px" className="object-cover" />
         ) : (
