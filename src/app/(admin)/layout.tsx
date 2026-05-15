@@ -11,7 +11,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const ctx = await requireAuth();
   const tenant =
     process.env.USE_MOCKS === 'true'
-      ? mockTenant
+      ? { primaryColor: mockTenant.primaryColor }
       : await getPrisma().tenant.findUnique({
           where: { id: ctx.tenantId },
           select: { primaryColor: true },

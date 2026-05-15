@@ -1,11 +1,12 @@
 import { Suspense } from 'react';
 import { cookies } from 'next/headers';
+import { ExternalLink } from 'lucide-react';
 import { PlanLimitBanner } from '@/components/admin/plan-limit-banner';
 import { TenantSwitcher } from '@/components/admin/tenant-switcher';
 import { SectionGrid } from '@/components/admin/section-grid';
+import { WelcomeBanner } from '@/components/admin/welcome-banner';
 import { AppHeader } from '@/components/layout/app-header';
 import { ItemCard } from '@/components/menu/item-card';
-import { Card } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Button } from '@/components/ui/button';
 import { PLAN_CONFIG } from '@/config/plans';
@@ -29,13 +30,7 @@ export default async function MenuPage({ searchParams }: MenuPageProps) {
         right={<TenantSwitcher activeTenantId={ctx.tenantId} memberships={ctx.memberships} />}
       />
       <main className="flex-1 px-4">
-        {showWelcomeBanner && (
-          <Card className="mb-4 border-[1.5px] border-mostaza-500 bg-mostaza-50 shadow-sm">
-            <p className="text-sm font-extrabold text-ink-900">
-              Tu menú arrancó con 6 platillos base. Edita nombres, precios o fotos cuando quieras.
-            </p>
-          </Card>
-        )}
+        {showWelcomeBanner && <WelcomeBanner />}
         <Suspense fallback={<MenuListLoading />}>
           <MenuList tenantId={ctx.tenantId} />
         </Suspense>
@@ -48,6 +43,14 @@ async function MenuList({ tenantId }: { tenantId: string }) {
   const { tenant, sections, categories, items } = await menuService.getMenuByTenantId(tenantId);
   const visibleItems = await getVisibleItems(items);
   const categoryNamesById = new Map(categories.map((category) => [category.id, category.name]));
+  const sectionIdByCategoryId = new Map(categories.map((c) => [c.id, c.sectionId]));
+  const itemCountBySectionId: Record<string, number> = {};
+  for (const item of visibleItems) {
+    if (!item.categoryId) continue;
+    const sectionId = sectionIdByCategoryId.get(item.categoryId);
+    if (!sectionId) continue;
+    itemCountBySectionId[sectionId] = (itemCountBySectionId[sectionId] ?? 0) + 1;
+  }
   const freeSectionLimit = PLAN_CONFIG.free.limits.sections ?? 5;
   const canCreateSection = tenant.plan !== 'free' || sections.length < freeSectionLimit;
 
@@ -80,7 +83,25 @@ async function MenuList({ tenantId }: { tenantId: string }) {
         sectionCount={sections.length}
       />
 
-      {hasSections && <SectionGrid sections={sections} canCreateSection={canCreateSection} />}
+      <div className="mb-3 flex justify-end">
+        <Link
+          href={`/m/${tenant.slug}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 rounded-md border border-ink-200 bg-white px-3 py-2 text-sm font-bold text-ink-900 shadow-sm hover:border-mostaza-500"
+        >
+          <ExternalLink className="h-4 w-4" aria-hidden />
+          Ver menú público
+        </Link>
+      </div>
+
+      {hasSections && (
+        <SectionGrid
+          sections={sections}
+          canCreateSection={canCreateSection}
+          itemCountBySectionId={itemCountBySectionId}
+        />
+      )}
 
       {!hasSections && hasItems && (
         <ul className="mt-4 flex flex-col gap-2">
