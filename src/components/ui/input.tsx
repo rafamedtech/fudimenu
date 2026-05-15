@@ -22,8 +22,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         )}
         <div
           className={cn(
-            'flex h-14 items-center gap-2 rounded-md border-[1.5px] bg-white px-4 transition-all',
-            'focus-within:border-mostaza-500 focus-within:shadow-glow-mostaza',
+            'flex h-14 items-center gap-2 rounded-md border-[1.5px] bg-[var(--brand-card)] px-4 transition-all',
+            'focus-within:border-[var(--brand-primary)] focus-within:shadow-glow-mostaza',
             error ? 'border-red-500' : 'border-ink-300',
           )}
         >

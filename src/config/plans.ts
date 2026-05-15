@@ -3,7 +3,6 @@ import type { Plan } from '@/types/domain';
 type AnalyticsAccess = 'none' | 'basic';
 
 export type PlanLimits = {
-  branches: number | null;
   sections: number | null;
   items: number | null;
 };
@@ -34,7 +33,6 @@ export const PLAN_CONFIG: Record<Plan, PlanConfig> = {
     currency: 'MXN',
     interval: 'month',
     limits: {
-      branches: 1,
       sections: 5,
       items: 20,
     },
@@ -53,7 +51,6 @@ export const PLAN_CONFIG: Record<Plan, PlanConfig> = {
     currency: 'MXN',
     interval: 'month',
     limits: {
-      branches: null,
       sections: null,
       items: null,
     },
@@ -72,7 +69,6 @@ export const PLAN_CONFIG: Record<Plan, PlanConfig> = {
     currency: 'MXN',
     interval: 'month',
     limits: {
-      branches: 3,
       sections: null,
       items: null,
     },
@@ -81,12 +77,12 @@ export const PLAN_CONFIG: Record<Plan, PlanConfig> = {
       analytics: 'basic',
       specials: true,
       multiLanguage: true,
-      modifiers: true,
+      modifiers: false,
     },
   },
 };
 
-export const PLANS = [PLAN_CONFIG.free, PLAN_CONFIG.pro, PLAN_CONFIG.business] as const;
+export const PLANS = [PLAN_CONFIG.free, PLAN_CONFIG.pro] as const;
 
 export function getPlanConfig(plan: Plan): PlanConfig {
   return PLAN_CONFIG[plan];

@@ -7,14 +7,16 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        primary: 'bg-mostaza-500 text-ink-900 hover:bg-mostaza-400 shadow-md',
-        secondary: 'bg-ink-100 text-ink-900 hover:bg-ink-300/40',
-        ghost: 'bg-transparent text-ink-700 hover:bg-ink-100',
-        outline: 'bg-white text-ink-900 border-[1.5px] border-ink-300 hover:border-ink-500',
+        primary:
+          'bg-[var(--brand-primary)] text-[var(--brand-on-primary)] hover:bg-[var(--brand-primary-hover)] shadow-md',
+        secondary: 'bg-[var(--brand-primary-soft)] text-ink-900 hover:bg-[var(--brand-primary-muted)]',
+        ghost: 'bg-transparent text-ink-700 hover:bg-[var(--brand-primary-faint)]',
+        outline:
+          'bg-[var(--brand-card)] text-ink-900 border-[1.5px] border-[var(--brand-primary-border)] hover:border-[var(--brand-primary)]',
         destructive: 'bg-red-500 text-white hover:bg-red-600 shadow-md',
         success: 'bg-menta-500 text-ink-900 hover:opacity-90 shadow-md',
         premium:
-          'bg-gradient-to-r from-mostaza-500 to-coral-500 text-ink-900 hover:opacity-95 shadow-md',
+          'bg-[linear-gradient(135deg,var(--brand-primary),var(--brand-primary-pressed))] text-[var(--brand-on-primary)] hover:opacity-95 shadow-md',
       },
       size: {
         sm: 'px-3 text-sm rounded-sm',

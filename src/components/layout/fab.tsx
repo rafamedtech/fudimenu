@@ -12,7 +12,7 @@ interface FabProps {
 
 export function Fab({ href, onClick, label = 'Agregar', className }: FabProps) {
   const classes = cn(
-    'fixed bottom-[88px] right-4 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-mostaza-500 text-ink-900 shadow-lg transition-transform active:scale-90 hover:scale-105',
+    'fixed bottom-[88px] right-4 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--brand-primary)] text-[var(--brand-on-primary)] shadow-lg transition-transform active:scale-90 hover:scale-105',
     className,
   );
   if (href) {

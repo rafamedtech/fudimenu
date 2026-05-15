@@ -5,10 +5,37 @@
 @layer base {
   :root {
     color-scheme: light;
+    --brand-primary: #F4B400;
+    --brand-primary-rgb: 244 180 0;
+    --brand-primary-hover: #FFC633;
+    --brand-primary-hover-rgb: 255 198 51;
+    --brand-primary-pressed: #D69900;
+    --brand-primary-pressed-rgb: 214 153 0;
+    --brand-primary-soft: #FFF1C2;
+    --brand-primary-soft-rgb: 255 241 194;
+    --brand-primary-muted: #FFF8E1;
+    --brand-primary-muted-rgb: 255 248 225;
+    --brand-primary-faint: rgba(244, 180, 0, 0.14);
+    --brand-primary-ring: rgba(244, 180, 0, 0.24);
+    --brand-primary-border: rgba(244, 180, 0, 0.38);
+    --brand-primary-border-rgb: 244 180 0;
+    --brand-accent-text: #9A7200;
+    --brand-accent-text-rgb: 154 114 0;
+    --brand-on-primary: #1A1611;
+    --brand-surface: #FFFCF5;
+    --brand-surface-rgb: 255 252 245;
+    --brand-surface-strong: #FFF8E7;
+    --brand-surface-strong-rgb: 255 248 231;
+    --brand-surface-translucent: rgba(255, 252, 245, 0.94);
+    --brand-card: #FFFFFF;
+    --brand-card-rgb: 255 255 255;
+    --brand-card-strong: #FFFDF8;
+    --brand-card-strong-rgb: 255 253 248;
+    --brand-card-border: rgba(244, 180, 0, 0.16);
   }
   html,
   body {
-    background: theme('colors.crema.50');
+    background: var(--brand-surface);
     color: theme('colors.ink.900');
     -webkit-font-smoothing: antialiased;
     -webkit-tap-highlight-color: transparent;

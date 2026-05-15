@@ -8,7 +8,7 @@ export function AddItemFab({ sectionId }: { sectionId: string }) {
       <button
         type="button"
         onClick={() => router.push(`/menu/new?sectionId=${sectionId}`)}
-        className="flex h-14 items-center gap-2 rounded-full bg-mostaza-500 px-6 font-bold text-white shadow-lg"
+        className="flex h-14 items-center gap-2 rounded-full bg-[var(--brand-primary)] px-6 font-bold text-[var(--brand-on-primary)] shadow-lg"
       >
         Agregar platillo
       </button>

@@ -58,7 +58,7 @@ export function ProFeatureLock({
 
           <Link
             href="/settings/billing"
-            className="flex min-h-12 w-full items-center justify-center rounded-md bg-mostaza-500 px-5 text-base font-semibold text-ink-900 shadow-md transition-all duration-150 active:scale-[0.97]"
+            className="flex min-h-12 w-full items-center justify-center rounded-md bg-[var(--brand-primary)] px-5 text-base font-semibold text-[var(--brand-on-primary)] shadow-md transition-all duration-150 active:scale-[0.97]"
           >
             Upgrade
           </Link>

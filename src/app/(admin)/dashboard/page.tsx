@@ -121,7 +121,7 @@ export default async function DashboardPage() {
             ) : (
               <Link
                 href="/menu/new"
-                className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-md bg-mostaza-500 px-4 text-sm font-semibold text-ink-900 shadow-md transition-all duration-150 active:scale-[0.97]"
+                className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-md bg-[var(--brand-primary)] px-4 text-sm font-semibold text-[var(--brand-on-primary)] shadow-md transition-all duration-150 active:scale-[0.97]"
               >
                 + Agregar
               </Link>

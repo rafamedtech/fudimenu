@@ -16,7 +16,7 @@ export function Sheet({ open, onOpenChange, title, children }: SheetProps) {
         <Drawer.Overlay className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm" />
         <Drawer.Content
           className={cn(
-            'fixed inset-x-0 bottom-0 z-50 mt-24 flex max-h-[95vh] flex-col rounded-t-xl bg-white pb-safe shadow-xl',
+            'fixed inset-x-0 bottom-0 z-50 mt-24 flex max-h-[95vh] flex-col rounded-t-xl bg-[var(--brand-card)] pb-safe shadow-xl',
           )}
         >
           <div className="mx-auto mt-2 h-1 w-10 rounded-full bg-ink-300" />
