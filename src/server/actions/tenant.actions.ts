@@ -4,6 +4,7 @@ import { revalidatePath, revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { getPrisma } from '@/lib/db/prisma';
+import { mockTenant } from '@/lib/mock/data';
 import {
   checkTenantSlugAvailability,
   normalizeTenantSlug,
@@ -44,6 +45,10 @@ export async function updateBrandSettingsFormAction(formData: FormData) {
   });
 
   if (process.env.USE_MOCKS === 'true') {
+    mockTenant.slug = data.slug;
+    mockTenant.logoUrl = data.logoUrl ?? null;
+    mockTenant.primaryColor = data.primaryColor;
+    revalidatePath('/', 'layout');
     redirect('/settings/brand?saved=1');
   }
 
@@ -93,7 +98,7 @@ export async function updateBrandSettingsFormAction(formData: FormData) {
 
   revalidateTag(`menu:${ctx.tenantId}`);
   revalidateTag(`tenant:${ctx.tenantId}`);
-  revalidatePath('/settings/brand');
+  revalidatePath('/', 'layout');
   revalidatePath(`/m/${oldSlug}`);
   revalidatePath(`/m/${newSlug}`);
 
