@@ -3,7 +3,9 @@ import type { Category, MenuSection, MenuItem, Tenant } from '@/types/domain';
 const now = new Date().toISOString();
 const tenantId = 'tnt_demo';
 
-export const mockTenant: Tenant = {
+const globalStore = globalThis as unknown as { __mockTenant?: Tenant };
+
+export const mockTenant: Tenant = (globalStore.__mockTenant ??= {
   id: tenantId,
   slug: 'taqueria-don-pepe',
   name: 'Marenca',
@@ -16,7 +18,7 @@ export const mockTenant: Tenant = {
   currency: 'MXN',
   plan: 'free',
   createdAt: now,
-};
+});
 
 export const mockSections: MenuSection[] = [
   section('sec_1', 'Tortilla de huevos', '#FFF8E7', 0),

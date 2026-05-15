@@ -5,6 +5,11 @@
 @layer base {
   :root {
     color-scheme: light;
+    --mostaza-500: #f4b400;
+    --mostaza-50: color-mix(in srgb, var(--mostaza-500) 12%, white);
+    --mostaza-100: color-mix(in srgb, var(--mostaza-500) 24%, white);
+    --mostaza-400: color-mix(in srgb, var(--mostaza-500) 70%, white);
+    --mostaza-600: color-mix(in srgb, var(--mostaza-500) 85%, black);
   }
   html,
   body {

@@ -6,11 +6,11 @@ export default {
     extend: {
       colors: {
         mostaza: {
-          50: '#FFF8E1',
-          100: '#FFF1C2',
-          400: '#FFC633',
-          500: '#F4B400',
-          600: '#D69900',
+          50: 'var(--mostaza-50)',
+          100: 'var(--mostaza-100)',
+          400: 'var(--mostaza-400)',
+          500: 'var(--mostaza-500)',
+          600: 'var(--mostaza-600)',
         },
         coral: { 100: '#FFE0DB', 500: '#FF6B5B' },
         menta: { 100: '#D4F2E4', 500: '#6BD4A4' },
@@ -39,7 +39,7 @@ export default {
         md: '0 4px 12px rgba(26,22,17,0.08)',
         lg: '0 12px 32px rgba(26,22,17,0.12)',
         xl: '0 24px 64px rgba(26,22,17,0.16)',
-        'glow-mostaza': '0 0 0 4px rgba(244,180,0,0.2)',
+        'glow-mostaza': '0 0 0 4px color-mix(in srgb, var(--mostaza-500) 20%, transparent)',
       },
       transitionTimingFunction: {
         spring: 'cubic-bezier(0.34, 1.56, 0.64, 1)',

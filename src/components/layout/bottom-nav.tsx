@@ -39,7 +39,7 @@ export function BottomNav({ plan }: BottomNavProps) {
                   description="Mide vistas, platillos favoritos y señales de demanda para decidir qué vender más."
                   className={cn(
                     'relative flex flex-col items-center gap-1 px-3 py-2 transition-transform',
-                    active ? 'scale-110 text-mostaza-500' : 'text-ink-500',
+                    active ? 'text-mostaza-500 scale-110' : 'text-ink-500',
                   )}
                 >
                   <Icon size={24} strokeWidth={active ? 2.5 : 2} />
