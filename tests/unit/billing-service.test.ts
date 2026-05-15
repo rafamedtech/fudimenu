@@ -34,6 +34,9 @@ vi.mock('@/lib/db/prisma', () => ({
       findFirst: mocks.referralFindFirst,
       updateMany: mocks.referralUpdateMany,
     },
+    tenant: {
+      update: vi.fn(async () => ({ id: 'tenant-referred' })),
+    },
   })),
 }));
 
