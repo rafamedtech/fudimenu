@@ -29,9 +29,10 @@ import type { MenuSection } from '@/types/domain';
 interface SectionGridProps {
   sections: MenuSection[];
   canCreateSection: boolean;
+  itemCountBySectionId?: Record<string, number>;
 }
 
-export function SectionGrid({ sections, canCreateSection }: SectionGridProps) {
+export function SectionGrid({ sections, canCreateSection, itemCountBySectionId }: SectionGridProps) {
   const [items, setItems] = useState(sections);
   const [reorderMode, setReorderMode] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -90,6 +91,7 @@ export function SectionGrid({ sections, canCreateSection }: SectionGridProps) {
                 key={section.id}
                 section={section}
                 reorderMode={reorderMode}
+                itemCount={itemCountBySectionId?.[section.id] ?? 0}
               />
             ))}
             {canCreateSection && (
@@ -115,9 +117,11 @@ export function SectionGrid({ sections, canCreateSection }: SectionGridProps) {
 function SortableSectionCard({
   section,
   reorderMode,
+  itemCount,
 }: {
   section: MenuSection;
   reorderMode: boolean;
+  itemCount: number;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: section.id,
@@ -149,6 +153,13 @@ function SortableSectionCard({
         )}
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink-900/80 to-transparent p-3">
           <h2 className="line-clamp-2 text-base font-extrabold text-white">{section.name}</h2>
+          <p className="mt-0.5 text-xs font-semibold text-white/90">
+            {itemCount === 0
+              ? 'Sin platillos'
+              : itemCount === 1
+                ? '1 platillo'
+                : `${itemCount} platillos`}
+          </p>
         </div>
         {reorderMode ? (
           <button
