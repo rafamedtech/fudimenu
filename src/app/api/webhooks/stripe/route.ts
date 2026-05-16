@@ -149,6 +149,7 @@ async function processEvent(event: Stripe.Event): Promise<ProcessResult> {
       if (session.mode === 'payment' && session.payment_status === 'paid' && paidPlan) {
         await updateTenantPlan(tenantId, paidPlan, {
           ...(customerId ? { stripeCustomerId: customerId } : {}),
+          stripeSubscriptionId: null,
         });
         return { tenantId, auditAction: 'plan.upgraded' };
       }
@@ -160,7 +161,7 @@ async function processEvent(event: Stripe.Event): Promise<ProcessResult> {
       const charge = event.data.object as Stripe.Charge;
       const tenantId = getTenantId(charge.metadata);
       const paidPlan = getPaidPlan(charge.metadata);
-      if (paidPlan) await updateTenantPlan(tenantId, paidPlan);
+      if (paidPlan) await updateTenantPlan(tenantId, paidPlan, { stripeSubscriptionId: null });
       return { tenantId, auditAction: paidPlan ? 'plan.upgraded' : defaultAction };
     }
 
@@ -168,7 +169,7 @@ async function processEvent(event: Stripe.Event): Promise<ProcessResult> {
       const pi = event.data.object as Stripe.PaymentIntent;
       const tenantId = getTenantId(pi.metadata);
       const paidPlan = getPaidPlan(pi.metadata);
-      if (paidPlan) await updateTenantPlan(tenantId, paidPlan);
+      if (paidPlan) await updateTenantPlan(tenantId, paidPlan, { stripeSubscriptionId: null });
       return { tenantId, auditAction: paidPlan ? 'plan.upgraded' : defaultAction };
     }
 
@@ -185,7 +186,7 @@ async function processEvent(event: Stripe.Event): Promise<ProcessResult> {
         (subscription.cancel_at_period_end && isSubscriptionPeriodEnded(subscription));
 
       if (shouldDowngrade) {
-        await updateTenantPlan(tenantId, 'free');
+        await updateTenantPlan(tenantId, 'free', { stripeSubscriptionId: null });
         return { tenantId, auditAction: 'plan.downgraded' };
       }
 
@@ -204,7 +205,7 @@ async function processEvent(event: Stripe.Event): Promise<ProcessResult> {
     case 'customer.subscription.deleted': {
       const subscription = event.data.object as Stripe.Subscription;
       const tenantId = getTenantId(subscription.metadata);
-      await updateTenantPlan(tenantId, 'free');
+      await updateTenantPlan(tenantId, 'free', { stripeSubscriptionId: null });
       return { tenantId, auditAction: 'plan.downgraded' };
     }
 
