@@ -9,6 +9,14 @@ export async function GET(request: Request) {
     return Response.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
   }
 
+  if (new URL(request.url).searchParams.get('dryRun') === '1') {
+    return Response.json({
+      ok: true,
+      dryRun: true,
+      wouldRun: ['sendTrialReminderEmails', 'downgradeExpiredTrialsWithoutCard'],
+    });
+  }
+
   const [reminders, downgrades] = await Promise.all([
     billingService.sendTrialReminderEmails(12),
     billingService.downgradeExpiredTrialsWithoutCard(),

@@ -8,7 +8,27 @@ import {
 
 export { ANALYTICS_CONSENT_KEY, type AnalyticsConsent, getStoredAnalyticsConsent };
 
-let initialized = false;
+type PendingAnalyticsEvent = { name: AnalyticsEvent['name']; props: Record<string, unknown> };
+
+declare global {
+  interface Window {
+    __fudiAnalyticsInitialized?: boolean;
+    __fudiAnalyticsPendingEvents?: PendingAnalyticsEvent[];
+  }
+}
+
+function isInitialized() {
+  return typeof window !== 'undefined' && window.__fudiAnalyticsInitialized === true;
+}
+
+function setInitialized() {
+  window.__fudiAnalyticsInitialized = true;
+}
+
+function getPendingEvents() {
+  window.__fudiAnalyticsPendingEvents ??= [];
+  return window.__fudiAnalyticsPendingEvents;
+}
 
 function isLocalAnalyticsHost() {
   const { hostname } = window.location;
@@ -16,35 +36,56 @@ function isLocalAnalyticsHost() {
 }
 
 export function initAnalytics() {
-  if (initialized || typeof window === 'undefined') return;
+  if (typeof window === 'undefined' || isInitialized()) return;
   if (isLocalAnalyticsHost()) return;
+  if (!hasAnalyticsConsent()) return;
   const key = process.env.NEXT_PUBLIC_POSTHOG_KEY;
   if (!key) return;
-  const consent = getStoredAnalyticsConsent();
   posthog.init(key, {
     api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST ?? 'https://us.i.posthog.com',
-    capture_pageview: true,
-    capture_pageleave: true,
+    capture_pageview: false,
+    capture_pageleave: false,
+    autocapture: false,
+    disable_session_recording: true,
+    disable_surveys: true,
+    advanced_disable_flags: true,
+    request_batching: false,
+    opt_out_useragent_filter: process.env.NODE_ENV !== 'production',
     persistence: 'localStorage',
-    opt_out_capturing_by_default: consent !== 'accepted',
-    opt_out_persistence_by_default: consent !== 'accepted',
+    opt_out_capturing_by_default: false,
+    opt_out_persistence_by_default: false,
     opt_out_capturing_persistence_type: 'localStorage',
   });
-  initialized = true;
+  setInitialized();
+}
+
+function hasAnalyticsConsent() {
+  return getStoredAnalyticsConsent() === 'accepted';
+}
+
+function flushPendingEvents() {
+  if (!isInitialized() || !hasAnalyticsConsent()) return;
+  const pendingEvents = getPendingEvents();
+  while (pendingEvents.length > 0) {
+    const event = pendingEvents.shift()!;
+    posthog.capture(event.name, event.props);
+  }
 }
 
 export function acceptAnalyticsConsent() {
   if (typeof window !== 'undefined') {
     window.localStorage.setItem(ANALYTICS_CONSENT_KEY, 'accepted');
   }
-  if (initialized) posthog.opt_in_capturing();
+  if (!isInitialized()) initAnalytics();
+  if (isInitialized()) posthog.opt_in_capturing();
+  flushPendingEvents();
 }
 
 export function declineAnalyticsConsent() {
   if (typeof window !== 'undefined') {
     window.localStorage.setItem(ANALYTICS_CONSENT_KEY, 'declined');
   }
-  if (initialized) posthog.opt_out_capturing();
+  if (isInitialized()) posthog.opt_out_capturing();
 }
 
 export type AnalyticsEvent =
@@ -70,16 +111,22 @@ export function track<E extends AnalyticsEvent>(
   name: E['name'],
   props: Extract<AnalyticsEvent, { name: E['name'] }>['props'],
 ) {
-  if (!initialized) return;
+  if (typeof window === 'undefined') return;
+  if (!hasAnalyticsConsent()) {
+    getPendingEvents().push({ name, props: props as Record<string, unknown> });
+    return;
+  }
+  if (!isInitialized()) initAnalytics();
+  if (!isInitialized()) return;
   posthog.capture(name, props as Record<string, unknown>);
 }
 
 export function identify(userId: string, traits: Record<string, unknown>) {
-  if (!initialized) return;
+  if (!isInitialized()) return;
   posthog.identify(userId, traits);
 }
 
 export function resetAnalytics() {
-  if (!initialized) return;
+  if (!isInitialized()) return;
   posthog.reset();
 }

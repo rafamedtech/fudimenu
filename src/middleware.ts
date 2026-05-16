@@ -28,11 +28,11 @@ function buildCsp(nonce: string) {
 
   return [
     `default-src 'self'`,
-    `script-src 'self' 'nonce-${nonce}' ${isDev ? "'unsafe-eval'" : ''} https://us.i.posthog.com`,
+    `script-src 'self' 'nonce-${nonce}' ${isDev ? "'unsafe-eval'" : ''} https://us.i.posthog.com https://us-assets.i.posthog.com`,
     `style-src 'self' 'unsafe-inline'`,
     `img-src 'self' data: blob: https://res.cloudinary.com https://*.supabase.co`,
     `font-src 'self' data:`,
-    `connect-src 'self' https://*.supabase.co https://api.stripe.com https://us.i.posthog.com https://*.sentry.io wss://*.supabase.co${devConnectSrc}`,
+    `connect-src 'self' https://*.supabase.co https://api.stripe.com https://us.i.posthog.com https://us-assets.i.posthog.com https://*.sentry.io wss://*.supabase.co${devConnectSrc}`,
     `frame-src 'self' https://js.stripe.com https://hooks.stripe.com`,
     `frame-ancestors 'none'`,
     `base-uri 'self'`,
