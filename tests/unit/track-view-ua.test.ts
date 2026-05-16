@@ -33,6 +33,7 @@ function requestWithUserAgent(userAgent: string | null) {
 }
 
 async function postTrackView(userAgent: string | null) {
+  process.env.USE_MOCKS = 'false';
   const { POST } = await import('../../src/app/api/track/view/route');
   await POST(requestWithUserAgent(userAgent) as NextRequest);
   return (mocks.menuViewCreate.mock.calls as Array<Array<{ data: { userAgent: string | null } }>>).at(-1)?.[0].data.userAgent;
