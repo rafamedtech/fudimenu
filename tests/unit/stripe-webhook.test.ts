@@ -117,7 +117,11 @@ describe('Stripe webhook route', () => {
     expect(res.status).toBe(200);
     expect(mocks.tenantUpdate).toHaveBeenCalledWith({
       where: { id: 'tenant-1' },
-      data: { plan: 'business', stripeCustomerId: 'cus_abc' },
+      data: {
+        plan: 'business',
+        stripeCustomerId: 'cus_abc',
+        stripeSubscriptionId: null,
+      },
     });
     expect(mocks.auditLogCreate).toHaveBeenCalledWith(
       expect.objectContaining({ data: expect.objectContaining({ action: 'plan.upgraded' }) }),
@@ -174,7 +178,7 @@ describe('Stripe webhook route', () => {
     expect(res.status).toBe(200);
     expect(mocks.tenantUpdate).toHaveBeenCalledWith({
       where: { id: 'tenant-1' },
-      data: { plan: 'pro' },
+      data: { plan: 'pro', stripeSubscriptionId: null },
     });
     expect(mocks.auditLogCreate).toHaveBeenCalledWith(
       expect.objectContaining({ data: expect.objectContaining({ action: 'plan.upgraded' }) }),
@@ -192,7 +196,7 @@ describe('Stripe webhook route', () => {
 
     expect(mocks.tenantUpdate).toHaveBeenCalledWith({
       where: { id: 'tenant-1' },
-      data: { plan: 'business' },
+      data: { plan: 'business', stripeSubscriptionId: null },
     });
   });
 
@@ -269,7 +273,7 @@ describe('Stripe webhook route', () => {
 
     expect(mocks.tenantUpdate).toHaveBeenCalledWith({
       where: { id: 'tenant-1' },
-      data: { plan: 'free' },
+      data: { plan: 'free', stripeSubscriptionId: null },
     });
     expect(mocks.auditLogCreate).toHaveBeenCalledWith(
       expect.objectContaining({ data: expect.objectContaining({ action: 'plan.downgraded' }) }),
@@ -292,7 +296,7 @@ describe('Stripe webhook route', () => {
 
     expect(mocks.tenantUpdate).toHaveBeenCalledWith({
       where: { id: 'tenant-1' },
-      data: { plan: 'free' },
+      data: { plan: 'free', stripeSubscriptionId: null },
     });
   });
 
@@ -330,7 +334,7 @@ describe('Stripe webhook route', () => {
     expect(res.status).toBe(200);
     expect(mocks.tenantUpdate).toHaveBeenCalledWith({
       where: { id: 'tenant-1' },
-      data: { plan: 'free' },
+      data: { plan: 'free', stripeSubscriptionId: null },
     });
     expect(mocks.auditLogCreate).toHaveBeenCalledWith(
       expect.objectContaining({ data: expect.objectContaining({ action: 'plan.downgraded' }) }),
