@@ -11,7 +11,39 @@ export async function GET(request: Request) {
   }
 
   const cutoff = new Date(Date.now() - RETENTION_MS);
+  const dryRun = new URL(request.url).searchParams.get('dryRun') === '1';
   const prisma = getPrisma();
+
+  if (dryRun) {
+    const [tenants, items] = await Promise.all([
+      prisma.tenant.count({
+        where: {
+          deletedAt: {
+            lt: cutoff,
+          },
+        },
+      }),
+      prisma.menuItem.count({
+        where: {
+          deletedAt: {
+            lt: cutoff,
+          },
+          tenant: {
+            deletedAt: null,
+          },
+        },
+      }),
+    ]);
+
+    return Response.json({
+      ok: true,
+      dryRun: true,
+      wouldDeleteTenants: tenants,
+      wouldDeleteItems: items,
+      cutoff: cutoff.toISOString(),
+    });
+  }
+
   const [deletedTenants, deletedItems] = await prisma.$transaction([
     prisma.tenant.deleteMany({
       where: {
