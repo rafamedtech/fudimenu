@@ -19,6 +19,7 @@ vi.mock('@/lib/db/prisma', () => ({
 
 const originalUpstashUrl = process.env.UPSTASH_REDIS_REST_URL;
 const originalUpstashToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+const originalUseMocks = process.env.USE_MOCKS;
 
 function requestWithUserAgent(userAgent: string | null) {
   const headers = new Headers({ 'content-type': 'application/json' });
@@ -41,6 +42,7 @@ describe('track view user-agent anonymization', () => {
   afterEach(() => {
     process.env.UPSTASH_REDIS_REST_URL = originalUpstashUrl;
     process.env.UPSTASH_REDIS_REST_TOKEN = originalUpstashToken;
+    process.env.USE_MOCKS = originalUseMocks;
     vi.clearAllMocks();
     vi.resetModules();
   });
@@ -90,5 +92,19 @@ describe('track view user-agent anonymization', () => {
       os: null,
       deviceType: 'desktop',
     });
+  });
+
+  it('does not touch Prisma in mock mode', async () => {
+    delete process.env.UPSTASH_REDIS_REST_URL;
+    delete process.env.UPSTASH_REDIS_REST_TOKEN;
+    process.env.USE_MOCKS = 'true';
+
+    const { POST } = await import('../../src/app/api/track/view/route');
+    const response = await POST(requestWithUserAgent('not a real ua') as NextRequest);
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ ok: true, menuViewId: null });
+    expect(mocks.tenantFindUnique).not.toHaveBeenCalled();
+    expect(mocks.menuViewCreate).not.toHaveBeenCalled();
   });
 });
