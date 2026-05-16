@@ -148,6 +148,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, error: 'missing_tenant' }, { status: 400 });
   }
 
+  if (process.env.USE_MOCKS === 'true') {
+    return NextResponse.json({ ok: true, menuViewId: null });
+  }
+
   const prisma = getPrisma();
   const tenant = tenantId
     ? await prisma.tenant.findUnique({ where: { id: tenantId } })
