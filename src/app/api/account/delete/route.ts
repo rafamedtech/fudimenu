@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { getPrisma } from '@/lib/db/prisma';
+import { mockItems, mockTenant } from '@/lib/mock/data';
 import { billingService } from '@/server/services/billing.service';
 import { requireAuth } from '@/server/guards/require-auth';
 import {
@@ -25,6 +26,30 @@ export async function DELETE(request: NextRequest) {
   const token = normalizeDeleteToken(request.headers.get('x-delete-token'));
   if (!token) {
     return NextResponse.json({ ok: false, error: 'invalid_token' }, noStore(400));
+  }
+
+  if (process.env.USE_MOCKS === 'true') {
+    if (token !== '123456') {
+      return NextResponse.json({ ok: false, error: 'invalid_token' }, noStore(400));
+    }
+
+    const deletedAt = new Date();
+
+    return NextResponse.json(
+      {
+        ok: true,
+        deletedAt: deletedAt.toISOString(),
+        hardDeleteAfter: new Date(deletedAt.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        softDeleted: {
+          tenant: true,
+          memberships: 1,
+          items: mockItems.length,
+        },
+        stripe: { cancelled: 0 },
+        email: { sent: false, reason: 'mock_mode', tenantName: mockTenant.name },
+      },
+      noStore(),
+    );
   }
 
   const prisma = getPrisma();
