@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: fudimenu-e2e-postgres
+    environment:
+      POSTGRES_DB: fudimenu_test
+      POSTGRES_USER: fudimenu_test
+      POSTGRES_PASSWORD: fudimenu_test
+    ports:
+      - "55432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fudimenu_test -d fudimenu_test"]
+      interval: 2s
+      timeout: 5s
+      retries: 20
+    volumes:
+      - fudimenu-e2e-postgres-data:/var/lib/postgresql/data
+      - ./scripts/e2e/init-postgres.sql:/docker-entrypoint-initdb.d/001-init-postgres.sql:ro
+
+volumes:
+  fudimenu-e2e-postgres-data:

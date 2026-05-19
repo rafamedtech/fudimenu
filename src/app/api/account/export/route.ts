@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getPrisma } from '@/lib/db/prisma';
+import { mockCategories, mockItems, mockTenant } from '@/lib/mock/data';
+import { isMockRuntime } from '@/lib/mock/runtime';
 import { checkRateLimit, getClientIp } from '@/lib/ratelimit';
 import { requireAuth } from '@/server/guards/require-auth';
 
@@ -27,6 +29,40 @@ export async function GET(request: Request) {
   }
 
   const ctx = await requireAuth();
+
+  if (isMockRuntime()) {
+    const exportedAt = new Date();
+
+    return NextResponse.json(
+      {
+        exportedAt: exportedAt.toISOString(),
+        account: {
+          userId: ctx.userId,
+          email: ctx.email,
+          activeTenantId: ctx.tenantId,
+          role: ctx.role,
+        },
+        tenant: mockTenant,
+        categories: mockCategories,
+        items: mockItems,
+        memberships: ctx.memberships.map((membership) => ({
+          tenantId: membership.tenantId,
+          userId: ctx.userId,
+          role: membership.role,
+          createdAt: mockTenant.createdAt,
+          updatedAt: mockTenant.createdAt,
+          deletedAt: null,
+        })),
+      },
+      {
+        headers: {
+          'Cache-Control': 'no-store',
+          'Content-Disposition': `attachment; filename="fudimenu-export-${mockTenant.slug}-${exportedAt.toISOString().slice(0, 10)}.json"`,
+        },
+      },
+    );
+  }
+
   const prisma = getPrisma();
   const cutoff = new Date(Date.now() - EXPORT_RATE_LIMIT_MS);
 

@@ -65,9 +65,14 @@ Usar siempre un proyecto Supabase dedicado para tests. El setup detecta automát
 # Correr solo unit tests (seguro con cualquier entorno):
 pnpm test --run
 
-# Correr E2E (requiere DATABASE_URL de proyecto test):
+# Correr E2E contra Postgres local aislado en Docker:
+pnpm test:e2e:local
+
+# Correr E2E contra proyecto Supabase test dedicado:
 DATABASE_URL="postgresql://..." pnpm test:e2e
 ```
+
+`pnpm test:e2e:local` levanta `docker-compose.e2e.yml`, espera Postgres en `127.0.0.1:55432`, inyecta `DATABASE_URL`/`DIRECT_URL` locales y deja intactos `.env`/`.env.local`. El setup de Playwright sigue ejecutando `db:push --force-reset`, pero solo contra esa base local.
 
 ## Estructura
 

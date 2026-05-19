@@ -2,6 +2,8 @@ import { CheckCircle2, XCircle } from 'lucide-react';
 import { AppHeader } from '@/components/layout/app-header';
 import { Card } from '@/components/ui/card';
 import { getPrisma } from '@/lib/db/prisma';
+import { mockTenant } from '@/lib/mock/data';
+import { isMockRuntime } from '@/lib/mock/runtime';
 import { requireAuth } from '@/server/guards/require-auth';
 import { BillingPlans } from './billing-plans';
 
@@ -12,10 +14,16 @@ type BillingPageProps = {
 export default async function BillingPage({ searchParams }: BillingPageProps) {
   const [{ checkout }, ctx] = await Promise.all([searchParams, requireAuth()]);
 
-  const tenant = await getPrisma().tenant.findUnique({
-    where: { id: ctx.tenantId },
-    select: { stripeCustomerId: true, stripeSubscriptionId: true },
-  });
+  const tenant =
+    isMockRuntime()
+      ? {
+          stripeCustomerId: mockTenant.stripeCustomerId,
+          stripeSubscriptionId: mockTenant.stripeSubscriptionId,
+        }
+      : await getPrisma().tenant.findUnique({
+          where: { id: ctx.tenantId },
+          select: { stripeCustomerId: true, stripeSubscriptionId: true },
+        });
 
   return (
     <>

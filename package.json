@@ -18,7 +18,8 @@
     "db:seed:marenca": "node --experimental-strip-types prisma/seed-marenca.ts",
     "db:studio": "prisma studio",
     "test": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:e2e:local": "node scripts/e2e-local.mjs"
   },
   "prisma": {
     "seed": "node --experimental-strip-types prisma/seed.ts"

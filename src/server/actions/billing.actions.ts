@@ -6,6 +6,8 @@ import { z } from 'zod';
 import { PLAN_CONFIG } from '@/config/plans';
 import { getPrisma } from '@/lib/db/prisma';
 import { env } from '@/lib/env';
+import { mockTenant } from '@/lib/mock/data';
+import { isMockRuntime } from '@/lib/mock/runtime';
 import { requireAuth } from '@/server/guards/require-auth';
 import type { Plan } from '@/types/domain';
 
@@ -55,6 +57,14 @@ export async function createBillingCheckoutAction(input: unknown) {
     process.env.E2E_STRIPE_CHECKOUT_MOCK === 'true' &&
     process.env.STRIPE_SECRET_KEY?.startsWith('sk_test_')
   ) {
+    if (isMockRuntime()) {
+      mockTenant.plan = plan;
+      return {
+        ok: true as const,
+        url: `${appUrl}/settings/billing?checkout=success&session_id=cs_test_e2e_mock`,
+      };
+    }
+
     await getPrisma().tenant.update({ where: { id: ctx.tenantId }, data: { plan } });
     return {
       ok: true as const,
