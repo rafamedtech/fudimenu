@@ -3,9 +3,20 @@ import { TenantSwitcher } from '@/components/admin/tenant-switcher';
 import { ProFeatureLock } from '@/components/admin/pro-feature-lock';
 import { Card } from '@/components/ui/card';
 import { requireAuth } from '@/server/guards/require-auth';
+import { getTenantAnalyticsStats } from '@/server/services/posthog-analytics.service';
+
+function formatCount(value: number) {
+  return new Intl.NumberFormat('es-MX').format(value);
+}
+
+function formatDelta(value: number | null) {
+  if (value === null) return 'Sin comparativo previo';
+  return `${value >= 0 ? '▲' : '▼'} ${value >= 0 ? '+' : ''}${value}% vs semana pasada`;
+}
 
 export default async function AnalyticsPage() {
   const ctx = await requireAuth();
+  const stats = ctx.plan === 'free' ? null : await getTenantAnalyticsStats(ctx.tenantId);
 
   return (
     <>
@@ -38,31 +49,59 @@ export default async function AnalyticsPage() {
           </Card>
         ) : (
           <>
-        <Card className="bg-gradient-to-br from-mostaza-50 to-[var(--brand-card)]">
-          <p className="text-sm font-medium text-ink-500">Vistas semana 📈</p>
-          <p className="mt-1 text-4xl font-extrabold tabular-nums">1,247</p>
-          <p className="mt-1 text-sm text-menta-500">▲ +18% vs semana pasada</p>
-        </Card>
+            {stats?.status === 'missing_config' ? (
+              <Card className="border-[1.5px] border-mostaza-500 bg-mostaza-50">
+                <p className="text-sm font-extrabold text-ink-900">PostHog no configurado</p>
+                <p className="mt-2 text-sm leading-6 text-ink-700">
+                  Agrega POSTHOG_PERSONAL_API_KEY y POSTHOG_PROJECT_ID para cargar stats reales.
+                </p>
+              </Card>
+            ) : null}
 
-        <Card>
-          <p className="mb-3 text-sm font-medium text-ink-700">Top 5 esta semana</p>
-          <ul className="flex flex-col gap-3">
-            {[
-              { name: 'Tacos al pastor', views: 487 },
-              { name: 'Tacos de suadero', views: 312 },
-              { name: 'Agua de horchata', views: 198 },
-              { name: 'Flan de la casa', views: 145 },
-              { name: 'Quesadillas', views: 105 },
-            ].map((row, i) => (
-              <li key={row.name} className="flex items-center justify-between">
-                <span className="font-medium">
-                  {i + 1}. {row.name}
-                </span>
-                <span className="tabular-nums text-ink-500">{row.views}</span>
-              </li>
-            ))}
-          </ul>
-        </Card>
+            {stats?.status === 'error' ? (
+              <Card className="border-[1.5px] border-coral-500 bg-coral-50">
+                <p className="text-sm font-extrabold text-ink-900">No pudimos leer PostHog</p>
+                <p className="mt-2 text-sm leading-6 text-ink-700">
+                  Intenta de nuevo en unos minutos. Los eventos siguen capturándose.
+                </p>
+              </Card>
+            ) : null}
+
+            <Card className="bg-gradient-to-br from-mostaza-50 to-[var(--brand-card)]">
+              <p className="text-sm font-medium text-ink-500">Vistas semana</p>
+              <p className="mt-1 text-4xl font-extrabold tabular-nums">
+                {formatCount(stats?.weeklyViews ?? 0)}
+              </p>
+              <p
+                className={`mt-1 text-sm ${
+                  (stats?.weeklyDeltaPercent ?? 0) >= 0 ? 'text-menta-500' : 'text-coral-500'
+                }`}
+              >
+                {formatDelta(stats?.weeklyDeltaPercent ?? null)}
+              </p>
+            </Card>
+
+            <Card>
+              <p className="mb-3 text-sm font-medium text-ink-700">Top 5 esta semana</p>
+              {stats && stats.topItems.length > 0 ? (
+                <ul className="flex flex-col gap-3">
+                  {stats.topItems.map((row, i) => (
+                    <li key={row.id} className="flex items-center justify-between gap-3">
+                      <span className="min-w-0 truncate font-medium">
+                        {i + 1}. {row.name}
+                      </span>
+                      <span className="shrink-0 tabular-nums text-ink-500">
+                        {formatCount(row.views)}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-sm leading-6 text-ink-600">
+                  Todavía no hay vistas de platillos esta semana.
+                </p>
+              )}
+            </Card>
           </>
         )}
       </main>
