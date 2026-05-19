@@ -5,6 +5,7 @@ const mocks = vi.hoisted(() => ({
   cookieDelete: vi.fn(),
   checkRateLimit: vi.fn(),
   membershipFindFirst: vi.fn(),
+  membershipFindMany: vi.fn(),
   getUser: vi.fn(),
   redirect: vi.fn((path: string) => {
     throw new Error(`redirect:${path}`);
@@ -33,6 +34,7 @@ vi.mock('@/lib/db/prisma', () => ({
   getPrisma: vi.fn(() => ({
     membership: {
       findFirst: mocks.membershipFindFirst,
+      findMany: mocks.membershipFindMany,
     },
   })),
 }));
@@ -179,12 +181,15 @@ describe('onboarding actions', () => {
     expect(mocks.createFromOnboarding).not.toHaveBeenCalled();
   });
 
-  it('createSecondTenantAction creates a tenant even when membership exists', async () => {
+  it('createSecondTenantAction creates a tenant when the user has a business owner membership', async () => {
     process.env.USE_MOCKS = 'false';
     process.env.E2E_TEST_AUTH = 'false';
     mocks.getUser.mockResolvedValue({
       data: { user: { id: 'user-1', email: 'owner@example.com' } },
     });
+    mocks.membershipFindMany.mockResolvedValue([
+      { role: 'owner', tenant: { plan: 'business' } },
+    ]);
     mocks.createFromOnboarding.mockResolvedValue({ tenantId: 'tenant-2', slug: 'taqueria-2' });
 
     const { createSecondTenantAction } = await loadOnboardingActions();
@@ -196,5 +201,23 @@ describe('onboarding actions', () => {
       'tenant-2',
       expect.objectContaining({ httpOnly: true }),
     );
+  });
+
+  it('createSecondTenantAction throws plan_limit_reached for free/pro accounts', async () => {
+    process.env.USE_MOCKS = 'false';
+    process.env.E2E_TEST_AUTH = 'false';
+    mocks.getUser.mockResolvedValue({
+      data: { user: { id: 'user-1', email: 'owner@example.com' } },
+    });
+    mocks.membershipFindMany.mockResolvedValue([
+      { role: 'owner', tenant: { plan: 'pro' } },
+    ]);
+
+    const { createSecondTenantAction } = await loadOnboardingActions();
+
+    await expect(
+      createSecondTenantAction({ name: 'Taqueria 2', cuisine: 'pizza' }),
+    ).rejects.toThrow('plan_limit_reached');
+    expect(mocks.createFromOnboarding).not.toHaveBeenCalled();
   });
 });

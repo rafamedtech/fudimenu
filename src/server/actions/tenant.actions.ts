@@ -1,15 +1,22 @@
 'use server';
 
+import { cookies } from 'next/headers';
 import { revalidatePath, revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
+import { canCreateAnotherMenu } from '@/config/plans';
 import { getPrisma } from '@/lib/db/prisma';
 import { mockTenant } from '@/lib/mock/data';
 import {
   checkTenantSlugAvailability,
   normalizeTenantSlug,
 } from '@/server/services/slug.service';
+import { tenantService } from '@/server/services/tenant.service';
 import { requireAuth } from '@/server/guards/require-auth';
+import {
+  ACTIVE_TENANT_COOKIE,
+  activeTenantCookieOptions,
+} from '@/server/tenants/active-tenant-cookie';
 
 function normalizeOptionalText(input: string | null | undefined) {
   const trimmed = input?.trim();
@@ -103,4 +110,60 @@ export async function updateBrandSettingsFormAction(formData: FormData) {
   revalidatePath(`/m/${newSlug}`);
 
   redirect('/settings/brand?saved=1');
+}
+
+type DeleteTenantError =
+  | 'forbidden'
+  | 'last_menu'
+  | 'plan_limit'
+  | 'not_found'
+  | 'mock_unsupported';
+
+function failDelete(code: DeleteTenantError) {
+  return { ok: false as const, code };
+}
+
+export async function deleteTenantAction(input: unknown) {
+  const tenantId = z.string().min(1).parse(input);
+  const ctx = await requireAuth();
+
+  if (process.env.USE_MOCKS === 'true') {
+    return failDelete('mock_unsupported');
+  }
+
+  const membership = ctx.memberships.find((m) => m.tenantId === tenantId);
+  if (!membership) return failDelete('not_found');
+  if (membership.role !== 'owner') return failDelete('forbidden');
+
+  if (!canCreateAnotherMenu(ctx.memberships)) {
+    return failDelete('plan_limit');
+  }
+
+  if (ctx.memberships.length <= 1) {
+    return failDelete('last_menu');
+  }
+
+  try {
+    await tenantService.softDeleteTenant(tenantId, ctx.userId);
+  } catch (err) {
+    if (err instanceof Error) {
+      if (err.message === 'forbidden') return failDelete('forbidden');
+      if (err.message === 'last_menu') return failDelete('last_menu');
+    }
+    throw err;
+  }
+
+  const nextMembership = ctx.memberships.find((m) => m.tenantId !== tenantId);
+  const cookieStore = await cookies();
+  if (nextMembership) {
+    cookieStore.set(ACTIVE_TENANT_COOKIE, nextMembership.tenantId, activeTenantCookieOptions);
+  } else {
+    cookieStore.delete(ACTIVE_TENANT_COOKIE);
+  }
+
+  revalidateTag(`menu:${tenantId}`);
+  revalidateTag(`tenant:${tenantId}`);
+  revalidatePath('/', 'layout');
+
+  return { ok: true as const, nextTenantId: nextMembership?.tenantId ?? null };
 }

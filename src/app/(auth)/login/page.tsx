@@ -89,10 +89,10 @@ export default function LoginPage() {
     track('login_google_started', {});
     try {
       const supabase = createSupabaseBrowser();
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${process.env.NEXT_PUBLIC_APP_URL ?? window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`,
+          redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`,
           queryParams: {
             prompt: 'select_account',
           },
@@ -101,6 +101,12 @@ export default function LoginPage() {
 
       if (error) {
         toast.error(error.message);
+        setGoogleLoading(false);
+        return;
+      }
+
+      if (!data?.url) {
+        toast.error('No pude iniciar sesión con Google. Reintenta.');
         setGoogleLoading(false);
       }
     } catch {
