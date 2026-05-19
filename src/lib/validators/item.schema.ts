@@ -24,16 +24,16 @@ export const itemSchema = z
   });
 
 export const categorySchema = z.object({
-  id: z.string().uuid().optional(),
+  id: z.string().min(1).optional(),
   name: z.string().min(1).max(40),
-  sectionId: z.string().uuid().nullable().optional(),
+  sectionId: z.string().min(1).nullable().optional(),
   sortOrder: z.number().int().default(0),
   isVisible: z.boolean().default(true),
 });
 
 export const reorderCategoriesSchema = z.object({
-  sectionId: z.string().uuid().nullable(),
-  categoryIds: z.array(z.string().uuid()).min(1).max(100),
+  sectionId: z.string().min(1).nullable(),
+  categoryIds: z.array(z.string().min(1)).min(1).max(100),
 });
 
 export const tenantUpdateSchema = z.object({

@@ -1,9 +1,11 @@
 import { AppHeader } from '@/components/layout/app-header';
+import { DeleteMenuCard } from '@/components/admin/delete-menu-card';
 import { ProBadge, ProFeatureLock } from '@/components/admin/pro-feature-lock';
 import { TenantSwitcher } from '@/components/admin/tenant-switcher';
 import { Card } from '@/components/ui/card';
 import Link from 'next/link';
 import { Building2, ChevronRight, Sparkles } from 'lucide-react';
+import { canCreateAnotherMenu } from '@/config/plans';
 import { requireAuth } from '@/server/guards/require-auth';
 
 const links = [
@@ -17,6 +19,11 @@ const links = [
 
 export default async function SettingsPage() {
   const ctx = await requireAuth();
+  const activeMembership = ctx.memberships.find((m) => m.tenantId === ctx.tenantId);
+  const canDeleteMenu =
+    canCreateAnotherMenu(ctx.memberships) &&
+    ctx.memberships.length > 1 &&
+    activeMembership?.role === 'owner';
 
   return (
     <>
@@ -66,6 +73,10 @@ export default async function SettingsPage() {
             <span className="flex-1 font-semibold">Sucursales</span>
             <span className="text-xs font-semibold text-ink-500">Próximamente</span>
           </Card>
+        )}
+
+        {canDeleteMenu && activeMembership && (
+          <DeleteMenuCard tenantId={ctx.tenantId} tenantName={activeMembership.tenant.name} />
         )}
       </main>
     </>

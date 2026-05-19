@@ -193,4 +193,26 @@ export const tenantService = {
 
     return { tenantId, slug };
   },
+
+  async softDeleteTenant(tenantId: string, userId: string) {
+    const prisma = getPrisma();
+    const membership = await prisma.membership.findUnique({
+      where: { tenantId_userId: { tenantId, userId } },
+      select: { role: true, deletedAt: true },
+    });
+    if (!membership || membership.deletedAt || membership.role !== 'owner') {
+      throw new Error('forbidden');
+    }
+
+    const activeCount = await prisma.membership.count({
+      where: { userId, deletedAt: null, tenant: { deletedAt: null } },
+    });
+    if (activeCount <= 1) throw new Error('last_menu');
+
+    const now = new Date();
+    await prisma.$transaction([
+      prisma.tenant.update({ where: { id: tenantId }, data: { deletedAt: now } }),
+      prisma.membership.updateMany({ where: { tenantId }, data: { deletedAt: now } }),
+    ]);
+  },
 };
