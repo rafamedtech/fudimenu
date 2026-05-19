@@ -11,6 +11,9 @@ type PostHogQueryResponse = {
 
 export type TenantAnalyticsStats = {
   status: 'ready' | 'missing_config' | 'error';
+  todayViews: number;
+  previousDayViews: number;
+  todayDeltaPercent: number | null;
   weeklyViews: number;
   previousWeeklyViews: number;
   weeklyDeltaPercent: number | null;
@@ -23,6 +26,9 @@ export type TenantAnalyticsStats = {
 
 const EMPTY_STATS: TenantAnalyticsStats = {
   status: 'ready',
+  todayViews: 0,
+  previousDayViews: 0,
+  todayDeltaPercent: null,
   weeklyViews: 0,
   previousWeeklyViews: 0,
   weeklyDeltaPercent: null,
@@ -98,6 +104,8 @@ export async function getTenantAnalyticsStats(tenantId: string): Promise<TenantA
 
     const viewsQuery = `
       SELECT
+        countIf(timestamp >= today()) AS today_views,
+        countIf(timestamp >= today() - INTERVAL 1 DAY AND timestamp < today()) AS previous_day_views,
         countIf(timestamp >= now() - INTERVAL 7 DAY) AS weekly_views,
         countIf(timestamp >= now() - INTERVAL 14 DAY AND timestamp < now() - INTERVAL 7 DAY) AS previous_weekly_views
       FROM events
@@ -125,8 +133,16 @@ export async function getTenantAnalyticsStats(tenantId: string): Promise<TenantA
     ]);
 
     const viewsRow = viewsResults?.[0] ?? [];
-    const weeklyViews = toNumber(viewsRow[0]);
-    const previousWeeklyViews = toNumber(viewsRow[1]);
+    const todayViews = toNumber(viewsRow[0]);
+    const previousDayViews = toNumber(viewsRow[1]);
+    const weeklyViews = toNumber(viewsRow[2]);
+    const previousWeeklyViews = toNumber(viewsRow[3]);
+    const todayDeltaPercent =
+      previousDayViews > 0
+        ? Math.round(((todayViews - previousDayViews) / previousDayViews) * 100)
+        : todayViews > 0
+          ? 100
+          : null;
     const weeklyDeltaPercent =
       previousWeeklyViews > 0
         ? Math.round(((weeklyViews - previousWeeklyViews) / previousWeeklyViews) * 100)
@@ -136,6 +152,9 @@ export async function getTenantAnalyticsStats(tenantId: string): Promise<TenantA
 
     return {
       status: 'ready',
+      todayViews,
+      previousDayViews,
+      todayDeltaPercent,
       weeklyViews,
       previousWeeklyViews,
       weeklyDeltaPercent,
