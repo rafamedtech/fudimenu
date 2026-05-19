@@ -1,6 +1,7 @@
 import { Card } from '@/components/ui/card';
 import { ProFeatureLock, ProBadge } from '@/components/admin/pro-feature-lock';
 import { TenantSwitcher } from '@/components/admin/tenant-switcher';
+import { Doodle } from '@/components/brand/doodles';
 import { AppHeader } from '@/components/layout/app-header';
 import { formatPrice } from '@/lib/utils';
 import { removeItemSpecialTodayFormAction } from '@/server/actions/items.actions';
@@ -33,7 +34,7 @@ function formatDelta(value: number | null, period: 'ayer' | 'semana pasada') {
 
 export default async function DashboardPage() {
   const ctx = await requireAuth();
-  const [{ items }, analyticsStats] = await Promise.all([
+  const [{ items, categories, sections }, analyticsStats] = await Promise.all([
     menuService.getMenuByTenantId(ctx.tenantId),
     ctx.plan === 'free' ? Promise.resolve(null) : getTenantAnalyticsStats(ctx.tenantId),
   ]);
@@ -41,6 +42,7 @@ export default async function DashboardPage() {
   const total = items.length;
   const agotados = items.filter((i) => !i.isAvailable).length;
   const topItem = analyticsStats?.topItems[0] ?? null;
+  const activeSlug = ctx.memberships.find((m) => m.tenantId === ctx.tenantId)?.tenant.slug ?? '#';
 
   return (
     <>
@@ -49,9 +51,15 @@ export default async function DashboardPage() {
         right={<TenantSwitcher activeTenantId={ctx.tenantId} memberships={ctx.memberships} />}
       />
       <main className="flex flex-col gap-4 px-4 pb-6 ipad:gap-5 ipad:px-6 ipad:pb-8 ipad-landscape:px-7 desktop:px-8">
-        <div className="ipad:pt-1">
-          <p className="text-sm text-ink-500">{greeting()}</p>
-          <h2 className="text-2xl font-bold ipad:text-3xl">¡Hola, {ctx.email.split('@')[0]}!</h2>
+        <div className="relative overflow-hidden rounded-xl border border-[var(--brand-card-border)] bg-[var(--brand-card)] p-5 shadow-md ipad:p-7 ipad-landscape:min-h-48">
+          <div className="relative z-10 max-w-[68%] ipad:max-w-[58%]">
+            <p className="text-sm font-bold text-[var(--brand-accent-text)]">{greeting()}</p>
+            <h2 className="fudi-h1 mt-1">¡Hola, {ctx.email.split('@')[0]}!</h2>
+            <p className="mt-3 text-sm leading-6 text-ink-500 ipad:text-base">
+              Tu menú ya vive online. Toca para activar, editar o compartir.
+            </p>
+          </div>
+          <Doodle name="chef" className="absolute -right-8 bottom-0 h-40 w-48 ipad:right-2 ipad:h-56 ipad:w-64" />
         </div>
 
         {ctx.plan === 'free' ? (
@@ -100,6 +108,14 @@ export default async function DashboardPage() {
           <Card className="p-4 ipad:p-5">
             <p className="text-xs text-ink-500">Agotados</p>
             <p className="text-2xl font-bold tabular-nums text-coral-500 ipad:text-3xl">{agotados}</p>
+          </Card>
+          <Card className="p-4 ipad:p-5">
+            <p className="text-xs text-ink-500">Categorías</p>
+            <p className="text-2xl font-bold tabular-nums ipad:text-3xl">{categories.length}</p>
+          </Card>
+          <Card className="p-4 ipad:p-5">
+            <p className="text-xs text-ink-500">Secciones</p>
+            <p className="text-2xl font-bold tabular-nums ipad:text-3xl">{sections.length}</p>
           </Card>
         </div>
 
@@ -154,6 +170,12 @@ export default async function DashboardPage() {
             )}
           </div>
         </Card>
+
+        <div className="grid gap-3 ipad:grid-cols-3 ipad:gap-4">
+          <Link href="/qr" className="rounded-lg border border-[var(--brand-card-border)] bg-[var(--brand-card)] p-4 font-black shadow-md hover:border-[var(--brand-primary-border)]">Compartir QR</Link>
+          <Link href="/menu" className="rounded-lg border border-[var(--brand-card-border)] bg-[var(--brand-card)] p-4 font-black shadow-md hover:border-[var(--brand-primary-border)]">Editar menú</Link>
+          <Link href={`/m/${activeSlug}`} target="_blank" className="rounded-lg border border-[var(--brand-card-border)] bg-[var(--brand-card)] p-4 font-black shadow-md hover:border-[var(--brand-primary-border)]">Ver mi menú público</Link>
+        </div>
 
         {ctx.plan === 'free' ? null : (
           <Card className="ipad:p-5">

@@ -24,45 +24,45 @@ export function BottomNav({ plan }: BottomNavProps) {
   return (
     <nav
       aria-label="Navegación principal"
-      className="fixed inset-x-0 bottom-0 z-30 border-t border-[var(--brand-card-border)] bg-[var(--brand-card)] pb-safe backdrop-blur"
+      className="fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] left-4 right-4 z-30 mx-auto max-w-[480px] rounded-full border border-[var(--brand-card-border)] bg-[var(--brand-card)]/95 backdrop-blur-md shadow-lg ipad:max-w-[720px] ipad-landscape:hidden"
     >
-      <ul className="mx-auto flex h-[72px] max-w-md items-center justify-around ipad:h-20 ipad:max-w-[744px] ipad:justify-center ipad:gap-6 ipad-landscape:max-w-[984px] desktop:max-w-[1180px]">
+      <ul className="flex h-[72px] items-center justify-around px-2 ipad:h-20">
         {tabs.map(({ href, label, Icon }) => {
           const active = pathname === href || pathname.startsWith(`${href}/`);
           const isAnalyticsLocked = isFree && href === '/analytics';
-
+ 
           if (isAnalyticsLocked) {
             return (
-              <li key={href}>
+              <li key={href} className="flex-1">
                 <ProFeatureLock
                   title="Analytics es Pro"
                   description="Mide vistas, platillos favoritos y señales de demanda para decidir qué vender más."
                   className={cn(
-                    'relative flex flex-col items-center gap-1 px-3 py-2 transition-transform ipad:min-w-28 ipad:rounded-md ipad:px-5 ipad:hover:bg-[var(--brand-primary-faint)]',
-                    active ? 'scale-110 text-[var(--brand-accent-text)]' : 'text-ink-500',
+                    'relative flex flex-col items-center justify-center gap-0.5 py-1 transition-all rounded-full',
+                    active ? 'text-[var(--brand-primary)] scale-105' : 'text-ink-500 hover:text-ink-700',
                   )}
                 >
-                  <Icon size={24} strokeWidth={active ? 2.5 : 2} />
-                  <span className={cn('text-[11px]', active && 'font-semibold')}>{label}</span>
-                  <span className="absolute -right-1 -top-1">
+                  <Icon size={20} strokeWidth={active ? 2.5 : 2} />
+                  <span className={cn('text-[10px]', active && 'font-bold')}>{label}</span>
+                  <span className="absolute right-1/4 top-1">
                     <ProBadge />
                   </span>
                 </ProFeatureLock>
               </li>
             );
           }
-
+ 
           return (
-            <li key={href}>
+            <li key={href} className="flex-1">
               <Link
                 href={href}
                 className={cn(
-                  'flex flex-col items-center gap-1 px-3 py-2 transition-transform ipad:min-w-28 ipad:rounded-md ipad:px-5 ipad:hover:bg-[var(--brand-primary-faint)]',
-                  active ? 'text-[var(--brand-accent-text)] scale-110' : 'text-ink-500',
+                  'flex flex-col items-center justify-center gap-0.5 py-1 transition-all rounded-full',
+                  active ? 'text-[var(--brand-primary)] scale-105' : 'text-ink-500 hover:text-ink-700',
                 )}
               >
-                <Icon size={24} strokeWidth={active ? 2.5 : 2} />
-                <span className={cn('text-[11px]', active && 'font-semibold')}>{label}</span>
+                <Icon size={20} strokeWidth={active ? 2.5 : 2} />
+                <span className={cn('text-[10px]', active && 'font-bold')}>{label}</span>
               </Link>
             </li>
           );

@@ -3,6 +3,7 @@ import { DeleteMenuCard } from '@/components/admin/delete-menu-card';
 import { ProBadge, ProFeatureLock } from '@/components/admin/pro-feature-lock';
 import { TenantSwitcher } from '@/components/admin/tenant-switcher';
 import { Card } from '@/components/ui/card';
+import { Doodle } from '@/components/brand/doodles';
 import Link from 'next/link';
 import { Building2, ChevronRight, Sparkles } from 'lucide-react';
 import { canCreateAnotherMenu } from '@/config/plans';
@@ -32,6 +33,14 @@ export default async function SettingsPage() {
         right={<TenantSwitcher activeTenantId={ctx.tenantId} memberships={ctx.memberships} />}
       />
       <main className="grid gap-3 px-4 ipad:grid-cols-2 ipad:gap-4 ipad:px-6 ipad-landscape:grid-cols-3 ipad-landscape:px-7 desktop:px-8">
+        <Card className="relative overflow-hidden border-[1.5px] border-mostaza-500 bg-mostaza-50 ipad:col-span-2 ipad:min-h-44 ipad:p-6 ipad-landscape:col-span-3">
+          <div className="max-w-[68%]">
+            <p className="text-sm font-black uppercase text-[var(--brand-accent-text)]">Ajusta tu casa</p>
+            <h2 className="mt-1 text-2xl font-black text-ink-900 ipad:text-3xl">Marca, pagos y compartir</h2>
+            <p className="mt-2 text-sm leading-6 text-ink-600">Todo lo que hace que tu menú se sienta tuyo.</p>
+          </div>
+          <Doodle name="settings" className="absolute -right-8 bottom-0 h-36 w-44 ipad:right-6 ipad:h-48 ipad:w-60" />
+        </Card>
         {links.map((l) => (
           <Link key={l.href} href={l.href}>
             <Card className="flex items-center gap-3 ipad:min-h-24 ipad:p-5">

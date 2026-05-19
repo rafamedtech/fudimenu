@@ -8,22 +8,22 @@ const buttonVariants = cva(
     variants: {
       variant: {
         primary:
-          'bg-[var(--brand-primary)] text-[var(--brand-on-primary)] hover:bg-[var(--brand-primary-hover)] shadow-md',
-        secondary: 'bg-[var(--brand-primary-soft)] text-ink-900 hover:bg-[var(--brand-primary-muted)]',
+          'bg-[var(--brand-primary)] text-[var(--brand-on-primary)] hover:bg-[var(--brand-primary-hover)] shadow-[0_6px_14px_rgba(244,180,0,0.24)] hover:shadow-[0_8px_20px_rgba(244,180,0,0.32)]',
+        secondary: 'bg-[var(--brand-primary-soft)] text-[var(--brand-accent-text)] hover:bg-[var(--brand-primary-muted)]',
         ghost: 'bg-transparent text-ink-700 hover:bg-[var(--brand-primary-faint)]',
         outline:
-          'bg-[var(--brand-card)] text-ink-900 border-[1.5px] border-[var(--brand-primary-border)] hover:border-[var(--brand-primary)]',
+          'bg-[var(--brand-card)] text-ink-900 border-[1.5px] border-[var(--brand-primary-border)] hover:border-[var(--brand-primary)] hover:bg-[var(--brand-primary-faint)]',
         destructive: 'bg-red-500 text-white hover:bg-red-600 shadow-md',
         success: 'bg-menta-500 text-ink-900 hover:opacity-90 shadow-md',
         premium:
-          'bg-[linear-gradient(135deg,var(--brand-primary),var(--brand-primary-pressed))] text-[var(--brand-on-primary)] hover:opacity-95 shadow-md',
+          'bg-[linear-gradient(135deg,var(--brand-primary),var(--brand-primary-hover))] text-[var(--brand-on-primary)] hover:opacity-95 shadow-[0_6px_14px_rgba(244,180,0,0.28)]',
       },
       size: {
-        sm: 'px-3 text-sm rounded-sm',
-        md: 'h-12 px-5 text-base rounded-md',
-        lg: 'h-14 px-6 text-base rounded-md',
-        xl: 'h-16 px-7 text-lg rounded-md',
-        icon: 'h-12 w-12 rounded-md',
+        sm: 'h-9 px-4 text-sm rounded-full',
+        md: 'h-12 px-6 text-base rounded-full',
+        lg: 'h-14 px-8 text-base rounded-full',
+        xl: 'h-16 px-10 text-lg rounded-full',
+        icon: 'h-12 w-12 rounded-full',
       },
     },
     defaultVariants: {

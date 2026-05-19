@@ -155,7 +155,7 @@ function SortableCategoryGroup({
           </Link>
         )}
       </div>
-      <ul className="grid gap-2 ipad:grid-cols-2 ipad:gap-3 ipad-landscape:grid-cols-3">
+      <ul className="grid gap-2 ipad:grid-cols-2 ipad:gap-3 ipad-landscape:grid-cols-3 ipad-landscape:gap-4 desktop:grid-cols-4">
         {group.items.map((item) => (
           <li
             key={item.id}

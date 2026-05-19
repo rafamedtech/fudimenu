@@ -18,7 +18,7 @@
     --brand-primary-muted-rgb: 255 248 225;
     --brand-primary-faint: rgba(244, 180, 0, 0.14);
     --brand-primary-ring: rgba(244, 180, 0, 0.24);
-    --brand-primary-border: rgba(244, 180, 0, 0.38);
+    --brand-primary-border: rgba(244, 180, 0, 0.36);
     --brand-primary-border-rgb: 244 180 0;
     --brand-accent-text: #9A7200;
     --brand-accent-text-rgb: 154 114 0;
@@ -32,7 +32,11 @@
     --brand-card-rgb: 255 255 255;
     --brand-card-strong: #FFFDF8;
     --brand-card-strong-rgb: 255 253 248;
-    --brand-card-border: rgba(244, 180, 0, 0.16);
+    --brand-card-border: rgba(26, 22, 17, 0.1);
+    --brand-coral: #FF6B5B;
+    --brand-coral-soft: #FFE0DB;
+    --brand-menta: #5BC499;
+    --brand-menta-soft: #D4F2E4;
     --mostaza-50: var(--brand-primary-muted);
     --mostaza-100: var(--brand-primary-soft);
     --mostaza-400: var(--brand-primary-hover);
@@ -45,6 +49,9 @@
     color: theme('colors.ink.900');
     -webkit-font-smoothing: antialiased;
     -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    min-width: 320px;
   }
   * {
     -webkit-tap-highlight-color: transparent;
@@ -60,5 +67,26 @@
   }
   .tabular-nums {
     font-variant-numeric: tabular-nums;
+  }
+  .fudi-h1 {
+    font-size: 24px;
+    line-height: 1.08;
+    font-weight: 900;
+    letter-spacing: 0;
+  }
+  @media (min-width: 768px) {
+    .fudi-h1 {
+      font-size: 28px;
+    }
+  }
+  @media (min-width: 1024px) {
+    .fudi-h1 {
+      font-size: 32px;
+    }
+  }
+  @media (min-width: 1280px) {
+    .fudi-h1 {
+      font-size: 36px;
+    }
   }
 }

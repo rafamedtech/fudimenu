@@ -104,7 +104,7 @@ async function MenuList({ tenantId }: { tenantId: string }) {
       )}
 
       {!hasSections && hasItems && (
-        <ul className="mt-4 grid gap-2 ipad:grid-cols-2 ipad:gap-3 ipad-landscape:grid-cols-3">
+        <ul className="mt-4 grid gap-2 ipad:grid-cols-2 ipad:gap-3 ipad-landscape:grid-cols-3 ipad-landscape:gap-4 desktop:grid-cols-4">
           {visibleItems.map((item) => (
             <li key={item.id}>
               <ItemCard
@@ -148,7 +148,7 @@ async function getVisibleItems(items: Awaited<ReturnType<typeof menuService.getM
 
 function MenuListLoading() {
   return (
-    <ul className="grid grid-cols-2 gap-3 ipad:grid-cols-3 ipad:gap-4 ipad-landscape:grid-cols-4">
+    <ul className="grid grid-cols-2 gap-3 ipad:grid-cols-3 ipad:gap-4 ipad-landscape:grid-cols-3 ipad-landscape:gap-5 desktop:grid-cols-4">
       {Array.from({ length: 4 }).map((_, i) => (
         <li key={i}>
           <div className="aspect-[4/5] animate-pulse rounded-lg bg-ink-100" />

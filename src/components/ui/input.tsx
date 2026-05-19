@@ -22,9 +22,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         )}
         <div
           className={cn(
-            'flex h-14 items-center gap-2 rounded-md border-[1.5px] bg-[var(--brand-card)] px-4 transition-all',
+            'flex h-14 items-center gap-2 rounded-full border bg-[var(--brand-card)] px-6 transition-all',
             'focus-within:border-[var(--brand-primary)] focus-within:shadow-glow-mostaza',
-            error ? 'border-red-500' : 'border-ink-300',
+            error ? 'border-red-500' : 'border-ink-200',
           )}
         >
           {prefix && <span className="text-ink-500">{prefix}</span>}
