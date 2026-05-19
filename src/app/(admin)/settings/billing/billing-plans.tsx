@@ -47,7 +47,7 @@ export function BillingPlans({ currentPlan, hasStripeCustomer, hasStripeSubscrip
   return (
     <div className="flex flex-col gap-4">
       {/* Cycle toggle */}
-      <div className="flex rounded-lg border border-ink-200 bg-ink-50 p-1">
+      <div className="flex rounded-lg border border-ink-200 bg-ink-50 p-1 ipad:w-full ipad:max-w-md">
         <button
           type="button"
           onClick={() => setCycle('monthly')}
@@ -78,6 +78,7 @@ export function BillingPlans({ currentPlan, hasStripeCustomer, hasStripeSubscrip
       </div>
 
       {/* Plan cards */}
+      <div className="grid gap-4 ipad-landscape:grid-cols-2">
       {plans.map((plan) => {
         const isCurrent = currentPlan === plan.id;
         const isPaid = plan.priceCents > 0;
@@ -97,7 +98,7 @@ export function BillingPlans({ currentPlan, hasStripeCustomer, hasStripeSubscrip
             : null;
 
         return (
-          <Card key={plan.id} className="space-y-4">
+          <Card key={plan.id} className="space-y-4 ipad:p-5">
             {/* Header */}
             <div className="flex items-start justify-between gap-3">
               <div>
@@ -182,6 +183,7 @@ export function BillingPlans({ currentPlan, hasStripeCustomer, hasStripeSubscrip
           </Card>
         );
       })}
+      </div>
     </div>
   );
 }

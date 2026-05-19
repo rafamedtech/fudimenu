@@ -28,7 +28,7 @@ export default async function BrandSettingsPage({ searchParams }: BrandSettingsP
   return (
     <>
       <AppHeader title="Marca y tema" showBack />
-      <main className="flex flex-col gap-4 px-4">
+      <main className="flex flex-col gap-4 px-4 ipad:px-6 ipad-landscape:px-7 desktop:px-8">
         {saved === '1' && (
           <Card className="flex items-center gap-3 border border-menta-500/40 bg-menta-100 shadow-sm">
             <CheckCircle2 className="h-5 w-5 text-ink-700" />
@@ -41,7 +41,7 @@ export default async function BrandSettingsPage({ searchParams }: BrandSettingsP
           </Card>
         )}
 
-        <Card className="space-y-5">
+        <Card className="space-y-5 ipad:p-6">
           <div className="flex items-start gap-3">
             <Palette className="mt-1 h-6 w-6 shrink-0 text-mostaza-600" />
             <div>

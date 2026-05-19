@@ -3,6 +3,12 @@ import type { Config } from 'tailwindcss';
 export default {
   content: ['./src/**/*.{ts,tsx}'],
   theme: {
+    screens: {
+      sm: '640px',
+      ipad: '768px',
+      'ipad-landscape': '1024px',
+      desktop: '1280px',
+    },
     extend: {
       colors: {
         mostaza: {

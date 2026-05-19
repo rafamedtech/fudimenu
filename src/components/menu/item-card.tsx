@@ -15,10 +15,10 @@ interface ItemCardProps {
 export function ItemCard({ item, categoryName, href, showToggle = true }: ItemCardProps) {
   const placeholderEmoji = getCategoryEmoji(categoryName);
   const content = (
-    <div className="flex items-center gap-3 rounded-lg bg-[var(--brand-card)] p-3 shadow-sm transition-shadow active:shadow-md">
-      <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-md bg-[var(--brand-surface-strong)]">
+    <div className="flex items-center gap-3 rounded-lg bg-[var(--brand-card)] p-3 shadow-sm transition-shadow active:shadow-md ipad:gap-4 ipad:p-4">
+      <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-md bg-[var(--brand-surface-strong)] ipad:h-20 ipad:w-20">
         {item.imageUrl ? (
-          <Image src={item.imageUrl} alt={item.name} fill sizes="64px" className="object-cover" />
+          <Image src={item.imageUrl} alt={item.name} fill sizes="(min-width: 768px) 80px, 64px" className="object-cover" />
         ) : (
           <div className="flex h-full w-full items-center justify-center text-3xl">
             {placeholderEmoji}
@@ -31,7 +31,7 @@ export function ItemCard({ item, categoryName, href, showToggle = true }: ItemCa
         )}
       </div>
       <div className="flex flex-1 flex-col">
-        <h3 className="truncate font-semibold text-ink-900">{item.name}</h3>
+        <h3 className="truncate font-semibold text-ink-900 ipad:text-lg">{item.name}</h3>
         <p className="font-bold text-ink-900">{formatPrice(item.priceCents, item.currency)}</p>
       </div>
     </div>

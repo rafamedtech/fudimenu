@@ -71,7 +71,7 @@ export function SectionCategoryList({
   }
 
   return (
-    <div className="flex flex-col gap-4 pt-4">
+    <div className="flex flex-col gap-4 pt-4 ipad:gap-5">
       {items.length > 1 && (
         <div className="flex justify-end">
           <Button
@@ -131,7 +131,7 @@ function SortableCategoryGroup({
       style={style}
       className={isDragging ? 'relative z-10 opacity-80' : undefined}
     >
-      <div className="sticky top-14 z-10 mb-2 flex items-center justify-between gap-2 bg-[var(--brand-surface-translucent)] py-2 backdrop-blur">
+      <div className="sticky top-14 z-10 mb-2 flex items-center justify-between gap-2 bg-[var(--brand-surface-translucent)] py-2 backdrop-blur ipad:top-16">
         <div className="flex items-center gap-2">
           {reorderMode && (
             <button
@@ -155,11 +155,11 @@ function SortableCategoryGroup({
           </Link>
         )}
       </div>
-      <ul className="flex flex-col gap-2">
+      <ul className="grid gap-2 ipad:grid-cols-2 ipad:gap-3 ipad-landscape:grid-cols-3">
         {group.items.map((item) => (
           <li
             key={item.id}
-            className="flex items-center justify-between gap-3 rounded-lg bg-[var(--brand-card)] p-4 shadow-sm"
+            className="flex items-center justify-between gap-3 rounded-lg bg-[var(--brand-card)] p-4 shadow-sm ipad:min-h-24"
           >
             <Link href={`/menu/${item.id}?sectionId=${sectionId}`} className="min-w-0 flex-1">
               <p className="truncate font-semibold text-ink-900">{item.name}</p>

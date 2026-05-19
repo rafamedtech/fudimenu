@@ -26,7 +26,7 @@ export function BottomNav({ plan }: BottomNavProps) {
       aria-label="Navegación principal"
       className="fixed inset-x-0 bottom-0 z-30 border-t border-[var(--brand-card-border)] bg-[var(--brand-card)] pb-safe backdrop-blur"
     >
-      <ul className="mx-auto flex h-[72px] max-w-md items-center justify-around">
+      <ul className="mx-auto flex h-[72px] max-w-md items-center justify-around ipad:h-20 ipad:max-w-[744px] ipad:justify-center ipad:gap-6 ipad-landscape:max-w-[984px] desktop:max-w-[1180px]">
         {tabs.map(({ href, label, Icon }) => {
           const active = pathname === href || pathname.startsWith(`${href}/`);
           const isAnalyticsLocked = isFree && href === '/analytics';
@@ -38,7 +38,7 @@ export function BottomNav({ plan }: BottomNavProps) {
                   title="Analytics es Pro"
                   description="Mide vistas, platillos favoritos y señales de demanda para decidir qué vender más."
                   className={cn(
-                    'relative flex flex-col items-center gap-1 px-3 py-2 transition-transform',
+                    'relative flex flex-col items-center gap-1 px-3 py-2 transition-transform ipad:min-w-28 ipad:rounded-md ipad:px-5 ipad:hover:bg-[var(--brand-primary-faint)]',
                     active ? 'scale-110 text-[var(--brand-accent-text)]' : 'text-ink-500',
                   )}
                 >
@@ -57,7 +57,7 @@ export function BottomNav({ plan }: BottomNavProps) {
               <Link
                 href={href}
                 className={cn(
-                  'flex flex-col items-center gap-1 px-3 py-2 transition-transform',
+                  'flex flex-col items-center gap-1 px-3 py-2 transition-transform ipad:min-w-28 ipad:rounded-md ipad:px-5 ipad:hover:bg-[var(--brand-primary-faint)]',
                   active ? 'text-[var(--brand-accent-text)] scale-110' : 'text-ink-500',
                 )}
               >

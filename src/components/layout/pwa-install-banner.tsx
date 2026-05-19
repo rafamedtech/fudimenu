@@ -54,8 +54,8 @@ export function PwaInstallBanner() {
   };
 
   return (
-    <div className="fixed inset-x-0 bottom-[88px] z-40 px-4 pb-3">
-      <div className="mx-auto flex max-w-md items-center gap-3 rounded-md border border-ink-100 bg-[var(--brand-card)] p-3 shadow-lg">
+    <div className="fixed inset-x-0 bottom-[88px] z-40 px-4 pb-3 ipad:bottom-[96px]">
+      <div className="mx-auto flex max-w-md items-center gap-3 rounded-md border border-ink-100 bg-[var(--brand-card)] p-3 shadow-lg ipad:max-w-[744px] ipad:px-4 ipad:py-3.5 ipad-landscape:max-w-[984px] desktop:max-w-[1180px]">
         <p className="min-w-0 flex-1 text-sm font-semibold leading-snug text-ink-900">
           Agrega FudiMenu a tu inicio — acceso en 1 tap 📱
         </p>
