@@ -147,6 +147,7 @@ export async function createSecondTenantAction(input: unknown) {
   const user = await getOnboardingUser();
 
   const prisma = getPrisma();
+  // eslint-disable-next-line fudimenu/require-tenant-id-in-prisma-findmany -- Plan-limit check needs cross-tenant view of the user's own memberships before any tenant is active.
   const memberships = await prisma.membership.findMany({
     where: { userId: user.id, deletedAt: null },
     select: { role: true, tenant: { select: { plan: true } } },
