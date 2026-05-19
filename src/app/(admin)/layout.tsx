@@ -20,7 +20,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <AdminProviders>
       <div
-        className="mx-auto flex min-h-dvh max-w-md flex-col bg-[var(--brand-surface)] pb-[88px]"
+        className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-[var(--brand-surface)] pb-[88px] ipad:max-w-[744px] ipad:pb-[96px] ipad-landscape:max-w-[984px] desktop:max-w-[1180px] desktop:border-x desktop:border-[var(--brand-card-border)]"
         style={buildBrandThemeStyle(tenant?.primaryColor)}
       >
         <AuthBroadcast />

@@ -6,6 +6,10 @@
     },
     "Sentry": {
       "url": "https://mcp.sentry.dev/mcp/rafamed/javascript-nextjs"
+    },
+    "posthog": {
+      "type": "http",
+      "url": "https://mcp.posthog.com/mcp?features=insights,sql,events,data_schema,dashboards,workspace&project_id=415795"
     }
   }
 }

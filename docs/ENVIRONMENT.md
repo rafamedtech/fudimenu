@@ -28,6 +28,9 @@ Settings for deployed environments.
 | Cloudinary | `CLOUDINARY_API_SECRET` | Signed upload endpoint | Cloudinary API secret |
 | PostHog | `NEXT_PUBLIC_POSTHOG_KEY` | Client and server analytics | `phc_...` |
 | PostHog | `NEXT_PUBLIC_POSTHOG_HOST` | Client and server analytics host | `https://...`, defaults to PostHog US in `.env.example` |
+| PostHog | `POSTHOG_PERSONAL_API_KEY` | Server-side Stats page queries | Personal API key with `query:read` scope |
+| PostHog | `POSTHOG_PROJECT_ID` | Server-side Stats page queries | Numeric PostHog project ID |
+| PostHog | `POSTHOG_API_HOST` | Server-side Stats page queries | PostHog app host, e.g. `https://us.posthog.com` |
 | Sentry | `SENTRY_DSN` | Server-side Sentry reporting | Sentry DSN URL |
 | Sentry | `NEXT_PUBLIC_SENTRY_DSN` | Browser and edge Sentry reporting | Sentry DSN URL |
 | Resend | `RESEND_API_KEY` | Billing and daily-special emails | `re_...` |

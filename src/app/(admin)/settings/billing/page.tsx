@@ -28,9 +28,9 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
   return (
     <>
       <AppHeader title="Plan y facturación" showBack />
-      <main className="flex flex-col gap-4 px-4 pb-8">
+      <main className="flex flex-col gap-4 px-4 pb-8 ipad:px-6 ipad-landscape:px-7 desktop:px-8">
         {checkout === 'success' && (
-          <Card className="border border-menta-500/40 bg-menta-50 shadow-sm">
+          <Card className="border border-menta-500/40 bg-menta-50 shadow-sm ipad:p-5">
             <div className="flex gap-3">
               <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-menta-700" />
               <div className="space-y-1">
@@ -50,7 +50,7 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
         )}
 
         {checkout === 'cancelled' && (
-          <Card className="border border-coral-500/40 bg-coral-50 shadow-sm">
+          <Card className="border border-coral-500/40 bg-coral-50 shadow-sm ipad:p-5">
             <div className="flex gap-3">
               <XCircle className="mt-0.5 h-5 w-5 shrink-0 text-coral-600" />
               <p className="text-sm text-ink-700">Pago cancelado. Puedes intentarlo de nuevo.</p>

@@ -66,7 +66,7 @@ export function PlanLimitBanner({
           aria-label="Agregar platillo"
           onClick={() => setIsUpgradeOpen(true)}
           className={cn(
-            'fixed bottom-[88px] right-4 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-ink-900 text-mostaza-500 shadow-lg transition-transform active:scale-90 hover:scale-105',
+            'fixed bottom-[88px] right-4 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-ink-900 text-mostaza-500 shadow-lg transition-transform active:scale-90 hover:scale-105 ipad:bottom-[104px] ipad:right-[max(1rem,calc((100vw-744px)/2+1rem))] ipad-landscape:right-[max(1rem,calc((100vw-984px)/2+1rem))] desktop:right-[max(1rem,calc((100vw-1180px)/2+1rem))]',
           )}
         >
           <Lock size={24} strokeWidth={2.5} />
@@ -75,7 +75,7 @@ export function PlanLimitBanner({
         <Link
           href={addHref}
           aria-label="Agregar platillo"
-          className="fixed bottom-[88px] right-4 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--brand-primary)] text-[var(--brand-on-primary)] shadow-lg transition-transform active:scale-90 hover:scale-105"
+          className="fixed bottom-[88px] right-4 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--brand-primary)] text-[var(--brand-on-primary)] shadow-lg transition-transform active:scale-90 hover:scale-105 ipad:bottom-[104px] ipad:right-[max(1rem,calc((100vw-744px)/2+1rem))] ipad-landscape:right-[max(1rem,calc((100vw-984px)/2+1rem))] desktop:right-[max(1rem,calc((100vw-1180px)/2+1rem))]"
         >
           <Plus size={28} strokeWidth={2.5} />
         </Link>
@@ -83,12 +83,12 @@ export function PlanLimitBanner({
 
       {isUpgradeOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-end bg-ink-900/45 px-4 pb-4 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-end bg-ink-900/45 px-4 pb-4 backdrop-blur-sm ipad:items-center ipad:justify-center"
           role="dialog"
           aria-modal="true"
           aria-labelledby="upgrade-limit-title"
         >
-          <Card className="w-full space-y-4 rounded-lg border-[1.5px] border-mostaza-500 shadow-xl">
+          <Card className="w-full space-y-4 rounded-lg border-[1.5px] border-mostaza-500 shadow-xl ipad:max-w-lg">
             <div className="flex items-start gap-3">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-mostaza-100 text-ink-900">
                 <Lock className="h-5 w-5" />
