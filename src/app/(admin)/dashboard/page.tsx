@@ -6,6 +6,7 @@ import { formatPrice } from '@/lib/utils';
 import { removeItemSpecialTodayFormAction } from '@/server/actions/items.actions';
 import { requireAuth } from '@/server/guards/require-auth';
 import { menuService } from '@/server/services/menu.service';
+import { getTenantAnalyticsStats } from '@/server/services/posthog-analytics.service';
 import type { MenuItem } from '@/types/domain';
 import Link from 'next/link';
 
@@ -21,12 +22,25 @@ function findDailySpecial(items: MenuItem[]) {
   return items.find((item) => item.isAvailable && item.isSpecialToday) ?? null;
 }
 
+function formatCount(value: number) {
+  return new Intl.NumberFormat('es-MX').format(value);
+}
+
+function formatDelta(value: number | null, period: 'ayer' | 'semana pasada') {
+  if (value === null) return `Sin comparativo vs ${period}`;
+  return `${value >= 0 ? '▲' : '▼'} ${value >= 0 ? '+' : ''}${value}% vs ${period}`;
+}
+
 export default async function DashboardPage() {
   const ctx = await requireAuth();
-  const { items } = await menuService.getMenuByTenantId(ctx.tenantId);
+  const [{ items }, analyticsStats] = await Promise.all([
+    menuService.getMenuByTenantId(ctx.tenantId),
+    ctx.plan === 'free' ? Promise.resolve(null) : getTenantAnalyticsStats(ctx.tenantId),
+  ]);
   const dailySpecial = findDailySpecial(items);
   const total = items.length;
   const agotados = items.filter((i) => !i.isAvailable).length;
+  const topItem = analyticsStats?.topItems[0] ?? null;
 
   return (
     <>
@@ -59,10 +73,22 @@ export default async function DashboardPage() {
         ) : (
           <Card className="bg-gradient-to-br from-mostaza-50 to-[var(--brand-card)]">
             <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-ink-500">Vistas hoy 👀</p>
+              <p className="text-sm font-medium text-ink-500">Vistas hoy</p>
             </div>
-            <p className="mt-1 text-4xl font-extrabold tabular-nums">142</p>
-            <p className="mt-1 text-sm text-menta-500">▲ +18% vs ayer</p>
+            <p className="mt-1 text-4xl font-extrabold tabular-nums">
+              {formatCount(analyticsStats?.todayViews ?? 0)}
+            </p>
+            <p
+              className={`mt-1 text-sm ${
+                (analyticsStats?.todayDeltaPercent ?? 0) >= 0 ? 'text-menta-500' : 'text-coral-500'
+              }`}
+            >
+              {analyticsStats?.status === 'missing_config'
+                ? 'PostHog no configurado'
+                : analyticsStats?.status === 'error'
+                  ? 'No pudimos leer PostHog'
+                  : formatDelta(analyticsStats?.todayDeltaPercent ?? null, 'ayer')}
+            </p>
           </Card>
         )}
 
@@ -129,11 +155,21 @@ export default async function DashboardPage() {
           </div>
         </Card>
 
-        <Card>
-          <p className="text-sm font-medium text-ink-700">Top platillo esta semana</p>
-          <p className="mt-1 text-lg font-bold">🌮 Tacos al pastor</p>
-          <p className="text-sm text-ink-500">487 vistas</p>
-        </Card>
+        {ctx.plan === 'free' ? null : (
+          <Card>
+            <p className="text-sm font-medium text-ink-700">Top platillo esta semana</p>
+            {topItem ? (
+              <>
+                <p className="mt-1 truncate text-lg font-bold">{topItem.name}</p>
+                <p className="text-sm text-ink-500">{formatCount(topItem.views)} vistas</p>
+              </>
+            ) : (
+              <p className="mt-1 text-sm leading-6 text-ink-600">
+                Todavía no hay vistas de platillos esta semana.
+              </p>
+            )}
+          </Card>
+        )}
       </main>
     </>
   );
