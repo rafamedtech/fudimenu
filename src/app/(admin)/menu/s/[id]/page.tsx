@@ -50,7 +50,7 @@ export default async function SectionDetailPage({ params }: Props) {
           </div>
         }
       />
-      <main className="flex-1 px-4 pb-24">
+      <main className="flex-1 px-4 pb-24 ipad:px-6 ipad-landscape:px-7 desktop:px-8">
         {sectionCategories.length === 0 ? (
           <EmptyState
             emoji="🏷️"

@@ -31,10 +31,10 @@ export default async function SettingsPage() {
         title="Ajustes"
         right={<TenantSwitcher activeTenantId={ctx.tenantId} memberships={ctx.memberships} />}
       />
-      <main className="flex flex-col gap-3 px-4">
+      <main className="grid gap-3 px-4 ipad:grid-cols-2 ipad:gap-4 ipad:px-6 ipad-landscape:grid-cols-3 ipad-landscape:px-7 desktop:px-8">
         {links.map((l) => (
           <Link key={l.href} href={l.href}>
-            <Card className="flex items-center gap-3">
+            <Card className="flex items-center gap-3 ipad:min-h-24 ipad:p-5">
               <span className="text-2xl">{l.emoji}</span>
               <span className="flex-1 font-semibold">{l.label}</span>
               <ChevronRight size={20} className="text-ink-300" />
@@ -49,7 +49,7 @@ export default async function SettingsPage() {
               description="Oculta el footer 'Hecho con FudiMenu' para que el menú público se sienta 100% tuyo."
               className="block"
             >
-              <Card className="flex items-center gap-3 border-[1.5px] border-mostaza-500 bg-mostaza-50 shadow-sm">
+              <Card className="flex items-center gap-3 border-[1.5px] border-mostaza-500 bg-mostaza-50 shadow-sm ipad:min-h-24 ipad:p-5">
                 <Sparkles className="h-6 w-6 text-mostaza-600" />
                 <span className="flex-1 font-semibold">Quitar marca FudiMenu</span>
                 <ProBadge />
@@ -60,7 +60,7 @@ export default async function SettingsPage() {
               description="Administra varias sucursales sin duplicar trabajo y cambia entre restaurantes desde el panel."
               className="block"
             >
-              <Card className="flex items-center gap-3 border-[1.5px] border-mostaza-500 bg-mostaza-50 shadow-sm">
+              <Card className="flex items-center gap-3 border-[1.5px] border-mostaza-500 bg-mostaza-50 shadow-sm ipad:min-h-24 ipad:p-5">
                 <Building2 className="h-6 w-6 text-mostaza-600" />
                 <span className="flex-1 font-semibold">Sucursales</span>
                 <ProBadge />
@@ -68,7 +68,7 @@ export default async function SettingsPage() {
             </ProFeatureLock>
           </>
         ) : (
-          <Card className="flex items-center gap-3 opacity-80">
+          <Card className="flex items-center gap-3 opacity-80 ipad:min-h-24 ipad:p-5">
             <Building2 className="h-6 w-6 text-ink-500" />
             <span className="flex-1 font-semibold">Sucursales</span>
             <span className="text-xs font-semibold text-ink-500">Próximamente</span>

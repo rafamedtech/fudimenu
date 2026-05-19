@@ -69,7 +69,7 @@ export function SectionGrid({ sections, canCreateSection, itemCountBySectionId }
   }
 
   return (
-    <section className="space-y-3">
+    <section className="space-y-3 ipad:space-y-4">
       {items.length > 1 && (
         <div className="flex justify-end">
           <Button
@@ -86,7 +86,7 @@ export function SectionGrid({ sections, canCreateSection, itemCountBySectionId }
       )}
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={ids} strategy={rectSortingStrategy}>
-          <ul className="grid grid-cols-2 gap-3">
+          <ul className="grid grid-cols-2 gap-3 ipad:grid-cols-3 ipad:gap-4 ipad-landscape:grid-cols-4 desktop:grid-cols-5">
             {items.map((section) => (
               <SortableSectionCard
                 key={section.id}
@@ -99,7 +99,7 @@ export function SectionGrid({ sections, canCreateSection, itemCountBySectionId }
               <li>
                 <Link
                   href="/menu/sections/new"
-                  className="flex aspect-[4/5] flex-col items-center justify-center gap-3 rounded-lg border-[1.5px] border-dashed border-ink-300 bg-[var(--brand-card)] text-center text-ink-700 shadow-sm transition-colors hover:border-mostaza-500"
+                  className="flex aspect-[4/5] flex-col items-center justify-center gap-3 rounded-lg border-[1.5px] border-dashed border-ink-300 bg-[var(--brand-card)] text-center text-ink-700 shadow-sm transition-colors hover:border-mostaza-500 ipad:gap-4"
                 >
                   <span className="flex h-12 w-12 items-center justify-center rounded-full bg-mostaza-100 text-ink-900">
                     <Plus className="h-6 w-6" aria-hidden />
@@ -144,7 +144,7 @@ function SortableSectionCard({
             src={section.coverImageUrl}
             alt=""
             fill
-            sizes="50vw"
+            sizes="(min-width: 1280px) 220px, (min-width: 1024px) 230px, (min-width: 768px) 230px, 50vw"
             className="object-cover opacity-80"
           />
         ) : (
@@ -152,8 +152,8 @@ function SortableSectionCard({
             🍽️
           </div>
         )}
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink-900/80 to-transparent p-3">
-          <h2 className="line-clamp-2 text-base font-extrabold text-white">{section.name}</h2>
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink-900/80 to-transparent p-3 ipad:p-4">
+          <h2 className="line-clamp-2 text-base font-extrabold text-white ipad:text-lg">{section.name}</h2>
           <p className="mt-0.5 text-xs font-semibold text-white/90">
             {itemCount === 0
               ? 'Sin platillos'

@@ -29,7 +29,7 @@ export default async function MenuPage({ searchParams }: MenuPageProps) {
         title="Menú"
         right={<TenantSwitcher activeTenantId={ctx.tenantId} memberships={ctx.memberships} />}
       />
-      <main className="flex-1 px-4">
+      <main className="flex-1 px-4 ipad:px-6 ipad-landscape:px-7 desktop:px-8">
         {showWelcomeBanner && <WelcomeBanner />}
         <Suspense fallback={<MenuListLoading />}>
           <MenuList tenantId={ctx.tenantId} />
@@ -83,12 +83,12 @@ async function MenuList({ tenantId }: { tenantId: string }) {
         sectionCount={sections.length}
       />
 
-      <div className="mb-3 flex justify-end">
+      <div className="mb-3 flex justify-end ipad:mb-4">
         <Link
           href={`/m/${tenant.slug}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 rounded-md border border-[var(--brand-primary-border)] bg-[var(--brand-card)] px-3 py-2 text-sm font-bold text-ink-900 shadow-sm transition-colors hover:border-[var(--brand-primary)] hover:bg-[var(--brand-primary-faint)]"
+          className="inline-flex items-center gap-1.5 rounded-md border border-[var(--brand-primary-border)] bg-[var(--brand-card)] px-3 py-2 text-sm font-bold text-ink-900 shadow-sm transition-colors hover:border-[var(--brand-primary)] hover:bg-[var(--brand-primary-faint)] ipad:px-4"
         >
           <ExternalLink className="h-4 w-4" aria-hidden />
           Ver menú público
@@ -104,7 +104,7 @@ async function MenuList({ tenantId }: { tenantId: string }) {
       )}
 
       {!hasSections && hasItems && (
-        <ul className="mt-4 flex flex-col gap-2">
+        <ul className="mt-4 grid gap-2 ipad:grid-cols-2 ipad:gap-3 ipad-landscape:grid-cols-3">
           {visibleItems.map((item) => (
             <li key={item.id}>
               <ItemCard
@@ -148,7 +148,7 @@ async function getVisibleItems(items: Awaited<ReturnType<typeof menuService.getM
 
 function MenuListLoading() {
   return (
-    <ul className="grid grid-cols-2 gap-3">
+    <ul className="grid grid-cols-2 gap-3 ipad:grid-cols-3 ipad:gap-4 ipad-landscape:grid-cols-4">
       {Array.from({ length: 4 }).map((_, i) => (
         <li key={i}>
           <div className="aspect-[4/5] animate-pulse rounded-lg bg-ink-100" />

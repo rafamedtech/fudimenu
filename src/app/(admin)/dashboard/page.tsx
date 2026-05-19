@@ -48,10 +48,10 @@ export default async function DashboardPage() {
         title="Inicio"
         right={<TenantSwitcher activeTenantId={ctx.tenantId} memberships={ctx.memberships} />}
       />
-      <main className="flex flex-col gap-4 px-4 pb-6">
-        <div>
+      <main className="flex flex-col gap-4 px-4 pb-6 ipad:gap-5 ipad:px-6 ipad:pb-8 ipad-landscape:px-7 desktop:px-8">
+        <div className="ipad:pt-1">
           <p className="text-sm text-ink-500">{greeting()}</p>
-          <h2 className="text-2xl font-bold">¡Hola, {ctx.email.split('@')[0]}!</h2>
+          <h2 className="text-2xl font-bold ipad:text-3xl">¡Hola, {ctx.email.split('@')[0]}!</h2>
         </div>
 
         {ctx.plan === 'free' ? (
@@ -60,7 +60,7 @@ export default async function DashboardPage() {
             description="Desbloquea vistas del día, tendencias semanales y top platillos para saber qué se está moviendo."
             className="block"
           >
-            <Card className="border-[1.5px] border-mostaza-500 bg-mostaza-50 shadow-sm">
+            <Card className="border-[1.5px] border-mostaza-500 bg-mostaza-50 shadow-sm ipad:p-5">
               <div className="flex items-center justify-between">
                 <p className="text-sm font-medium text-ink-500">Vistas hoy</p>
                 <ProBadge />
@@ -71,7 +71,7 @@ export default async function DashboardPage() {
             </Card>
           </ProFeatureLock>
         ) : (
-          <Card className="bg-gradient-to-br from-mostaza-50 to-[var(--brand-card)]">
+          <Card className="bg-gradient-to-br from-mostaza-50 to-[var(--brand-card)] ipad:p-5 ipad-landscape:p-6">
             <div className="flex items-center justify-between">
               <p className="text-sm font-medium text-ink-500">Vistas hoy</p>
             </div>
@@ -92,18 +92,18 @@ export default async function DashboardPage() {
           </Card>
         )}
 
-        <div className="grid grid-cols-2 gap-3">
-          <Card className="p-4">
+        <div className="grid grid-cols-2 gap-3 ipad:gap-4 ipad-landscape:grid-cols-4">
+          <Card className="p-4 ipad:p-5">
             <p className="text-xs text-ink-500">Items totales</p>
-            <p className="text-2xl font-bold tabular-nums">{total}</p>
+            <p className="text-2xl font-bold tabular-nums ipad:text-3xl">{total}</p>
           </Card>
-          <Card className="p-4">
+          <Card className="p-4 ipad:p-5">
             <p className="text-xs text-ink-500">Agotados</p>
-            <p className="text-2xl font-bold tabular-nums text-coral-500">{agotados}</p>
+            <p className="text-2xl font-bold tabular-nums text-coral-500 ipad:text-3xl">{agotados}</p>
           </Card>
         </div>
 
-        <Card className="border-[1.5px] border-mostaza-500 bg-mostaza-50 shadow-sm">
+        <Card className="border-[1.5px] border-mostaza-500 bg-mostaza-50 shadow-sm ipad:p-5 ipad-landscape:p-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
               <p className="text-sm font-medium text-ink-500">Especial de hoy</p>
@@ -156,7 +156,7 @@ export default async function DashboardPage() {
         </Card>
 
         {ctx.plan === 'free' ? null : (
-          <Card>
+          <Card className="ipad:p-5">
             <p className="text-sm font-medium text-ink-700">Top platillo esta semana</p>
             {topItem ? (
               <>
