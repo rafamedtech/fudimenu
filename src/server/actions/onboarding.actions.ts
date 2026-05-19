@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
+import { canCreateAnotherMenu } from '@/config/plans';
 import { getPrisma } from '@/lib/db/prisma';
 import { mockCategories, mockItems, mockTenant } from '@/lib/mock/data';
 import { checkRateLimit } from '@/lib/ratelimit';
@@ -144,6 +145,17 @@ export async function createSecondTenantAction(input: unknown) {
   if (mockResult) return mockResult;
 
   const user = await getOnboardingUser();
+
+  const prisma = getPrisma();
+  const memberships = await prisma.membership.findMany({
+    where: { userId: user.id, deletedAt: null },
+    select: { role: true, tenant: { select: { plan: true } } },
+  });
+
+  if (!canCreateAnotherMenu(memberships)) {
+    throw new Error('plan_limit_reached');
+  }
+
   const { tenantId, slug } = await tenantService.createFromOnboarding({
     userId: user.id,
     email: user.email!,

@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -31,6 +31,8 @@ const cuisines = [
 
 export default function OnboardingPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isAddingMenu = searchParams.get('new') === '1';
   const [name, setName] = useState('');
   const [cuisine, setCuisine] = useState<string>('');
   const [itemName, setItemName] = useState('');
@@ -76,6 +78,21 @@ export default function OnboardingPage() {
     try {
       const payload = buildPayload();
       setLastPayload(payload);
+
+      if (isAddingMenu) {
+        try {
+          const res = await createSecondTenantAction(payload);
+          completeNewTenant(res.tenantId);
+        } catch (err) {
+          if (err instanceof Error && err.message.includes('plan_limit_reached')) {
+            toast.error('Tu plan no permite más menús. Cambia a Business para agregar varios.');
+          } else {
+            toast.error('No pude crear el menú. Reintenta.');
+          }
+        }
+        return;
+      }
+
       const res = await completeOnboardingAction(payload);
 
       if (res.existing) {
@@ -122,8 +139,14 @@ export default function OnboardingPage() {
 
       <div className="flex flex-1 flex-col gap-5">
         <section className="flex flex-col gap-4">
-          <h2 className="text-3xl font-extrabold">¿Cómo se llama tu changarro?</h2>
-          <p className="text-ink-500">Dinos lo básico y FudiMenu arranca con platillos listos para editar.</p>
+          <h2 className="text-3xl font-extrabold">
+            {isAddingMenu ? 'Nuevo menú: ¿cómo se llama?' : '¿Cómo se llama tu changarro?'}
+          </h2>
+          <p className="text-ink-500">
+            {isAddingMenu
+              ? 'Crea otro menú independiente con su propio link público.'
+              : 'Dinos lo básico y FudiMenu arranca con platillos listos para editar.'}
+          </p>
           <Input
             autoFocus
             label="Nombre del restaurante"
@@ -198,7 +221,7 @@ export default function OnboardingPage() {
 
       <div className="mt-6">
         <Button size="lg" className="w-full" disabled={!canSubmit} loading={loading} onClick={finish}>
-          Crear mi menú
+          {isAddingMenu ? 'Crear nuevo menú' : 'Crear mi menú'}
         </Button>
       </div>
 

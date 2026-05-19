@@ -87,3 +87,15 @@ export const PLANS = [PLAN_CONFIG.free, PLAN_CONFIG.pro] as const;
 export function getPlanConfig(plan: Plan): PlanConfig {
   return PLAN_CONFIG[plan];
 }
+
+type MembershipForLimit = {
+  role: 'owner' | 'admin' | 'staff';
+  tenant: { plan: Plan };
+};
+
+export function canCreateAnotherMenu(memberships: MembershipForLimit[]): boolean {
+  if (memberships.length === 0) return true;
+  return memberships.some(
+    (m) => m.tenant.plan === 'business' && (m.role === 'owner' || m.role === 'admin'),
+  );
+}
