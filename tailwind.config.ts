@@ -37,14 +37,22 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['Satoshi', 'Inter', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-inter, Inter)', 'Inter', 'system-ui', 'sans-serif'],
+        heading: [
+          'var(--font-dm-sans, "DM Sans")',
+          'DM Sans',
+          'var(--font-inter, Inter)',
+          'system-ui',
+          'sans-serif',
+        ],
       },
       borderRadius: {
-        xs: '8px',
-        sm: '14px',
-        md: '20px',
-        lg: '28px',
-        xl: '36px',
+        xs: '6px',
+        sm: '10px',
+        md: '12px',
+        lg: '16px',
+        xl: '20px',
+        '2xl': '24px',
       },
       boxShadow: {
         sm: '0 1px 2px rgba(26,22,17,0.06)',

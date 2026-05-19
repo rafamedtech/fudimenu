@@ -19,7 +19,7 @@ export function FudiLogo({ className, markClassName, textClassName }: FudiLogoPr
       >
         <Utensils className="h-6 w-6" strokeWidth={2.5} />
       </span>
-      <span className={cn('text-2xl font-black text-ink-900', textClassName)}>FudiMenu</span>
+      <span className={cn('font-heading text-2xl font-black text-ink-900', textClassName)}>FudiMenu</span>
     </div>
   );
 }

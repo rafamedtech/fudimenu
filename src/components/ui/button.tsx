@@ -3,7 +3,7 @@ import { forwardRef } from 'react';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
-  'inline-flex min-h-12 min-w-12 items-center justify-center gap-2 font-semibold transition-all duration-150 active:scale-[0.97] disabled:opacity-40 disabled:pointer-events-none focus-visible:outline-none focus-visible:shadow-glow-mostaza',
+  'inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-md font-semibold transition-all duration-150 active:scale-95 disabled:opacity-40 disabled:pointer-events-none focus-visible:outline-none focus-visible:shadow-glow-mostaza',
   {
     variants: {
       variant: {
@@ -19,11 +19,11 @@ const buttonVariants = cva(
           'bg-[linear-gradient(135deg,var(--brand-primary),var(--brand-primary-hover))] text-[var(--brand-on-primary)] hover:opacity-95 shadow-[0_6px_14px_rgba(244,180,0,0.28)]',
       },
       size: {
-        sm: 'h-9 px-4 text-sm rounded-full',
-        md: 'h-12 px-6 text-base rounded-full',
-        lg: 'h-14 px-8 text-base rounded-full',
-        xl: 'h-16 px-10 text-lg rounded-full',
-        icon: 'h-12 w-12 rounded-full',
+        sm: 'h-10 px-4 text-sm',
+        md: 'h-11 px-5 text-sm',
+        lg: 'h-12 px-6 text-base',
+        xl: 'h-14 px-8 text-base',
+        icon: 'h-11 w-11 p-0',
       },
     },
     defaultVariants: {

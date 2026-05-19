@@ -1,7 +1,7 @@
 ---
 version: alpha
 name: FudiMenu Warm Counter
-description: A mobile-first restaurant menu operating system with warm cream surfaces, dense scan-friendly cards, tactile rounded controls, and a bright mustard action color.
+description: A mobile-first restaurant menu operating system with warm cream surfaces, landing-style type scale, squircle-like 12px controls, and a bright mustard action color.
 colors:
   primary: "#F4B400"
   on-primary: "#1A1611"
@@ -40,73 +40,85 @@ colors:
   on-error: "#FFFFFF"
 typography:
   display-lg:
-    fontFamily: Satoshi, Inter, system-ui, sans-serif
-    fontSize: 40px
+    fontFamily: DM Sans, Inter, system-ui, sans-serif
+    fontSize: 60px
     fontWeight: 800
-    lineHeight: 44px
-    letterSpacing: -0.02em
+    lineHeight: 66px
+    letterSpacing: 0em
+  display-md:
+    fontFamily: DM Sans, Inter, system-ui, sans-serif
+    fontSize: 48px
+    fontWeight: 800
+    lineHeight: 53px
+    letterSpacing: 0em
+  display-sm:
+    fontFamily: DM Sans, Inter, system-ui, sans-serif
+    fontSize: 36px
+    fontWeight: 800
+    lineHeight: 40px
+    letterSpacing: 0em
   headline-lg:
-    fontFamily: Satoshi, Inter, system-ui, sans-serif
-    fontSize: 30px
+    fontFamily: DM Sans, Inter, system-ui, sans-serif
+    fontSize: 32px
     fontWeight: 800
-    lineHeight: 36px
-    letterSpacing: -0.01em
+    lineHeight: 38px
+    letterSpacing: 0em
   headline-md:
-    fontFamily: Satoshi, Inter, system-ui, sans-serif
+    fontFamily: DM Sans, Inter, system-ui, sans-serif
     fontSize: 24px
     fontWeight: 800
-    lineHeight: 32px
+    lineHeight: 29px
     letterSpacing: 0em
   title-lg:
-    fontFamily: Satoshi, Inter, system-ui, sans-serif
+    fontFamily: DM Sans, Inter, system-ui, sans-serif
     fontSize: 20px
-    fontWeight: 700
-    lineHeight: 28px
-    letterSpacing: 0em
-  title-md:
-    fontFamily: Satoshi, Inter, system-ui, sans-serif
-    fontSize: 18px
-    fontWeight: 700
+    fontWeight: 800
     lineHeight: 24px
     letterSpacing: 0em
+  title-md:
+    fontFamily: DM Sans, Inter, system-ui, sans-serif
+    fontSize: 18px
+    fontWeight: 800
+    lineHeight: 22px
+    letterSpacing: 0em
   body-lg:
-    fontFamily: Satoshi, Inter, system-ui, sans-serif
+    fontFamily: Inter, system-ui, sans-serif
     fontSize: 18px
     fontWeight: 400
-    lineHeight: 28px
+    lineHeight: 32px
     letterSpacing: 0em
   body-md:
-    fontFamily: Satoshi, Inter, system-ui, sans-serif
+    fontFamily: Inter, system-ui, sans-serif
     fontSize: 16px
-    fontWeight: 500
+    fontWeight: 400
     lineHeight: 24px
     letterSpacing: 0em
   body-sm:
-    fontFamily: Satoshi, Inter, system-ui, sans-serif
+    fontFamily: Inter, system-ui, sans-serif
     fontSize: 14px
     fontWeight: 400
     lineHeight: 20px
     letterSpacing: 0em
   label-md:
-    fontFamily: Satoshi, Inter, system-ui, sans-serif
+    fontFamily: Inter, system-ui, sans-serif
     fontSize: 14px
     fontWeight: 600
     lineHeight: 20px
     letterSpacing: 0em
   label-sm:
-    fontFamily: Satoshi, Inter, system-ui, sans-serif
+    fontFamily: Inter, system-ui, sans-serif
     fontSize: 12px
-    fontWeight: 500
+    fontWeight: 600
     lineHeight: 16px
     letterSpacing: 0em
   label-xs:
-    fontFamily: Satoshi, Inter, system-ui, sans-serif
+    fontFamily: Inter, system-ui, sans-serif
     fontSize: 11px
-    fontWeight: 500
+    fontWeight: 600
     lineHeight: 14px
     letterSpacing: 0em
   data-lg:
-    fontFamily: Satoshi, Inter, system-ui, sans-serif
+    fontFamily: DM Sans, Inter, system-ui, sans-serif
     fontSize: 36px
     fontWeight: 800
     lineHeight: 40px
@@ -134,9 +146,10 @@ spacing:
 rounded:
   xs: 6px
   sm: 10px
-  md: 14px
-  lg: 20px
-  xl: 28px
+  md: 12px
+  lg: 16px
+  xl: 20px
+  "2xl": 24px
   full: 9999px
 shadows:
   sm: "0 1px 2px rgba(26, 22, 17, 0.06)"
@@ -193,9 +206,9 @@ components:
   button-primary:
     backgroundColor: "{colors.primary}"
     textColor: "{colors.on-primary}"
-    typography: "{typography.body-md}"
+    typography: "{typography.label-md}"
     rounded: "{rounded.md}"
-    height: 48px
+    height: 44px
     padding: 0 20px
   button-primary-hover:
     backgroundColor: "{colors.primary-hover}"
@@ -203,31 +216,52 @@ components:
   button-secondary:
     backgroundColor: "{colors.outline-muted}"
     textColor: "{colors.on-surface}"
-    typography: "{typography.body-md}"
+    typography: "{typography.label-md}"
     rounded: "{rounded.md}"
-    height: 48px
+    height: 44px
     padding: 0 20px
   button-outline:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.on-surface}"
-    typography: "{typography.body-md}"
+    typography: "{typography.label-md}"
     rounded: "{rounded.md}"
-    height: 48px
+    height: 44px
     padding: 0 20px
+    borderWidth: 1.5px
   button-success:
     backgroundColor: "{colors.success}"
     textColor: "{colors.on-success}"
-    typography: "{typography.body-md}"
+    typography: "{typography.label-md}"
     rounded: "{rounded.md}"
-    height: 48px
+    height: 44px
     padding: 0 20px
   button-premium:
     backgroundColor: "#F4B400"
     textColor: "{colors.on-primary}"
-    typography: "{typography.body-md}"
+    typography: "{typography.label-md}"
     rounded: "{rounded.md}"
-    height: 48px
+    height: 44px
     padding: 0 20px
+  button-sizes:
+    sm:
+      height: 40px
+      padding: 0 16px
+      typography: "{typography.label-md}"
+    md:
+      height: 44px
+      padding: 0 20px
+      typography: "{typography.label-md}"
+    lg:
+      height: 48px
+      padding: 0 24px
+      typography: "{typography.body-md}"
+    xl:
+      height: 56px
+      padding: 0 32px
+      typography: "{typography.body-md}"
+    icon:
+      size: 44px
+      padding: 0
   floating-action-button:
     backgroundColor: "{colors.primary}"
     textColor: "{colors.on-primary}"
