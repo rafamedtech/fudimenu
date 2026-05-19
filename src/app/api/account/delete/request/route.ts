@@ -2,6 +2,7 @@ import { createHash, randomInt } from 'node:crypto';
 import { NextResponse, type NextRequest } from 'next/server';
 import { getPrisma } from '@/lib/db/prisma';
 import { mockTenant } from '@/lib/mock/data';
+import { isMockRuntime } from '@/lib/mock/runtime';
 import { checkRateLimit, getClientIp } from '@/lib/ratelimit';
 import { requireAuth } from '@/server/guards/require-auth';
 import { hashDeleteToken } from '@/server/services/account-delete-otp.service';
@@ -39,7 +40,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  if (process.env.USE_MOCKS === 'true') {
+  if (isMockRuntime()) {
     const code = '123456';
     const expiresAt = new Date(Date.now() + EXPIRY_MINUTES * 60 * 1000);
 

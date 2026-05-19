@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { getPrisma } from '@/lib/db/prisma';
 import { mockItems, mockTenant } from '@/lib/mock/data';
+import { isMockRuntime } from '@/lib/mock/runtime';
 import { billingService } from '@/server/services/billing.service';
 import { requireAuth } from '@/server/guards/require-auth';
 import {
@@ -28,7 +29,7 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ ok: false, error: 'invalid_token' }, noStore(400));
   }
 
-  if (process.env.USE_MOCKS === 'true') {
+  if (isMockRuntime()) {
     if (token !== '123456') {
       return NextResponse.json({ ok: false, error: 'invalid_token' }, noStore(400));
     }

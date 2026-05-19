@@ -3,6 +3,7 @@ import { AppHeader } from '@/components/layout/app-header';
 import { Card } from '@/components/ui/card';
 import { getPrisma } from '@/lib/db/prisma';
 import { mockTenant } from '@/lib/mock/data';
+import { isMockRuntime } from '@/lib/mock/runtime';
 import { requireAuth } from '@/server/guards/require-auth';
 import { BillingPlans } from './billing-plans';
 
@@ -14,7 +15,7 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
   const [{ checkout }, ctx] = await Promise.all([searchParams, requireAuth()]);
 
   const tenant =
-    process.env.USE_MOCKS === 'true'
+    isMockRuntime()
       ? {
           stripeCustomerId: mockTenant.stripeCustomerId,
           stripeSubscriptionId: mockTenant.stripeSubscriptionId,

@@ -7,6 +7,7 @@ import { PLAN_CONFIG } from '@/config/plans';
 import { getPrisma } from '@/lib/db/prisma';
 import { env } from '@/lib/env';
 import { mockTenant } from '@/lib/mock/data';
+import { isMockRuntime } from '@/lib/mock/runtime';
 import { requireAuth } from '@/server/guards/require-auth';
 import type { Plan } from '@/types/domain';
 
@@ -56,7 +57,7 @@ export async function createBillingCheckoutAction(input: unknown) {
     process.env.E2E_STRIPE_CHECKOUT_MOCK === 'true' &&
     process.env.STRIPE_SECRET_KEY?.startsWith('sk_test_')
   ) {
-    if (process.env.USE_MOCKS === 'true') {
+    if (isMockRuntime()) {
       mockTenant.plan = plan;
       return {
         ok: true as const,

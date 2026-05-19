@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getPrisma } from '@/lib/db/prisma';
 import { mockCategories, mockItems, mockTenant } from '@/lib/mock/data';
+import { isMockRuntime } from '@/lib/mock/runtime';
 import { checkRateLimit, getClientIp } from '@/lib/ratelimit';
 import { requireAuth } from '@/server/guards/require-auth';
 
@@ -29,7 +30,7 @@ export async function GET(request: Request) {
 
   const ctx = await requireAuth();
 
-  if (process.env.USE_MOCKS === 'true') {
+  if (isMockRuntime()) {
     const exportedAt = new Date();
 
     return NextResponse.json(
