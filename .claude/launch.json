@@ -8,6 +8,12 @@
       "port": 3000
     },
     {
+      "name": "Next.js dev alt",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["dev", "--port", "3010"],
+      "port": 3010
+    },
+    {
       "name": "Prisma Studio",
       "runtimeExecutable": "pnpm",
       "runtimeArgs": ["db:studio"],
