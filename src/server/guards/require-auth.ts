@@ -14,6 +14,7 @@ export type AuthRole = 'owner' | 'admin' | 'staff';
 export type AuthContext = {
   userId: string;
   email: string;
+  avatarUrl: string | null;
   tenantId: string;
   plan: Plan;
   role: AuthRole;
@@ -27,6 +28,35 @@ export type AuthContext = {
     };
   }>;
 };
+
+function normalizeAvatarUrl(value: unknown): string | null {
+  if (typeof value !== 'string' || value.length === 0) return null;
+
+  try {
+    const url = new URL(value);
+    return url.protocol === 'https:' || url.protocol === 'http:' ? url.toString() : null;
+  } catch {
+    return null;
+  }
+}
+
+function getAvatarUrl(metadata: unknown): string | null {
+  if (!metadata || typeof metadata !== 'object') return null;
+
+  const record = metadata as Record<string, unknown>;
+  return normalizeAvatarUrl(record.avatar_url) ?? normalizeAvatarUrl(record.picture);
+}
+
+function getUserAvatarUrl(user: { user_metadata?: unknown; identities?: Array<{ identity_data?: unknown }> | null }) {
+  const metadataAvatar = getAvatarUrl(user.user_metadata);
+  if (metadataAvatar) return metadataAvatar;
+
+  return (
+    user.identities
+      ?.map((identity) => getAvatarUrl(identity.identity_data))
+      .find((avatarUrl): avatarUrl is string => Boolean(avatarUrl)) ?? null
+  );
+}
 
 export async function requireAuth(): Promise<AuthContext> {
   if (process.env.E2E_TEST_AUTH === 'true') {
@@ -60,6 +90,7 @@ export async function requireAuth(): Promise<AuthContext> {
         return {
           userId: e2eUserId,
           email: 'e2e@fudimenu.test',
+          avatarUrl: null,
           tenantId: membership.tenantId,
           plan: membership.tenant.plan as Plan,
           role: membership.role as AuthRole,
@@ -85,6 +116,7 @@ export async function requireAuth(): Promise<AuthContext> {
       return {
         userId: e2eUserId,
         email: 'e2e@fudimenu.test',
+        avatarUrl: null,
         tenantId,
         plan: tenantInfo.plan,
         role: 'owner',
@@ -103,6 +135,7 @@ export async function requireAuth(): Promise<AuthContext> {
     return {
       userId: 'usr_demo',
       email: 'demo@fudimenu.app',
+      avatarUrl: null,
       tenantId: mockTenant.id,
       plan: mockTenant.plan,
       role: 'owner',
@@ -161,6 +194,7 @@ export async function requireAuth(): Promise<AuthContext> {
   const ctx = {
     userId: user.id,
     email: user.email!,
+    avatarUrl: getUserAvatarUrl(user),
     tenantId: membership.tenantId,
     plan: membership.tenant.plan as Plan,
     role: membership.role as AuthRole,

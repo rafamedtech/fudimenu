@@ -30,7 +30,7 @@ function buildCsp(nonce: string) {
     `default-src 'self'`,
     `script-src 'self' 'nonce-${nonce}' ${isDev ? "'unsafe-eval'" : ''} https://us.i.posthog.com https://us-assets.i.posthog.com`,
     `style-src 'self' 'unsafe-inline'`,
-    `img-src 'self' data: blob: https://res.cloudinary.com https://*.supabase.co`,
+    `img-src 'self' data: blob: https://res.cloudinary.com https://*.supabase.co https://lh3.googleusercontent.com https://*.googleusercontent.com`,
     `font-src 'self' data:`,
     `connect-src 'self' https://*.supabase.co https://api.stripe.com https://us.i.posthog.com https://us-assets.i.posthog.com https://*.sentry.io wss://*.supabase.co${devConnectSrc}`,
     `frame-src 'self' https://js.stripe.com https://hooks.stripe.com`,

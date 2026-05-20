@@ -12,6 +12,8 @@ import type { Plan } from '@/types/domain';
 
 type SidebarNavProps = {
   plan: Plan;
+  tenantName: string;
+  avatarUrl: string | null;
 };
 
 function isItemActive(pathname: string, item: NavItem): boolean {
@@ -19,7 +21,15 @@ function isItemActive(pathname: string, item: NavItem): boolean {
   return !!item.items?.some((sub) => pathname === sub.url || pathname.startsWith(`${sub.url}/`));
 }
 
-export function SidebarNav({ plan }: SidebarNavProps) {
+function getPlanLabel(plan: Plan) {
+  return plan === 'free' ? 'Free' : 'Pro';
+}
+
+function getInitial(value: string) {
+  return value.trim().charAt(0).toUpperCase() || 'F';
+}
+
+export function SidebarNav({ plan, tenantName, avatarUrl }: SidebarNavProps) {
   const pathname = usePathname();
   const { isOpen } = useSidebarContext();
   const isFree = plan === 'free';
@@ -41,29 +51,34 @@ export function SidebarNav({ plan }: SidebarNavProps) {
   return (
     <aside
       className={cn(
-        'hidden ipad-landscape:flex flex-col border-r border-[var(--brand-card-border)] bg-[var(--brand-card)] transition-[width] duration-200 ease-linear',
+        'hidden ipad-landscape:flex flex-col border-r border-[var(--brand-card-border)] bg-[rgb(var(--brand-card-rgb)/0.95)] shadow-sm backdrop-blur-md transition-[width] duration-200 ease-linear',
         isOpen ? 'ipad-landscape:w-60 desktop:w-64' : 'ipad-landscape:w-[76px]',
       )}
       aria-label="Navegación principal"
     >
-      <div className={cn('flex items-center px-6 py-7', !isOpen && 'justify-center px-2')}>
+      <div
+        className={cn(
+          'flex min-h-[92px] items-center border-b border-[var(--brand-card-border)] px-5 py-5',
+          !isOpen && 'justify-center px-2',
+        )}
+      >
         {isOpen ? (
-          <FudiLogo markClassName="h-14" textClassName="text-lg" />
+          <FudiLogo markClassName="h-12" textClassName="text-lg" />
         ) : (
           <FudiLogo markClassName="h-10" showText={false} />
         )}
       </div>
 
-      <nav className="flex flex-1 flex-col gap-6 overflow-y-auto px-3 pt-2 pb-4">
+      <nav className="flex flex-1 flex-col gap-6 overflow-y-auto px-3 py-4">
         {NAV_DATA.map((section) => (
           <div key={section.label}>
             {isOpen && (
-              <h2 className="mb-2 px-3 text-[11px] font-bold uppercase tracking-wider text-ink-500">
+              <h2 className="mb-2 px-3 text-[11px] font-extrabold uppercase tracking-wider text-ink-500">
                 {section.label}
               </h2>
             )}
-            <ul className="flex flex-col gap-1">
-              {section.items.map((item) => {
+            <ul className="flex flex-col gap-1.5">
+              {section.items.filter((item) => item.url !== '/account').map((item) => {
                 const active = isItemActive(pathname, item);
                 const hasSub = !!item.items?.length;
                 const isExpanded = expanded.includes(item.title);
@@ -71,27 +86,27 @@ export function SidebarNav({ plan }: SidebarNavProps) {
                 const Icon = item.icon;
 
                 const baseRow = cn(
-                  'flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-200',
+                  'flex min-h-11 items-center gap-3 rounded-lg px-4 py-2.5 text-left text-sm font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--brand-primary-ring)]',
                   active
                     ? 'bg-[var(--brand-primary-faint)] text-[var(--brand-primary)] shadow-sm'
                     : 'text-ink-500 hover:bg-[var(--brand-primary-faint)] hover:text-ink-700',
                   !isOpen && 'justify-center px-2',
                 );
 
-                const iconNode = <Icon size={20} strokeWidth={active ? 2.5 : 2} />;
+                const iconNode = <Icon className="h-5 w-5 shrink-0" strokeWidth={active ? 2.5 : 2} />;
 
                 if (locked && item.url) {
                   return (
-                    <li key={item.title}>
+                    <li key={item.title} className="w-full">
                       <ProFeatureLock
                         title="Analytics es Pro"
                         description="Mide vistas, platillos favoritos y señales de demanda para decidir qué vender más."
-                        className={cn(baseRow, 'relative')}
+                        className={cn(baseRow, 'relative w-full')}
                       >
                         {iconNode}
                         {isOpen && (
                           <>
-                            <span>{item.title}</span>
+                            <span className="min-w-0 flex-1 truncate">{item.title}</span>
                             <span className="ml-auto">
                               <ProBadge />
                             </span>
@@ -115,11 +130,11 @@ export function SidebarNav({ plan }: SidebarNavProps) {
                         {iconNode}
                         {isOpen && (
                           <>
-                            <span>{item.title}</span>
+                            <span className="min-w-0 flex-1 truncate">{item.title}</span>
                             <ChevronDown
                               size={16}
                               className={cn(
-                                'ml-auto transition-transform duration-200',
+                                'ml-auto shrink-0 transition-transform duration-200',
                                 isExpanded && 'rotate-180',
                               )}
                             />
@@ -127,7 +142,7 @@ export function SidebarNav({ plan }: SidebarNavProps) {
                         )}
                       </button>
                       {isOpen && isExpanded && item.items && (
-                        <ul className="mt-1 ml-4 flex flex-col gap-1 border-l border-[var(--brand-card-border)] pl-3">
+                        <ul className="mt-1.5 ml-5 flex flex-col gap-1 border-l border-[var(--brand-card-border)] pl-3">
                           {item.items.map((sub) => {
                             const subActive =
                               pathname === sub.url || pathname.startsWith(`${sub.url}/`);
@@ -135,11 +150,12 @@ export function SidebarNav({ plan }: SidebarNavProps) {
                               <li key={sub.url}>
                                 <Link
                                   href={sub.url}
+                                  aria-current={subActive ? 'page' : undefined}
                                   className={cn(
-                                    'block rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                                    'block rounded-lg px-3 py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--brand-primary-ring)]',
                                     subActive
-                                      ? 'text-[var(--brand-primary)]'
-                                      : 'text-ink-500 hover:text-ink-700',
+                                      ? 'bg-[var(--brand-primary-faint)] text-[var(--brand-primary)]'
+                                      : 'text-ink-500 hover:bg-[var(--brand-primary-faint)] hover:text-ink-700',
                                   )}
                                 >
                                   {sub.title}
@@ -157,11 +173,12 @@ export function SidebarNav({ plan }: SidebarNavProps) {
                   <li key={item.title}>
                     <Link
                       href={item.url!}
+                      aria-current={active ? 'page' : undefined}
                       className={baseRow}
                       title={!isOpen ? item.title : undefined}
                     >
                       {iconNode}
-                      {isOpen && <span>{item.title}</span>}
+                      {isOpen && <span className="min-w-0 flex-1 truncate">{item.title}</span>}
                     </Link>
                   </li>
                 );
@@ -171,14 +188,39 @@ export function SidebarNav({ plan }: SidebarNavProps) {
         ))}
       </nav>
 
-      {isOpen && (
-        <div className="border-t border-[var(--brand-card-border)] px-6 py-5">
-          <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[var(--brand-surface-strong)] text-sm font-black text-ink-700">
-            FM
-          </div>
-          <p className="mt-2 text-xs font-medium text-ink-500">Tu menú vive online.</p>
-        </div>
-      )}
+      <div className="border-t border-[var(--brand-card-border)] p-3">
+        <Link
+          href="/account"
+          className={cn(
+            'flex items-center rounded-lg bg-[var(--brand-surface-strong)] p-2 transition-all duration-200 hover:bg-[var(--brand-primary-faint)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--brand-primary-ring)]',
+            isOpen ? 'gap-3' : 'justify-center',
+          )}
+          title={!isOpen ? 'Cuenta' : undefined}
+        >
+          <span
+            className={cn(
+              'flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-[var(--brand-primary-faint)] bg-cover bg-center text-sm font-black text-[var(--brand-primary)]',
+              avatarUrl && 'text-transparent',
+            )}
+            style={avatarUrl ? { backgroundImage: `url(${avatarUrl})` } : undefined}
+            aria-hidden="true"
+          >
+            {avatarUrl ? null : getInitial(tenantName)}
+          </span>
+          {isOpen && (
+            <span className="min-w-0 flex-1">
+              <span className="line-clamp-2 block text-sm font-extrabold leading-4 text-ink-900">
+                {tenantName}
+              </span>
+            </span>
+          )}
+          {isOpen && (
+            <span className="rounded-full bg-ink-900 px-2 py-1 text-[11px] font-extrabold text-mostaza-500">
+              {getPlanLabel(plan)}
+            </span>
+          )}
+        </Link>
+      </div>
     </aside>
   );
 }

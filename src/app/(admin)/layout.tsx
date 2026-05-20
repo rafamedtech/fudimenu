@@ -11,6 +11,9 @@ import { requireAuth } from '@/server/guards/require-auth';
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const ctx = await requireAuth();
+  const activeMembership =
+    ctx.memberships.find((membership) => membership.tenantId === ctx.tenantId) ??
+    ctx.memberships[0];
   const tenant =
     process.env.USE_MOCKS === 'true'
       ? { primaryColor: mockTenant.primaryColor }
@@ -27,7 +30,11 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           style={buildBrandThemeStyle(tenant?.primaryColor)}
         >
           <AuthBroadcast />
-          <SidebarNav plan={ctx.plan} />
+          <SidebarNav
+            plan={ctx.plan}
+            tenantName={activeMembership?.tenant.name ?? 'FudiMenu'}
+            avatarUrl={ctx.avatarUrl}
+          />
           <div className="flex min-w-0 flex-1 flex-col ipad-landscape:items-center">
             <div className="w-full ipad-landscape:max-w-[984px] desktop:max-w-[1180px]">
               {children}
