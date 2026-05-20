@@ -51,7 +51,7 @@ export function SidebarNav({ plan, tenantName, avatarUrl }: SidebarNavProps) {
   return (
     <aside
       className={cn(
-        'hidden ipad-landscape:flex flex-col border-r border-[var(--brand-card-border)] bg-[rgb(var(--brand-card-rgb)/0.95)] shadow-sm backdrop-blur-md transition-[width] duration-200 ease-linear',
+        'sticky top-0 hidden h-dvh shrink-0 self-start overflow-hidden ipad-landscape:flex flex-col border-r border-[var(--brand-card-border)] bg-[rgb(var(--brand-card-rgb)/0.95)] shadow-sm backdrop-blur-md transition-[width] duration-200 ease-linear',
         isOpen ? 'ipad-landscape:w-60 desktop:w-64' : 'ipad-landscape:w-[76px]',
       )}
       aria-label="Navegación principal"
