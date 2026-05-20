@@ -14,8 +14,8 @@ export function FudiLogo({ className, markClassName, textClassName, showText = t
       <Image
         src="/brand/fudimenu-logo.png"
         alt="FudiMenu"
-        width={415}
-        height={568}
+        width={401}
+        height={609}
         priority
         className={cn('h-14 w-auto object-contain', markClassName)}
       />
