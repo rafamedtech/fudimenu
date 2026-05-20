@@ -30,12 +30,16 @@ function ActionCard({
   title,
   description,
   doodle,
+  imageSrc,
+  imageAlt,
   target,
 }: {
   href: string;
   title: string;
   description: string;
-  doodle: React.ComponentProps<typeof Doodle>['name'];
+  doodle?: React.ComponentProps<typeof Doodle>['name'];
+  imageSrc?: string;
+  imageAlt?: string;
   target?: '_blank';
 }) {
   return (
@@ -49,10 +53,22 @@ function ActionCard({
         <p className="font-heading text-xl font-black text-ink-900 ipad:text-2xl">{title}</p>
         <p className="mt-2 text-sm leading-6 text-ink-500">{description}</p>
       </div>
-      <Doodle
-        name={doodle}
-        className="absolute -bottom-6 -right-10 h-36 w-44 opacity-95 transition-transform group-hover:scale-105 ipad:-bottom-8 ipad:-right-12 ipad:h-44 ipad:w-56"
-      />
+      {imageSrc ? (
+        <div className="absolute -bottom-7 right-3 h-[9.1rem] w-[6.3rem] overflow-hidden transition-transform group-hover:scale-105 ipad:-bottom-10 ipad:right-5 ipad:h-[11.2rem] ipad:w-[7.7rem]">
+          <Image
+            src={imageSrc}
+            alt={imageAlt ?? ''}
+            fill
+            sizes="(min-width: 768px) 176px, 144px"
+            className="object-cover object-center grayscale"
+          />
+        </div>
+      ) : doodle ? (
+        <Doodle
+          name={doodle}
+          className="absolute -bottom-6 -right-10 h-36 w-44 opacity-95 transition-transform group-hover:scale-105 ipad:-bottom-8 ipad:-right-12 ipad:h-44 ipad:w-56"
+        />
+      ) : null}
     </Link>
   );
 }
@@ -77,14 +93,14 @@ export default async function DashboardPage() {
       />
       <main className="flex flex-col gap-4 px-4 pb-6 ipad:gap-5 ipad:px-6 ipad:pb-8 ipad-landscape:px-7 desktop:px-8">
         <div className="relative overflow-hidden rounded-xl border border-[var(--brand-card-border)] bg-[var(--brand-card)] p-5 shadow-md ipad:p-7">
-          <div className="flex items-center gap-5 ipad:gap-7">
-            <div className="relative flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-2xl border-[1.5px] border-[var(--brand-card-border)] bg-[var(--brand-surface-strong)] shadow-sm ipad:h-32 ipad:w-32">
+          <div className="flex flex-col items-center gap-5 desktop:flex-row desktop:items-center desktop:gap-7">
+            <div className="relative flex h-32 w-full shrink-0 items-center justify-center overflow-hidden rounded-2xl border-[1.5px] border-[var(--brand-card-border)] bg-[var(--brand-surface-strong)] shadow-sm desktop:h-40 desktop:w-72">
               {tenant.logoUrl ? (
                 <Image
                   src={tenant.logoUrl}
                   alt={`Logo de ${tenant.name}`}
                   fill
-                  sizes="(min-width: 768px) 128px, 96px"
+                  sizes="(min-width: 1024px) 288px, 100vw"
                   className="object-cover"
                   priority
                 />
@@ -97,9 +113,14 @@ export default async function DashboardPage() {
                 </div>
               )}
             </div>
-            <h2 className="font-heading text-3xl font-black leading-tight text-ink-900 ipad:text-5xl ipad-landscape:text-6xl">
-              Bienvenido a <span className="text-[var(--brand-primary)]">{tenant.name}</span>
-            </h2>
+            <div className="flex flex-col text-center desktop:text-left">
+              <span className="font-heading text-xl font-bold leading-tight text-ink-700 ipad:text-2xl desktop:text-3xl">
+                Bienvenido a
+              </span>
+              <h2 className="font-heading text-3xl font-black leading-tight text-[var(--brand-primary)] ipad:text-5xl ipad-landscape:text-6xl">
+                {tenant.name}
+              </h2>
+            </div>
           </div>
         </div>
 
@@ -159,14 +180,16 @@ export default async function DashboardPage() {
             href="/qr"
             title="Compartir QR"
             description="Descarga, imprime o manda el QR de tu menú."
-            doodle="qr-phone"
+            imageSrc="/dashboard/share-qr.png"
+            imageAlt="Teléfono escaneando un código QR"
           />
           <ActionCard
             href={`/m/${activeSlug}`}
             target="_blank"
             title="Ver mi menú público"
             description="Abre la vista que ven tus clientes al escanear."
-            doodle="hero"
+            imageSrc="/dashboard/public-menu.png"
+            imageAlt="Teléfono mostrando el menú público del restaurante"
           />
           <ActionCard
             href={dailySpecial ? `/menu/${dailySpecial.id}` : '/menu'}
@@ -179,7 +202,8 @@ export default async function DashboardPage() {
                   )}`
                 : 'Elige el platillo que quieres empujar hoy.'
             }
-            doodle="chef"
+            imageSrc="/dashboard/especial-de-hoy.png"
+            imageAlt="Teléfono mostrando el especial de hoy"
           />
         </div>
 
