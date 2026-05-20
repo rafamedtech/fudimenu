@@ -1,19 +1,19 @@
 'use client';
 import { useCallback, useEffect, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
-import { ArrowRight } from 'lucide-react';
-import { Doodle } from '@/components/brand/doodles';
+import { ArrowRight, CheckCircle2, QrCode, Utensils } from 'lucide-react';
 import { FudiLogo } from '@/components/brand/fudi-logo';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { useListenForSignIn } from '@/hooks/use-auth-broadcast';
 import { createSupabaseBrowser } from '@/lib/supabase/client';
 import { signInWithMagicLinkAction } from '@/server/actions/auth.actions';
 import { track } from '@/lib/analytics/events';
 
 const MAGIC_LINK_POLL_TIMEOUT_MS = 30_000;
+const MAIL_IMAGE =
+  'https://ggrhecslgdflloszjkwl.supabase.co/storage/v1/object/public/user-assets/T5aFVdCanUY/components/8YmDwAg9deN.png';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -66,8 +66,7 @@ export default function LoginPage() {
     };
   }, [handleDetectedSignIn, magicLinkSentAt]);
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  async function sendMagicLink() {
     setLoading(true);
     try {
       const fd = new FormData();
@@ -86,6 +85,11 @@ export default function LoginPage() {
     } finally {
       setLoading(false);
     }
+  }
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    await sendMagicLink();
   }
 
   async function handleGoogleSignIn() {
@@ -120,80 +124,128 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-dvh max-w-[480px] flex-col bg-[var(--brand-surface)] px-6 py-8 ipad:max-w-[768px] ipad:items-center ipad:justify-center">
-      <div className="mb-10 flex justify-center ipad:mb-14">
-        <FudiLogo />
+    <main className="relative flex min-h-dvh flex-col items-center justify-center overflow-hidden bg-[var(--brand-surface)] p-6 font-sans">
+      <div className="absolute left-0 right-0 top-8 flex justify-center ipad-landscape:hidden">
+        <FudiLogo markClassName="h-11" textClassName="text-lg" />
       </div>
 
-      <div className="w-full rounded-xl border border-[var(--brand-card-border)] bg-[var(--brand-card)] p-6 text-center shadow-lg ipad:max-w-[640px] ipad:p-10 desktop:max-w-[680px]">
-        <Doodle name="mail" className="mx-auto h-32 w-40 ipad:h-40 ipad:w-52" />
-        <div className="mb-8">
-          <h1 className="fudi-h1">¡Hola de nuevo!</h1>
-          <p className="mt-3 text-base font-medium text-ink-500 ipad:text-lg">
-            Ingresa para gestionar tu menú digital.
-          </p>
-        </div>
+      <div className="w-full max-w-[480px] space-y-8">
+        <div className="relative overflow-hidden rounded-3xl border-[1.5px] border-[var(--brand-card-border)] bg-[var(--brand-card)] p-8 shadow-sm ipad:p-10">
+          <div className="mb-6 flex justify-center">
+            <div className="relative">
+              <div className="absolute inset-0 scale-150 rounded-full bg-[var(--brand-primary-faint)] blur-2xl" />
+              <Image
+                src={MAIL_IMAGE}
+                alt="Correo"
+                width={96}
+                height={96}
+                priority
+                className="relative z-10 h-24 w-24 object-contain"
+              />
+            </div>
+          </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <Input
-            name="email"
-            type="email"
-            placeholder="ejemplo@restaurante.com"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            label="Correo electrónico"
-          />
-          <Button type="submit" size="xl" loading={loading} className="mt-2 font-black">
-            {magicLinkSentAt ? 'Reenviar enlace de acceso' : 'Enviar enlace de acceso'}
-            {!loading && <ArrowRight className="h-5 w-5" />}
-          </Button>
-        </form>
-
-        {magicLinkSentAt ? (
-          <div
-            role="status"
-            aria-live="polite"
-            className="mt-5 rounded-lg border border-menta-500/20 bg-menta-50 px-5 py-4 text-left text-sm text-ink-700 shadow-sm"
-          >
-            <p className="font-bold text-ink-900 flex items-center gap-1.5">
-              <span className="h-2 w-2 rounded-full bg-menta-500 animate-ping" />
-              {magicLinkPollExpired ? 'Listo, revisa tu correo' : 'Revisando tu bandeja...'}
-            </p>
-            <p className="mt-1.5 leading-relaxed">
-              Abre el enlace desde este navegador. Si detectamos tu sesión en otra pestaña, te redirigiremos de inmediato.
-            </p>
-            <p className="mt-2 text-xs text-ink-500">
-              ¿No llegó? Revisa spam o intenta con Google.
+          <div className="mb-8 space-y-2 text-center">
+            <h1 className="font-heading text-2xl font-bold tracking-[0] text-ink-900 ipad:text-3xl">
+              ¡Hola de nuevo!
+            </h1>
+            <p className="text-sm text-ink-500 ipad:text-base">
+              Ingresa para gestionar tu menú digital
             </p>
           </div>
-        ) : null}
 
-        <div className="my-8 flex items-center gap-4 text-xs font-bold uppercase text-ink-500">
-          <div className="h-px flex-1 bg-ink-100" />
-          <span>O continuar con</span>
-          <div className="h-px flex-1 bg-ink-100" />
+          {!magicLinkSentAt ? (
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2 text-left">
+                <label htmlFor="email" className="px-1 text-sm font-semibold text-ink-900/80">
+                  Correo electrónico
+                </label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="ejemplo@restaurante.com"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="h-12 w-full rounded-xl border-[1.5px] border-[var(--brand-card-border)] bg-[var(--brand-card)] px-4 text-ink-900 outline-none transition-all placeholder:text-ink-500/60 focus:border-[var(--brand-primary)] focus:ring-2 focus:ring-[var(--brand-primary-ring)]"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--brand-primary)] font-bold text-[var(--brand-on-primary)] shadow-sm transition-all hover:bg-[var(--brand-primary-hover)] active:scale-95 disabled:pointer-events-none disabled:opacity-50"
+              >
+                {loading ? 'Enviando...' : 'Enviar enlace de acceso'}
+                {!loading && <ArrowRight className="h-5 w-5" aria-hidden="true" />}
+              </button>
+
+              <div className="relative my-8">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-[var(--brand-card-border)]" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-[var(--brand-card)] px-3 font-medium text-ink-500">
+                    O continúa con
+                  </span>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                disabled={googleLoading}
+                onClick={handleGoogleSignIn}
+                className="flex h-12 w-full items-center justify-center gap-3 rounded-xl border-[1.5px] border-[var(--brand-card-border)] bg-[var(--brand-card)] font-semibold text-ink-900 shadow-sm transition-all hover:bg-[var(--brand-surface-strong)] active:scale-95 disabled:pointer-events-none disabled:opacity-50"
+              >
+                {!googleLoading && <GoogleIcon />}
+                {googleLoading ? 'Abriendo Google...' : 'Entrar con Google'}
+              </button>
+            </form>
+          ) : (
+            <div
+              role="status"
+              aria-live="polite"
+              className="flex animate-fade-in flex-col items-center space-y-4 py-4 text-center"
+            >
+              <div className="rounded-full bg-menta-100 p-3 text-menta-600">
+                <CheckCircle2 className="h-10 w-10" aria-hidden="true" />
+              </div>
+              <h2 className="font-heading text-xl font-bold text-ink-900">
+                ¡Revisa tu bandeja!
+              </h2>
+              <p className="text-sm leading-6 text-ink-500">
+                Te enviamos un enlace mágico a <strong>{email}</strong>. Haz clic en el botón para
+                entrar.
+              </p>
+              <button
+                type="button"
+                disabled={loading}
+                onClick={sendMagicLink}
+                className="text-sm font-bold text-[var(--brand-primary)] hover:underline disabled:opacity-50"
+              >
+                {magicLinkPollExpired ? '¿No recibiste nada? Reenviar' : 'Reenviar enlace'}
+              </button>
+            </div>
+          )}
         </div>
 
-        <Button
-          type="button"
-          variant="outline"
-          size="xl"
-          loading={googleLoading}
-          onClick={handleGoogleSignIn}
-          className="font-bold tracking-wide flex items-center justify-center gap-2 border-[1.5px] border-ink-100 shadow-sm hover:border-[var(--brand-primary)] hover:bg-[var(--brand-primary-faint)] transition-all bg-white"
-        >
-          {!googleLoading && <GoogleIcon />}
-          Entrar con Google
-        </Button>
+        <div className="text-center">
+          <p className="text-sm text-ink-500">
+            ¿Aún no tienes cuenta?{' '}
+            <Link href="/onboarding" className="font-bold text-[var(--brand-primary)] hover:underline">
+              Crea tu menú gratis
+            </Link>
+          </p>
+        </div>
       </div>
 
-      <p className="mt-8 text-center text-base text-ink-500">
-        ¿Aún no tienes cuenta?{' '}
-        <Link href="/onboarding" className="font-black text-[var(--brand-primary)] hover:underline">
-          Crea tu menú gratis
-        </Link>
-      </p>
+      <div className="fixed -bottom-10 -left-10 hidden rotate-12 text-[var(--brand-primary)] opacity-20 ipad-landscape:block">
+        <Utensils className="h-64 w-64" aria-hidden="true" />
+      </div>
+      <div className="fixed -right-10 -top-10 hidden -rotate-12 text-menta-500 opacity-20 ipad-landscape:block">
+        <QrCode className="h-64 w-64" aria-hidden="true" />
+      </div>
     </main>
   );
 }

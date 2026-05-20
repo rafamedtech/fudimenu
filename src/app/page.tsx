@@ -6,7 +6,6 @@ import {
   Smartphone,
   SmartphoneNfc,
   Store,
-  UtensilsCrossed,
   Zap,
 } from 'lucide-react';
 import { FudiLogo } from '@/components/brand/fudi-logo';
@@ -52,7 +51,7 @@ export default function LandingPage() {
     <div className="flex min-h-dvh flex-col bg-[var(--brand-surface)] text-ink-900">
       <header className="sticky top-0 z-50 w-full border-b border-[var(--brand-card-border)] bg-[var(--brand-surface-translucent)] backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-[1180px] items-center justify-between px-6 ipad:h-20 ipad:px-8">
-          <FudiLogo markClassName="h-9 w-9 rounded-md" textClassName="text-xl" />
+          <FudiLogo markClassName="h-12" textClassName="text-xl" />
           <div className="flex items-center gap-4">
             <Link
               href="/login"
@@ -177,10 +176,7 @@ export default function LandingPage() {
 
       <footer className="border-t border-[var(--brand-card-border)] bg-[var(--brand-surface)] py-12">
         <div className="mx-auto flex max-w-[1180px] flex-col items-center justify-between gap-4 px-6 ipad:flex-row ipad:px-8">
-          <div className="flex items-center gap-2 text-ink-500">
-            <UtensilsCrossed className="h-5 w-5" aria-hidden="true" />
-            <span className="font-heading text-lg font-black">FudiMenu</span>
-          </div>
+          <FudiLogo markClassName="h-12 opacity-75" textClassName="text-lg text-ink-500" />
           <p className="text-sm text-ink-500">© 2026 FudiMenu. Hecho para restaurantes.</p>
         </div>
       </footer>

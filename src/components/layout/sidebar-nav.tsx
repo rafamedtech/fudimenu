@@ -25,7 +25,7 @@ export function SidebarNav({ plan }: SidebarNavProps) {
   return (
     <aside className="hidden ipad-landscape:flex ipad-landscape:w-60 desktop:w-64 flex-col border-r border-[var(--brand-card-border)] bg-[var(--brand-card)]">
       <div className="px-6 py-7">
-        <FudiLogo markClassName="h-10 w-10 rounded-lg" textClassName="text-lg" />
+        <FudiLogo markClassName="h-14" textClassName="text-lg" />
       </div>
 
       {/* Navigation links */}
