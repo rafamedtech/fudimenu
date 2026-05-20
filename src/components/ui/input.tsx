@@ -7,16 +7,33 @@ export interface InputProps
   error?: string;
   hint?: string;
   prefix?: React.ReactNode;
+  containerClassName?: string;
+  labelClassName?: string;
+  controlClassName?: string;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ className, label, error, hint, prefix, id, ...props }, ref) => {
+  (
+    {
+      className,
+      containerClassName,
+      labelClassName,
+      controlClassName,
+      label,
+      error,
+      hint,
+      prefix,
+      id,
+      ...props
+    },
+    ref,
+  ) => {
     const generatedId = useId();
     const inputId = id ?? props.name ?? generatedId;
     return (
-      <div className="flex flex-col gap-1.5">
+      <div className={cn('flex flex-col gap-1.5', containerClassName)}>
         {label && (
-          <label htmlFor={inputId} className="text-sm font-medium text-ink-700">
+          <label htmlFor={inputId} className={cn('text-sm font-medium text-ink-700', labelClassName)}>
             {label}
           </label>
         )}
@@ -25,6 +42,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             'flex h-14 items-center gap-2 rounded-md border bg-[var(--brand-card)] px-4 transition-all',
             'focus-within:border-[var(--brand-primary)] focus-within:shadow-glow-mostaza',
             error ? 'border-red-500' : 'border-ink-200',
+            controlClassName,
           )}
         >
           {prefix && <span className="text-ink-500">{prefix}</span>}

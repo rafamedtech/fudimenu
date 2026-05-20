@@ -1,10 +1,11 @@
 'use client';
 import { useState } from 'react';
+import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
-import { ArrowRight, Check, ChevronLeft } from 'lucide-react';
-import { Doodle } from '@/components/brand/doodles';
+import { ArrowRight, Check, ChevronLeft, Utensils } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { usePriceInput } from '@/hooks/use-price-input';
 import { track } from '@/lib/analytics/events';
@@ -14,6 +15,8 @@ import {
 } from '@/server/actions/onboarding.actions';
 
 const POST_ONBOARDING_PATH = '/menu?welcome=1';
+const CHEF_IMAGE =
+  'https://ggrhecslgdflloszjkwl.supabase.co/storage/v1/object/public/user-assets/T5aFVdCanUY/components/VbWmwtcwtWu.png';
 
 type OnboardingPayload = {
   name: string;
@@ -31,12 +34,18 @@ const cuisines = [
   { id: 'saludable', label: '🥗 Saludable' },
 ];
 
+function splitCuisineLabel(label: string) {
+  const [emoji, ...rest] = label.split(' ');
+  return { emoji, name: rest.join(' ') };
+}
+
 export default function OnboardingPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isAddingMenu = searchParams.get('new') === '1';
   const [name, setName] = useState('');
   const [cuisine, setCuisine] = useState<string>('');
+  const [otherCuisine, setOtherCuisine] = useState('');
   const [itemName, setItemName] = useState('');
   const [priceCents, setPriceCents] = useState<number>(0);
   const [isDishOpen, setIsDishOpen] = useState(true);
@@ -54,12 +63,14 @@ export default function OnboardingPage() {
   const progress = Math.round(
     ((trimmedName.length > 0 ? 1 : 0) + (cuisine.length > 0 ? 1 : 0) + (includeFirstItem ? 1 : 0)) / 3 * 100,
   );
-  const canSubmit = trimmedName.length > 0 && cuisine.length > 0;
+  const trimmedOtherCuisine = otherCuisine.trim();
+  const selectedCuisine = cuisine === 'otro' ? trimmedOtherCuisine : cuisine;
+  const canSubmit = trimmedName.length > 0 && selectedCuisine.length > 0;
 
   function buildPayload(): OnboardingPayload {
     return {
       name: trimmedName,
-      cuisine,
+      cuisine: selectedCuisine,
       ...(includeFirstItem
         ? {
             itemName: trimmedItemName,
@@ -131,111 +142,182 @@ export default function OnboardingPage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-dvh max-w-[480px] flex-col bg-[var(--brand-surface)] px-6 pb-[calc(6rem+env(safe-area-inset-bottom))] pt-safe ipad:max-w-[820px] ipad:px-8 ipad:pb-32 ipad-landscape:max-w-[984px]">
-      <header className="flex h-20 items-center justify-between">
-        <button
-          type="button"
-          onClick={() => router.back()}
-          aria-label="Volver"
-          className="flex h-12 w-12 items-center justify-center rounded-md text-ink-700 hover:bg-[var(--brand-primary-faint)]"
-        >
-          <ChevronLeft className="h-7 w-7" />
-        </button>
-        <p className="text-xl font-black">Paso 2 de 3</p>
+    <main className="flex min-h-dvh flex-col bg-[var(--brand-surface)] pb-24 font-sans">
+      <header className="sticky top-0 z-50 border-b border-[var(--brand-card-border)] bg-[var(--brand-surface)] px-6 py-4">
+        <div className="mx-auto max-w-[600px] space-y-4">
+          <div className="flex items-center justify-between">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => router.back()}
+              aria-label="Volver"
+              className="text-ink-500 hover:text-ink-900"
+            >
+              <ChevronLeft className="h-6 w-6" />
+            </Button>
+            <span className="font-heading text-sm font-bold">Paso 2 de 3</span>
+          </div>
+          <div className="h-2 w-full overflow-hidden rounded-full bg-ink-100" aria-label="Progreso de onboarding">
+            <div
+              className="h-full rounded-full bg-[var(--brand-primary)] transition-all duration-500 ease-out"
+              style={{ width: `${Math.max(progress, 66)}%` }}
+            />
+          </div>
+        </div>
       </header>
-      <div className="mb-8 h-2 overflow-hidden rounded-full bg-ink-100" aria-label="Progreso de onboarding">
-        <div className="h-full rounded-full bg-[var(--brand-primary)] transition-all" style={{ width: `${progress}%` }} />
-      </div>
 
-      <div className="grid flex-1 gap-6 ipad-landscape:grid-cols-[0.8fr_1.2fr] ipad-landscape:items-start">
-        <section className="flex items-center gap-5 ipad:gap-8 ipad-landscape:sticky ipad-landscape:top-8 ipad-landscape:flex-col ipad-landscape:items-start">
-          <Doodle name="chef" className="h-32 w-36 shrink-0 ipad:h-44 ipad:w-52" />
-          <div>
-            <p className="text-sm font-black uppercase text-[var(--brand-accent-text)]">¡Casi listo!</p>
-            <h1 className="fudi-h1 mt-1">
-              {isAddingMenu ? 'Nuevo menú: ¿cómo se llama?' : '¿Qué cocina preparas?'}
+      <div className="mx-auto w-full max-w-[600px] flex-1 space-y-12 px-6 pt-8">
+        <section className="flex items-center gap-6">
+          <Image
+            src={CHEF_IMAGE}
+            alt="Chef"
+            width={128}
+            height={128}
+            priority
+            className="h-24 w-24 shrink-0 object-contain ipad:h-32 ipad:w-32"
+          />
+          <div className="space-y-1">
+            <h1 className="font-heading text-2xl font-bold leading-tight text-ink-900">
+              ¡Casi listo! <br />
+              <span className="text-[var(--brand-primary)]">
+                {isAddingMenu ? '¿Cómo se llama?' : '¿Qué cocina preparas?'}
+              </span>
             </h1>
-            <p className="mt-3 text-lg leading-7 text-ink-500">
-            {isAddingMenu
-              ? 'Crea otro menú independiente con su propio link público.'
-              : 'Ayúdanos a personalizar tu menú digital.'}
+            <p className="text-sm text-ink-500">
+              {isAddingMenu
+                ? 'Crea otro menú independiente.'
+                : 'Ayúdanos a personalizar tu menú digital.'}
             </p>
           </div>
         </section>
 
-        <div className="flex flex-col gap-6">
-          <section className="rounded-xl border border-[var(--brand-card-border)] bg-[var(--brand-card)] p-5 shadow-md ipad:p-6">
-            <div className="flex items-center gap-4">
-              <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-menta-100 text-menta-600">
-                <Check className="h-7 w-7" />
-              </span>
+        <Card className="flex items-center justify-between rounded-2xl border-[1.5px] border-[var(--brand-card-border)] p-5 opacity-90 shadow-sm">
+          <div className="flex min-w-0 flex-1 items-center gap-4">
+            <div className="shrink-0 rounded-full bg-menta-100 p-2 text-menta-600">
+              <Check className="h-5 w-5" aria-hidden="true" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-ink-500">
+                Nombre del restaurante
+              </p>
               <Input
                 autoFocus
-                label="Nombre del restaurante"
+                aria-label="Nombre del restaurante"
                 placeholder="Taquería Los Compas"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                containerClassName="mt-1 gap-0"
+                controlClassName="h-auto border-0 bg-transparent p-0 focus-within:border-transparent focus-within:shadow-none"
+                className="text-base font-bold placeholder:text-ink-500"
               />
             </div>
-          </section>
+          </div>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="shrink-0 px-2 text-sm font-bold text-[var(--brand-primary)]"
+            onClick={() => {
+              const input = document.querySelector<HTMLInputElement>('input[aria-label="Nombre del restaurante"]');
+              input?.focus();
+            }}
+          >
+            Editar
+          </Button>
+        </Card>
 
-          <section className="flex flex-col gap-3">
-            <h2 className="text-xl font-black">Tipo de cocina</h2>
-            <div className="grid grid-cols-2 gap-3 ipad:gap-4" aria-label="Tipo de cocina">
-              {cuisines.map((c) => (
-                <button
+        <section className="space-y-6">
+          <div className="grid grid-cols-2 gap-3" aria-label="Tipo de cocina">
+            {cuisines.map((c) => {
+              const { emoji, name: cuisineName } = splitCuisineLabel(c.label);
+              const selected = cuisine === c.id;
+              return (
+                <Button
                   key={c.id}
                   type="button"
-                  aria-pressed={cuisine === c.id}
+                  variant={selected ? 'secondary' : 'outline'}
+                  aria-pressed={selected}
                   onClick={() => setCuisine(c.id)}
-                  className={`flex min-h-24 flex-col items-center justify-center rounded-lg border-[1.5px] px-3 text-center text-lg font-black transition-all ipad:min-h-32 ipad:text-xl ${
-                    cuisine === c.id
-                      ? 'border-[var(--brand-primary)] bg-[var(--brand-primary-soft)] shadow-md'
-                      : 'border-[var(--brand-card-border)] bg-[var(--brand-card)] shadow-sm hover:border-[var(--brand-primary-border)]'
+                  className={`flex h-auto min-h-[92px] flex-col items-center gap-2 rounded-2xl border-[1.5px] p-4 transition-all ${
+                    selected
+                      ? 'border-[var(--brand-primary)] bg-[var(--brand-primary-soft)] text-[var(--brand-on-primary)]'
+                      : 'border-[var(--brand-card-border)] bg-[var(--brand-card)] hover:border-[var(--brand-primary-border)]'
                   }`}
                 >
-                  <span className="mb-2 text-3xl" aria-hidden>{c.label.split(' ')[0]}</span>
-                  {c.label.replace(/^.+\s/, '')}
-                </button>
-              ))}
-            </div>
-          </section>
-
-          <section className="rounded-lg border border-[var(--brand-card-border)] bg-[var(--brand-card)] shadow-md">
-            <button
-              type="button"
-              className="flex min-h-16 w-full items-center justify-between gap-3 px-5 py-4 text-left"
-              aria-expanded={isDishOpen}
-              onClick={() => setIsDishOpen((open) => !open)}
-            >
-              <span>
-                <span className="block text-xl font-black">Primer platillo</span>
-                <span className="text-sm text-ink-500">Opcional, lo puedes saltar.</span>
-              </span>
-              <span className="text-3xl font-black text-[var(--brand-accent-text)]" aria-hidden>
-                {isDishOpen ? '-' : '+'}
-              </span>
-            </button>
-
-            {isDishOpen && (
-              <div className="grid gap-4 border-t border-ink-100 px-5 py-5 ipad:grid-cols-2">
-                <Input label="Nombre" placeholder="Tacos al pastor" value={itemName} onChange={(e) => setItemName(e.target.value)} />
-                <Input label="Precio" type="text" inputMode="decimal" prefix="$" placeholder="0" value={priceDisplayValue} onChange={(e) => handlePriceChange(e.target.value)} />
-                <Button variant="outline" size="lg" className="w-full ipad:col-span-2" onClick={skipFirstItem}>
-                  Saltar y agregar después
+                  <span className="text-3xl" aria-hidden="true">
+                    {emoji}
+                  </span>
+                  <span className="text-sm font-bold">{cuisineName}</span>
                 </Button>
-              </div>
-            )}
-          </section>
-        </div>
+              );
+            })}
+          </div>
+
+          <Input
+            label="Otro tipo de cocina"
+            placeholder="Ej: Fusión Japonesa"
+            value={otherCuisine}
+            onChange={(e) => {
+              setOtherCuisine(e.target.value);
+              setCuisine('otro');
+            }}
+            containerClassName="gap-2"
+            labelClassName="px-1 text-xs font-bold uppercase tracking-widest text-ink-500"
+            controlClassName="h-12 rounded-xl border-[1.5px] border-[var(--brand-card-border)] focus-within:ring-2 focus-within:ring-[var(--brand-primary-ring)] focus-within:shadow-none"
+            className="font-normal"
+          />
+        </section>
+
+        <section className="space-y-4">
+          <button
+            type="button"
+            onClick={() => setIsDishOpen((open) => !open)}
+            aria-expanded={isDishOpen}
+            className="w-full rounded-2xl border-[1.5px] border-dashed border-[var(--brand-card-border)] bg-ink-100/30 p-6 text-center transition-colors hover:bg-ink-100/50"
+          >
+            <Utensils className="mx-auto h-8 w-8 text-ink-500" aria-hidden="true" />
+            <p className="mt-2 font-bold text-ink-500">Paso 3: Tu primer platillo</p>
+            <p className="mt-1 text-xs text-ink-500/70">
+              Agregaremos un ítem para que veas cómo queda.
+            </p>
+          </button>
+
+          {isDishOpen && (
+            <Card className="grid gap-4 rounded-2xl border-[1.5px] border-[var(--brand-card-border)] p-5 shadow-sm ipad:grid-cols-2">
+              <Input
+                label="Nombre"
+                placeholder="Tacos al pastor"
+                value={itemName}
+                onChange={(e) => setItemName(e.target.value)}
+                controlClassName="h-12 rounded-xl border-[1.5px] border-[var(--brand-card-border)]"
+              />
+              <Input
+                label="Precio"
+                type="text"
+                inputMode="decimal"
+                prefix="$"
+                placeholder="0"
+                value={priceDisplayValue}
+                onChange={(e) => handlePriceChange(e.target.value)}
+                controlClassName="h-12 rounded-xl border-[1.5px] border-[var(--brand-card-border)]"
+              />
+              <Button variant="outline" size="lg" className="w-full rounded-xl ipad:col-span-2" onClick={skipFirstItem}>
+                Saltar y agregar después
+              </Button>
+            </Card>
+          )}
+        </section>
       </div>
 
-      <footer className="fixed inset-x-0 bottom-0 z-20 mx-auto max-w-[480px] border-t border-[var(--brand-card-border)] bg-[var(--brand-surface-translucent)] px-6 pb-[calc(1.25rem+env(safe-area-inset-bottom))] pt-4 backdrop-blur ipad:max-w-[820px] ipad:px-8 ipad-landscape:max-w-[984px]">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="lg" onClick={skipFirstItem} className="px-4 font-black">Saltar</Button>
-          <Button size="xl" className="flex-1 font-black" disabled={!canSubmit} loading={loading} onClick={finish}>
-            {isAddingMenu ? 'Crear nuevo menú' : 'Crear mi menú'}
-            {!loading && <ArrowRight className="h-6 w-6" />}
+      <footer className="fixed inset-x-0 bottom-0 z-20 border-t border-[var(--brand-card-border)] bg-[var(--brand-surface-translucent)] p-6 backdrop-blur-md">
+        <div className="mx-auto flex max-w-[600px] items-center justify-between gap-4">
+          <Button variant="ghost" size="lg" onClick={skipFirstItem} className="px-4 font-bold text-ink-500 hover:text-ink-900">
+            Saltar
+          </Button>
+          <Button size="xl" className="flex-1 rounded-2xl font-bold shadow-lg" disabled={!canSubmit} loading={loading} onClick={finish}>
+            {isAddingMenu ? 'Crear nuevo menú' : 'Siguiente paso'}
+            {!loading && <ArrowRight className="h-5 w-5" />}
           </Button>
         </div>
       </footer>

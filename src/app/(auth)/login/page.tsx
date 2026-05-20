@@ -6,6 +6,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { ArrowRight, CheckCircle2, QrCode, Utensils } from 'lucide-react';
 import { FudiLogo } from '@/components/brand/fudi-logo';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { useListenForSignIn } from '@/hooks/use-auth-broadcast';
 import { createSupabaseBrowser } from '@/lib/supabase/client';
 import { signInWithMagicLinkAction } from '@/server/actions/auth.actions';
@@ -156,30 +158,30 @@ export default function LoginPage() {
 
           {!magicLinkSentAt ? (
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2 text-left">
-                <label htmlFor="email" className="px-1 text-sm font-semibold text-ink-900/80">
-                  Correo electrónico
-                </label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="ejemplo@restaurante.com"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="h-12 w-full rounded-xl border-[1.5px] border-[var(--brand-card-border)] bg-[var(--brand-card)] px-4 text-ink-900 outline-none transition-all placeholder:text-ink-500/60 focus:border-[var(--brand-primary)] focus:ring-2 focus:ring-[var(--brand-primary-ring)]"
-                />
-              </div>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="ejemplo@restaurante.com"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                label="Correo electrónico"
+                containerClassName="gap-2 text-left"
+                labelClassName="px-1 text-sm font-semibold text-ink-900/80"
+                controlClassName="h-12 rounded-xl border-[1.5px] border-[var(--brand-card-border)] focus-within:ring-2 focus-within:ring-[var(--brand-primary-ring)] focus-within:shadow-none"
+                className="font-normal placeholder:text-ink-500/60"
+              />
 
-              <button
+              <Button
                 type="submit"
-                disabled={loading}
-                className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--brand-primary)] font-bold text-[var(--brand-on-primary)] shadow-sm transition-all hover:bg-[var(--brand-primary-hover)] active:scale-95 disabled:pointer-events-none disabled:opacity-50"
+                size="lg"
+                loading={loading}
+                className="w-full rounded-xl font-bold shadow-sm"
               >
-                {loading ? 'Enviando...' : 'Enviar enlace de acceso'}
+                Enviar enlace de acceso
                 {!loading && <ArrowRight className="h-5 w-5" aria-hidden="true" />}
-              </button>
+              </Button>
 
               <div className="relative my-8">
                 <div className="absolute inset-0 flex items-center">
@@ -192,15 +194,17 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              <button
+              <Button
                 type="button"
-                disabled={googleLoading}
+                variant="outline"
+                size="lg"
+                loading={googleLoading}
                 onClick={handleGoogleSignIn}
-                className="flex h-12 w-full items-center justify-center gap-3 rounded-xl border-[1.5px] border-[var(--brand-card-border)] bg-[var(--brand-card)] font-semibold text-ink-900 shadow-sm transition-all hover:bg-[var(--brand-surface-strong)] active:scale-95 disabled:pointer-events-none disabled:opacity-50"
+                className="w-full rounded-xl border-[var(--brand-card-border)] bg-[var(--brand-card)] font-semibold shadow-sm hover:bg-[var(--brand-surface-strong)]"
               >
                 {!googleLoading && <GoogleIcon />}
-                {googleLoading ? 'Abriendo Google...' : 'Entrar con Google'}
-              </button>
+                Entrar con Google
+              </Button>
             </form>
           ) : (
             <div
@@ -218,14 +222,16 @@ export default function LoginPage() {
                 Te enviamos un enlace mágico a <strong>{email}</strong>. Haz clic en el botón para
                 entrar.
               </p>
-              <button
+              <Button
                 type="button"
-                disabled={loading}
+                variant="ghost"
+                size="sm"
+                loading={loading}
                 onClick={sendMagicLink}
-                className="text-sm font-bold text-[var(--brand-primary)] hover:underline disabled:opacity-50"
+                className="h-auto min-h-0 px-2 py-1 text-sm font-bold text-[var(--brand-primary)] hover:underline"
               >
                 {magicLinkPollExpired ? '¿No recibiste nada? Reenviar' : 'Reenviar enlace'}
-              </button>
+              </Button>
             </div>
           )}
         </div>
