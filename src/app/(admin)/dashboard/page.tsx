@@ -79,45 +79,39 @@ export default async function DashboardPage() {
             </Card>
           </ProFeatureLock>
         ) : (
-          <Card className="bg-gradient-to-br from-mostaza-50 to-[var(--brand-card)] ipad:p-5 ipad-landscape:p-6">
-            <div className="flex items-center justify-between">
+          <div className="grid gap-3 ipad:grid-cols-2 ipad:gap-4">
+            <Card className="bg-gradient-to-br from-mostaza-50 to-[var(--brand-card)] ipad:p-5 ipad-landscape:p-6">
               <p className="text-sm font-medium text-ink-500">Vistas hoy</p>
-            </div>
-            <p className="mt-1 text-4xl font-extrabold tabular-nums">
-              {formatCount(analyticsStats?.todayViews ?? 0)}
-            </p>
-            <p
-              className={`mt-1 text-sm ${
-                (analyticsStats?.todayDeltaPercent ?? 0) >= 0 ? 'text-menta-500' : 'text-coral-500'
-              }`}
-            >
-              {analyticsStats?.status === 'missing_config'
-                ? 'PostHog no configurado'
-                : analyticsStats?.status === 'error'
-                  ? 'No pudimos leer PostHog'
-                  : formatDelta(analyticsStats?.todayDeltaPercent ?? null, 'ayer')}
-            </p>
-          </Card>
+              <p className="mt-1 text-4xl font-extrabold tabular-nums">
+                {formatCount(analyticsStats?.todayViews ?? 0)}
+              </p>
+              <p
+                className={`mt-1 text-sm ${
+                  (analyticsStats?.todayDeltaPercent ?? 0) >= 0 ? 'text-menta-500' : 'text-coral-500'
+                }`}
+              >
+                {analyticsStats?.status === 'missing_config'
+                  ? 'PostHog no configurado'
+                  : analyticsStats?.status === 'error'
+                    ? 'No pudimos leer PostHog'
+                    : formatDelta(analyticsStats?.todayDeltaPercent ?? null, 'ayer')}
+              </p>
+            </Card>
+            <Card className="ipad:p-5">
+              <p className="text-sm font-medium text-ink-700">Top platillo esta semana</p>
+              {topItem ? (
+                <>
+                  <p className="mt-1 truncate text-lg font-bold">{topItem.name}</p>
+                  <p className="text-sm text-ink-500">{formatCount(topItem.views)} vistas</p>
+                </>
+              ) : (
+                <p className="mt-1 text-sm leading-6 text-ink-600">
+                  Todavía no hay vistas de platillos esta semana.
+                </p>
+              )}
+            </Card>
+          </div>
         )}
-
-        <div className="grid grid-cols-2 gap-3 ipad:gap-4 ipad-landscape:grid-cols-4">
-          <Card className="p-4 ipad:p-5">
-            <p className="text-xs text-ink-500">Items totales</p>
-            <p className="text-2xl font-bold tabular-nums ipad:text-3xl">{total}</p>
-          </Card>
-          <Card className="p-4 ipad:p-5">
-            <p className="text-xs text-ink-500">Agotados</p>
-            <p className="text-2xl font-bold tabular-nums text-coral-500 ipad:text-3xl">{agotados}</p>
-          </Card>
-          <Card className="p-4 ipad:p-5">
-            <p className="text-xs text-ink-500">Categorías</p>
-            <p className="text-2xl font-bold tabular-nums ipad:text-3xl">{categories.length}</p>
-          </Card>
-          <Card className="p-4 ipad:p-5">
-            <p className="text-xs text-ink-500">Secciones</p>
-            <p className="text-2xl font-bold tabular-nums ipad:text-3xl">{sections.length}</p>
-          </Card>
-        </div>
 
         <Card className="border-[1.5px] border-mostaza-500 bg-mostaza-50 shadow-sm ipad:p-5 ipad-landscape:p-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -177,21 +171,24 @@ export default async function DashboardPage() {
           <Link href={`/m/${activeSlug}`} target="_blank" className="rounded-lg border border-[var(--brand-card-border)] bg-[var(--brand-card)] p-4 font-black shadow-md hover:border-[var(--brand-primary-border)]">Ver mi menú público</Link>
         </div>
 
-        {ctx.plan === 'free' ? null : (
-          <Card className="ipad:p-5">
-            <p className="text-sm font-medium text-ink-700">Top platillo esta semana</p>
-            {topItem ? (
-              <>
-                <p className="mt-1 truncate text-lg font-bold">{topItem.name}</p>
-                <p className="text-sm text-ink-500">{formatCount(topItem.views)} vistas</p>
-              </>
-            ) : (
-              <p className="mt-1 text-sm leading-6 text-ink-600">
-                Todavía no hay vistas de platillos esta semana.
-              </p>
-            )}
+        <div className="grid grid-cols-2 gap-3 ipad:gap-4 ipad-landscape:grid-cols-4">
+          <Card className="p-4 ipad:p-5">
+            <p className="text-xs text-ink-500">Items totales</p>
+            <p className="text-2xl font-bold tabular-nums ipad:text-3xl">{total}</p>
           </Card>
-        )}
+          <Card className="p-4 ipad:p-5">
+            <p className="text-xs text-ink-500">Agotados</p>
+            <p className="text-2xl font-bold tabular-nums text-coral-500 ipad:text-3xl">{agotados}</p>
+          </Card>
+          <Card className="p-4 ipad:p-5">
+            <p className="text-xs text-ink-500">Categorías</p>
+            <p className="text-2xl font-bold tabular-nums ipad:text-3xl">{categories.length}</p>
+          </Card>
+          <Card className="p-4 ipad:p-5">
+            <p className="text-xs text-ink-500">Secciones</p>
+            <p className="text-2xl font-bold tabular-nums ipad:text-3xl">{sections.length}</p>
+          </Card>
+        </div>
       </main>
     </>
   );
