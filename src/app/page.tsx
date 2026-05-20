@@ -98,7 +98,7 @@ export default function LandingPage() {
                   Crear mi menú gratis
                 </Link>
                 <Link
-                  href="#demo"
+                  href="/m/brunette-demo"
                   className="inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-md border-[1.5px] border-[var(--brand-card-border)] bg-[var(--brand-card)] px-8 text-base font-semibold text-ink-900 shadow-sm transition-all hover:bg-[var(--brand-surface-strong)] active:scale-95 sm:w-auto"
                 >
                   <Smartphone className="h-5 w-5 text-ink-500" aria-hidden="true" />
