@@ -85,6 +85,7 @@ describe('requireAuth', () => {
     expect(ctx).toEqual({
       userId: 'user-1',
       email: 'user@example.com',
+      avatarUrl: null,
       tenantId: 'tenant-b',
       plan: 'pro',
       role: 'admin',

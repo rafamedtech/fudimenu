@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
-import { revalidateTag } from 'next/cache';
 import Stripe from 'stripe';
 import type { Prisma } from '@/generated/prisma/client';
 import { getPrisma } from '@/lib/db/prisma';
 import { billingService } from '@/server/services/billing.service';
 import { getPostHogClient } from '@/lib/posthog-server';
+import { revalidateTenantCache } from '@/server/cache/revalidate';
 
 export const runtime = 'nodejs';
 
@@ -99,9 +99,7 @@ async function updateTenantPlan(
     select: { slug: true },
   });
 
-  revalidateTag(`menu:${tenantId}`);
-  revalidateTag(`tenant:${tenantId}`);
-  revalidateTag(`tenant-slug:${tenant.slug}`);
+  revalidateTenantCache(tenantId, tenant.slug);
 }
 
 async function handlePaymentFailed(invoice: Stripe.Invoice) {

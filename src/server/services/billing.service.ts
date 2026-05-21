@@ -1,9 +1,9 @@
 import 'server-only';
-import { revalidateTag } from 'next/cache';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import { getPrisma } from '@/lib/db/prisma';
 import { env } from '@/lib/env';
+import { revalidateTenantCache } from '@/server/cache/revalidate';
 
 const PRO_TRIAL_DAYS = 14;
 const REFERRAL_CREDIT_CENTS = 14_900;
@@ -30,12 +30,6 @@ const CANCELABLE_SUBSCRIPTION_STATUSES = new Set<Stripe.Subscription.Status>([
   'trialing',
   'unpaid',
 ]);
-
-function revalidateTenantCache(tenantId: string, slug?: string | null) {
-  revalidateTag(`menu:${tenantId}`);
-  revalidateTag(`tenant:${tenantId}`);
-  if (slug) revalidateTag(`tenant-slug:${slug}`);
-}
 
 function getStripe() {
   const secretKey = process.env.STRIPE_SECRET_KEY;
