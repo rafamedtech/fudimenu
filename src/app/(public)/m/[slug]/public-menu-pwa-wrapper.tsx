@@ -79,15 +79,15 @@ export function PublicMenuLanguageSwitcher({ activeLocale: initialLocale, ariaLa
 
   return (
     <div
-      className="inline-grid h-9 grid-cols-2 rounded-md border border-[var(--brand-card-border)] bg-[var(--brand-surface)] p-0.5 shadow-sm"
+      className="inline-grid h-10 grid-cols-2 gap-1 rounded-xl border border-[var(--brand-card-border)] bg-[var(--brand-card)] p-1 shadow-sm"
       role="group"
       aria-label={ariaLabel}
     >
       {LOCALES.map((option) => {
         const isActive = option === activeLocale;
         const className = isActive
-          ? 'h-8 min-w-10 rounded px-2 text-xs font-extrabold uppercase transition-colors disabled:cursor-wait bg-[var(--brand-primary)] text-[var(--brand-on-primary)] shadow-sm'
-          : 'h-8 min-w-10 rounded px-2 text-xs font-extrabold uppercase transition-colors disabled:cursor-wait text-ink-500 hover:bg-[var(--brand-card)] hover:text-ink-900';
+          ? 'flex h-8 min-w-10 items-center justify-center rounded-lg border-2 border-[var(--brand-primary)] bg-[var(--brand-primary-faint)] px-2 text-xs font-extrabold uppercase text-ink-900 transition-colors disabled:cursor-wait'
+          : 'flex h-8 min-w-10 items-center justify-center rounded-lg border-2 border-transparent px-2 text-xs font-extrabold uppercase text-ink-500 transition-colors hover:text-ink-900 disabled:cursor-wait';
 
         return (
           <button

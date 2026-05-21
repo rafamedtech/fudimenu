@@ -2,15 +2,17 @@ import { Suspense } from 'react';
 import { notFound, permanentRedirect } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useTranslations } from 'next-intl';
 import { getLocale, getTranslations } from 'next-intl/server';
-import { buildBrandThemeStyle, resolveBrandSurfaceColor } from '@/lib/brand-theme';
-import { getCategoryEmoji } from '@/lib/category-placeholder';
-import { formatPrice } from '@/lib/utils';
-import { buildWhatsAppOrderUrl } from '@/lib/whatsapp';
+import { buildBrandThemeStyle } from '@/lib/brand-theme';
 import { menuService } from '@/server/services/menu.service';
 import { getPrisma } from '@/lib/db/prisma';
 import { PublicMenuLanguageSwitcher, PublicMenuPwaWrapper } from './public-menu-pwa-wrapper';
+import {
+  PublicMenuIsland,
+  type IslandGroup,
+  type IslandStrings,
+} from './public-menu-island';
+import { PublicMenuStickyNav, type NavAnchor } from './public-menu-sticky-nav';
 import type { Metadata } from 'next';
 import type { Category, MenuItem, MenuSection, Tenant } from '@/types/domain';
 
@@ -35,87 +37,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-function getItemPrice(item: MenuItem) {
-  return item.isSpecialToday ? item.specialPrice ?? item.priceCents : item.priceCents;
-}
-
-function PublicMenuItemCard({
-  item,
-  categoryName,
-  whatsappHref,
-  priceLocale,
-}: {
-  item: MenuItem;
-  categoryName: string;
-  whatsappHref: string | null;
-  priceLocale: string;
-}) {
-  const t = useTranslations('menu');
-
-  return (
-    <article
-      className="flex gap-3 rounded-lg border border-[var(--brand-card-border)] bg-[var(--brand-card)] p-3 shadow-sm ipad:gap-4 ipad:p-4 ipad-landscape:min-h-[156px]"
-      data-item-id={item.id}
-      data-item-category={categoryName}
-    >
-      <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-md bg-[var(--brand-primary-soft)] ipad:h-24 ipad:w-24 ipad-landscape:h-28 ipad-landscape:w-28">
-        {item.imageUrl ? (
-          <Image
-            src={item.imageUrl}
-            alt={item.name}
-            fill
-            sizes="(min-width: 1024px) 112px, (min-width: 768px) 96px, 80px"
-            className="object-cover"
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center text-4xl">
-            {getCategoryEmoji(categoryName)}
-          </div>
-        )}
-        {!item.isAvailable && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/60 text-[10px] font-bold uppercase text-white">
-            {t('soldOut')}
-          </div>
-        )}
-      </div>
-      <div className="flex min-w-0 flex-1 flex-col">
-        <div className="flex items-start justify-between gap-2">
-          <h3 className="font-semibold text-ink-900 ipad:text-lg">{item.name}</h3>
-          {item.isSpecialToday && (
-            <span className="shrink-0 rounded-full bg-coral-500 px-2 py-1 text-[10px] font-extrabold uppercase text-white">
-              {t('special')}
-            </span>
-          )}
-        </div>
-        {item.description && (
-          <p className="line-clamp-2 text-sm text-ink-500 ipad:mt-1">{item.description}</p>
-        )}
-        <p className="mt-1 font-bold text-ink-900">
-          {formatPrice(getItemPrice(item), item.currency, priceLocale)}
-        </p>
-        {whatsappHref && item.isAvailable && (
-          <a
-            href={whatsappHref}
-            target="_blank"
-            rel="noopener noreferrer"
-            data-track-wa={item.id}
-            className="mt-3 inline-flex min-h-11 items-center justify-center rounded-md bg-[var(--brand-primary)] px-3 text-sm font-extrabold text-[var(--brand-on-primary)] shadow-sm transition-all hover:bg-[var(--brand-primary-hover)] active:scale-[0.98] ipad:self-start ipad:px-4"
-          >
-            {t('orderWhatsApp')}
-          </a>
-        )}
-      </div>
-    </article>
-  );
-}
-
-function PublicMenuContent({
+async function PublicMenuContent({
   slug,
   tenant,
   sections,
   categories,
   items,
   priceLocale,
+  locale,
 }: {
   slug: string;
   tenant: Tenant;
@@ -123,81 +52,103 @@ function PublicMenuContent({
   categories: Category[];
   items: MenuItem[];
   priceLocale: string;
+  locale: 'es' | 'en';
 }) {
-  const t = useTranslations('menu');
+  const t = await getTranslations('menu');
 
-  const categoryNamesById = new Map(categories.map((c) => [c.id, c.name]));
   const dailySpecials = items.filter((item) => item.isSpecialToday);
   const regularItems = items.filter((item) => !item.isSpecialToday);
   const brandThemeStyle = buildBrandThemeStyle(tenant.primaryColor);
 
   const hasSections = sections.length > 0;
 
-  // Section → category → items grouping
-  const sectionedMenu = hasSections
-    ? sections
-        .filter((s) => s.isVisible)
-        .map((section) => ({
-          section,
-          groups: categories
-            .filter((c) => c.sectionId === section.id && c.isVisible)
-            .map((category) => ({
-              category,
-              items: regularItems.filter((i) => i.categoryId === category.id),
-            }))
-            .filter(({ items: its }) => its.length > 0),
-        }))
-        .filter(({ groups }) => groups.length > 0)
-    : [];
+  const groups: IslandGroup[] = [];
 
-  // Legacy fallback: flat category grouping (no sections)
-  const uncategorizedItems = regularItems.filter((item) => item.categoryId === null);
-  const otherCategory = categories.find(
-    (c) => c.name.trim().toLocaleLowerCase() === OTHER_CATEGORY_NAME.toLocaleLowerCase(),
-  );
-  const visibleCategories =
-    !hasSections && uncategorizedItems.length > 0 && !otherCategory
-      ? [
-          ...categories,
-          {
-            id: 'uncategorized',
-            tenantId: tenant.id,
-            name: t('otherCategory'),
-            sortOrder: 999,
-            isVisible: true,
-          } as Category,
-        ]
-      : categories;
-  const itemsByCategory = !hasSections
-    ? visibleCategories
-        .map((cat) => ({
-          category: cat,
-          items: regularItems
-            .filter((item) => item.categoryId === cat.id)
-            .concat(
-              cat.id === otherCategory?.id || (cat.id === 'uncategorized' && !otherCategory)
-                ? uncategorizedItems
-                : [],
-            ),
-        }))
-        .filter(({ items: its }) => its.length > 0)
-    : [];
+  if (hasSections) {
+    for (const section of sections.filter((s) => s.isVisible)) {
+      for (const category of categories.filter((c) => c.sectionId === section.id && c.isVisible)) {
+        const groupItems = regularItems.filter((i) => i.categoryId === category.id);
+        if (groupItems.length === 0) continue;
+        groups.push({
+          sectionId: section.id,
+          sectionName: section.name,
+          sectionAccent: section.accentColor ?? null,
+          categoryId: category.id,
+          categoryName: category.name,
+          items: groupItems,
+        });
+      }
+    }
+  } else {
+    const uncategorized = regularItems.filter((i) => i.categoryId === null);
+    const otherCategory = categories.find(
+      (c) => c.name.trim().toLocaleLowerCase() === OTHER_CATEGORY_NAME.toLocaleLowerCase(),
+    );
+    for (const category of categories.filter((c) => c.isVisible)) {
+      const catItems = regularItems.filter((i) => i.categoryId === category.id);
+      const merged =
+        otherCategory && category.id === otherCategory.id
+          ? [...catItems, ...uncategorized]
+          : catItems;
+      if (merged.length === 0) continue;
+      groups.push({
+        sectionId: null,
+        sectionName: null,
+        sectionAccent: null,
+        categoryId: category.id,
+        categoryName: category.name,
+        items: merged,
+      });
+    }
+    if (!otherCategory && uncategorized.length > 0) {
+      groups.push({
+        sectionId: null,
+        sectionName: null,
+        sectionAccent: null,
+        categoryId: 'uncategorized',
+        categoryName: t('otherCategory'),
+        items: uncategorized,
+      });
+    }
+  }
 
-  const buildWhatsapp = (item: MenuItem) =>
-    buildWhatsAppOrderUrl({
-      phone: tenant.whatsappPhone,
-      slug,
-      itemName: item.name,
-      locale: priceLocale === 'en-US' ? 'en' : 'es',
-      restaurantName: tenant.name,
-      price: formatPrice(getItemPrice(item), item.currency, priceLocale),
-    });
+  const sectionAnchors: NavAnchor[] = hasSections
+    ? Array.from(
+        new Map(
+          groups
+            .filter((g) => g.sectionId)
+            .map((g) => [g.sectionId!, { id: `sec-${g.sectionId}`, label: g.sectionName! }]),
+        ).values(),
+      )
+    : groups.map((g) => ({ id: `cat-${g.categoryId}`, label: g.categoryName }));
+
+  const navAnchors: NavAnchor[] = [
+    ...(dailySpecials.length > 0
+      ? [{ id: 'especiales-hoy', label: t('dailySpecials'), variant: 'special' as const }]
+      : []),
+    ...sectionAnchors,
+  ];
+
+  const islandStrings: IslandStrings = {
+    searchPlaceholder: t('searchPlaceholder'),
+    searchAria: t('searchAria'),
+    searchClear: t('searchClear'),
+    searchEmpty: t('searchEmpty'),
+    closeSheet: t('closeSheet'),
+    sectionLabel: t('sectionLabel'),
+    special: t('special'),
+    soldOut: t('soldOut'),
+    orderWhatsApp: t('orderWhatsApp'),
+    viewDetail: t('viewDetail'),
+    dailySpecials: t('dailySpecials'),
+    otherCategory: t('otherCategory'),
+  };
 
   return (
     <PublicMenuPwaWrapper
       slug={slug}
       tenantId={tenant.id}
-      locale={priceLocale === 'en-US' ? 'en' : 'es'}
+      locale={locale}
       brandThemeStyle={brandThemeStyle}
       pwaStrings={{
         prompt: t('pwaPrompt'),
@@ -215,11 +166,12 @@ function PublicMenuContent({
         >
           {t('skipToMenu')}
         </a>
+
         <header className="relative border-b border-[var(--brand-card-border)] bg-[var(--brand-card)] px-6 py-8 text-center shadow-sm ipad:px-10 ipad:py-10 ipad-landscape:py-12">
           <div className="absolute right-4 top-4">
             <Suspense fallback={null}>
               <PublicMenuLanguageSwitcher
-                activeLocale={priceLocale === 'en-US' ? 'en' : 'es'}
+                activeLocale={locale}
                 ariaLabel={t('language.label')}
               />
             </Suspense>
@@ -242,108 +194,24 @@ function PublicMenuContent({
               🍽️
             </div>
           )}
-          <h1 className="text-2xl font-extrabold ipad:text-4xl">{tenant.name}</h1>
+          <h1 className="fudi-h1 font-heading text-ink-900">{tenant.name}</h1>
         </header>
 
-        <nav className="sticky top-0 z-10 flex gap-2 overflow-x-auto bg-[var(--brand-surface-translucent)] px-4 py-3 backdrop-blur ipad:px-6 ipad-landscape:px-8">
-          {dailySpecials.length > 0 && (
-            <a
-              href="#especiales-hoy"
-              className="whitespace-nowrap rounded-full bg-coral-500 px-4 py-2 text-sm font-extrabold text-white shadow-sm"
-            >
-              {t('dailySpecials')}
-            </a>
-          )}
-          {hasSections
-            ? sectionedMenu.map(({ section }) => (
-                <a
-                  key={section.id}
-                  href={`#sec-${section.id}`}
-                  className="whitespace-nowrap rounded-full bg-[var(--brand-card)] px-4 py-2 text-sm font-semibold text-ink-700 shadow-sm"
-                >
-                  {section.name}
-                </a>
-              ))
-            : itemsByCategory.map(({ category }) => (
-                <a
-                  key={category.id}
-                  href={`#cat-${category.id}`}
-                  className="whitespace-nowrap rounded-full bg-[var(--brand-card)] px-4 py-2 text-sm font-semibold text-ink-700 shadow-sm"
-                >
-                  {category.name}
-                </a>
-              ))}
-        </nav>
+        <PublicMenuStickyNav anchors={navAnchors} ariaLabel="Categorías" />
 
-        <div id="menu-content" className="flex flex-col gap-8 px-4 pt-4 ipad:gap-10 ipad:px-6 ipad:pt-6 ipad-landscape:px-8 desktop:px-10">
-          {dailySpecials.length > 0 && (
-            <section id="especiales-hoy">
-              <h2 className="mb-3 text-xl font-bold">{t('dailySpecials')}</h2>
-              <div className="grid gap-3 ipad:gap-4 ipad-landscape:grid-cols-2">
-                {dailySpecials.map((item) => (
-                  <PublicMenuItemCard
-                    key={item.id}
-                    item={item}
-                    whatsappHref={buildWhatsapp(item)}
-                    categoryName={
-                      item.categoryId ? (categoryNamesById.get(item.categoryId) ?? '') : t('otherCategory')
-                    }
-                    priceLocale={priceLocale}
-                  />
-                ))}
-              </div>
-            </section>
-          )}
-
-          {hasSections
-            ? sectionedMenu.map(({ section, groups }) => (
-                <section key={section.id} id={`sec-${section.id}`}>
-                  <div
-                    className="mb-3 rounded-lg px-4 py-3 ipad:mb-4 ipad:px-5 ipad:py-4"
-                    style={{ backgroundColor: resolveBrandSurfaceColor(section.accentColor) }}
-                  >
-                    <h2 className="text-2xl font-extrabold text-ink-900 ipad:text-3xl">{section.name}</h2>
-                  </div>
-                  {groups.map(({ category, items: catItems }) => (
-                    <div key={category.id} className="mb-4">
-                      <h3 className="mb-2 px-1 text-base font-bold text-ink-700">
-                        {category.name}
-                      </h3>
-                      <div className="grid gap-3 ipad:gap-4 ipad-landscape:grid-cols-2">
-                        {catItems.map((item) => (
-                          <PublicMenuItemCard
-                            key={item.id}
-                            item={item}
-                            whatsappHref={buildWhatsapp(item)}
-                            categoryName={category.name}
-                            priceLocale={priceLocale}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </section>
-              ))
-            : itemsByCategory.map(({ category, items: catItems }) => (
-                <section key={category.id} id={`cat-${category.id}`}>
-                  <h2 className="mb-3 text-xl font-bold ipad:text-2xl">{category.name}</h2>
-                  <div className="grid gap-3 ipad:gap-4 ipad-landscape:grid-cols-2">
-                    {catItems.map((item) => (
-                      <PublicMenuItemCard
-                        key={item.id}
-                        item={item}
-                        whatsappHref={buildWhatsapp(item)}
-                        categoryName={category.name}
-                        priceLocale={priceLocale}
-                      />
-                    ))}
-                  </div>
-                </section>
-              ))}
-        </div>
+        <PublicMenuIsland
+          slug={slug}
+          tenantName={tenant.name}
+          whatsappPhone={tenant.whatsappPhone ?? null}
+          priceLocale={priceLocale}
+          locale={locale}
+          dailySpecials={dailySpecials}
+          groups={groups}
+          strings={islandStrings}
+        />
 
         {tenant.plan === 'free' && (
-          <footer className="mt-12 px-4 text-center text-xs text-ink-500 ipad:mt-16">
+          <footer className="mt-8 px-4 text-center text-xs text-ink-500 ipad:mt-12">
             {t('madeWith')}{' '}
             <Link href="/" className="font-bold text-[var(--brand-accent-text)] hover:underline">
               FudiMenu
@@ -359,16 +227,17 @@ export default async function PublicMenuPage({ params }: Props) {
   const { slug } = await params;
   const tenant = await menuService.getCachedTenantBySlug(slug);
   if (!tenant) {
-    const history = process.env.USE_MOCKS === 'true'
-      ? null
-      : await getPrisma().slugHistory.findUnique({
-          where: { slug },
-          select: {
-            createdAt: true,
-            deletedAt: true,
-            tenant: { select: { slug: true, deletedAt: true } },
-          },
-        });
+    const history =
+      process.env.USE_MOCKS === 'true'
+        ? null
+        : await getPrisma().slugHistory.findUnique({
+            where: { slug },
+            select: {
+              createdAt: true,
+              deletedAt: true,
+              tenant: { select: { slug: true, deletedAt: true } },
+            },
+          });
 
     if (
       history &&
@@ -397,6 +266,7 @@ export default async function PublicMenuPage({ params }: Props) {
         categories={categories}
         items={items}
         priceLocale={locale === 'en' ? 'en-US' : 'es-MX'}
+        locale={locale === 'en' ? 'en' : 'es'}
       />
     </>
   );

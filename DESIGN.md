@@ -270,12 +270,12 @@ components:
   card:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.on-surface}"
-    rounded: "{rounded.lg}"
+    rounded: "{rounded.xl}"
     padding: "{spacing.card-padding}"
   compact-card:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.on-surface}"
-    rounded: "{rounded.lg}"
+    rounded: "{rounded.xl}"
     padding: "{spacing.compact-card-padding}"
   warm-empty-state:
     backgroundColor: "{colors.surface-warm}"
@@ -305,7 +305,7 @@ components:
   menu-item-card:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.on-surface}"
-    rounded: "{rounded.lg}"
+    rounded: "{rounded.xl}"
     padding: "{spacing.compact-card-padding}"
   menu-item-image:
     backgroundColor: "{colors.surface-warm}"
@@ -315,12 +315,26 @@ components:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.on-surface-muted}"
     typography: "{typography.label-md}"
-    rounded: "{rounded.full}"
+    rounded: "{rounded.xl}"
     padding: 8px 16px
+    borderWidth: 1px
+    borderColor: "{colors.outline-muted}"
+  category-chip-active:
+    backgroundColor: "{colors.primary-faint}"
+    textColor: "{colors.on-surface}"
+    typography: "{typography.label-md}"
+    rounded: "{rounded.xl}"
+    padding: 8px 16px
+    borderWidth: 2px
+    borderColor: "{colors.primary}"
+    shadow: "{shadows.focus}"
   selected-choice:
-    backgroundColor: "{colors.primary-muted}"
-    textColor: "{colors.on-primary}"
-    rounded: "{rounded.md}"
+    backgroundColor: "{colors.primary-faint}"
+    textColor: "{colors.on-surface}"
+    rounded: "{rounded.xl}"
+    borderWidth: 2px
+    borderColor: "{colors.primary}"
+    shadow: "{shadows.focus}"
   sheet:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.on-surface}"
@@ -455,7 +469,9 @@ Headers and nav bars may use translucent warm cream or white with backdrop blur.
 
 ## Shapes
 
-The shape language is friendly and tactile. Cards use generous 20px corners; inputs and standard buttons use 14px corners; smaller controls use 10px. Pills, toggles, avatars, logos, category chips, and floating action buttons are fully rounded.
+The shape language is friendly and tactile. Cards, category chips, and choice selectors all share the same generous 20px (`rounded.xl`) corners so list surfaces feel consistent. Inputs and standard buttons use 12px corners; smaller controls use 10px. Toggles, avatars, logos, floating action buttons, and status badges remain fully rounded.
+
+Selected/active surfaces share a single visual recipe: 2px brand-primary border, a soft brand-faint fill (`primary-faint`), the same `rounded.xl` corners, and a soft mustard focus halo (`shadows.focus`). The label stays ink-dark — never invert the text to white on tap. This treatment applies to choice cards, category chips, segmented controls, and the active state in horizontal scrollers.
 
 Do not mix sharp editorial corners into the product. Even utility surfaces should retain enough radius to feel approachable and food-service friendly.
 
@@ -467,7 +483,7 @@ Cards are white, rounded, and compact. Menu item cards should stay horizontal an
 
 Inputs are 56px tall, white, and bordered. Focus states use mustard borders and a soft mustard focus halo. Textareas follow the same border and radius. Toggles use mint for on, warm gray for off, and a white circular knob with a soft shadow.
 
-Navigation is mobile-native: a sticky top header with centered title, a fixed bottom tab bar, active mustard icon/text, and subtle active scale. Category chips on the public menu are pill-shaped white surfaces over the cream canvas.
+Navigation is mobile-native: a sticky top header with centered title, a fixed bottom tab bar, active mustard icon/text, and subtle active scale. Category chips on the public menu are rounded-xl white surfaces with a 1px outline; the active chip switches to the selected-surface recipe (brand-faint fill, 2px brand-primary border, soft focus halo).
 
 ## Do's and Don'ts
 

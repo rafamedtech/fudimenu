@@ -73,10 +73,15 @@ export default {
           from: { opacity: '0' },
           to: { opacity: '1' },
         },
+        'sheet-in': {
+          from: { opacity: '0', transform: 'translateY(24px)' },
+          to: { opacity: '1', transform: 'translateY(0)' },
+        },
       },
       animation: {
         shimmer: 'shimmer 1.5s linear infinite',
         'fade-in': 'fade-in 200ms ease-out',
+        'sheet-in': 'sheet-in 280ms cubic-bezier(0.22, 1, 0.36, 1)',
       },
     },
   },
