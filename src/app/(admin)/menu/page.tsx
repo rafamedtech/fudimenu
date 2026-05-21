@@ -18,10 +18,16 @@ type MenuPageProps = {
   searchParams: Promise<{ welcome?: string }>;
 };
 
+type MockMenuItemOverride = {
+  name: string;
+  priceCents: number;
+};
+
 export default async function MenuPage({ searchParams }: MenuPageProps) {
   const { welcome } = await searchParams;
   const ctx = await requireAuth();
   const showWelcomeBanner = welcome === '1';
+  const mockItemOverride = await getMockMenuItemOverride();
 
   return (
     <>
@@ -32,16 +38,22 @@ export default async function MenuPage({ searchParams }: MenuPageProps) {
       <main className="flex-1 px-4 ipad:px-6 ipad-landscape:px-7 desktop:px-8">
         {showWelcomeBanner && <WelcomeBanner />}
         <Suspense fallback={<MenuListLoading />}>
-          <MenuList tenantId={ctx.tenantId} />
+          <MenuList tenantId={ctx.tenantId} mockItemOverride={mockItemOverride} />
         </Suspense>
       </main>
     </>
   );
 }
 
-async function MenuList({ tenantId }: { tenantId: string }) {
+async function MenuList({
+  tenantId,
+  mockItemOverride,
+}: {
+  tenantId: string;
+  mockItemOverride: MockMenuItemOverride | null;
+}) {
   const { tenant, sections, categories, items } = await menuService.getCachedMenuByTenantId(tenantId);
-  const visibleItems = await getVisibleItems(items);
+  const visibleItems = getVisibleItems(items, mockItemOverride);
   const categoryNamesById = new Map(categories.map((category) => [category.id, category.name]));
   const sectionIdByCategoryId = new Map(categories.map((c) => [c.id, c.sectionId]));
   const itemCountBySectionId: Record<string, number> = {};
@@ -120,30 +132,36 @@ async function MenuList({ tenantId }: { tenantId: string }) {
   );
 }
 
-async function getVisibleItems(items: Awaited<ReturnType<typeof menuService.getCachedMenuByTenantId>>['items']) {
-  if (process.env.USE_MOCKS !== 'true') return items;
+async function getMockMenuItemOverride(): Promise<MockMenuItemOverride | null> {
+  if (process.env.USE_MOCKS !== 'true') return null;
 
   const mockItem = (await cookies()).get('mock_onboarding_item')?.value;
-  if (!mockItem) return items;
+  if (!mockItem) return null;
 
   try {
     const parsed = JSON.parse(mockItem) as { name?: unknown; priceCents?: unknown };
-    if (typeof parsed.name !== 'string' || typeof parsed.priceCents !== 'number') return items;
-    const name = parsed.name;
-    const priceCents = parsed.priceCents;
-
-    return items.map((item, index) =>
-      index === 0
-        ? {
-            ...item,
-            name,
-            priceCents,
-          }
-        : item,
-    );
+    if (typeof parsed.name !== 'string' || typeof parsed.priceCents !== 'number') return null;
+    return { name: parsed.name, priceCents: parsed.priceCents };
   } catch {
-    return items;
+    return null;
   }
+}
+
+function getVisibleItems(
+  items: Awaited<ReturnType<typeof menuService.getCachedMenuByTenantId>>['items'],
+  mockItemOverride: MockMenuItemOverride | null,
+) {
+  if (!mockItemOverride) return items;
+
+  return items.map((item, index) =>
+    index === 0
+      ? {
+          ...item,
+          name: mockItemOverride.name,
+          priceCents: mockItemOverride.priceCents,
+        }
+      : item,
+  );
 }
 
 function MenuListLoading() {

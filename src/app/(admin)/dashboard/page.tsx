@@ -1,4 +1,6 @@
+import { Suspense } from 'react';
 import { Card } from '@/components/ui/card';
+import { Skeleton, StatCardSkeleton } from '@/components/ui/skeleton';
 import { ProFeatureLock, ProBadge } from '@/components/admin/pro-feature-lock';
 import { TenantSwitcher } from '@/components/admin/tenant-switcher';
 import { Doodle } from '@/components/brand/doodles';
@@ -6,8 +8,11 @@ import { AppHeader } from '@/components/layout/app-header';
 import { formatPrice } from '@/lib/utils';
 import { requireAuth } from '@/server/guards/require-auth';
 import { menuService } from '@/server/services/menu.service';
-import { getTenantAnalyticsStats } from '@/server/services/posthog-analytics.service';
-import type { MenuItem } from '@/types/domain';
+import {
+  getTenantAnalyticsStats,
+  type TenantAnalyticsStats,
+} from '@/server/services/posthog-analytics.service';
+import type { MenuItem, Plan } from '@/types/domain';
 import { ImageIcon } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -75,15 +80,8 @@ function ActionCard({
 
 export default async function DashboardPage() {
   const ctx = await requireAuth();
-  const [{ tenant, items, categories, sections }, analyticsStats] = await Promise.all([
-    menuService.getCachedMenuByTenantId(ctx.tenantId),
-    ctx.plan === 'free' ? Promise.resolve(null) : getTenantAnalyticsStats(ctx.tenantId),
-  ]);
-  const dailySpecial = findDailySpecial(items);
-  const total = items.length;
-  const agotados = items.filter((i) => !i.isAvailable).length;
-  const topItem = analyticsStats?.topItems[0] ?? null;
-  const activeSlug = tenant.slug;
+  const analyticsStats =
+    ctx.plan === 'free' ? null : await getTenantAnalyticsStats(ctx.tenantId);
 
   return (
     <>
@@ -91,6 +89,35 @@ export default async function DashboardPage() {
         title="Inicio"
         right={<TenantSwitcher activeTenantId={ctx.tenantId} memberships={ctx.memberships} />}
       />
+      <Suspense fallback={<DashboardContentLoading />}>
+        <DashboardContent
+          tenantId={ctx.tenantId}
+          plan={ctx.plan}
+          analyticsStats={analyticsStats}
+        />
+      </Suspense>
+    </>
+  );
+}
+
+async function DashboardContent({
+  tenantId,
+  plan,
+  analyticsStats,
+}: {
+  tenantId: string;
+  plan: Plan;
+  analyticsStats: TenantAnalyticsStats | null;
+}) {
+  const { tenant, items, categories, sections } =
+    await menuService.getCachedMenuByTenantId(tenantId);
+  const dailySpecial = findDailySpecial(items);
+  const total = items.length;
+  const agotados = items.filter((i) => !i.isAvailable).length;
+  const topItem = analyticsStats?.topItems[0] ?? null;
+  const activeSlug = tenant.slug;
+
+  return (
       <main className="flex flex-col gap-4 px-4 pb-6 ipad:gap-5 ipad:px-6 ipad:pb-8 ipad-landscape:px-7 desktop:px-8">
         <div className="relative overflow-hidden rounded-xl border border-[var(--brand-card-border)] bg-[var(--brand-card)] p-5 shadow-md ipad:p-7">
           <div className="flex flex-col items-center gap-5 desktop:flex-row desktop:items-center desktop:gap-7">
@@ -124,7 +151,7 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        {ctx.plan === 'free' ? (
+        {plan === 'free' ? (
           <ProFeatureLock
             title="Analytics es Pro"
             description="Desbloquea vistas del día, tendencias semanales y top platillos para saber qué se está moviendo."
@@ -226,6 +253,36 @@ export default async function DashboardPage() {
           </Card>
         </div>
       </main>
-    </>
+  );
+}
+
+function DashboardContentLoading() {
+  return (
+    <main className="flex flex-col gap-4 px-4 pb-6 ipad:gap-5 ipad:px-6 ipad:pb-8 ipad-landscape:px-7 desktop:px-8">
+      <div className="rounded-xl border border-[var(--brand-card-border)] bg-[var(--brand-card)] p-5 shadow-md ipad:p-7">
+        <div className="flex flex-col items-center gap-5 desktop:flex-row desktop:items-center desktop:gap-7">
+          <Skeleton className="h-32 w-full rounded-2xl desktop:h-40 desktop:w-72" />
+          <div className="flex w-full flex-col items-center gap-3 desktop:items-start">
+            <Skeleton className="h-6 w-40" />
+            <Skeleton className="h-10 w-56 ipad:h-14 ipad:w-80" />
+          </div>
+        </div>
+      </div>
+      <div className="grid gap-3 ipad:grid-cols-2 ipad:gap-4">
+        <StatCardSkeleton />
+        <StatCardSkeleton />
+      </div>
+      <div className="grid gap-3 ipad:grid-cols-3 ipad:gap-4">
+        <Skeleton className="h-44 rounded-2xl ipad:h-52" />
+        <Skeleton className="h-44 rounded-2xl ipad:h-52" />
+        <Skeleton className="h-44 rounded-2xl ipad:h-52" />
+      </div>
+      <div className="grid grid-cols-2 gap-3 ipad:gap-4 ipad-landscape:grid-cols-4">
+        <StatCardSkeleton />
+        <StatCardSkeleton />
+        <StatCardSkeleton />
+        <StatCardSkeleton />
+      </div>
+    </main>
   );
 }
