@@ -24,11 +24,11 @@ test.describe('public menu smoke — seeded demo', () => {
     await expect(nav.locator('a').first()).toBeVisible();
   });
 
-  test('renders item cards as <article> elements', async ({ page }) => {
+  test('renders item cards as detail buttons', async ({ page }) => {
     await page.goto(BASE);
-    const articles = page.locator('article');
-    await expect(articles.first()).toBeVisible();
-    const count = await articles.count();
+    const itemCards = page.locator('button[data-item-id]');
+    await expect(itemCards.first()).toBeVisible();
+    const count = await itemCards.count();
     expect(count).toBeGreaterThanOrEqual(30);
   });
 
@@ -55,12 +55,16 @@ test.describe('public menu smoke — seeded demo', () => {
     await expect(page).toHaveTitle(/Marenca/);
   });
 
-  test('WhatsApp order buttons are server-rendered anchors', async ({ page }) => {
+  test('item detail sheet shows WhatsApp order link', async ({ page }) => {
     await page.goto(BASE);
-    // Links should be present in DOM immediately (no hydration needed)
-    const waLinks = page.locator('a[data-track-wa]');
-    await expect(waLinks.first()).toBeVisible();
-    const href = await waLinks.first().getAttribute('href');
+    await page.getByRole('button', { name: /Azapotzalco/ }).click();
+
+    const dialog = page.locator('dialog[open]');
+    await expect(dialog).toBeVisible();
+
+    const waLink = dialog.locator('a[data-track-wa]');
+    await expect(waLink).toBeVisible();
+    const href = await waLink.getAttribute('href');
     expect(href).toMatch(/wa\.me|api\.whatsapp\.com/);
   });
 });
