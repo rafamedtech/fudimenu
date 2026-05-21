@@ -6,6 +6,10 @@ import { useEffect, useState } from 'react';
 import { ProBadge, ProFeatureLock } from '@/components/admin/pro-feature-lock';
 import { FudiLogo } from '@/components/brand/fudi-logo';
 import { NAV_DATA, type NavItem } from '@/components/layout/nav-data';
+import {
+  getIntentPrefetchHandlers,
+  usePrefetchRoute,
+} from '@/components/layout/route-prefetch';
 import { useSidebarContext } from '@/components/layout/sidebar-context';
 import { cn } from '@/lib/utils';
 import type { Plan } from '@/types/domain';
@@ -34,6 +38,7 @@ export function SidebarNav({ plan, tenantName, avatarUrl }: SidebarNavProps) {
   const { isOpen } = useSidebarContext();
   const isFree = plan === 'free';
   const [expanded, setExpanded] = useState<string[]>([]);
+  const prefetchRoute = usePrefetchRoute();
 
   useEffect(() => {
     NAV_DATA.forEach((section) =>
@@ -151,6 +156,8 @@ export function SidebarNav({ plan, tenantName, avatarUrl }: SidebarNavProps) {
                                 <Link
                                   href={sub.url}
                                   aria-current={subActive ? 'page' : undefined}
+                                  prefetch
+                                  {...getIntentPrefetchHandlers(sub.url, prefetchRoute)}
                                   className={cn(
                                     'block rounded-lg px-3 py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--brand-primary-ring)]',
                                     subActive
@@ -174,6 +181,8 @@ export function SidebarNav({ plan, tenantName, avatarUrl }: SidebarNavProps) {
                     <Link
                       href={item.url!}
                       aria-current={active ? 'page' : undefined}
+                      prefetch
+                      {...getIntentPrefetchHandlers(item.url!, prefetchRoute)}
                       className={baseRow}
                       title={!isOpen ? item.title : undefined}
                     >
@@ -191,6 +200,8 @@ export function SidebarNav({ plan, tenantName, avatarUrl }: SidebarNavProps) {
       <div className="border-t border-[var(--brand-card-border)] p-3">
         <Link
           href="/account"
+          prefetch
+          {...getIntentPrefetchHandlers('/account', prefetchRoute)}
           className={cn(
             'flex items-center rounded-lg bg-[var(--brand-surface-strong)] p-2 transition-all duration-200 hover:bg-[var(--brand-primary-faint)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--brand-primary-ring)]',
             isOpen ? 'gap-3' : 'justify-center',

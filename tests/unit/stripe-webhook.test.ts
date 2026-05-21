@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 const mocks = vi.hoisted(() => ({
   constructEvent: vi.fn(),
   webhookEventCreate: vi.fn(async () => ({})),
-  tenantUpdate: vi.fn(async () => ({})),
+  tenantUpdate: vi.fn(async () => ({ slug: 'taqueria-norte' })),
   tenantFindUnique: vi.fn(async () => ({ name: 'Taqueria Norte' } as { name: string | null } | null)),
   auditLogCreate: vi.fn(async () => ({})),
   sendPaymentFailedEmail: vi.fn(async () => ({ sent: true, reason: null })),
@@ -122,6 +122,7 @@ describe('Stripe webhook route', () => {
         stripeCustomerId: 'cus_abc',
         stripeSubscriptionId: null,
       },
+      select: { slug: true },
     });
     expect(mocks.auditLogCreate).toHaveBeenCalledWith(
       expect.objectContaining({ data: expect.objectContaining({ action: 'plan.upgraded' }) }),
@@ -158,6 +159,7 @@ describe('Stripe webhook route', () => {
     expect(mocks.tenantUpdate).toHaveBeenCalledWith({
       where: { id: 'tenant-1' },
       data: { plan: 'pro', stripeCustomerId: 'cus_card', stripeSubscriptionId: 'sub_card' },
+      select: { slug: true },
     });
     expect(mocks.auditLogCreate).toHaveBeenCalledWith(
       expect.objectContaining({ data: expect.objectContaining({ action: 'plan.upgraded' }) }),
@@ -179,6 +181,7 @@ describe('Stripe webhook route', () => {
     expect(mocks.tenantUpdate).toHaveBeenCalledWith({
       where: { id: 'tenant-1' },
       data: { plan: 'pro', stripeSubscriptionId: null },
+      select: { slug: true },
     });
     expect(mocks.auditLogCreate).toHaveBeenCalledWith(
       expect.objectContaining({ data: expect.objectContaining({ action: 'plan.upgraded' }) }),
@@ -197,6 +200,7 @@ describe('Stripe webhook route', () => {
     expect(mocks.tenantUpdate).toHaveBeenCalledWith({
       where: { id: 'tenant-1' },
       data: { plan: 'business', stripeSubscriptionId: null },
+      select: { slug: true },
     });
   });
 
@@ -233,6 +237,7 @@ describe('Stripe webhook route', () => {
         stripeCustomerId: 'cus_1',
         stripeSubscriptionId: 'sub_1',
       },
+      select: { slug: true },
     });
     expect(mocks.auditLogCreate).toHaveBeenCalledWith(
       expect.objectContaining({ data: expect.objectContaining({ action: 'plan.upgraded' }) }),
@@ -274,6 +279,7 @@ describe('Stripe webhook route', () => {
     expect(mocks.tenantUpdate).toHaveBeenCalledWith({
       where: { id: 'tenant-1' },
       data: { plan: 'free', stripeSubscriptionId: null },
+      select: { slug: true },
     });
     expect(mocks.auditLogCreate).toHaveBeenCalledWith(
       expect.objectContaining({ data: expect.objectContaining({ action: 'plan.downgraded' }) }),
@@ -297,6 +303,7 @@ describe('Stripe webhook route', () => {
     expect(mocks.tenantUpdate).toHaveBeenCalledWith({
       where: { id: 'tenant-1' },
       data: { plan: 'free', stripeSubscriptionId: null },
+      select: { slug: true },
     });
   });
 
@@ -335,6 +342,7 @@ describe('Stripe webhook route', () => {
     expect(mocks.tenantUpdate).toHaveBeenCalledWith({
       where: { id: 'tenant-1' },
       data: { plan: 'free', stripeSubscriptionId: null },
+      select: { slug: true },
     });
     expect(mocks.auditLogCreate).toHaveBeenCalledWith(
       expect.objectContaining({ data: expect.objectContaining({ action: 'plan.downgraded' }) }),

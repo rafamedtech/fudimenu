@@ -3,6 +3,7 @@ import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import { getPrisma } from '@/lib/db/prisma';
 import { env } from '@/lib/env';
+import { revalidateTenantCache } from '@/server/cache/revalidate';
 
 const PRO_TRIAL_DAYS = 14;
 const REFERRAL_CREDIT_CENTS = 14_900;
@@ -286,14 +287,16 @@ export const billingService = {
       { idempotencyKey: `tenant:${input.tenantId}:pro-trial` },
     );
 
-    await getPrisma().tenant.update({
+    const tenant = await getPrisma().tenant.update({
       where: { id: input.tenantId },
       data: {
         plan: 'pro',
         stripeCustomerId: customer.id,
         stripeSubscriptionId: subscription.id,
       },
+      select: { slug: true },
     });
+    revalidateTenantCache(input.tenantId, tenant.slug);
 
     const referralCredit = await applyReferralCreditForTenant(stripe, input.tenantId);
 
@@ -413,10 +416,12 @@ export const billingService = {
       if (!tenantId || !subscription.trial_end || subscription.trial_end > endedBefore) continue;
       if (await hasCard(stripe, customerId)) continue;
 
-      await prisma.tenant.update({
+      const tenant = await prisma.tenant.update({
         where: { id: tenantId },
         data: { plan: 'free' },
+        select: { slug: true },
       });
+      revalidateTenantCache(tenantId, tenant.slug);
 
       if (subscription.status !== 'canceled') {
         await stripe.subscriptions.cancel(subscription.id);

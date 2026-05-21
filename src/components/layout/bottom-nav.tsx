@@ -3,6 +3,10 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ProBadge, ProFeatureLock } from '@/components/admin/pro-feature-lock';
 import { NAV_ICONS_PRIMARY } from '@/components/layout/nav-data';
+import {
+  getIntentPrefetchHandlers,
+  usePrefetchRoute,
+} from '@/components/layout/route-prefetch';
 import { cn } from '@/lib/utils';
 import type { Plan } from '@/types/domain';
 
@@ -13,6 +17,7 @@ type BottomNavProps = {
 export function BottomNav({ plan }: BottomNavProps) {
   const pathname = usePathname();
   const isFree = plan === 'free';
+  const prefetchRoute = usePrefetchRoute();
 
   return (
     <nav
@@ -53,6 +58,8 @@ export function BottomNav({ plan }: BottomNavProps) {
               <Link
                 href={href}
                 aria-current={active ? 'page' : undefined}
+                prefetch
+                {...getIntentPrefetchHandlers(href, prefetchRoute)}
                 className={itemClassName}
               >
                 <Icon className="h-5 w-5 shrink-0" strokeWidth={active ? 2.5 : 2} />

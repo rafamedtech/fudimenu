@@ -10,7 +10,7 @@ type NewCategoryPageProps = {
 
 export default async function NewCategoryPage({ searchParams }: NewCategoryPageProps) {
   const [{ sectionId }, ctx] = await Promise.all([searchParams, requireAuth()]);
-  const { categories } = await menuService.getMenuByTenantId(ctx.tenantId);
+  const { categories } = await menuService.getCachedMenuByTenantId(ctx.tenantId);
   const scopedCategories = categories.filter((category) => category.sectionId === (sectionId ?? null));
 
   return (

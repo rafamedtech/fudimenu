@@ -49,6 +49,7 @@ export async function updateContactSettingsFormAction(formData: FormData) {
 
   revalidateTag(`menu:${ctx.tenantId}`);
   revalidateTag(`tenant:${ctx.tenantId}`);
+  revalidateTag(`tenant-slug:${tenant.slug}`);
   revalidatePath('/settings/contact');
   revalidatePath(`/m/${tenant.slug}`);
 

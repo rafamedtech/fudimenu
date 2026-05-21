@@ -1,5 +1,6 @@
 'use server';
 
+import { revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
 import Stripe from 'stripe';
 import { z } from 'zod';
@@ -65,7 +66,14 @@ export async function createBillingCheckoutAction(input: unknown) {
       };
     }
 
-    await getPrisma().tenant.update({ where: { id: ctx.tenantId }, data: { plan } });
+    const tenant = await getPrisma().tenant.update({
+      where: { id: ctx.tenantId },
+      data: { plan },
+      select: { slug: true },
+    });
+    revalidateTag(`menu:${ctx.tenantId}`);
+    revalidateTag(`tenant:${ctx.tenantId}`);
+    revalidateTag(`tenant-slug:${tenant.slug}`);
     return {
       ok: true as const,
       url: `${appUrl}/settings/billing?checkout=success&session_id=cs_test_e2e_mock`,

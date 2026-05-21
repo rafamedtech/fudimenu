@@ -105,6 +105,8 @@ export async function updateBrandSettingsFormAction(formData: FormData) {
 
   revalidateTag(`menu:${ctx.tenantId}`);
   revalidateTag(`tenant:${ctx.tenantId}`);
+  revalidateTag(`tenant-slug:${oldSlug}`);
+  revalidateTag(`tenant-slug:${newSlug}`);
   revalidatePath('/', 'layout');
   revalidatePath(`/m/${oldSlug}`);
   revalidatePath(`/m/${newSlug}`);
@@ -163,6 +165,7 @@ export async function deleteTenantAction(input: unknown) {
 
   revalidateTag(`menu:${tenantId}`);
   revalidateTag(`tenant:${tenantId}`);
+  if (membership) revalidateTag(`tenant-slug:${membership.tenant.slug}`);
   revalidatePath('/', 'layout');
 
   return { ok: true as const, nextTenantId: nextMembership?.tenantId ?? null };

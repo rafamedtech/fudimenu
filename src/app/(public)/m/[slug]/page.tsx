@@ -27,7 +27,7 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const t = await getTranslations('menu');
-  const tenant = await menuService.getTenantBySlug(slug);
+  const tenant = await menuService.getCachedTenantBySlug(slug);
   if (!tenant) return { title: t('metadata.notFoundTitle') };
   return {
     title: t('metadata.title', { restaurant: tenant.name }),
@@ -357,7 +357,7 @@ function PublicMenuContent({
 
 export default async function PublicMenuPage({ params }: Props) {
   const { slug } = await params;
-  const tenant = await menuService.getTenantBySlug(slug);
+  const tenant = await menuService.getCachedTenantBySlug(slug);
   if (!tenant) {
     const history = process.env.USE_MOCKS === 'true'
       ? null
@@ -383,7 +383,7 @@ export default async function PublicMenuPage({ params }: Props) {
   }
 
   const [{ sections, categories, items }, locale] = await Promise.all([
-    menuService.getMenuByTenantId(tenant.id),
+    menuService.getCachedMenuByTenantId(tenant.id),
     getLocale(),
   ]);
 

@@ -4,6 +4,7 @@ import type { Prisma } from '@/generated/prisma/client';
 import { getPrisma } from '@/lib/db/prisma';
 import { billingService } from '@/server/services/billing.service';
 import { getPostHogClient } from '@/lib/posthog-server';
+import { revalidateTenantCache } from '@/server/cache/revalidate';
 
 export const runtime = 'nodejs';
 
@@ -86,7 +87,7 @@ async function updateTenantPlan(
 ) {
   if (!tenantId || !plan) return;
 
-  await getPrisma().tenant.update({
+  const tenant = await getPrisma().tenant.update({
     where: { id: tenantId },
     data: {
       plan,
@@ -95,7 +96,10 @@ async function updateTenantPlan(
         ? { stripeSubscriptionId: extra.stripeSubscriptionId }
         : {}),
     },
+    select: { slug: true },
   });
+
+  revalidateTenantCache(tenantId, tenant.slug);
 }
 
 async function handlePaymentFailed(invoice: Stripe.Invoice) {

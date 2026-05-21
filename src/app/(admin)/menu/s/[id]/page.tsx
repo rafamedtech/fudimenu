@@ -17,7 +17,7 @@ interface Props {
 export default async function SectionDetailPage({ params }: Props) {
   const { id } = await params;
   const ctx = await requireAuth();
-  const { sections, categories, items } = await menuService.getMenuByTenantId(ctx.tenantId);
+  const { sections, categories, items } = await menuService.getCachedMenuByTenantId(ctx.tenantId);
 
   const section = sections.find((s) => s.id === id);
   if (!section) notFound();
