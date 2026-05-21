@@ -62,7 +62,8 @@ test.describe('onboarding golden path', () => {
     ]);
 
     await page.goto('/onboarding');
-    await expect(page.getByRole('heading', { name: '¿Cómo se llama tu changarro?' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /¿Qué cocina preparas\?/ })).toBeVisible();
+    await expect(page.getByLabel('Nombre del restaurante')).toBeVisible();
 
     await page.getByLabel('Nombre del restaurante').fill(restaurantName);
     await page.getByRole('button', { name: /Mexicana/ }).click();
