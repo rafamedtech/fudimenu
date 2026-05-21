@@ -3,7 +3,7 @@ import { notFound, permanentRedirect } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { getLocale, getTranslations } from 'next-intl/server';
-import { buildBrandThemeStyle } from '@/lib/brand-theme';
+import { buildBrandThemeStyle, resolveBrandSurfaceColor } from '@/lib/brand-theme';
 import { menuService } from '@/server/services/menu.service';
 import { getPrisma } from '@/lib/db/prisma';
 import { PublicMenuLanguageSwitcher, PublicMenuPwaWrapper } from './public-menu-pwa-wrapper';
@@ -72,7 +72,7 @@ async function PublicMenuContent({
         groups.push({
           sectionId: section.id,
           sectionName: section.name,
-          sectionAccent: section.accentColor ?? null,
+          sectionAccent: resolveBrandSurfaceColor(section.accentColor),
           categoryId: category.id,
           categoryName: category.name,
           items: groupItems,
