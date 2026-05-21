@@ -70,7 +70,7 @@ test.describe('onboarding golden path', () => {
     await expect(page.getByText('Tu primer platillo')).toBeVisible();
     await page.getByLabel('Nombre', { exact: true }).fill(itemName);
     await page.getByLabel('Precio').fill('123.45');
-    await page.getByRole('button', { name: 'Crear mi menú' }).click();
+    await page.getByRole('button', { name: 'Siguiente paso' }).click();
 
     await expect(page).toHaveURL(/\/menu\?welcome=1/, { timeout: 15_000 });
 
