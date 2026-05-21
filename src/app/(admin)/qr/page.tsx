@@ -15,7 +15,7 @@ export default async function QrPage() {
   const ctx = await requireAuth();
   const activeMembership = ctx.memberships.find((membership) => membership.tenantId === ctx.tenantId);
   const tenant = activeMembership
-    ? await menuService.getTenantBySlug(activeMembership.tenant.slug)
+    ? await menuService.getCachedTenantBySlug(activeMembership.tenant.slug)
     : null;
 
   if (!tenant) {

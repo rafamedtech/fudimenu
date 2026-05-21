@@ -4,6 +4,6 @@ import { menuService } from '@/server/services/menu.service';
 
 export async function GET() {
   const ctx = await requireAuth();
-  const items = await menuService.getItemsByTenantId(ctx.tenantId);
+  const items = await menuService.getCachedItemsByTenantId(ctx.tenantId);
   return NextResponse.json(items);
 }

@@ -6,7 +6,7 @@ import { menuService } from '@/server/services/menu.service';
 
 export default async function NewSectionPage() {
   const ctx = await requireAuth();
-  const { sections } = await menuService.getMenuByTenantId(ctx.tenantId);
+  const { sections } = await menuService.getCachedMenuByTenantId(ctx.tenantId);
 
   return (
     <>

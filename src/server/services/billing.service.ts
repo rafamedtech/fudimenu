@@ -1,4 +1,5 @@
 import 'server-only';
+import { revalidateTag } from 'next/cache';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import { getPrisma } from '@/lib/db/prisma';
@@ -29,6 +30,12 @@ const CANCELABLE_SUBSCRIPTION_STATUSES = new Set<Stripe.Subscription.Status>([
   'trialing',
   'unpaid',
 ]);
+
+function revalidateTenantCache(tenantId: string, slug?: string | null) {
+  revalidateTag(`menu:${tenantId}`);
+  revalidateTag(`tenant:${tenantId}`);
+  if (slug) revalidateTag(`tenant-slug:${slug}`);
+}
 
 function getStripe() {
   const secretKey = process.env.STRIPE_SECRET_KEY;
@@ -286,14 +293,16 @@ export const billingService = {
       { idempotencyKey: `tenant:${input.tenantId}:pro-trial` },
     );
 
-    await getPrisma().tenant.update({
+    const tenant = await getPrisma().tenant.update({
       where: { id: input.tenantId },
       data: {
         plan: 'pro',
         stripeCustomerId: customer.id,
         stripeSubscriptionId: subscription.id,
       },
+      select: { slug: true },
     });
+    revalidateTenantCache(input.tenantId, tenant.slug);
 
     const referralCredit = await applyReferralCreditForTenant(stripe, input.tenantId);
 
@@ -413,10 +422,12 @@ export const billingService = {
       if (!tenantId || !subscription.trial_end || subscription.trial_end > endedBefore) continue;
       if (await hasCard(stripe, customerId)) continue;
 
-      await prisma.tenant.update({
+      const tenant = await prisma.tenant.update({
         where: { id: tenantId },
         data: { plan: 'free' },
+        select: { slug: true },
       });
+      revalidateTenantCache(tenantId, tenant.slug);
 
       if (subscription.status !== 'canceled') {
         await stripe.subscriptions.cancel(subscription.id);

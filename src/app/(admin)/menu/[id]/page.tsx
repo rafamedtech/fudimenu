@@ -18,7 +18,7 @@ interface Props {
 export default async function ItemEditPage({ params, searchParams }: Props) {
   const [{ id }, { sectionId }] = await Promise.all([params, searchParams]);
   const ctx = await requireAuth();
-  const { tenant, categories, items } = await menuService.getMenuByTenantId(ctx.tenantId);
+  const { tenant, categories, items } = await menuService.getCachedMenuByTenantId(ctx.tenantId);
   const item = items.find((i) => i.id === id);
   const freeItemLimit = PLAN_CONFIG.free.limits.items ?? 20;
 

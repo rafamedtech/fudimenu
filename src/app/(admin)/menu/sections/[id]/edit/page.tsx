@@ -11,7 +11,7 @@ interface Props {
 
 export default async function EditSectionPage({ params }: Props) {
   const [{ id }, ctx] = await Promise.all([params, requireAuth()]);
-  const { sections } = await menuService.getMenuByTenantId(ctx.tenantId);
+  const { sections } = await menuService.getCachedMenuByTenantId(ctx.tenantId);
   const section = sections.find((item) => item.id === id);
   if (!section) notFound();
 

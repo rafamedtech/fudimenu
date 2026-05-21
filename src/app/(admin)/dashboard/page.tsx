@@ -76,7 +76,7 @@ function ActionCard({
 export default async function DashboardPage() {
   const ctx = await requireAuth();
   const [{ tenant, items, categories, sections }, analyticsStats] = await Promise.all([
-    menuService.getMenuByTenantId(ctx.tenantId),
+    menuService.getCachedMenuByTenantId(ctx.tenantId),
     ctx.plan === 'free' ? Promise.resolve(null) : getTenantAnalyticsStats(ctx.tenantId),
   ]);
   const dailySpecial = findDailySpecial(items);

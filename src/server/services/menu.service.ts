@@ -1,21 +1,80 @@
 import 'server-only';
+import { unstable_cache } from 'next/cache';
 import { getMenuRepository } from '@/server/repositories/get-repository';
 import type { MenuData } from '@/server/repositories/menu.repository';
 import type { MenuItem, MenuSection, Category, Tenant } from '@/types/domain';
 import type { SectionInput } from '@/lib/validators/section.schema';
 import type { CategoryInput } from '@/lib/validators/item.schema';
 
+const MENU_CACHE_REVALIDATE_SECONDS = 300;
+const TENANT_CACHE_REVALIDATE_SECONDS = 300;
+
+function shouldBypassCache() {
+  return process.env.USE_MOCKS === 'true' || process.env.NODE_ENV === 'test';
+}
+
+async function readTenantBySlug(slug: string): Promise<Tenant | null> {
+  return (await getMenuRepository()).getTenantBySlug(slug);
+}
+
+async function readMenuByTenantId(tenantId: string): Promise<MenuData> {
+  return (await getMenuRepository()).getMenuByTenantId(tenantId);
+}
+
+async function readItemsByTenantId(tenantId: string): Promise<MenuItem[]> {
+  return (await getMenuRepository()).getItemsByTenantId(tenantId);
+}
+
 export const menuService = {
   async getTenantBySlug(slug: string): Promise<Tenant | null> {
-    return (await getMenuRepository()).getTenantBySlug(slug);
+    return readTenantBySlug(slug);
+  },
+
+  async getCachedTenantBySlug(slug: string): Promise<Tenant | null> {
+    if (shouldBypassCache()) return readTenantBySlug(slug);
+
+    return unstable_cache(
+      () => readTenantBySlug(slug),
+      ['tenant-by-slug', slug],
+      {
+        revalidate: TENANT_CACHE_REVALIDATE_SECONDS,
+        tags: [`tenant-slug:${slug}`],
+      },
+    )();
   },
 
   async getMenuByTenantId(tenantId: string): Promise<MenuData> {
-    return (await getMenuRepository()).getMenuByTenantId(tenantId);
+    return readMenuByTenantId(tenantId);
+  },
+
+  async getCachedMenuByTenantId(tenantId: string): Promise<MenuData> {
+    if (shouldBypassCache()) return readMenuByTenantId(tenantId);
+
+    return unstable_cache(
+      () => readMenuByTenantId(tenantId),
+      ['menu-by-tenant', tenantId],
+      {
+        revalidate: MENU_CACHE_REVALIDATE_SECONDS,
+        tags: [`menu:${tenantId}`, `tenant:${tenantId}`],
+      },
+    )();
   },
 
   async getItemsByTenantId(tenantId: string): Promise<MenuItem[]> {
-    return (await getMenuRepository()).getItemsByTenantId(tenantId);
+    return readItemsByTenantId(tenantId);
+  },
+
+  async getCachedItemsByTenantId(tenantId: string): Promise<MenuItem[]> {
+    if (shouldBypassCache()) return readItemsByTenantId(tenantId);
+
+    return unstable_cache(
+      () => readItemsByTenantId(tenantId),
+      ['items-by-tenant', tenantId],
+      {
+        revalidate: MENU_CACHE_REVALIDATE_SECONDS,
+        tags: [`menu:${tenantId}`],
+      },
+    )();
   },
 
   async toggleItemAvailability(

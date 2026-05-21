@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { revalidateTag } from 'next/cache';
 import Stripe from 'stripe';
 import type { Prisma } from '@/generated/prisma/client';
 import { getPrisma } from '@/lib/db/prisma';
@@ -86,7 +87,7 @@ async function updateTenantPlan(
 ) {
   if (!tenantId || !plan) return;
 
-  await getPrisma().tenant.update({
+  const tenant = await getPrisma().tenant.update({
     where: { id: tenantId },
     data: {
       plan,
@@ -95,7 +96,12 @@ async function updateTenantPlan(
         ? { stripeSubscriptionId: extra.stripeSubscriptionId }
         : {}),
     },
+    select: { slug: true },
   });
+
+  revalidateTag(`menu:${tenantId}`);
+  revalidateTag(`tenant:${tenantId}`);
+  revalidateTag(`tenant-slug:${tenant.slug}`);
 }
 
 async function handlePaymentFailed(invoice: Stripe.Invoice) {

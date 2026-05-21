@@ -40,7 +40,7 @@ export default async function MenuPage({ searchParams }: MenuPageProps) {
 }
 
 async function MenuList({ tenantId }: { tenantId: string }) {
-  const { tenant, sections, categories, items } = await menuService.getMenuByTenantId(tenantId);
+  const { tenant, sections, categories, items } = await menuService.getCachedMenuByTenantId(tenantId);
   const visibleItems = await getVisibleItems(items);
   const categoryNamesById = new Map(categories.map((category) => [category.id, category.name]));
   const sectionIdByCategoryId = new Map(categories.map((c) => [c.id, c.sectionId]));
@@ -120,7 +120,7 @@ async function MenuList({ tenantId }: { tenantId: string }) {
   );
 }
 
-async function getVisibleItems(items: Awaited<ReturnType<typeof menuService.getMenuByTenantId>>['items']) {
+async function getVisibleItems(items: Awaited<ReturnType<typeof menuService.getCachedMenuByTenantId>>['items']) {
   if (process.env.USE_MOCKS !== 'true') return items;
 
   const mockItem = (await cookies()).get('mock_onboarding_item')?.value;

@@ -12,7 +12,7 @@ interface Props {
 
 export default async function EditCategoryPage({ params, searchParams }: Props) {
   const [{ id }, { sectionId }, ctx] = await Promise.all([params, searchParams, requireAuth()]);
-  const { categories } = await menuService.getMenuByTenantId(ctx.tenantId);
+  const { categories } = await menuService.getCachedMenuByTenantId(ctx.tenantId);
   const category = categories.find((item) => item.id === id);
   if (!category) notFound();
 
