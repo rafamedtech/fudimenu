@@ -82,7 +82,7 @@ export const PLAN_CONFIG: Record<Plan, PlanConfig> = {
   },
 };
 
-export const PLANS = [PLAN_CONFIG.free, PLAN_CONFIG.pro] as const;
+export const PLANS = [PLAN_CONFIG.free, PLAN_CONFIG.pro, PLAN_CONFIG.business] as const;
 
 export function getPlanConfig(plan: Plan): PlanConfig {
   return PLAN_CONFIG[plan];
