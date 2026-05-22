@@ -11,36 +11,36 @@ import {
 } from '@/server/actions/billing.actions';
 import type { Plan } from '@/types/domain';
 import { track } from '@/lib/analytics/events';
+import type { LivePrices } from '@/types/billing';
 
 type Cycle = 'monthly' | 'annual';
 
-function formatMXN(cents: number) {
+function formatMoney(cents: number, currency = 'MXN') {
   return new Intl.NumberFormat('es-MX', {
     style: 'currency',
-    currency: 'MXN',
+    currency,
     maximumFractionDigits: 0,
   }).format(cents / 100);
 }
 
-function annualTotal(monthlyCents: number) {
+// Fallback when no live Stripe annual price exists.
+function fallbackAnnualTotal(monthlyCents: number) {
   return Math.round(monthlyCents * 12 * 0.75);
-}
-
-function annualPerMonth(monthlyCents: number) {
-  return Math.round(annualTotal(monthlyCents) / 12);
-}
-
-function annualSavings(monthlyCents: number) {
-  return monthlyCents * 12 - annualTotal(monthlyCents);
 }
 
 interface Props {
   currentPlan: Plan;
   hasStripeCustomer: boolean;
   hasStripeSubscription: boolean;
+  livePrices?: LivePrices;
 }
 
-export function BillingPlans({ currentPlan, hasStripeCustomer, hasStripeSubscription }: Props) {
+export function BillingPlans({
+  currentPlan,
+  hasStripeCustomer,
+  hasStripeSubscription,
+  livePrices,
+}: Props) {
   const [cycle, setCycle] = useState<Cycle>('monthly');
   const plans = PLANS;
 
@@ -78,23 +78,33 @@ export function BillingPlans({ currentPlan, hasStripeCustomer, hasStripeSubscrip
       </div>
 
       {/* Plan cards */}
-      <div className="grid gap-4 ipad-landscape:grid-cols-2">
+      <div className="grid gap-4 ipad-landscape:grid-cols-3">
       {plans.map((plan) => {
         const isCurrent = currentPlan === plan.id;
         const isPaid = plan.priceCents > 0;
         const planCycle = cycle as Cycle;
 
-        const monthlyPrice = plan.priceCents;
+        const live = plan.id === 'pro' || plan.id === 'business' ? livePrices?.[plan.id] : undefined;
+        const liveMonthly = live?.monthly;
+        const liveAnnual = live?.annual;
+        const currency = liveMonthly?.currency ?? liveAnnual?.currency ?? plan.currency;
+
+        const monthlyCents = liveMonthly?.unitAmount ?? plan.priceCents;
+        const annualTotalCents = liveAnnual?.unitAmount ?? fallbackAnnualTotal(plan.priceCents);
+        const annualPerMonthCents = Math.round(annualTotalCents / 12);
+        const baselineAnnual = monthlyCents * 12;
+        const savingsCents = baselineAnnual - annualTotalCents;
+
         const displayPrice =
           !isPaid
             ? 'Gratis'
             : planCycle === 'annual'
-              ? `${formatMXN(annualPerMonth(monthlyPrice))}/mes · ${formatMXN(annualTotal(monthlyPrice))}/año`
-              : `${formatMXN(monthlyPrice)}/mes`;
+              ? `${formatMoney(annualPerMonthCents, currency)}/mes · ${formatMoney(annualTotalCents, currency)}/año`
+              : `${formatMoney(monthlyCents, currency)}/mes`;
 
         const savings =
-          isPaid && planCycle === 'annual'
-            ? `Ahorras ${formatMXN(annualSavings(monthlyPrice))} al año`
+          isPaid && planCycle === 'annual' && savingsCents > 0
+            ? `Ahorras ${formatMoney(savingsCents, currency)} al año`
             : null;
 
         return (
@@ -134,6 +144,14 @@ export function BillingPlans({ currentPlan, hasStripeCustomer, hasStripeSubscrip
                   <li>· Sin marca FudiMenu</li>
                   <li>· Especiales del día</li>
                   <li>· Analytics básico</li>
+                </>
+              )}
+              {plan.id === 'business' && (
+                <>
+                  <li>· Todo lo de Pro</li>
+                  <li>· Multi-idioma</li>
+                  <li>· Multi-sucursal</li>
+                  <li>· Soporte prioritario</li>
                 </>
               )}
             </ul>

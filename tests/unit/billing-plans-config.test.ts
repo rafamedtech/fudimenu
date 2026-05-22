@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { PLAN_CONFIG, PLANS } from '@/config/plans';
 
 describe('billing plan config', () => {
-  it('exposes only Free and Pro as MVP billing plans', () => {
-    expect(PLANS.map((plan) => plan.id)).toEqual(['free', 'pro']);
+  it('exposes Free, Pro and Business as selectable billing plans', () => {
+    expect(PLANS.map((plan) => plan.id)).toEqual(['free', 'pro', 'business']);
   });
 
   it('keeps out-of-MVP capabilities disabled in plan feature flags', () => {

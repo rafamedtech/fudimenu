@@ -7,6 +7,7 @@ import { getPrisma } from '@/lib/db/prisma';
 import { mockTenant } from '@/lib/mock/data';
 import { isMockRuntime } from '@/lib/mock/runtime';
 import { requireAuth } from '@/server/guards/require-auth';
+import { getLiveStripePrices } from '@/server/services/stripe-prices';
 import { BillingPlans } from './billing-plans';
 
 type BillingPageProps = {
@@ -64,22 +65,25 @@ async function BillingContent({
   tenantId: string;
   currentPlan: ComponentProps<typeof BillingPlans>['currentPlan'];
 }) {
-  const tenant =
+  const [tenant, livePrices] = await Promise.all([
     isMockRuntime()
-      ? {
+      ? Promise.resolve({
           stripeCustomerId: mockTenant.stripeCustomerId,
           stripeSubscriptionId: mockTenant.stripeSubscriptionId,
-        }
-      : await getPrisma().tenant.findUnique({
+        })
+      : getPrisma().tenant.findUnique({
           where: { id: tenantId },
           select: { stripeCustomerId: true, stripeSubscriptionId: true },
-        });
+        }),
+    getLiveStripePrices().catch(() => ({ pro: {}, business: {} })),
+  ]);
 
   return (
     <BillingPlans
       currentPlan={currentPlan}
       hasStripeCustomer={!!tenant?.stripeCustomerId}
       hasStripeSubscription={!!tenant?.stripeSubscriptionId}
+      livePrices={livePrices}
     />
   );
 }
