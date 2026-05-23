@@ -74,14 +74,29 @@ export default {
           to: { opacity: '1' },
         },
         'sheet-in': {
-          from: { opacity: '0', transform: 'translateY(24px)' },
-          to: { opacity: '1', transform: 'translateY(0)' },
+          from: { opacity: '0', transform: 'translateY(40px) scale(0.98)' },
+          to: { opacity: '1', transform: 'translateY(0) scale(1)' },
+        },
+        'backdrop-in': {
+          from: { opacity: '0' },
+          to: { opacity: '1' },
+        },
+        'sheet-out': {
+          from: { opacity: '1', transform: 'translateY(0) scale(1)' },
+          to: { opacity: '0', transform: 'translateY(32px) scale(0.98)' },
+        },
+        'backdrop-out': {
+          from: { opacity: '1' },
+          to: { opacity: '0' },
         },
       },
       animation: {
         shimmer: 'shimmer 1.5s linear infinite',
         'fade-in': 'fade-in 200ms ease-out',
-        'sheet-in': 'sheet-in 280ms cubic-bezier(0.22, 1, 0.36, 1)',
+        'sheet-in': 'sheet-in 360ms cubic-bezier(0.16, 1, 0.3, 1)',
+        'backdrop-in': 'backdrop-in 240ms ease-out',
+        'sheet-out': 'sheet-out 220ms cubic-bezier(0.4, 0, 1, 1) forwards',
+        'backdrop-out': 'backdrop-out 200ms ease-in forwards',
       },
     },
   },

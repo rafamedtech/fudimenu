@@ -375,41 +375,96 @@ function ItemSheet({
   strings: IslandStrings;
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const [displayItem, setDisplayItem] = useState<MenuItem | null>(item);
+  const [displayCategory, setDisplayCategory] = useState(categoryName);
+  const [displayWhatsapp, setDisplayWhatsapp] = useState<string | null>(whatsappUrl);
+  const [isClosing, setIsClosing] = useState(false);
 
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
-    if (item && !dialog.open) {
-      dialog.showModal();
-    } else if (!item && dialog.open) {
-      dialog.close();
+    if (item) {
+      setDisplayItem(item);
+      setDisplayCategory(categoryName);
+      setDisplayWhatsapp(whatsappUrl);
+      setIsClosing(false);
+      if (!dialog.open) {
+        dialog.showModal();
+        dialog.getAnimations().forEach((a) => a.cancel());
+        dialog.animate(
+          [
+            { opacity: 0, transform: 'translateY(40px) scale(0.98)' },
+            { opacity: 1, transform: 'translateY(0) scale(1)' },
+          ],
+          { duration: 320, easing: 'cubic-bezier(0.16, 1, 0.3, 1)', fill: 'forwards' },
+        );
+      }
+    } else if (dialog.open) {
+      setIsClosing(true);
     }
-  }, [item]);
+  }, [item, categoryName, whatsappUrl]);
+
+  useEffect(() => {
+    if (!isClosing) return;
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    const cs = getComputedStyle(dialog);
+    const fromOpacity = cs.opacity;
+    const fromTransform = cs.transform === 'none' ? 'translateY(0) scale(1)' : cs.transform;
+    dialog.getAnimations().forEach((a) => a.cancel());
+    const anim = dialog.animate(
+      [
+        { opacity: fromOpacity, transform: fromTransform },
+        { opacity: 0, transform: 'translateY(32px) scale(0.98)' },
+      ],
+      { duration: 220, easing: 'cubic-bezier(0.4, 0, 1, 1)', fill: 'forwards' },
+    );
+    const onFinish = () => {
+      anim.cancel();
+      dialog.close();
+      setDisplayItem(null);
+      setIsClosing(false);
+    };
+    anim.addEventListener('finish', onFinish);
+    return () => {
+      anim.removeEventListener('finish', onFinish);
+      anim.cancel();
+    };
+  }, [isClosing]);
 
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
-    const handleClose = () => onClose();
-    dialog.addEventListener('close', handleClose);
-    return () => dialog.removeEventListener('close', handleClose);
+    const handleCancel = (e: Event) => {
+      e.preventDefault();
+      onClose();
+    };
+    dialog.addEventListener('cancel', handleCancel);
+    return () => dialog.removeEventListener('cancel', handleCancel);
   }, [onClose]);
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDialogElement>) => {
-    if (e.target === dialogRef.current) {
-      dialogRef.current?.close();
+    if (e.target === dialogRef.current && !isClosing) {
+      onClose();
     }
   };
+
+  const stateClasses = isClosing
+    ? '[&::backdrop]:animate-backdrop-out'
+    : 'open:[&::backdrop]:animate-backdrop-in';
 
   return (
     <dialog
       ref={dialogRef}
       onClick={handleBackdropClick}
-      aria-labelledby={item ? `sheet-title-${item.id}` : undefined}
-      className="fixed inset-x-0 bottom-0 top-auto mx-auto w-full max-w-md rounded-t-xl bg-[var(--brand-card)] p-0 text-ink-900 shadow-xl backdrop:bg-black/50 backdrop:backdrop-blur-sm open:animate-sheet-in ipad:max-w-[640px]"
+      aria-labelledby={displayItem ? `sheet-title-${displayItem.id}` : undefined}
+      className={`fixed inset-x-0 bottom-0 top-auto mx-auto w-full max-w-md rounded-t-3xl bg-[var(--brand-card)] p-0 text-ink-900 shadow-2xl backdrop:bg-black/60 backdrop:backdrop-blur-sm ipad:max-w-[640px] ${stateClasses}`}
     >
-      {item && (
-        <div className="flex max-h-[95dvh] flex-col overflow-hidden">
-          <div className="mx-auto mt-2 h-1 w-10 shrink-0 rounded-full bg-ink-300" aria-hidden />
+      {displayItem && ((item: MenuItem) => (
+        <div className="flex max-h-[92dvh] flex-col overflow-hidden">
+          <div className="absolute inset-x-0 top-0 z-10 flex justify-center pt-2.5">
+            <span className="h-1.5 w-12 rounded-full bg-white/70 shadow-sm" aria-hidden />
+          </div>
 
           <div className="relative aspect-[4/3] w-full shrink-0 overflow-hidden bg-[var(--brand-primary-soft)]">
             {item.imageUrl ? (
@@ -422,14 +477,18 @@ function ItemSheet({
               />
             ) : (
               <div className="flex h-full w-full items-center justify-center text-7xl">
-                {getCategoryEmoji(categoryName)}
+                {getCategoryEmoji(displayCategory)}
               </div>
             )}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/40 to-transparent"
+            />
             <button
               type="button"
-              onClick={() => dialogRef.current?.close()}
+              onClick={onClose}
               aria-label={strings.closeSheet}
-              className="absolute right-3 top-3 inline-flex h-10 w-10 items-center justify-center rounded-full bg-[var(--brand-card)]/90 text-ink-900 shadow-md transition-colors hover:bg-[var(--brand-card)] focus-visible:outline-none focus-visible:shadow-glow-mostaza"
+              className="absolute right-3 top-3 inline-flex h-10 w-10 items-center justify-center rounded-full bg-[var(--brand-card)]/95 text-ink-900 shadow-md backdrop-blur-sm transition-all hover:scale-105 hover:bg-[var(--brand-card)] active:scale-95 focus-visible:outline-none focus-visible:shadow-glow-mostaza"
             >
               <svg
                 aria-hidden
@@ -438,7 +497,7 @@ function ItemSheet({
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="2"
+                strokeWidth="2.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               >
@@ -446,20 +505,27 @@ function ItemSheet({
                 <line x1="6" y1="6" x2="18" y2="18" />
               </svg>
             </button>
-            {item.isSpecialToday && (
-              <span className="absolute left-3 top-3 inline-flex items-center rounded-md bg-coral-500 px-3 py-1 text-[10px] font-extrabold uppercase tracking-wide text-white shadow-sm">
-                {strings.special}
-              </span>
-            )}
+            <div className="absolute left-3 top-3 flex flex-wrap gap-2">
+              {item.isSpecialToday && (
+                <span className="inline-flex items-center rounded-full bg-coral-500 px-3 py-1 text-[10px] font-extrabold uppercase tracking-wide text-white shadow-md">
+                  {strings.special}
+                </span>
+              )}
+              {!item.isAvailable && (
+                <span className="inline-flex items-center rounded-full bg-ink-900/85 px-3 py-1 text-[10px] font-extrabold uppercase tracking-wide text-white shadow-md backdrop-blur-sm">
+                  {strings.soldOut}
+                </span>
+              )}
+            </div>
           </div>
 
-          <div className="flex flex-1 flex-col gap-3 overflow-y-auto px-6 pb-6 pt-5 pb-safe ipad:px-8 ipad:pt-6">
-            <p className="text-xs font-bold uppercase tracking-wider text-ink-500">
-              {categoryName}
-            </p>
+          <div className="flex flex-1 flex-col gap-4 overflow-y-auto px-6 pb-4 pt-5 ipad:px-8 ipad:pt-6">
+            <span className="inline-flex w-fit items-center rounded-full bg-[var(--brand-primary-soft)] px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-[var(--brand-primary)]">
+              {displayCategory}
+            </span>
             <h2
               id={`sheet-title-${item.id}`}
-              className="text-2xl font-extrabold text-ink-900 ipad:text-3xl"
+              className="text-2xl font-extrabold leading-tight tracking-tight text-ink-900 ipad:text-3xl"
             >
               {item.name}
             </h2>
@@ -467,35 +533,38 @@ function ItemSheet({
               <p className="text-base leading-relaxed text-ink-700">{item.description}</p>
             )}
             <div className="flex items-baseline gap-3 pt-1">
+              <span className="text-3xl font-extrabold text-ink-900 tabular-nums ipad:text-4xl">
+                {formatPrice(getItemPrice(item), item.currency, priceLocale)}
+              </span>
               {item.isSpecialToday && item.specialPrice !== null && (
                 <span className="text-base text-ink-500 line-through tabular-nums">
                   {formatPrice(item.priceCents, item.currency, priceLocale)}
                 </span>
               )}
-              <span className="text-3xl font-extrabold text-ink-900 tabular-nums ipad:text-4xl">
-                {formatPrice(getItemPrice(item), item.currency, priceLocale)}
-              </span>
             </div>
-            {whatsappUrl && item.isAvailable ? (
+          </div>
+
+          <div className="shrink-0 border-t border-[var(--brand-card-border)] bg-[var(--brand-card)] px-6 pb-safe pt-4 ipad:px-8">
+            {displayWhatsapp && item.isAvailable ? (
               <a
-                href={whatsappUrl}
+                href={displayWhatsapp}
                 target="_blank"
                 rel="noopener noreferrer"
                 data-track-wa={item.id}
-                className="mt-4 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-md bg-[var(--brand-primary)] px-6 text-base font-bold text-[var(--brand-on-primary)] shadow-[0_6px_14px_rgba(244,180,0,0.24)] transition-all hover:bg-[var(--brand-primary-hover)] active:scale-[0.98] focus-visible:outline-none focus-visible:shadow-glow-mostaza"
+                className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[var(--brand-primary)] px-6 text-base font-bold text-[var(--brand-on-primary)] shadow-[0_6px_14px_rgba(244,180,0,0.28)] transition-all hover:bg-[var(--brand-primary-hover)] active:scale-[0.98] focus-visible:outline-none focus-visible:shadow-glow-mostaza"
               >
                 {strings.orderWhatsApp}
               </a>
             ) : (
               !item.isAvailable && (
-                <p className="mt-4 inline-flex min-h-12 w-full items-center justify-center rounded-md border border-[var(--brand-card-border)] px-6 text-sm font-bold uppercase tracking-wider text-ink-500">
+                <p className="inline-flex min-h-12 w-full items-center justify-center rounded-full border border-[var(--brand-card-border)] px-6 text-sm font-bold uppercase tracking-wider text-ink-500">
                   {strings.soldOut}
                 </p>
               )
             )}
           </div>
         </div>
-      )}
+      ))(displayItem)}
     </dialog>
   );
 }
