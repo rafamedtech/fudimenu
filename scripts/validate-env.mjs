@@ -10,6 +10,12 @@ for (const file of files) {
   }
 }
 
+for (const [key, value] of Object.entries(env)) {
+  if (typeof value === 'string' && value.startsWith('$')) {
+    env[key] = env[value.slice(1)] ?? value;
+  }
+}
+
 const required = {
   Supabase: [
     'DATABASE_URL',
@@ -32,12 +38,24 @@ const required = {
     'CLOUDINARY_API_KEY',
     'CLOUDINARY_API_SECRET',
   ],
-  PostHog: ['NEXT_PUBLIC_POSTHOG_KEY', 'NEXT_PUBLIC_POSTHOG_HOST'],
+  PostHog: [
+    'NEXT_PUBLIC_POSTHOG_KEY',
+    'NEXT_PUBLIC_POSTHOG_HOST',
+    'POSTHOG_PERSONAL_API_KEY',
+    'POSTHOG_PROJECT_ID',
+    'POSTHOG_API_HOST',
+  ],
   Sentry: ['SENTRY_DSN', 'NEXT_PUBLIC_SENTRY_DSN'],
   Resend: ['RESEND_API_KEY'],
   Upstash: ['UPSTASH_REDIS_REST_URL', 'UPSTASH_REDIS_REST_TOKEN'],
   Cron: ['CRON_SECRET'],
-  App: ['NEXT_PUBLIC_APP_URL'],
+  App: ['NEXT_PUBLIC_APP_URL', 'USE_MOCKS'],
+};
+
+const optional = {
+  Resend: ['RESEND_FROM', 'DEV_EMAIL_OVERRIDE'],
+  Sentry: ['SENTRY_ORG', 'SENTRY_PROJECT'],
+  App: ['SKIP_ENV_VALIDATION'],
 };
 
 const validators = {
@@ -65,6 +83,10 @@ const validators = {
   UPSTASH_REDIS_REST_TOKEN: (value) => value.length > 20,
   CRON_SECRET: (value) => value.length >= 32,
   NEXT_PUBLIC_APP_URL: (value) => /^https?:\/\//.test(value),
+  USE_MOCKS: (value) => ['true', 'false'].includes(value),
+  POSTHOG_API_HOST: (value) => /^https?:\/\//.test(value),
+  RESEND_FROM: (value) => value.includes('@'),
+  DEV_EMAIL_OVERRIDE: (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value),
 };
 
 let hasIssue = false;
@@ -82,6 +104,23 @@ for (const [group, keys] of Object.entries(required)) {
     }
 
     const status = !present ? 'MISSING' : valid ? 'present/valid' : 'present/INVALID_FORMAT';
+    console.log(`${key}: ${status}`);
+  }
+}
+
+for (const [group, keys] of Object.entries(optional)) {
+  console.log(`[${group} optional]`);
+
+  for (const key of keys) {
+    const value = env[key]?.trim() ?? '';
+    const present = value.length > 0;
+    const valid = !present || !validators[key] || validators[key](value);
+
+    if (!valid) {
+      hasIssue = true;
+    }
+
+    const status = !present ? 'absent' : valid ? 'present/valid' : 'present/INVALID_FORMAT';
     console.log(`${key}: ${status}`);
   }
 }

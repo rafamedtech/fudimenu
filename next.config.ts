@@ -47,9 +47,9 @@ export default withSentryConfig(withBundleAnalyzer(withNextIntl(config)), {
   // For all available options, see:
   // https://www.npmjs.com/package/@sentry/webpack-plugin#options
 
-  org: "rafamed",
+  org: process.env.SENTRY_ORG ?? "rafamed",
 
-  project: "javascript-nextjs",
+  project: process.env.SENTRY_PROJECT ?? "javascript-nextjs",
 
   // Only print logs for uploading source maps in CI
   silent: !process.env.CI,

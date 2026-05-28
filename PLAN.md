@@ -454,3 +454,145 @@ pnpm test --run tests/unit/account-delete-otp.test.ts tests/unit/audit-log-reten
 8. [ ] Ejecutar Lighthouse.
 9. [ ] Cerrar legal/ops antes de launch.
 
+---
+
+## Gaps Detectados — Auditoría 2026-05-26
+
+> Lectura directa de código fuente contra MVP.md. Cada ítem tiene un prompt listo para copiar. Si requiere datos del usuario, están listados explícitamente.
+
+---
+
+### GAP-1 — Tests unitarios faltantes (`menu-service` y `menu-sections.repository`)
+
+**Quién lo resuelve:** Claude — no requiere input del usuario
+
+**Prompt:**
+
+```text
+Crea dos archivos de test unitario en tests/unit/:
+
+1. menu-service.test.ts — cubre menuService.upsertItem, menuService.toggleItemAvailability,
+   menuService.softDeleteItem, menuService.restoreItem, menuService.upsertSection,
+   menuService.deleteSection, menuService.reorderSections. Usa el mock repository
+   (USE_MOCKS=true). Cada test debe encodar el "por qué" importa el comportamiento,
+   no solo que retorna algo.
+
+2. menu-sections.repository.test.ts — cubre que PrismaMenuRepository.upsertSection y
+   findSections siempre filtran por tenantId. Usa el patrón de mock de Prisma en
+   tests/unit/tenant-isolation-prisma.test.ts y repository-isolation.test.ts como guía.
+
+No modifiques código fuera de tests/. Verifica con `pnpm test --run` al final.
+```
+
+---
+
+### GAP-2 — Evento `signup` ausente en analytics
+
+**Quién lo resuelve:** Claude — no requiere input del usuario
+
+**Prompt:**
+
+```text
+Agrega el evento 'signup' al tipo AnalyticsEvent en src/lib/analytics/events.ts
+con props: { method: 'magic_link' | 'google' }.
+
+Luego llama track('signup', { method }) en dos lugares en src/app/(auth)/login/page.tsx:
+- Cuando signInWithMagicLinkAction retorna ok:true → track('signup', { method: 'magic_link' })
+- Cuando se inicia Google OAuth → track('signup', { method: 'google' })
+
+No modifiques más de lo necesario. Corre `pnpm typecheck` al final.
+```
+
+---
+
+### GAP-3 — Variables de entorno críticas marcadas como `.optional()` en producción
+
+**Quién lo resuelve:** Claude — no requiere input del usuario
+
+**Prompt:**
+
+```text
+En src/lib/env.ts, crea un helper:
+
+  const requiredInProd = (schema: z.ZodString) =>
+    process.env.USE_MOCKS === 'true' ? schema.optional() : schema.min(1, 'Requerida en producción');
+
+Aplica requiredInProd() a: DATABASE_URL, DIRECT_URL, SUPABASE_SERVICE_ROLE_KEY,
+STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, RESEND_API_KEY,
+UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN, CRON_SECRET.
+
+Deja como .optional() las que tienen fallback funcional en mocks:
+POSTHOG_*, SENTRY_DSN, CLOUDINARY_*.
+
+Corre `pnpm typecheck` y `pnpm test --run` al final. No modifiques nada más.
+```
+
+---
+
+### GAP-4 — Logo upload en `/settings/brand` marcado como TODO en CLAUDE.md
+
+**Quién lo resuelve:** Claude — pero primero necesito que confirmes lo siguiente:
+
+**Necesito que me digas:**
+- [ ] ¿Las variables `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` y `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` ya están seteadas en producción?
+
+**Prompt (una vez confirmado Cloudinary activo):**
+
+```text
+El componente ImageUploadField ya existe en src/components/admin/image-upload-field.tsx
+y el endpoint signed upload en src/app/api/uploads/cloudinary/route.ts.
+
+Verifica que BrandSettingsForm en src/components/admin/brand-settings-form.tsx pasa
+correctamente kind="logo" a ImageUploadField y que el campo logoUrl se persiste en
+updateBrandSettingsFormAction en src/server/actions/tenant.actions.ts.
+
+Si hay algún gap (prop faltante, campo no guardado, validación ausente), corrígelo.
+Corre `pnpm typecheck` al final. No crees UI nueva.
+```
+
+---
+
+### GAP-5 — Status page público no configurado
+
+**Quién lo resuelve:** Requiere acción del usuario primero
+
+**Necesito que me proporciones:**
+- [ ] Cuenta en [Better Stack](https://betterstack.com) o [Instatus](https://instatus.com) (elige uno)
+- [ ] URL de producción de FudiMenu a monitorear
+- [ ] Email o canal (Slack/email) donde llegan alertas de downtime
+- [ ] API key o token de la plataforma elegida
+
+**Prompt (una vez que tengas la cuenta y los datos):**
+
+```text
+Configura el status page de FudiMenu:
+1. Crea un monitor HTTP GET a {APP_URL} con check cada 1 minuto.
+2. Crea un monitor HTTP GET a {APP_URL}/api/qr/taqueria-don-pepe con check cada 5 minutos.
+3. Documenta las URLs del status page y los monitores en docs/RUNBOOK.md
+   bajo la sección "Monitoring". No modifiques código de la app.
+```
+
+---
+
+### GAP-6 — DPA con contenido placeholder antes de beta pública
+
+**Quién lo resuelve:** Requiere acción del usuario primero
+
+**Necesito que me proporciones:**
+- [ ] Nombre legal de la empresa / razón social
+- [ ] RFC o número de registro fiscal
+- [ ] País y estado de constitución legal
+- [ ] Email de contacto legal (ej. legal@fudimenu.app)
+- [ ] Nombre del representante legal o DPO
+- [ ] Decisión: ¿FudiMenu procesa datos de tarjetahabientes directamente o los delega 100% a Stripe?
+- [ ] Si tienes un template DPA redactado por tu abogado, compártelo
+
+**Prompt (una vez que tengas lo anterior):**
+
+```text
+Reemplaza el contenido placeholder de src/app/(public)/legal/dpa/page.tsx con el DPA
+real. Estructura mínima: Partes, Objeto, Datos Procesados, Obligaciones del Procesador,
+Subprocesadores, Transferencias Internacionales, Duración y Terminación, Contacto DPO.
+Elimina el comentario TODO(legal). No modifiques otras páginas legales.
+```
+
