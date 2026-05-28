@@ -77,7 +77,7 @@ export function SidebarNav({ plan, tenantName, avatarUrl }: SidebarNavProps) {
       <nav className="flex flex-1 flex-col gap-6 overflow-y-auto px-3 py-4">
         {NAV_DATA.map((section) => (
           <div key={section.label}>
-            {isOpen && (
+            {isOpen && section.label && (
               <h2 className="mb-2 px-3 text-[11px] font-extrabold uppercase tracking-wider text-ink-500">
                 {section.label}
               </h2>
