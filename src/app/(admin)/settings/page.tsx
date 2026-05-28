@@ -3,19 +3,94 @@ import { DeleteMenuCard } from '@/components/admin/delete-menu-card';
 import { ProBadge, ProFeatureLock } from '@/components/admin/pro-feature-lock';
 import { TenantSwitcher } from '@/components/admin/tenant-switcher';
 import { Card } from '@/components/ui/card';
-import { Doodle } from '@/components/brand/doodles';
 import Link from 'next/link';
-import { Building2, ChevronRight, Sparkles } from 'lucide-react';
+import {
+  Building2,
+  ChevronRight,
+  CreditCard,
+  Gift,
+  MessageCircle,
+  Palette,
+  QrCode,
+  Sparkles,
+  UserCircle2,
+} from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { canCreateAnotherMenu } from '@/config/plans';
 import { requireAuth } from '@/server/guards/require-auth';
 
-const links = [
-  { href: '/settings/brand', label: 'Marca y tema', emoji: '🎨' },
-  { href: '/settings/contact', label: 'WhatsApp y horarios', emoji: '💬' },
-  { href: '/settings/billing', label: 'Plan y facturación', emoji: '💳' },
-  { href: '/settings/referrals', label: 'Referidos', emoji: '🎁' },
-  { href: '/qr', label: 'QR y compartir', emoji: '📱' },
-  { href: '/account', label: 'Cuenta', emoji: '👤' },
+type SettingLink = {
+  href: string;
+  label: string;
+  description: string;
+  icon: LucideIcon;
+};
+
+type SettingsSection = {
+  id: string;
+  eyebrow: string;
+  title: string;
+  links: SettingLink[];
+};
+
+const SECTIONS: SettingsSection[] = [
+  {
+    id: 'brand',
+    eyebrow: 'Tu identidad',
+    title: 'Marca y menú',
+    links: [
+      {
+        href: '/settings/brand',
+        label: 'Marca y tema',
+        description: 'Logo, colores y tipografía del menú público.',
+        icon: Palette,
+      },
+      {
+        href: '/qr',
+        label: 'QR y compartir',
+        description: 'Descarga, imprime y comparte tu código.',
+        icon: QrCode,
+      },
+    ],
+  },
+  {
+    id: 'ops',
+    eyebrow: 'Día a día',
+    title: 'Operaciones',
+    links: [
+      {
+        href: '/settings/contact',
+        label: 'WhatsApp y horarios',
+        description: 'Número de pedidos y cuándo está abierto.',
+        icon: MessageCircle,
+      },
+      {
+        href: '/settings/referrals',
+        label: 'Referidos',
+        description: 'Invita restaurantes y gana meses gratis.',
+        icon: Gift,
+      },
+    ],
+  },
+  {
+    id: 'account',
+    eyebrow: 'Tu cuenta',
+    title: 'Plan y acceso',
+    links: [
+      {
+        href: '/settings/billing',
+        label: 'Plan y facturación',
+        description: 'Suscripción, métodos de pago y recibos.',
+        icon: CreditCard,
+      },
+      {
+        href: '/account',
+        label: 'Cuenta',
+        description: 'Correo, contraseña y sesión.',
+        icon: UserCircle2,
+      },
+    ],
+  },
 ];
 
 export default async function SettingsPage() {
@@ -32,62 +107,154 @@ export default async function SettingsPage() {
         title="Ajustes"
         right={<TenantSwitcher activeTenantId={ctx.tenantId} memberships={ctx.memberships} />}
       />
-      <main className="grid gap-3 px-4 ipad:grid-cols-2 ipad:gap-4 ipad:px-6 ipad-landscape:grid-cols-3 ipad-landscape:px-7 desktop:px-8">
-        <Card className="relative overflow-hidden border-[1.5px] border-mostaza-500 bg-mostaza-50 ipad:col-span-2 ipad:min-h-44 ipad:p-6 ipad-landscape:col-span-3">
-          <div className="max-w-[68%]">
-            <p className="text-sm font-black uppercase text-[var(--brand-accent-text)]">Ajusta tu casa</p>
-            <h2 className="mt-1 text-2xl font-black text-ink-900 ipad:text-3xl">Marca, pagos y compartir</h2>
-            <p className="mt-2 text-sm leading-6 text-ink-600">Todo lo que hace que tu menú se sienta tuyo.</p>
-          </div>
-          <Doodle name="settings" className="absolute -right-8 bottom-0 h-36 w-44 ipad:right-6 ipad:h-48 ipad:w-60" />
-        </Card>
-        {links.map((l) => (
-          <Link key={l.href} href={l.href}>
-            <Card className="flex items-center gap-3 ipad:min-h-24 ipad:p-5">
-              <span className="text-2xl">{l.emoji}</span>
-              <span className="flex-1 font-semibold">{l.label}</span>
-              <ChevronRight size={20} className="text-ink-300" />
-            </Card>
-          </Link>
-        ))}
+      <main className="mx-auto w-full max-w-6xl px-4 pb-16 ipad:px-6 ipad-landscape:px-7 desktop:px-8">
+        <div className="flex flex-col gap-8 ipad:gap-10">
+          {SECTIONS.map((section) => (
+            <section key={section.id} aria-labelledby={`section-${section.id}`}>
+              <header className="flex items-baseline justify-between gap-3">
+                <div>
+                  <p className="text-[11px] font-black uppercase tracking-wider text-ink-500">
+                    {section.eyebrow}
+                  </p>
+                  <h2
+                    id={`section-${section.id}`}
+                    className="mt-1 font-heading text-xl font-extrabold text-ink-900 ipad:text-2xl"
+                  >
+                    {section.title}
+                  </h2>
+                </div>
+                <span className="hidden text-[11px] font-semibold text-ink-300 ipad:inline">
+                  {section.links.length} opciones
+                </span>
+              </header>
+              <div className="mt-4 grid gap-3 ipad:grid-cols-2 ipad:gap-4">
+                {section.links.map((link) => (
+                  <SettingsRow key={link.href} {...link} />
+                ))}
+              </div>
+            </section>
+          ))}
 
-        {ctx.plan === 'free' ? (
-          <>
-            <ProFeatureLock
-              title="Quitar marca es Pro"
-              description="Oculta el footer 'Hecho con FudiMenu' para que el menú público se sienta 100% tuyo."
-              className="block"
-            >
-              <Card className="flex items-center gap-3 border-[1.5px] border-mostaza-500 bg-mostaza-50 shadow-sm ipad:min-h-24 ipad:p-5">
-                <Sparkles className="h-6 w-6 text-mostaza-600" />
-                <span className="flex-1 font-semibold">Quitar marca FudiMenu</span>
-                <ProBadge />
-              </Card>
-            </ProFeatureLock>
-            <ProFeatureLock
-              title="Multi-sucursal es Pro"
-              description="Administra varias sucursales sin duplicar trabajo y cambia entre restaurantes desde el panel."
-              className="block"
-            >
-              <Card className="flex items-center gap-3 border-[1.5px] border-mostaza-500 bg-mostaza-50 shadow-sm ipad:min-h-24 ipad:p-5">
-                <Building2 className="h-6 w-6 text-mostaza-600" />
-                <span className="flex-1 font-semibold">Sucursales</span>
-                <ProBadge />
-              </Card>
-            </ProFeatureLock>
-          </>
-        ) : (
-          <Card className="flex items-center gap-3 opacity-80 ipad:min-h-24 ipad:p-5">
-            <Building2 className="h-6 w-6 text-ink-500" />
-            <span className="flex-1 font-semibold">Sucursales</span>
-            <span className="text-xs font-semibold text-ink-500">Próximamente</span>
-          </Card>
-        )}
+          <section aria-labelledby="section-pro">
+            <header>
+              <p className="text-[11px] font-black uppercase tracking-wider text-mostaza-700">
+                Crece con Pro
+              </p>
+              <h2
+                id="section-pro"
+                className="mt-1 font-heading text-xl font-extrabold text-ink-900 ipad:text-2xl"
+              >
+                Más herramientas
+              </h2>
+            </header>
+            <div className="mt-4 grid gap-3 ipad:grid-cols-2 ipad:gap-4">
+              {ctx.plan === 'free' ? (
+                <>
+                  <ProFeatureLock
+                    title="Quitar marca es Pro"
+                    description="Oculta el footer 'Hecho con FudiMenu' para que el menú público se sienta 100% tuyo."
+                    className="block"
+                  >
+                    <ProRow
+                      icon={Sparkles}
+                      label="Quitar marca FudiMenu"
+                      description="Esconde el footer en tu menú público."
+                    />
+                  </ProFeatureLock>
+                  <ProFeatureLock
+                    title="Multi-sucursal es Pro"
+                    description="Administra varias sucursales sin duplicar trabajo y cambia entre restaurantes desde el panel."
+                    className="block"
+                  >
+                    <ProRow
+                      icon={Building2}
+                      label="Sucursales"
+                      description="Maneja varias ubicaciones sin duplicar trabajo."
+                    />
+                  </ProFeatureLock>
+                </>
+              ) : (
+                <Card className="flex items-center gap-4 opacity-90 ipad:min-h-24 ipad:p-5">
+                  <span className="inline-flex h-11 w-11 items-center justify-center rounded-lg bg-[var(--brand-surface-strong)] text-ink-500">
+                    <Building2 className="h-5 w-5" />
+                  </span>
+                  <div className="flex-1">
+                    <p className="font-semibold text-ink-900">Sucursales</p>
+                    <p className="mt-0.5 text-xs text-ink-500">
+                      Maneja varias ubicaciones sin duplicar trabajo.
+                    </p>
+                  </div>
+                  <span className="rounded-full bg-[var(--brand-surface-strong)] px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-ink-500">
+                    Pronto
+                  </span>
+                </Card>
+              )}
+            </div>
+          </section>
 
-        {canDeleteMenu && activeMembership && (
-          <DeleteMenuCard tenantId={ctx.tenantId} tenantName={activeMembership.tenant.name} />
-        )}
+          {canDeleteMenu && activeMembership && (
+            <section aria-labelledby="section-danger">
+              <header>
+                <p className="text-[11px] font-black uppercase tracking-wider text-coral-600">
+                  Zona delicada
+                </p>
+                <h2
+                  id="section-danger"
+                  className="mt-1 font-heading text-xl font-extrabold text-ink-900 ipad:text-2xl"
+                >
+                  Eliminar menú
+                </h2>
+              </header>
+              <div className="mt-4">
+                <DeleteMenuCard tenantId={ctx.tenantId} tenantName={activeMembership.tenant.name} />
+              </div>
+            </section>
+          )}
+        </div>
       </main>
     </>
+  );
+}
+
+function SettingsRow({ href, label, description, icon: Icon }: SettingLink) {
+  return (
+    <Link href={href} className="group block">
+      <Card className="flex items-center gap-4 transition-colors group-hover:border-mostaza-300 ipad:min-h-24 ipad:p-5">
+        <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-mostaza-50 text-mostaza-700 transition-colors group-hover:bg-white group-hover:ring-1 group-hover:ring-mostaza-300">
+          <Icon className="h-5 w-5" strokeWidth={2.25} />
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="font-semibold text-ink-900">{label}</p>
+          <p className="mt-0.5 truncate text-xs text-ink-500">{description}</p>
+        </div>
+        <ChevronRight
+          size={18}
+          className="text-ink-300 transition-transform group-hover:translate-x-0.5 group-hover:text-mostaza-600"
+        />
+      </Card>
+    </Link>
+  );
+}
+
+function ProRow({
+  icon: Icon,
+  label,
+  description,
+}: {
+  icon: LucideIcon;
+  label: string;
+  description: string;
+}) {
+  return (
+    <Card className="flex items-center gap-4 border-[1.5px] border-mostaza-500 bg-mostaza-50 shadow-sm ipad:min-h-24 ipad:p-5">
+      <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-white text-mostaza-700 ring-1 ring-mostaza-300">
+        <Icon className="h-5 w-5" strokeWidth={2.25} />
+      </span>
+      <div className="min-w-0 flex-1">
+        <p className="font-semibold text-ink-900">{label}</p>
+        <p className="mt-0.5 text-xs text-ink-600">{description}</p>
+      </div>
+      <ProBadge />
+    </Card>
   );
 }

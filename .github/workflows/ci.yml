@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       USE_MOCKS: "true"
+      SKIP_ENV_VALIDATION: "true"
       NEXT_PUBLIC_APP_URL: "http://localhost:3000"
       # prisma.config.ts calls env('DIRECT_URL') at load time even for `prisma generate`.
       # generate does not open a connection; a placeholder satisfies the resolver.
@@ -58,6 +59,7 @@ jobs:
       DATABASE_URL: "postgresql://fudimenu:fudimenu@localhost:5432/fudimenu_test?schema=public"
       DIRECT_URL: "postgresql://fudimenu:fudimenu@localhost:5432/fudimenu_test?schema=public"
       USE_MOCKS: "false"
+      SKIP_ENV_VALIDATION: "true"
       E2E_TEST_AUTH: "true"
       E2E_STRIPE_CHECKOUT_MOCK: "true"
       NEXT_PUBLIC_APP_URL: "http://127.0.0.1:3102"

@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       USE_MOCKS: 'true'
+      SKIP_ENV_VALIDATION: 'true'
       NEXT_PUBLIC_APP_URL: 'http://localhost:3000'
       DIRECT_URL: "postgresql://ci:ci@localhost:5432/ci"
       DATABASE_URL: "postgresql://ci:ci@localhost:5432/ci"
