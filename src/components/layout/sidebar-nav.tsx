@@ -11,6 +11,7 @@ import {
   usePrefetchRoute,
 } from '@/components/layout/route-prefetch';
 import { useSidebarContext } from '@/components/layout/sidebar-context';
+import { SidebarToggle } from '@/components/layout/sidebar-toggle';
 import { cn } from '@/lib/utils';
 import type { Plan } from '@/types/domain';
 
@@ -196,6 +197,10 @@ export function SidebarNav({ plan, tenantName, avatarUrl }: SidebarNavProps) {
           </div>
         ))}
       </nav>
+
+      <div className={cn('px-3 pb-2', isOpen ? 'flex justify-start' : 'flex justify-center')}>
+        <SidebarToggle />
+      </div>
 
       <div className="border-t border-[var(--brand-card-border)] p-3">
         <Link

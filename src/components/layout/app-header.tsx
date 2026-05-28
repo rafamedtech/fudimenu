@@ -1,7 +1,6 @@
 'use client';
 import { ChevronLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { SidebarToggle } from '@/components/layout/sidebar-toggle';
 
 interface AppHeaderProps {
   title: string;
@@ -16,7 +15,6 @@ export function AppHeader({ title, showBack, right }: AppHeaderProps) {
       <span className="block h-px" aria-hidden="true" />
       <header className="sticky top-0 z-20 -mt-px flex h-14 items-center justify-between bg-[var(--brand-surface-translucent)] px-2 pt-safe backdrop-blur ipad:h-16 ipad:px-5 ipad-landscape:h-[76px] ipad-landscape:px-8 desktop:px-10">
         <div className="flex w-12 items-center gap-2 ipad:w-24 ipad-landscape:w-auto">
-          <SidebarToggle />
           {showBack && (
             <button
               type="button"
