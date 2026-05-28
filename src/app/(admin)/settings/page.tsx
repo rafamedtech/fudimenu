@@ -13,11 +13,13 @@ import {
   Palette,
   QrCode,
   Sparkles,
+  Trash2,
   UserCircle2,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { canCreateAnotherMenu } from '@/config/plans';
 import { requireAuth } from '@/server/guards/require-auth';
+import { SettingsTabs, type SettingsTab } from './settings-tabs';
 
 type SettingLink = {
   href: string;
@@ -30,6 +32,7 @@ type SettingsSection = {
   id: string;
   eyebrow: string;
   title: string;
+  icon: LucideIcon;
   links: SettingLink[];
 };
 
@@ -38,6 +41,7 @@ const SECTIONS: SettingsSection[] = [
     id: 'brand',
     eyebrow: 'Tu identidad',
     title: 'Marca y menú',
+    icon: Palette,
     links: [
       {
         href: '/settings/brand',
@@ -57,6 +61,7 @@ const SECTIONS: SettingsSection[] = [
     id: 'ops',
     eyebrow: 'Día a día',
     title: 'Operaciones',
+    icon: MessageCircle,
     links: [
       {
         href: '/settings/contact',
@@ -76,6 +81,7 @@ const SECTIONS: SettingsSection[] = [
     id: 'account',
     eyebrow: 'Tu cuenta',
     title: 'Plan y acceso',
+    icon: CreditCard,
     links: [
       {
         href: '/settings/billing',
@@ -101,6 +107,107 @@ export default async function SettingsPage() {
     ctx.memberships.length > 1 &&
     activeMembership?.role === 'owner';
 
+  const tabs: SettingsTab[] = SECTIONS.map((section) => ({
+    id: section.id,
+    label: section.title,
+    icon: <section.icon className="h-4 w-4" strokeWidth={2.25} />,
+    panel: (
+      <section aria-labelledby={`section-${section.id}`}>
+        <SectionHeader
+          id={`section-${section.id}`}
+          eyebrow={section.eyebrow}
+          title={section.title}
+          meta={`${section.links.length} opciones`}
+        />
+        <div className="mt-4 grid gap-3 ipad:grid-cols-2 ipad:gap-4 ipad-landscape:mt-0">
+          {section.links.map((link) => (
+            <SettingsRow key={link.href} {...link} />
+          ))}
+        </div>
+      </section>
+    ),
+  }));
+
+  tabs.push({
+    id: 'pro',
+    label: 'Más herramientas',
+    icon: <Sparkles className="h-4 w-4" strokeWidth={2.25} />,
+    panel: (
+      <section aria-labelledby="section-pro">
+        <SectionHeader
+          id="section-pro"
+          eyebrow="Crece con Pro"
+          eyebrowClassName="text-mostaza-700"
+          title="Más herramientas"
+        />
+        <div className="mt-4 grid gap-3 ipad:grid-cols-2 ipad:gap-4 ipad-landscape:mt-0">
+          {ctx.plan === 'free' ? (
+            <>
+              <ProFeatureLock
+                title="Quitar marca es Pro"
+                description="Oculta el footer 'Hecho con FudiMenu' para que el menú público se sienta 100% tuyo."
+                className="block"
+              >
+                <ProRow
+                  icon={Sparkles}
+                  label="Quitar marca FudiMenu"
+                  description="Esconde el footer en tu menú público."
+                />
+              </ProFeatureLock>
+              <ProFeatureLock
+                title="Multi-sucursal es Pro"
+                description="Administra varias sucursales sin duplicar trabajo y cambia entre restaurantes desde el panel."
+                className="block"
+              >
+                <ProRow
+                  icon={Building2}
+                  label="Sucursales"
+                  description="Maneja varias ubicaciones sin duplicar trabajo."
+                />
+              </ProFeatureLock>
+            </>
+          ) : (
+            <Card className="flex items-center gap-4 opacity-90 ipad:min-h-24 ipad:p-5">
+              <span className="inline-flex h-11 w-11 items-center justify-center rounded-lg bg-[var(--brand-surface-strong)] text-ink-500">
+                <Building2 className="h-5 w-5" />
+              </span>
+              <div className="flex-1">
+                <p className="font-semibold text-ink-900">Sucursales</p>
+                <p className="mt-0.5 text-xs text-ink-500">
+                  Maneja varias ubicaciones sin duplicar trabajo.
+                </p>
+              </div>
+              <span className="rounded-full bg-[var(--brand-surface-strong)] px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-ink-500">
+                Pronto
+              </span>
+            </Card>
+          )}
+        </div>
+      </section>
+    ),
+  });
+
+  if (canDeleteMenu && activeMembership) {
+    tabs.push({
+      id: 'danger',
+      label: 'Eliminar menú',
+      icon: <Trash2 className="h-4 w-4" strokeWidth={2.25} />,
+      panel: (
+        <section aria-labelledby="section-danger">
+          <SectionHeader
+            id="section-danger"
+            eyebrow="Zona delicada"
+            eyebrowClassName="text-coral-600"
+            title="Eliminar menú"
+          />
+          <div className="mt-4 ipad-landscape:mt-0">
+            <DeleteMenuCard tenantId={ctx.tenantId} tenantName={activeMembership.tenant.name} />
+          </div>
+        </section>
+      ),
+    });
+  }
+
   return (
     <>
       <AppHeader
@@ -108,111 +215,44 @@ export default async function SettingsPage() {
         right={<TenantSwitcher activeTenantId={ctx.tenantId} memberships={ctx.memberships} />}
       />
       <main className="mx-auto w-full max-w-6xl px-4 pb-16 ipad:px-6 ipad-landscape:px-7 desktop:px-8">
-        <div className="flex flex-col gap-8 ipad:gap-10">
-          {SECTIONS.map((section) => (
-            <section key={section.id} aria-labelledby={`section-${section.id}`}>
-              <header className="flex items-baseline justify-between gap-3">
-                <div>
-                  <p className="text-[11px] font-black uppercase tracking-wider text-ink-500">
-                    {section.eyebrow}
-                  </p>
-                  <h2
-                    id={`section-${section.id}`}
-                    className="mt-1 font-heading text-xl font-extrabold text-ink-900 ipad:text-2xl"
-                  >
-                    {section.title}
-                  </h2>
-                </div>
-                <span className="hidden text-[11px] font-semibold text-ink-300 ipad:inline">
-                  {section.links.length} opciones
-                </span>
-              </header>
-              <div className="mt-4 grid gap-3 ipad:grid-cols-2 ipad:gap-4">
-                {section.links.map((link) => (
-                  <SettingsRow key={link.href} {...link} />
-                ))}
-              </div>
-            </section>
-          ))}
-
-          <section aria-labelledby="section-pro">
-            <header>
-              <p className="text-[11px] font-black uppercase tracking-wider text-mostaza-700">
-                Crece con Pro
-              </p>
-              <h2
-                id="section-pro"
-                className="mt-1 font-heading text-xl font-extrabold text-ink-900 ipad:text-2xl"
-              >
-                Más herramientas
-              </h2>
-            </header>
-            <div className="mt-4 grid gap-3 ipad:grid-cols-2 ipad:gap-4">
-              {ctx.plan === 'free' ? (
-                <>
-                  <ProFeatureLock
-                    title="Quitar marca es Pro"
-                    description="Oculta el footer 'Hecho con FudiMenu' para que el menú público se sienta 100% tuyo."
-                    className="block"
-                  >
-                    <ProRow
-                      icon={Sparkles}
-                      label="Quitar marca FudiMenu"
-                      description="Esconde el footer en tu menú público."
-                    />
-                  </ProFeatureLock>
-                  <ProFeatureLock
-                    title="Multi-sucursal es Pro"
-                    description="Administra varias sucursales sin duplicar trabajo y cambia entre restaurantes desde el panel."
-                    className="block"
-                  >
-                    <ProRow
-                      icon={Building2}
-                      label="Sucursales"
-                      description="Maneja varias ubicaciones sin duplicar trabajo."
-                    />
-                  </ProFeatureLock>
-                </>
-              ) : (
-                <Card className="flex items-center gap-4 opacity-90 ipad:min-h-24 ipad:p-5">
-                  <span className="inline-flex h-11 w-11 items-center justify-center rounded-lg bg-[var(--brand-surface-strong)] text-ink-500">
-                    <Building2 className="h-5 w-5" />
-                  </span>
-                  <div className="flex-1">
-                    <p className="font-semibold text-ink-900">Sucursales</p>
-                    <p className="mt-0.5 text-xs text-ink-500">
-                      Maneja varias ubicaciones sin duplicar trabajo.
-                    </p>
-                  </div>
-                  <span className="rounded-full bg-[var(--brand-surface-strong)] px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-ink-500">
-                    Pronto
-                  </span>
-                </Card>
-              )}
-            </div>
-          </section>
-
-          {canDeleteMenu && activeMembership && (
-            <section aria-labelledby="section-danger">
-              <header>
-                <p className="text-[11px] font-black uppercase tracking-wider text-coral-600">
-                  Zona delicada
-                </p>
-                <h2
-                  id="section-danger"
-                  className="mt-1 font-heading text-xl font-extrabold text-ink-900 ipad:text-2xl"
-                >
-                  Eliminar menú
-                </h2>
-              </header>
-              <div className="mt-4">
-                <DeleteMenuCard tenantId={ctx.tenantId} tenantName={activeMembership.tenant.name} />
-              </div>
-            </section>
-          )}
-        </div>
+        <SettingsTabs tabs={tabs} />
       </main>
     </>
+  );
+}
+
+function SectionHeader({
+  id,
+  eyebrow,
+  title,
+  meta,
+  eyebrowClassName = 'text-ink-500',
+}: {
+  id: string;
+  eyebrow: string;
+  title: string;
+  meta?: string;
+  eyebrowClassName?: string;
+}) {
+  return (
+    <header className="flex items-baseline justify-between gap-3 ipad-landscape:hidden">
+      <div>
+        <p
+          className={`text-[11px] font-black uppercase tracking-wider ${eyebrowClassName}`}
+        >
+          {eyebrow}
+        </p>
+        <h2
+          id={id}
+          className="mt-1 font-heading text-xl font-extrabold text-ink-900 ipad:text-2xl"
+        >
+          {title}
+        </h2>
+      </div>
+      {meta ? (
+        <span className="hidden text-[11px] font-semibold text-ink-300 ipad:inline">{meta}</span>
+      ) : null}
+    </header>
   );
 }
 
