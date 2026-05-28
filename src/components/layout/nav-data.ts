@@ -32,28 +32,13 @@ export type NavSection = {
 
 export const NAV_DATA: NavSection[] = [
   {
-    label: 'Operación',
+    label: '',
     items: [
       { title: 'Inicio', icon: Home, url: '/dashboard' },
       { title: 'Menú', icon: BookOpen, url: '/menu' },
       { title: 'Stats', icon: BarChart3, url: '/analytics', proOnly: true },
       { title: 'QR', icon: QrCode, url: '/qr' },
-    ],
-  },
-  {
-    label: 'Configuración',
-    items: [
-      {
-        title: 'Ajustes',
-        icon: Settings,
-        items: [
-          { title: 'General', url: '/settings' },
-          { title: 'Marca', url: '/settings/brand' },
-          { title: 'Facturación', url: '/settings/billing' },
-          { title: 'Referidos', url: '/settings/referrals' },
-          { title: 'Contacto', url: '/settings/contact' },
-        ],
-      },
+      { title: 'Ajustes', icon: Settings, url: '/settings' },
       { title: 'Cuenta', icon: User, url: '/account' },
     ],
   },
