@@ -6,10 +6,7 @@ import { Doodle } from '@/components/brand/doodles';
 import { Card } from '@/components/ui/card';
 import { Skeleton, StatCardSkeleton } from '@/components/ui/skeleton';
 import { requireAuth } from '@/server/guards/require-auth';
-import {
-  getTenantAnalyticsStats,
-  type TenantAnalyticsStats,
-} from '@/server/services/posthog-analytics.service';
+import { getTenantAnalyticsStats } from '@/server/services/posthog-analytics.service';
 import type { Plan } from '@/types/domain';
 
 function formatCount(value: number) {
@@ -23,7 +20,6 @@ function formatDelta(value: number | null) {
 
 export default async function AnalyticsPage() {
   const ctx = await requireAuth();
-  const stats = ctx.plan === 'free' ? null : await getTenantAnalyticsStats(ctx.tenantId);
 
   return (
     <>
@@ -33,14 +29,14 @@ export default async function AnalyticsPage() {
       />
       <main className="flex flex-col gap-4 px-4 ipad:px-6 ipad-landscape:px-7 desktop:px-8">
         <Suspense fallback={<AnalyticsLoading />}>
-          <AnalyticsContent plan={ctx.plan} stats={stats} />
+          <AnalyticsContent plan={ctx.plan} tenantId={ctx.tenantId} />
         </Suspense>
       </main>
     </>
   );
 }
 
-function AnalyticsContent({ plan, stats }: { plan: Plan; stats: TenantAnalyticsStats | null }) {
+async function AnalyticsContent({ plan, tenantId }: { plan: Plan; tenantId: string }) {
   if (plan === 'free') {
     return (
       <Card className="space-y-5 overflow-hidden border-[1.5px] border-mostaza-500 bg-mostaza-50 shadow-sm ipad:grid ipad:grid-cols-[1fr_220px] ipad:items-center ipad:p-6">
@@ -67,6 +63,8 @@ function AnalyticsContent({ plan, stats }: { plan: Plan; stats: TenantAnalyticsS
       </Card>
     );
   }
+
+  const stats = await getTenantAnalyticsStats(tenantId);
 
   return (
     <>
