@@ -111,6 +111,17 @@ describe('middleware', () => {
     expect(response.headers.get('location')).toBe('http://localhost/dashboard');
   });
 
+  it('does not call updateSession on public routes', async () => {
+    const middleware = await loadMiddleware();
+
+    for (const path of ['/', '/m/mi-restaurante', '/legal/terms', '/r/abc']) {
+      const response = await middleware(makeRequest(`http://localhost${path}`));
+      expect(response.headers.get('location')).toBeNull();
+    }
+
+    expect(mocks.updateSession).not.toHaveBeenCalled();
+  });
+
   it('skips auth checks when USE_MOCKS=true', async () => {
     process.env.USE_MOCKS = 'true';
 

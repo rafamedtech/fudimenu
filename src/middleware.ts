@@ -88,11 +88,15 @@ export async function middleware(request: NextRequest) {
     return createResponse();
   }
 
-  const { response, user } = await updateSession(request, requestHeaders);
-  applyResponseHeaders(response, locale, nonce);
-
   const isAdminRoute = ADMIN_PREFIXES.some((p) => pathname.startsWith(p));
   const isAuthRoute = AUTH_PREFIXES.some((p) => pathname.startsWith(p));
+
+  if (!isAdminRoute && !isAuthRoute) {
+    return createResponse();
+  }
+
+  const { response, user } = await updateSession(request, requestHeaders);
+  applyResponseHeaders(response, locale, nonce);
 
   if (isAdminRoute && !user) {
     const url = request.nextUrl.clone();
