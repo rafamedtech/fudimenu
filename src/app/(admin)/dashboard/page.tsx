@@ -8,10 +8,7 @@ import { AppHeader } from '@/components/layout/app-header';
 import { formatPrice } from '@/lib/utils';
 import { requireAuth } from '@/server/guards/require-auth';
 import { menuService } from '@/server/services/menu.service';
-import {
-  getTenantAnalyticsStats,
-  type TenantAnalyticsStats,
-} from '@/server/services/posthog-analytics.service';
+import { getTenantAnalyticsStats } from '@/server/services/posthog-analytics.service';
 import type { MenuItem, Plan } from '@/types/domain';
 import { ImageIcon } from 'lucide-react';
 import Image from 'next/image';
@@ -80,8 +77,6 @@ function ActionCard({
 
 export default async function DashboardPage() {
   const ctx = await requireAuth();
-  const analyticsStats =
-    ctx.plan === 'free' ? null : await getTenantAnalyticsStats(ctx.tenantId);
 
   return (
     <>
@@ -90,31 +85,18 @@ export default async function DashboardPage() {
         right={<TenantSwitcher activeTenantId={ctx.tenantId} memberships={ctx.memberships} />}
       />
       <Suspense fallback={<DashboardContentLoading />}>
-        <DashboardContent
-          tenantId={ctx.tenantId}
-          plan={ctx.plan}
-          analyticsStats={analyticsStats}
-        />
+        <DashboardContent tenantId={ctx.tenantId} plan={ctx.plan} />
       </Suspense>
     </>
   );
 }
 
-async function DashboardContent({
-  tenantId,
-  plan,
-  analyticsStats,
-}: {
-  tenantId: string;
-  plan: Plan;
-  analyticsStats: TenantAnalyticsStats | null;
-}) {
+async function DashboardContent({ tenantId, plan }: { tenantId: string; plan: Plan }) {
   const { tenant, items, categories, sections } =
     await menuService.getCachedMenuByTenantId(tenantId);
   const dailySpecial = findDailySpecial(items);
   const total = items.length;
   const agotados = items.filter((i) => !i.isAvailable).length;
-  const topItem = analyticsStats?.topItems[0] ?? null;
   const activeSlug = tenant.slug;
 
   return (
@@ -168,38 +150,9 @@ async function DashboardContent({
             </Card>
           </ProFeatureLock>
         ) : (
-          <div className="grid gap-3 ipad:grid-cols-2 ipad:gap-4">
-            <Card className="bg-gradient-to-br from-mostaza-50 to-[var(--brand-card)] ipad:p-5 ipad-landscape:p-6">
-              <p className="text-sm font-medium text-ink-500">Vistas hoy</p>
-              <p className="mt-1 text-4xl font-extrabold tabular-nums">
-                {formatCount(analyticsStats?.todayViews ?? 0)}
-              </p>
-              <p
-                className={`mt-1 text-sm ${
-                  (analyticsStats?.todayDeltaPercent ?? 0) >= 0 ? 'text-menta-500' : 'text-coral-500'
-                }`}
-              >
-                {analyticsStats?.status === 'missing_config'
-                  ? 'PostHog no configurado'
-                  : analyticsStats?.status === 'error'
-                    ? 'No pudimos leer PostHog'
-                    : formatDelta(analyticsStats?.todayDeltaPercent ?? null, 'ayer')}
-              </p>
-            </Card>
-            <Card className="ipad:p-5">
-              <p className="text-sm font-medium text-ink-700">Top platillo esta semana</p>
-              {topItem ? (
-                <>
-                  <p className="mt-1 truncate text-lg font-bold">{topItem.name}</p>
-                  <p className="text-sm text-ink-500">{formatCount(topItem.views)} vistas</p>
-                </>
-              ) : (
-                <p className="mt-1 text-sm leading-6 text-ink-600">
-                  Todavía no hay vistas de platillos esta semana.
-                </p>
-              )}
-            </Card>
-          </div>
+          <Suspense fallback={<DashboardAnalyticsLoading />}>
+            <DashboardAnalyticsCards tenantId={tenantId} />
+          </Suspense>
         )}
 
         <div className="grid gap-3 ipad:grid-cols-3 ipad:gap-4">
@@ -253,6 +206,55 @@ async function DashboardContent({
           </Card>
         </div>
       </main>
+  );
+}
+
+async function DashboardAnalyticsCards({ tenantId }: { tenantId: string }) {
+  const analyticsStats = await getTenantAnalyticsStats(tenantId);
+  const topItem = analyticsStats.topItems[0] ?? null;
+
+  return (
+    <div className="grid gap-3 ipad:grid-cols-2 ipad:gap-4">
+      <Card className="bg-gradient-to-br from-mostaza-50 to-[var(--brand-card)] ipad:p-5 ipad-landscape:p-6">
+        <p className="text-sm font-medium text-ink-500">Vistas hoy</p>
+        <p className="mt-1 text-4xl font-extrabold tabular-nums">
+          {formatCount(analyticsStats.todayViews)}
+        </p>
+        <p
+          className={`mt-1 text-sm ${
+            (analyticsStats.todayDeltaPercent ?? 0) >= 0 ? 'text-menta-500' : 'text-coral-500'
+          }`}
+        >
+          {analyticsStats.status === 'missing_config'
+            ? 'PostHog no configurado'
+            : analyticsStats.status === 'error'
+              ? 'No pudimos leer PostHog'
+              : formatDelta(analyticsStats.todayDeltaPercent, 'ayer')}
+        </p>
+      </Card>
+      <Card className="ipad:p-5">
+        <p className="text-sm font-medium text-ink-700">Top platillo esta semana</p>
+        {topItem ? (
+          <>
+            <p className="mt-1 truncate text-lg font-bold">{topItem.name}</p>
+            <p className="text-sm text-ink-500">{formatCount(topItem.views)} vistas</p>
+          </>
+        ) : (
+          <p className="mt-1 text-sm leading-6 text-ink-600">
+            Todavía no hay vistas de platillos esta semana.
+          </p>
+        )}
+      </Card>
+    </div>
+  );
+}
+
+function DashboardAnalyticsLoading() {
+  return (
+    <div className="grid gap-3 ipad:grid-cols-2 ipad:gap-4">
+      <StatCardSkeleton />
+      <StatCardSkeleton />
+    </div>
   );
 }
 
