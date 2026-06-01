@@ -146,6 +146,9 @@ src/
 3. `middleware.ts` valida sesión y redirige rutas admin
 4. `requireAuth()` server-side en cada page admin
 
+La preparación para renombrar `middleware.ts` a `proxy.ts` al subir a Next 16 está documentada en
+[`docs/NEXT_16_PROXY_MIGRATION.md`](docs/NEXT_16_PROXY_MIGRATION.md).
+
 ## API layer
 
 - **Server Actions** para mutaciones (`server/actions/`)

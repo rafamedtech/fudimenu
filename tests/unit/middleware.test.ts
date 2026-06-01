@@ -131,4 +131,23 @@ describe('middleware', () => {
     expect(response.headers.get('location')).toBeNull();
     expect(mocks.updateSession).not.toHaveBeenCalled();
   });
+
+  it('preserves the matcher in the Next 15 adapter', async () => {
+    const { config } = await import('../../src/middleware');
+
+    expect(config).toEqual({
+      matcher: ['/((?!_next/static|_next/image|favicon.ico|api/webhooks|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'],
+    });
+  });
+
+  it('sets locale, CSP, and matching request nonce on public routes', async () => {
+    const middleware = await loadMiddleware();
+    const response = await middleware(makeRequest('http://localhost/m/menu?lang=en'));
+    const nonce = response.headers.get('x-middleware-request-x-nonce');
+
+    expect(response.cookies.get('NEXT_LOCALE')?.value).toBe('en');
+    expect(response.headers.get('x-middleware-request-x-next-intl-locale')).toBe('en');
+    expect(nonce).toBeTruthy();
+    expect(response.headers.get('content-security-policy')).toContain(`'nonce-${nonce}'`);
+  });
 });
