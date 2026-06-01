@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { AdminProviders } from '@/components/admin-providers';
 import { AuthBroadcast } from '@/components/admin/auth-broadcast';
 import { BottomNav } from '@/components/layout/bottom-nav';
@@ -8,6 +9,13 @@ import { buildBrandThemeStyle } from '@/lib/brand-theme';
 import { getPrisma } from '@/lib/db/prisma';
 import { mockTenant } from '@/lib/mock/data';
 import { requireAuth } from '@/server/guards/require-auth';
+
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const ctx = await requireAuth();

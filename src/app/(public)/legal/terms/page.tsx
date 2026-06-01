@@ -2,8 +2,11 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Terminos y condiciones | FudiMenu',
+  title: 'Terminos y condiciones',
   description: 'Terminos de uso de FudiMenu para restaurantes, administradores y comensales.',
+  alternates: {
+    canonical: '/legal/terms',
+  },
 };
 
 const updatedAt = '2 de mayo de 2026';

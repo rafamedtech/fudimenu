@@ -2,8 +2,11 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Aviso de privacidad | FudiMenu',
+  title: 'Aviso de privacidad',
   description: 'Aviso de privacidad de FudiMenu para restaurantes, administradores y comensales.',
+  alternates: {
+    canonical: '/legal/privacy',
+  },
 };
 
 const updatedAt = '2 de mayo de 2026';

@@ -35,6 +35,22 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: t('metadata.title', { restaurant: tenant.name }),
     description: t('metadata.description', { restaurant: tenant.name }),
+    alternates: {
+      canonical: `/m/${tenant.slug}`,
+    },
+    openGraph: {
+      type: 'website',
+      title: t('metadata.title', { restaurant: tenant.name }),
+      description: t('metadata.description', { restaurant: tenant.name }),
+      url: `/m/${tenant.slug}`,
+      ...(tenant.logoUrl ? { images: [{ url: tenant.logoUrl, alt: tenant.name }] } : {}),
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: t('metadata.title', { restaurant: tenant.name }),
+      description: t('metadata.description', { restaurant: tenant.name }),
+      ...(tenant.logoUrl ? { images: [tenant.logoUrl] } : {}),
+    },
     formatDetection: { telephone: false },
   };
 }

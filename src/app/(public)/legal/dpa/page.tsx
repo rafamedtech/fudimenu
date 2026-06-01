@@ -2,8 +2,11 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Acuerdo de Procesamiento de Datos (DPA) — FudiMenu',
+  title: 'Acuerdo de Procesamiento de Datos (DPA)',
   description: 'DPA entre FudiMenu y los restaurantes que usan la plataforma.',
+  alternates: {
+    canonical: '/legal/dpa',
+  },
 };
 
 export default function DpaPage() {

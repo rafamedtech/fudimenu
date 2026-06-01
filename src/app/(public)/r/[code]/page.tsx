@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
 import { Button } from '@/components/ui/button';
 import { startReferralSignupAction } from '@/server/actions/referral.actions';
 import { referralService } from '@/server/services/referral.service';
@@ -9,6 +10,44 @@ type ReferralPageProps = {
     code: string;
   }>;
 };
+
+export async function generateMetadata({ params }: ReferralPageProps): Promise<Metadata> {
+  const { code } = await params;
+  const referral = await referralService.getLandingByCode(code);
+
+  if (!referral) {
+    return {
+      title: 'Invitación no encontrada',
+      robots: { index: false, follow: false },
+    };
+  }
+
+  const title = `Invitación de ${referral.restaurantName}`;
+  const description = `${referral.restaurantName} te invita a crear tu menú digital gratis con FudiMenu.`;
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: `/r/${referral.code}`,
+    },
+    robots: {
+      index: false,
+      follow: false,
+    },
+    openGraph: {
+      type: 'website',
+      title,
+      description,
+      url: `/r/${referral.code}`,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+    },
+  };
+}
 
 function getSignupUrl(code: string, restaurantSlug: string) {
   const searchParams = new URLSearchParams({

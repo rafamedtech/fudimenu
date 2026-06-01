@@ -12,8 +12,22 @@ import { FudiLogo } from '@/components/brand/fudi-logo';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'FudiMenu - Tu menú online en menos de 3 minutos',
+  title: {
+    absolute: 'FudiMenu — Tu menú online en menos de 3 minutos',
+  },
   description: 'Reemplaza tu PDF por un menú digital editable y accesible desde un QR fijo.',
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    title: 'FudiMenu — Tu menú online en menos de 3 minutos',
+    description: 'Reemplaza tu PDF por un menú digital editable y accesible desde un QR fijo.',
+    url: '/',
+  },
+  twitter: {
+    title: 'FudiMenu — Tu menú online en menos de 3 minutos',
+    description: 'Reemplaza tu PDF por un menú digital editable y accesible desde un QR fijo.',
+  },
 };
 
 const heroImage =
