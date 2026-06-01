@@ -1,30 +1,16 @@
 'use client';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Toaster } from 'sonner';
 import { OfflineConflictListener } from '@/components/admin/offline-conflict-listener';
 import { initAnalytics } from '@/lib/analytics/events';
 
 export function AdminProviders({ children }: { children: React.ReactNode }) {
-  const [client] = useState(
-    () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: {
-            staleTime: 60_000,
-            retry: 1,
-            refetchOnWindowFocus: false,
-          },
-        },
-      }),
-  );
-
   useEffect(() => {
     initAnalytics();
   }, []);
 
   return (
-    <QueryClientProvider client={client}>
+    <>
       {children}
       <OfflineConflictListener />
       <Toaster
@@ -39,6 +25,6 @@ export function AdminProviders({ children }: { children: React.ReactNode }) {
           },
         }}
       />
-    </QueryClientProvider>
+    </>
   );
 }

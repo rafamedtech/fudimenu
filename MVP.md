@@ -733,7 +733,7 @@ Todo debe imprimir ✅. ❌ → bloquea.
 
 - [ ] DevTools Network: ver header `Content-Security-Policy` con nonce en cada response
 - [ ] DevTools Application: cookies httpOnly + Secure
-- [ ] Login con tenant A, modificar `ACTIVE_TENANT_COOKIE` en DevTools → request a `/api/items` no devuelve data de B
+- [ ] Login con tenant A, modificar `ACTIVE_TENANT_COOKIE` en DevTools → `/menu` no muestra data de B
 - [ ] Inyectar `<script>alert(1)</script>` en descripción item → renderiza pero no ejecuta + DB no contiene tag
 - [ ] 31 calls a `/api/qr/test-slug` rápido → 31° devuelve 429 con Retry-After
 - [ ] 6 magic links a mismo email en 1h → 6° error rate_limited

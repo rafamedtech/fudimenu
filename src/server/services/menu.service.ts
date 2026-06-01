@@ -21,10 +21,6 @@ async function readMenuByTenantId(tenantId: string): Promise<MenuData> {
   return (await getMenuRepository()).getMenuByTenantId(tenantId);
 }
 
-async function readItemsByTenantId(tenantId: string): Promise<MenuItem[]> {
-  return (await getMenuRepository()).getItemsByTenantId(tenantId);
-}
-
 export const menuService = {
   async getTenantBySlug(slug: string): Promise<Tenant | null> {
     return readTenantBySlug(slug);
@@ -56,23 +52,6 @@ export const menuService = {
       {
         revalidate: MENU_CACHE_REVALIDATE_SECONDS,
         tags: [`menu:${tenantId}`, `tenant:${tenantId}`],
-      },
-    )();
-  },
-
-  async getItemsByTenantId(tenantId: string): Promise<MenuItem[]> {
-    return readItemsByTenantId(tenantId);
-  },
-
-  async getCachedItemsByTenantId(tenantId: string): Promise<MenuItem[]> {
-    if (shouldBypassCache()) return readItemsByTenantId(tenantId);
-
-    return unstable_cache(
-      () => readItemsByTenantId(tenantId),
-      ['items-by-tenant', tenantId],
-      {
-        revalidate: MENU_CACHE_REVALIDATE_SECONDS,
-        tags: [`menu:${tenantId}`],
       },
     )();
   },

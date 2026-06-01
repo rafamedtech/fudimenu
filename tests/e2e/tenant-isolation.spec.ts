@@ -139,22 +139,22 @@ test.describe('tenant isolation', () => {
     await prisma?.$disconnect();
   });
 
-  test('tenant A cannot see tenant B items via /api/items', async ({ request }) => {
-    const itemsResponse = await request.get('/api/items', {
+  test('tenant A cannot see tenant B items via admin menu', async ({ request }) => {
+    const menuResponse = await request.get('/menu', {
       headers: { cookie: authCookie(fixture.tenantAId, fixture.userAId) },
     });
-    expect(itemsResponse.ok()).toBe(true);
+    expect(menuResponse.ok()).toBe(true);
+    const menuHtml = await menuResponse.text();
+    expect(menuHtml).toContain('Tenant A taco');
+    expect(menuHtml).not.toContain('Tenant B ramen');
 
-    const itemNames = ((await itemsResponse.json()) as Array<{ name: string }>).map((item) => item.name);
-    expect(itemNames).toEqual(['Tenant A taco']);
-
-    const forgedTenantAccess = await request.get('/api/items', {
+    const forgedTenantAccess = await request.get('/menu', {
       headers: { cookie: authCookie(fixture.tenantBId, fixture.userAId) },
     });
     expect(forgedTenantAccess.ok()).toBe(true);
-
-    const forgedItemNames = ((await forgedTenantAccess.json()) as Array<{ name: string }>).map((item) => item.name);
-    expect(forgedItemNames).toEqual(['Tenant A taco']);
+    const forgedMenuHtml = await forgedTenantAccess.text();
+    expect(forgedMenuHtml).toContain('Tenant A taco');
+    expect(forgedMenuHtml).not.toContain('Tenant B ramen');
 
     const invalidCookieAudit = await getTestPrisma().auditLog.findFirst({
       where: {
@@ -208,7 +208,7 @@ test.describe('tenant isolation', () => {
   }) => {
     // User A forges tenant B cookie — requireAuth rejects and falls back to tenant A.
     // The audit log entry must be scoped to tenant A (the real tenant), not tenant B.
-    await request.get('/api/items', {
+    await request.get('/menu', {
       headers: { cookie: authCookie(fixture.tenantBId, fixture.userAId) },
     });
 

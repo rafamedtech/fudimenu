@@ -53,7 +53,7 @@ pnpm dev
 
 `DIRECT_URL` es la conexión directa de Supabase que usa Prisma CLI para migraciones. `DATABASE_URL` es la conexión que usa Prisma Client en runtime; puede ser la URL pooled de Supavisor o la misma directa durante desarrollo. La app sigue usando `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY` para Supabase Auth/SSR.
 
-La vista pública demo `/m/taqueria-don-pepe` usa el menú Marenca desde `src/lib/mock/data.ts` en modo mock; el admin, onboarding y `/api/items` usan Prisma contra Supabase Postgres cuando `USE_MOCKS=false`.
+La vista pública demo `/m/taqueria-don-pepe` usa el menú Marenca desde `src/lib/mock/data.ts` en modo mock; el admin y onboarding usan Prisma contra Supabase Postgres cuando `USE_MOCKS=false`.
 
 ## E2E tests
 
@@ -89,8 +89,7 @@ src/
 │   │   ├── analytics/
 │   │   └── settings/
 │   ├── api/
-│   │   ├── qr/[slug]/            # F4 QR PNG
-│   │   └── items/
+│   │   └── qr/[slug]/            # F4 QR PNG
 │   └── auth/callback/            # F1 OAuth
 ├── components/
 │   ├── ui/                       # primitivos: button, input, toggle, sheet, card, skeleton
@@ -107,7 +106,7 @@ src/
 │   ├── mock/                     # data demo (USE_MOCKS=true)
 │   ├── env.ts                    # @t3-oss runtime validation
 │   └── utils.ts                  # cn, formatPrice, slugify
-├── hooks/                        # use-items con optimistic updates
+├── hooks/                        # hooks de UI local
 ├── stores/                       # ui.store, branch.store (Zustand)
 ├── server/
 │   ├── actions/                  # Server Actions (mutations)
@@ -124,7 +123,7 @@ src/
 |---|---|
 | F1 Auth + onboarding | `app/(auth)/login`, `app/auth/callback`, `app/(admin)/onboarding`, `server/actions/auth.actions.ts` |
 | F2 Editor menú | `app/(admin)/menu`, `components/admin/item-editor-form.tsx`, `server/actions/items.actions.ts` |
-| F3 Toggle agotado | `components/admin/stock-toggle.tsx`, `hooks/use-items.ts` (optimistic) |
+| F3 Toggle agotado | `components/admin/stock-toggle.tsx`, `server/actions/items.actions.ts` |
 | F4 Link + QR | `app/api/qr/[slug]/route.ts`, `app/(public)/m/[slug]` |
 | F5 Vista comensal | `app/(public)/m/[slug]/page.tsx` (edge + ISR 60s) |
 | F6 Tema básico | `app/(admin)/settings`, color en page público |
@@ -134,7 +133,7 @@ src/
 
 | Tipo | Tech | Dónde |
 |---|---|---|
-| Server state | TanStack Query | `hooks/use-items.ts` |
+| Server state | React Server Components | `app/(admin)`, `server/services/menu.service.ts` |
 | UI ephemeral | Zustand | `stores/ui.store.ts` |
 | URL state | Search params nativos | en cada page |
 | Form state | RHF + Zod | `components/admin/item-editor-form.tsx` |
@@ -150,7 +149,7 @@ src/
 ## API layer
 
 - **Server Actions** para mutaciones (`server/actions/`)
-- **Route Handlers** para públicas (`app/api/qr`, `app/api/items`)
+- **Route Handlers** para endpoints HTTP públicos o integraciones (`app/api/qr`, webhooks, tracking)
 - **`apiFetch`** wrapper con retry + `ApiError` mapping
 - **`menuService`** abstrae mock vs Prisma/Postgres real (toggle con `USE_MOCKS`)
 
