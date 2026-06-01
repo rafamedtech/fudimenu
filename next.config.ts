@@ -6,6 +6,7 @@ import bundleAnalyzer from '@next/bundle-analyzer';
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
+  openAnalyzer: false,
 });
 
 const config: NextConfig = {
@@ -21,11 +22,6 @@ const config: NextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react'],
   },
-  serverExternalPackages: [
-    '@sentry/nextjs',
-    '@opentelemetry/instrumentation',
-    'require-in-the-middle',
-  ],
   async headers() {
     const isProd = process.env.NODE_ENV === 'production';
     const baseHeaders = [
@@ -47,9 +43,9 @@ export default withSentryConfig(withBundleAnalyzer(withNextIntl(config)), {
   // For all available options, see:
   // https://www.npmjs.com/package/@sentry/webpack-plugin#options
 
-  org: process.env.SENTRY_ORG ?? "rafamed",
+  org: process.env.SENTRY_ORG ?? 'rafamed',
 
-  project: process.env.SENTRY_PROJECT ?? "javascript-nextjs",
+  project: process.env.SENTRY_PROJECT ?? 'javascript-nextjs',
 
   // Only print logs for uploading source maps in CI
   silent: !process.env.CI,
@@ -64,15 +60,14 @@ export default withSentryConfig(withBundleAnalyzer(withNextIntl(config)), {
   // This can increase your server load as well as your hosting bill.
   // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
   // side errors will fail.
-  // tunnelRoute: "/monitoring",
+  // tunnelRoute: '/monitoring',
+
+  // Span-based cron monitoring supports App Router route handlers.
+  _experimental: {
+    vercelCronsMonitoring: true,
+  },
 
   webpack: {
-    // Enables automatic instrumentation of Vercel Cron Monitors. (Does not yet work with App Router route handlers.)
-    // See the following for more information:
-    // https://docs.sentry.io/product/crons/
-    // https://vercel.com/docs/cron-jobs
-    automaticVercelMonitors: true,
-
     // Tree-shaking options for reducing bundle size
     treeshake: {
       // Automatically tree-shake Sentry logger statements to reduce bundle size
