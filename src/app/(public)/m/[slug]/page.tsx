@@ -1,17 +1,14 @@
-import { Suspense } from 'react';
+import { cache, Suspense } from 'react';
 import { notFound, permanentRedirect } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { buildBrandThemeStyle, resolveBrandSurfaceColor } from '@/lib/brand-theme';
+import { buildPublicMenuGroups } from '@/lib/public-menu-groups';
 import { menuService } from '@/server/services/menu.service';
 import { getPrisma } from '@/lib/db/prisma';
 import { PublicMenuLanguageSwitcher, PublicMenuPwaWrapper } from './public-menu-pwa-wrapper';
-import {
-  PublicMenuIsland,
-  type IslandGroup,
-  type IslandStrings,
-} from './public-menu-island';
+import { PublicMenuIsland, type IslandStrings } from './public-menu-island';
 import { PublicMenuStickyNav, type NavAnchor } from './public-menu-sticky-nav';
 import { PublicPhoneDisclosure } from './public-phone-disclosure';
 import type { Metadata } from 'next';
@@ -20,7 +17,7 @@ import type { Category, MenuItem, MenuSection, Tenant } from '@/types/domain';
 // Prisma requires Node.js runtime — Edge is incompatible.
 export const runtime = 'nodejs';
 export const revalidate = 60;
-const OTHER_CATEGORY_NAME = 'Otros';
+const getTenantBySlug = cache((slug: string) => menuService.getCachedTenantBySlug(slug));
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -29,8 +26,7 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const t = await getTranslations('menu');
-  const tenant = await menuService.getCachedTenantBySlug(slug);
+  const [t, tenant] = await Promise.all([getTranslations('menu'), getTenantBySlug(slug)]);
   if (!tenant) return { title: t('metadata.notFoundTitle') };
   return {
     title: t('metadata.title', { restaurant: tenant.name }),
@@ -65,61 +61,15 @@ async function PublicMenuContent({
 }) {
   const t = await getTranslations('menu');
 
-  const dailySpecials = items.filter((item) => item.isSpecialToday);
-  const regularItems = items.filter((item) => !item.isSpecialToday);
   const brandThemeStyle = buildBrandThemeStyle(tenant.primaryColor);
-
+  const { dailySpecials, groups } = buildPublicMenuGroups({
+    sections,
+    categories,
+    items,
+    otherCategoryName: t('otherCategory'),
+    resolveSectionAccent: resolveBrandSurfaceColor,
+  });
   const hasSections = sections.length > 0;
-
-  const groups: IslandGroup[] = [];
-
-  if (hasSections) {
-    for (const section of sections.filter((s) => s.isVisible)) {
-      for (const category of categories.filter((c) => c.sectionId === section.id && c.isVisible)) {
-        const groupItems = regularItems.filter((i) => i.categoryId === category.id);
-        if (groupItems.length === 0) continue;
-        groups.push({
-          sectionId: section.id,
-          sectionName: section.name,
-          sectionAccent: resolveBrandSurfaceColor(section.accentColor),
-          categoryId: category.id,
-          categoryName: category.name,
-          items: groupItems,
-        });
-      }
-    }
-  } else {
-    const uncategorized = regularItems.filter((i) => i.categoryId === null);
-    const otherCategory = categories.find(
-      (c) => c.name.trim().toLocaleLowerCase() === OTHER_CATEGORY_NAME.toLocaleLowerCase(),
-    );
-    for (const category of categories.filter((c) => c.isVisible)) {
-      const catItems = regularItems.filter((i) => i.categoryId === category.id);
-      const merged =
-        otherCategory && category.id === otherCategory.id
-          ? [...catItems, ...uncategorized]
-          : catItems;
-      if (merged.length === 0) continue;
-      groups.push({
-        sectionId: null,
-        sectionName: null,
-        sectionAccent: null,
-        categoryId: category.id,
-        categoryName: category.name,
-        items: merged,
-      });
-    }
-    if (!otherCategory && uncategorized.length > 0) {
-      groups.push({
-        sectionId: null,
-        sectionName: null,
-        sectionAccent: null,
-        categoryId: 'uncategorized',
-        categoryName: t('otherCategory'),
-        items: uncategorized,
-      });
-    }
-  }
 
   const sectionAnchors: NavAnchor[] = hasSections
     ? Array.from(
@@ -274,7 +224,8 @@ async function PublicMenuContent({
 
 export default async function PublicMenuPage({ params }: Props) {
   const { slug } = await params;
-  const tenant = await menuService.getCachedTenantBySlug(slug);
+  const localePromise = getLocale();
+  const tenant = await getTenantBySlug(slug);
   if (!tenant) {
     const history =
       process.env.USE_MOCKS === 'true'
@@ -302,7 +253,7 @@ export default async function PublicMenuPage({ params }: Props) {
 
   const [{ sections, categories, items }, locale] = await Promise.all([
     menuService.getCachedMenuByTenantId(tenant.id),
-    getLocale(),
+    localePromise,
   ]);
 
   return (

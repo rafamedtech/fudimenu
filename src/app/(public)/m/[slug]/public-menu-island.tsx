@@ -6,15 +6,9 @@ import { getCategoryEmoji } from '@/lib/category-placeholder';
 import { formatPrice } from '@/lib/utils';
 import { buildWhatsAppOrderUrl } from '@/lib/whatsapp';
 import type { MenuItem } from '@/types/domain';
+import type { PublicMenuGroup as IslandGroup } from '@/lib/public-menu-groups';
 
-export interface IslandGroup {
-  sectionId: string | null;
-  sectionName: string | null;
-  sectionAccent: string | null;
-  categoryId: string;
-  categoryName: string;
-  items: MenuItem[];
-}
+export type { PublicMenuGroup as IslandGroup } from '@/lib/public-menu-groups';
 
 export interface IslandStrings {
   searchPlaceholder: string;
