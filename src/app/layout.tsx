@@ -1,9 +1,22 @@
 import type { Metadata, Viewport } from 'next';
+import { DM_Sans, Inter } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
 import './globals.css';
 import { Providers } from '@/components/providers';
 import { getAppUrl } from '@/lib/seo';
+
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+});
+
+const dmSans = DM_Sans({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-dm-sans',
+});
 
 export const metadata: Metadata = {
   metadataBase: getAppUrl(),
@@ -42,7 +55,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const messages = await getMessages();
 
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <html lang={locale} className={`${inter.variable} ${dmSans.variable}`} suppressHydrationWarning>
       <body className="font-sans" suppressHydrationWarning>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <Providers>{children}</Providers>
