@@ -15,12 +15,14 @@ import type { LivePrices } from '@/types/billing';
 
 type Cycle = 'monthly' | 'annual';
 
-function formatMoney(cents: number, currency = 'MXN') {
-  return new Intl.NumberFormat('es-MX', {
-    style: 'currency',
-    currency,
-    maximumFractionDigits: 0,
-  }).format(cents / 100);
+const MONEY_FORMATTER = new Intl.NumberFormat('es-MX', {
+  style: 'currency',
+  currency: 'MXN',
+  maximumFractionDigits: 0,
+});
+
+function formatMoney(cents: number) {
+  return MONEY_FORMATTER.format(cents / 100);
 }
 
 // Fallback when no live Stripe annual price exists.
@@ -99,12 +101,12 @@ export function BillingPlans({
           !isPaid
             ? 'Gratis'
             : planCycle === 'annual'
-              ? `${formatMoney(annualPerMonthCents, currency)}/mes · ${formatMoney(annualTotalCents, currency)}/año`
-              : `${formatMoney(monthlyCents, currency)}/mes`;
+              ? `${formatMoney(annualPerMonthCents)}/mes · ${formatMoney(annualTotalCents)}/año`
+              : `${formatMoney(monthlyCents)}/mes`;
 
         const savings =
           isPaid && planCycle === 'annual' && savingsCents > 0
-            ? `Ahorras ${formatMoney(savingsCents, currency)} al año`
+            ? `Ahorras ${formatMoney(savingsCents)} al año`
             : null;
 
         return (
@@ -124,7 +126,7 @@ export function BillingPlans({
                 {savings && <p className="mt-0.5 text-xs text-menta-700">{savings}</p>}
               </div>
               {plan.id === 'free' ? null : (
-                <Store className="h-5 w-5 shrink-0 text-mostaza-600" />
+                <Store className="size-5 shrink-0 text-mostaza-600" />
               )}
             </div>
 
@@ -175,7 +177,7 @@ export function BillingPlans({
                     className="w-full"
                     onClick={() => track('plan_upgrade_started', { from: currentPlan, to: plan.id, method: 'card', cycle: planCycle })}
                   >
-                    Tarjeta — suscripción recurrente
+                    Tarjeta: suscripción recurrente
                   </Button>
                 </form>
                 {/* OXXO/SPEI — one-time manual */}
@@ -189,12 +191,12 @@ export function BillingPlans({
                     className="w-full"
                     onClick={() => track('plan_upgrade_started', { from: currentPlan, to: plan.id, method: 'cash', cycle: planCycle })}
                   >
-                    OXXO / SPEI — pago único manual
+                    OXXO / SPEI: pago único manual
                   </Button>
                 </form>
                 <p className="text-center text-xs text-ink-500">
                   Tarjeta: se renueva automáticamente. OXXO/SPEI: pago manual sin renovación
-                  automática — recibirás instrucciones de Stripe.
+                  automática. Recibirás instrucciones de Stripe.
                 </p>
               </div>
             ) : null}

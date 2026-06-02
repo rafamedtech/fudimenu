@@ -93,7 +93,7 @@ src/
 │   └── auth/callback/            # F1 OAuth
 ├── components/
 │   ├── ui/                       # primitivos: button, input, toggle, sheet, card, skeleton
-│   ├── layout/                   # bottom-nav, fab, app-header
+│   ├── layout/                   # bottom-nav, sidebar, app-header
 │   ├── menu/                     # item-card
 │   └── admin/                    # stock-toggle, item-editor-form
 ├── lib/
@@ -107,7 +107,7 @@ src/
 │   ├── env.ts                    # @t3-oss runtime validation
 │   └── utils.ts                  # cn, formatPrice, slugify
 ├── hooks/                        # hooks de UI local
-├── stores/                       # ui.store, branch.store (Zustand)
+├── stores/                       # client stores (Zustand)
 ├── server/
 │   ├── actions/                  # Server Actions (mutations)
 │   ├── services/                 # menu.service (DB layer)
@@ -134,7 +134,7 @@ src/
 | Tipo | Tech | Dónde |
 |---|---|---|
 | Server state | React Server Components | `app/(admin)`, `server/services/menu.service.ts` |
-| UI ephemeral | Zustand | `stores/ui.store.ts` |
+| UI ephemeral | Local component state | colocated with each UI flow |
 | URL state | Search params nativos | en cada page |
 | Form state | RHF + Zod | `components/admin/item-editor-form.tsx` |
 | Persist (branch, locale) | Zustand persist + localStorage | `stores/branch.store.ts`, `lib/storage/local.ts` |

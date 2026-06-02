@@ -38,7 +38,7 @@ export function PlanLimitBanner({
         <Link href="/settings/billing" className="mb-4 block">
           <Card className="border-[1.5px] border-mostaza-500 bg-mostaza-50 shadow-sm">
             <div className="flex items-center gap-3">
-              <Sparkles className="h-5 w-5 shrink-0 text-mostaza-600" />
+              <Sparkles className="size-5 shrink-0 text-mostaza-600" />
               <p className="text-sm font-extrabold text-ink-900">
                 Límite de {FREE_SECTION_LIMIT} secciones en Free alcanzado. Upgrade →
               </p>
@@ -51,7 +51,7 @@ export function PlanLimitBanner({
         <Link href="/settings/billing" className="mb-4 block">
           <Card className="border-[1.5px] border-mostaza-500 bg-mostaza-50 shadow-sm">
             <div className="flex items-center gap-3">
-              <Sparkles className="h-5 w-5 shrink-0 text-mostaza-600" />
+              <Sparkles className="size-5 shrink-0 text-mostaza-600" />
               <p className="text-sm font-extrabold text-ink-900">
                 {remainingItems} items restantes en Free. Upgrade →
               </p>
@@ -66,7 +66,7 @@ export function PlanLimitBanner({
           aria-label="Agregar platillo"
           onClick={() => setIsUpgradeOpen(true)}
           className={cn(
-            'fixed bottom-[88px] right-4 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-ink-900 text-mostaza-500 shadow-lg transition-transform active:scale-90 hover:scale-105 ipad:bottom-[104px] ipad:right-[max(1rem,calc((100vw-744px)/2+1rem))] ipad-landscape:right-[max(1rem,calc((100vw-984px)/2+1rem))] desktop:right-[max(1rem,calc((100vw-1180px)/2+1rem))]',
+            'fixed bottom-[88px] right-4 z-30 flex size-14 items-center justify-center rounded-full bg-ink-900 text-mostaza-500 shadow-lg transition-transform active:scale-90 hover:scale-105 ipad:bottom-[104px] ipad:right-[max(1rem,calc((100vw-744px)/2+1rem))] ipad-landscape:right-[max(1rem,calc((100vw-984px)/2+1rem))] desktop:right-[max(1rem,calc((100vw-1180px)/2+1rem))]',
           )}
         >
           <Lock size={24} strokeWidth={2.5} />
@@ -75,23 +75,25 @@ export function PlanLimitBanner({
         <Link
           href={addHref}
           aria-label="Agregar platillo"
-          className="fixed bottom-[88px] right-4 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--brand-primary)] text-[var(--brand-on-primary)] shadow-lg transition-transform active:scale-90 hover:scale-105 ipad:bottom-[104px] ipad:right-[max(1rem,calc((100vw-744px)/2+1rem))] ipad-landscape:right-[max(1rem,calc((100vw-984px)/2+1rem))] desktop:right-[max(1rem,calc((100vw-1180px)/2+1rem))]"
+          className="fixed bottom-[88px] right-4 z-30 flex size-14 items-center justify-center rounded-full bg-[var(--brand-primary)] text-[var(--brand-on-primary)] shadow-lg transition-transform active:scale-90 hover:scale-105 ipad:bottom-[104px] ipad:right-[max(1rem,calc((100vw-744px)/2+1rem))] ipad-landscape:right-[max(1rem,calc((100vw-984px)/2+1rem))] desktop:right-[max(1rem,calc((100vw-1180px)/2+1rem))]"
         >
           <Plus size={28} strokeWidth={2.5} />
         </Link>
       )}
 
       {isUpgradeOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-end bg-ink-900/45 px-4 pb-4 backdrop-blur-sm ipad:items-center ipad:justify-center"
-          role="dialog"
-          aria-modal="true"
+        <dialog
+          ref={(dialog) => {
+            if (dialog && !dialog.open) dialog.showModal();
+          }}
+          className="fixed inset-0 z-50 m-0 flex size-full max-h-none max-w-none items-end bg-transparent px-4 pb-4 ipad:items-center ipad:justify-center backdrop:bg-ink-900/45 backdrop:backdrop-blur-sm"
           aria-labelledby="upgrade-limit-title"
+          onCancel={() => setIsUpgradeOpen(false)}
         >
           <Card className="w-full space-y-4 rounded-lg border-[1.5px] border-mostaza-500 shadow-xl ipad:max-w-lg">
             <div className="flex items-start gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-mostaza-100 text-ink-900">
-                <Lock className="h-5 w-5" />
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-md bg-mostaza-100 text-ink-900">
+                <Lock className="size-5" />
               </div>
               <div>
                 <h2 id="upgrade-limit-title" className="text-lg font-extrabold text-ink-900">
@@ -120,7 +122,7 @@ export function PlanLimitBanner({
               </Link>
             </div>
           </Card>
-        </div>
+        </dialog>
       )}
     </>
   );

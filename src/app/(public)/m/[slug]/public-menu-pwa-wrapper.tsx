@@ -1,8 +1,8 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState, useTransition } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { useCallback, useEffect, useSyncExternalStore, useTransition } from 'react';
 import type { CSSProperties } from 'react';
 import {
   CookieConsentProvider,
@@ -19,7 +19,7 @@ const CookieConsent = dynamic(
 
 // Deferred: loads posthog + fetch tracker after hydration, not on initial paint.
 // Must live in a Client Component — `ssr: false` is not allowed in Server Components.
-export const PublicMenuTracker = dynamic(
+const PublicMenuTracker = dynamic(
   () => import('@/components/public/public-menu-tracking').then((m) => m.PublicMenuTracker),
   { ssr: false },
 );
@@ -27,18 +27,39 @@ export const PublicMenuTracker = dynamic(
 const PUBLIC_MENU_VISITS_PREFIX = 'fudimenu:public-menu-visits:';
 const PUBLIC_MENU_SESSION_PREFIX = 'fudimenu:public-menu-session-counted:';
 const PUBLIC_MENU_DISMISSED_PREFIX = 'fudimenu:public-menu-pwa-dismissed:';
+const PUBLIC_MENU_PWA_STATE_EVENT = 'fudimenu:public-menu-pwa-state';
+const PUBLIC_MENU_PWA_SERVER_SNAPSHOT = 'false|false';
 const LANG_QUERY_PARAM = 'lang';
 const LOCALES = ['es', 'en'] as const;
 type PublicMenuLocale = (typeof LOCALES)[number];
 
-function isPublicMenuLocale(value: string | null): value is PublicMenuLocale {
-  return value === 'es' || value === 'en';
-}
-
-function getLocalizedHref(pathname: string, searchParams: URLSearchParams, locale: PublicMenuLocale) {
-  const params = new URLSearchParams(searchParams);
+function getLocalizedHref(pathname: string, locale: PublicMenuLocale) {
+  const params = new URLSearchParams();
   params.set(LANG_QUERY_PARAM, locale);
   return `${pathname}?${params.toString()}${typeof window === 'undefined' ? '' : window.location.hash}`;
+}
+
+function subscribeToPublicMenuPwaState(onStoreChange: () => void) {
+  window.addEventListener(PUBLIC_MENU_PWA_STATE_EVENT, onStoreChange);
+  return () => window.removeEventListener(PUBLIC_MENU_PWA_STATE_EVENT, onStoreChange);
+}
+
+function getPublicMenuPwaSnapshot(slug: string) {
+  const visits = Number(localStorage.getItem(`${PUBLIC_MENU_VISITS_PREFIX}${slug}`) ?? '0');
+  const dismissed = localStorage.getItem(`${PUBLIC_MENU_DISMISSED_PREFIX}${slug}`) === '1';
+  return `${visits >= 2}|${dismissed}`;
+}
+
+function recordPublicMenuVisit(slug: string) {
+  const visitsKey = `${PUBLIC_MENU_VISITS_PREFIX}${slug}`;
+  const sessionKey = `${PUBLIC_MENU_SESSION_PREFIX}${slug}`;
+  const visits = Number(localStorage.getItem(visitsKey) ?? '0');
+  const hasCountedSession = sessionStorage.getItem(sessionKey) === '1';
+  if (!hasCountedSession) {
+    localStorage.setItem(visitsKey, String(visits + 1));
+    sessionStorage.setItem(sessionKey, '1');
+  }
+  window.dispatchEvent(new Event(PUBLIC_MENU_PWA_STATE_EVENT));
 }
 
 interface LanguageSwitcherProps {
@@ -49,40 +70,23 @@ interface LanguageSwitcherProps {
 export function PublicMenuLanguageSwitcher({ activeLocale: initialLocale, ariaLabel }: LanguageSwitcherProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
-  const queryLocale = searchParams.get(LANG_QUERY_PARAM);
-  const activeLocale = isPublicMenuLocale(queryLocale) ? queryLocale : initialLocale;
-
-  useEffect(() => {
-    if (isPublicMenuLocale(queryLocale)) {
-      localStore.set('fudi:locale', queryLocale);
-      return;
-    }
-
-    const storedLocale = localStore.get('fudi:locale');
-    if (storedLocale && storedLocale !== initialLocale) {
-      startTransition(() => {
-        router.replace(getLocalizedHref(pathname, searchParams, storedLocale), { scroll: false });
-      });
-    }
-  }, [initialLocale, pathname, queryLocale, router, searchParams]);
+  const activeLocale = initialLocale;
 
   function switchLocale(nextLocale: PublicMenuLocale) {
-    if (nextLocale === activeLocale && queryLocale === nextLocale) return;
+    if (nextLocale === activeLocale) return;
 
     localStore.set('fudi:locale', nextLocale);
     startTransition(() => {
-      router.replace(getLocalizedHref(pathname, searchParams, nextLocale), { scroll: false });
+      router.replace(getLocalizedHref(pathname, nextLocale), { scroll: false });
     });
   }
 
   return (
-    <div
+    <fieldset
       className="inline-grid h-10 grid-cols-2 gap-1 rounded-xl border border-[var(--brand-card-border)] bg-[var(--brand-card)] p-1 shadow-sm"
-      role="group"
-      aria-label={ariaLabel}
     >
+      <legend className="sr-only">{ariaLabel}</legend>
       {LOCALES.map((option) => {
         const isActive = option === activeLocale;
         const className = isActive
@@ -102,7 +106,7 @@ export function PublicMenuLanguageSwitcher({ activeLocale: initialLocale, ariaLa
           </button>
         );
       })}
-    </div>
+    </fieldset>
   );
 }
 
@@ -143,24 +147,16 @@ export function PublicMenuPwaWrapper({
 function PublicMenuPwaContent({ slug, tenantId, locale, pwaStrings, children }: PublicMenuPwaWrapperProps) {
   const { canInstall, isInstalled, promptInstall } = usePwaInstall();
   const consentDecided = useCookieConsentDecided();
-  const [isSecondVisit, setIsSecondVisit] = useState(false);
-  const [isDismissed, setIsDismissed] = useState(false);
+  const getSnapshot = useCallback(() => getPublicMenuPwaSnapshot(slug), [slug]);
+  const snapshot = useSyncExternalStore(
+    subscribeToPublicMenuPwaState,
+    getSnapshot,
+    () => PUBLIC_MENU_PWA_SERVER_SNAPSHOT,
+  );
+  const [isSecondVisit, isDismissed] = snapshot.split('|').map((value) => value === 'true');
 
   useEffect(() => {
-    const visitsKey = `${PUBLIC_MENU_VISITS_PREFIX}${slug}`;
-    const sessionKey = `${PUBLIC_MENU_SESSION_PREFIX}${slug}`;
-    const dismissedKey = `${PUBLIC_MENU_DISMISSED_PREFIX}${slug}`;
-    const visits = Number(localStorage.getItem(visitsKey) ?? '0');
-    const hasCountedSession = sessionStorage.getItem(sessionKey) === '1';
-    const nextVisits = hasCountedSession ? visits : visits + 1;
-
-    if (!hasCountedSession) {
-      localStorage.setItem(visitsKey, String(nextVisits));
-      sessionStorage.setItem(sessionKey, '1');
-    }
-
-    setIsSecondVisit(nextVisits >= 2);
-    setIsDismissed(localStorage.getItem(dismissedKey) === '1');
+    recordPublicMenuVisit(slug);
   }, [slug]);
 
   const shouldShowPrompt =
@@ -168,7 +164,7 @@ function PublicMenuPwaContent({ slug, tenantId, locale, pwaStrings, children }: 
 
   const handleDismiss = () => {
     localStorage.setItem(`${PUBLIC_MENU_DISMISSED_PREFIX}${slug}`, '1');
-    setIsDismissed(true);
+    window.dispatchEvent(new Event(PUBLIC_MENU_PWA_STATE_EVENT));
   };
 
   return (
@@ -205,7 +201,7 @@ function PublicMenuPwaContent({ slug, tenantId, locale, pwaStrings, children }: 
             </button>
             <button
               type="button"
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md text-ink-500 transition-colors hover:bg-[var(--brand-primary-faint)] hover:text-ink-900 focus-visible:outline-none focus-visible:shadow-glow-mostaza"
+              className="flex size-10 shrink-0 items-center justify-center rounded-md text-ink-500 transition-colors hover:bg-[var(--brand-primary-faint)] hover:text-ink-900 focus-visible:outline-none focus-visible:shadow-glow-mostaza"
               onClick={handleDismiss}
               aria-label={pwaStrings.close}
             >

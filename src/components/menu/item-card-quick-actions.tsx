@@ -72,7 +72,7 @@ export function ItemCardQuickActions({
               nextAvailable ? 'bg-menta-500' : 'bg-red-500',
             )}
           >
-            <ActionIcon aria-hidden="true" className="h-4 w-4" />
+            <ActionIcon aria-hidden="true" className="size-4" />
             <span>{actionLabel}</span>
           </button>
         </div>

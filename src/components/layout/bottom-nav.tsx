@@ -43,7 +43,7 @@ export function BottomNav({ plan }: BottomNavProps) {
                   description="Mide vistas, platillos favoritos y señales de demanda para decidir qué vender más."
                   className={cn(itemClassName, 'w-full')}
                 >
-                  <Icon className="h-5 w-5 shrink-0" strokeWidth={active ? 2.5 : 2} />
+                  <Icon className="size-5 shrink-0" strokeWidth={active ? 2.5 : 2} />
                   <span className="max-w-full truncate">{label}</span>
                   <span className="absolute -right-1 -top-1 scale-75 ipad:right-0 ipad:top-0">
                     <ProBadge />
@@ -62,7 +62,7 @@ export function BottomNav({ plan }: BottomNavProps) {
                 {...getIntentPrefetchHandlers(href, prefetchRoute)}
                 className={itemClassName}
               >
-                <Icon className="h-5 w-5 shrink-0" strokeWidth={active ? 2.5 : 2} />
+                <Icon className="size-5 shrink-0" strokeWidth={active ? 2.5 : 2} />
                 <span className="max-w-full truncate">{label}</span>
               </Link>
             </li>

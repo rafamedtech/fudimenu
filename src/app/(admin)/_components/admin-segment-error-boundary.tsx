@@ -42,7 +42,7 @@ export function AdminSegmentErrorBoundary({
         <p className="text-sm leading-6 text-ink-500">{description}</p>
       </div>
       <Button onClick={reset}>
-        <RotateCcw className="h-4 w-4" aria-hidden />
+        <RotateCcw className="size-4" aria-hidden />
         Reintentar
       </Button>
     </main>

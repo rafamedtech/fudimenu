@@ -65,7 +65,7 @@ export function OfflineConflictListener() {
                   className="flex-1"
                   onClick={() => {
                     toast.dismiss(toastId);
-                    router.push(getConflictReviewHref(mutation));
+                    window.location.assign(getConflictReviewHref(mutation));
                   }}
                 >
                   Ver ambos

@@ -15,20 +15,18 @@ interface Props {
 }
 
 export default async function SectionDetailPage({ params }: Props) {
-  const { id } = await params;
-  const ctx = await requireAuth();
+  const [{ id }, ctx] = await Promise.all([params, requireAuth()]);
   const { sections, categories, items } = await menuService.getCachedMenuByTenantId(ctx.tenantId);
 
   const section = sections.find((s) => s.id === id);
   if (!section) notFound();
 
   const sectionCategories = categories.filter((c) => c.sectionId === section.id);
-  const groups = sectionCategories
-    .map((cat) => ({
-      category: cat,
-      items: items.filter((i) => i.categoryId === cat.id),
-    }))
-    .filter((g) => g.items.length > 0);
+  const groups = [];
+  for (const category of sectionCategories) {
+    const categoryItems = items.filter((item) => item.categoryId === category.id);
+    if (categoryItems.length > 0) groups.push({ category, items: categoryItems });
+  }
 
   const hasItems = groups.length > 0;
 
@@ -42,9 +40,9 @@ export default async function SectionDetailPage({ params }: Props) {
             <Link
               href={`/menu/sections/${section.id}/edit`}
               aria-label="Editar sección"
-              className="flex h-12 w-12 items-center justify-center rounded-md text-ink-700 hover:bg-ink-100"
+              className="flex size-12 items-center justify-center rounded-md text-ink-700 hover:bg-ink-100"
             >
-              <Settings2 className="h-5 w-5" aria-hidden />
+              <Settings2 className="size-5" aria-hidden />
             </Link>
             <TenantSwitcher activeTenantId={ctx.tenantId} memberships={ctx.memberships} />
           </div>

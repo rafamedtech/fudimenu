@@ -9,8 +9,10 @@ import { requireAuth } from '@/server/guards/require-auth';
 import { getTenantAnalyticsStats } from '@/server/services/posthog-analytics.service';
 import type { Plan } from '@/types/domain';
 
+const COUNT_FORMATTER = new Intl.NumberFormat('es-MX');
+
 function formatCount(value: number) {
-  return new Intl.NumberFormat('es-MX').format(value);
+  return COUNT_FORMATTER.format(value);
 }
 
 function formatDelta(value: number | null) {
@@ -39,7 +41,7 @@ export default async function AnalyticsPage() {
 async function AnalyticsContent({ plan, tenantId }: { plan: Plan; tenantId: string }) {
   if (plan === 'free') {
     return (
-      <Card className="space-y-5 overflow-hidden border-[1.5px] border-mostaza-500 bg-mostaza-50 shadow-sm ipad:grid ipad:grid-cols-[1fr_220px] ipad:items-center ipad:p-6">
+      <Card className="flex flex-col gap-5 overflow-hidden border-[1.5px] border-mostaza-500 bg-mostaza-50 shadow-sm ipad:grid ipad:grid-cols-[1fr_220px] ipad:items-center ipad:p-6">
         <div>
           <p className="text-sm font-extrabold uppercase text-mostaza-600">Pro</p>
           <h2 className="mt-1 text-2xl font-extrabold text-ink-900 ipad:text-3xl">

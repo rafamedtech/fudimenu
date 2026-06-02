@@ -6,8 +6,6 @@ import {
   getStoredAnalyticsConsent,
 } from './consent';
 
-export { ANALYTICS_CONSENT_KEY, type AnalyticsConsent, getStoredAnalyticsConsent };
-
 type PendingAnalyticsEvent = { name: AnalyticsEvent['name']; props: Record<string, unknown> };
 
 declare global {
@@ -119,14 +117,4 @@ export function track<E extends AnalyticsEvent>(
   if (!isInitialized()) initAnalytics();
   if (!isInitialized()) return;
   posthog.capture(name, props as Record<string, unknown>);
-}
-
-export function identify(userId: string, traits: Record<string, unknown>) {
-  if (!isInitialized()) return;
-  posthog.identify(userId, traits);
-}
-
-export function resetAnalytics() {
-  if (!isInitialized()) return;
-  posthog.reset();
 }

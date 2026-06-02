@@ -20,7 +20,7 @@ export function AppHeader({ title, showBack, right }: AppHeaderProps) {
               type="button"
               onClick={() => router.back()}
               aria-label="Volver"
-              className="flex h-12 w-12 items-center justify-center rounded-md text-ink-700 hover:bg-[var(--brand-primary-faint)]"
+              className="flex size-12 items-center justify-center rounded-md text-ink-700 hover:bg-[var(--brand-primary-faint)]"
             >
               <ChevronLeft size={24} />
             </button>

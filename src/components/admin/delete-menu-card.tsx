@@ -43,7 +43,7 @@ export function DeleteMenuCard({ tenantId, tenantName }: DeleteMenuCardProps) {
   return (
     <Card className="border-[1.5px] border-coral-500 bg-coral-100/30 shadow-sm">
       <div className="flex items-start gap-3">
-        <Trash2 className="mt-0.5 h-6 w-6 text-coral-500" aria-hidden />
+        <Trash2 className="mt-0.5 size-6 text-coral-500" aria-hidden />
         <div className="flex-1">
           <h3 className="font-bold text-ink-900">Eliminar este menú</h3>
           <p className="mt-1 text-sm text-ink-700">
@@ -63,15 +63,15 @@ export function DeleteMenuCard({ tenantId, tenantName }: DeleteMenuCardProps) {
             </Button>
           ) : (
             <div className="mt-3 flex flex-col gap-2">
-              <label className="text-xs font-semibold text-ink-700">
+              <label htmlFor="delete-menu-confirmation" className="text-xs font-semibold text-ink-700">
                 Escribe <code className="rounded bg-ink-100 px-1">{tenantName}</code> para confirmar
               </label>
               <input
                 type="text"
+                id="delete-menu-confirmation"
                 value={confirmText}
                 onChange={(e) => setConfirmText(e.target.value)}
                 className="w-full rounded-md border border-ink-300 bg-[var(--brand-card)] px-3 py-2 text-sm"
-                autoFocus
               />
               <div className="flex gap-2">
                 <Button

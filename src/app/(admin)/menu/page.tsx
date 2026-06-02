@@ -24,10 +24,12 @@ type MockMenuItemOverride = {
 };
 
 export default async function MenuPage({ searchParams }: MenuPageProps) {
-  const { welcome } = await searchParams;
-  const ctx = await requireAuth();
+  const [{ welcome }, ctx, mockItemOverride] = await Promise.all([
+    searchParams,
+    requireAuth(),
+    getMockMenuItemOverride(),
+  ]);
   const showWelcomeBanner = welcome === '1';
-  const mockItemOverride = await getMockMenuItemOverride();
 
   return (
     <>
@@ -102,13 +104,14 @@ async function MenuList({
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1.5 rounded-md border border-[var(--brand-primary-border)] bg-[var(--brand-card)] px-3 py-2 text-sm font-bold text-ink-900 shadow-sm transition-colors hover:border-[var(--brand-primary)] hover:bg-[var(--brand-primary-faint)] ipad:px-4"
         >
-          <ExternalLink className="h-4 w-4" aria-hidden />
+          <ExternalLink className="size-4" aria-hidden />
           Ver menú público
         </Link>
       </div>
 
       {hasSections && (
         <SectionGrid
+          key={sections.map((section) => `${section.id}:${section.sortOrder}`).join('|')}
           sections={sections}
           canCreateSection={canCreateSection}
           itemCountBySectionId={itemCountBySectionId}

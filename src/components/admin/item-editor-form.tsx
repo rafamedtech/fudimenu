@@ -3,9 +3,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Lock, Trash2 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useMemo, useState, useTransition } from 'react';
-import { useForm } from 'react-hook-form';
+import { useRouter } from 'next/navigation';
+import { useEffect, useMemo, useReducer, useRef, useTransition } from 'react';
+import { useForm, type UseFormRegister } from 'react-hook-form';
 import { toast } from 'sonner';
 import { PLAN_CONFIG } from '@/config/plans';
 import { Button } from '@/components/ui/button';
@@ -21,7 +21,7 @@ import {
   keepLocalOfflineMutation,
   type JsonValue,
 } from '@/lib/storage/offline-queue';
-import { cn } from '@/lib/utils';
+import { cn, formatPrice } from '@/lib/utils';
 import { itemSchema, type ItemInput } from '@/lib/validators/item.schema';
 import {
   restoreItemAction,
@@ -38,26 +38,29 @@ interface Props {
   initial: MenuItem | null;
   categories: Category[];
   sectionId?: string | null;
+  offlineConflictId?: number;
 }
 
 const DESCRIPTION_MAX_CHARS = 500;
 const FREE_ITEM_LIMIT = PLAN_CONFIG.free.limits.items ?? 20;
 
-export function ItemEditorForm({ initial, categories, sectionId }: Props) {
+export function ItemEditorForm({ initial, categories, sectionId, offlineConflictId }: Props) {
   const locale = useLocale();
   const t = useTranslations('menu');
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [isStockPending, startStockTransition] = useTransition();
   const [isDeletePending, startDeleteTransition] = useTransition();
   const [isCategoryPending, startCategoryTransition] = useTransition();
-  const [stockAvailable, setStockAvailable] = useState(initial?.isAvailable ?? true);
-  const [conflictDraft, setConflictDraft] = useState<ItemInput | null>(null);
-  const [conflictMutationId, setConflictMutationId] = useState<number | null>(null);
-  const [showCategoryForm, setShowCategoryForm] = useState(false);
-  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-  const [newCategoryName, setNewCategoryName] = useState('');
-  const [localCategories, setLocalCategories] = useState(categories);
+  const [stockAvailable, setStockAvailable] = useReducer((_: boolean, next: boolean) => next, initial?.isAvailable ?? true);
+  const [conflictDraft, setConflictDraft] = useReducer((_: ItemInput | null, next: ItemInput | null) => next, null);
+  const conflictMutationIdRef = useRef<number | null>(null);
+  const [showCategoryForm, setShowCategoryForm] = useReducer((_: boolean, next: boolean) => next, false);
+  const [showUpgradeModal, setShowUpgradeModal] = useReducer((_: boolean, next: boolean) => next, false);
+  const [newCategoryName, setNewCategoryName] = useReducer((_: string, next: string) => next, '');
+  const [localCategories, setLocalCategories] = useReducer(
+    (_: Category[], next: Category[]) => next,
+    categories,
+  );
   const fallbackCategoryId = localCategories[0]?.id ?? null;
   const initialCategoryId =
     initial?.categoryId && localCategories.some((category) => category.id === initial.categoryId)
@@ -112,19 +115,8 @@ export function ItemEditorForm({ initial, categories, sectionId }: Props) {
   );
 
   useEffect(() => {
-    setLocalCategories(categories);
-  }, [categories]);
-
-  useEffect(() => {
-    if (localCategories.length > 0) {
-      setValue('categoryId', localCategories[0].id, { shouldDirty: true, shouldValidate: true });
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [localCategories.length]);
-
-  useEffect(() => {
-    const conflictId = Number(searchParams.get('offlineConflict'));
-    if (!Number.isFinite(conflictId) || conflictId <= 0) return;
+    const conflictId = offlineConflictId;
+    if (typeof conflictId !== 'number' || !Number.isFinite(conflictId) || conflictId <= 0) return;
 
     let isMounted = true;
 
@@ -134,7 +126,7 @@ export function ItemEditorForm({ initial, categories, sectionId }: Props) {
         const payload = mutation.payload;
         if (!isItemInputPayload(payload)) return;
 
-        setConflictMutationId(conflictId);
+        conflictMutationIdRef.current = conflictId;
         setConflictDraft(payload);
       })
       .catch(() => undefined);
@@ -142,7 +134,7 @@ export function ItemEditorForm({ initial, categories, sectionId }: Props) {
     return () => {
       isMounted = false;
     };
-  }, [searchParams]);
+  }, [offlineConflictId]);
 
   async function onSubmit(data: ItemInput) {
     try {
@@ -175,17 +167,16 @@ export function ItemEditorForm({ initial, categories, sectionId }: Props) {
 
   function handleCreateCategory() {
     if (!newCategoryName.trim()) return;
-    const activeSectionId = sectionId ?? searchParams.get('sectionId');
     startCategoryTransition(async () => {
       const res = await upsertCategoryAction({
         name: newCategoryName.trim(),
-        sectionId: activeSectionId ?? null,
+        sectionId: sectionId ?? null,
       });
       if (!res.ok) {
         toast.error('No se pudo crear la categoría');
         return;
       }
-      setLocalCategories((prev) => [...prev, res.category]);
+      setLocalCategories([...localCategories, res.category]);
       setValue('categoryId', res.category.id, { shouldDirty: true, shouldValidate: true });
       toast.success('Categoría creada');
       setShowCategoryForm(false);
@@ -264,311 +255,423 @@ export function ItemEditorForm({ initial, categories, sectionId }: Props) {
 
   return (
     <div className="flex flex-col gap-5 pt-4">
-      <Card className="border border-mostaza-300 bg-mostaza-50 shadow-sm">
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <p className="font-bold text-ink-900">Disponible para clientes</p>
-            <p className="text-xs text-ink-500">
-              {initial?.id
-                ? 'Se actualiza al instante en el menú público'
-                : 'Se aplicará cuando guardes el platillo'}
-            </p>
-          </div>
-          <Toggle
-            checked={stockAvailable}
-            onChange={handleAvailabilityChange}
-            disabled={isStockPending}
-            ariaLabel="Disponible para clientes"
-          />
-        </div>
-      </Card>
+      <StockAvailabilityCard
+        isExistingItem={Boolean(initial?.id)}
+        available={stockAvailable}
+        disabled={isStockPending}
+        onChange={handleAvailabilityChange}
+      />
 
       <form onSubmit={handleSubmit(onSubmit)} className="relative flex flex-col gap-4">
-        <Sheet
-          open={!!conflictDraft}
+        <ConflictReviewSheet
+          open={Boolean(conflictDraft)}
+          rows={conflictRows}
           onOpenChange={(open) => {
             if (!open) setConflictDraft(null);
           }}
-          title="Ver ambos"
-        >
-        <div className="space-y-4">
-          <p className="text-sm leading-6 text-ink-700">
-            Otro usuario guardó una versión nueva mientras estabas offline.
-          </p>
-          <div className="overflow-hidden rounded-md border border-ink-200">
-            <div className="grid grid-cols-3 bg-[var(--brand-surface-strong)] px-3 py-2 text-xs font-bold uppercase text-ink-500">
-              <span>Campo</span>
-              <span>Actual</span>
-              <span>Tus cambios</span>
-            </div>
-            {conflictRows.map((row) => (
-              <div
-                key={row.label}
-                className="grid grid-cols-3 gap-2 border-t border-ink-100 px-3 py-3 text-sm"
-              >
-                <span className="font-semibold text-ink-700">{row.label}</span>
-                <span className="break-words text-ink-600">{row.current}</span>
-                <span className="break-words font-semibold text-ink-900">{row.local}</span>
-              </div>
-            ))}
-          </div>
-          <div className="flex gap-2">
-            <Button
-              type="button"
-              className="flex-1"
-              onClick={() => {
-                if (conflictMutationId) {
-                  void keepLocalOfflineMutation(conflictMutationId);
-                  setConflictDraft(null);
-                  toast.info('Intentando guardar tus cambios');
-                }
-              }}
-            >
-              Mis cambios
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              className="flex-1"
-              onClick={() => setConflictDraft(null)}
-            >
-              Cerrar
-            </Button>
-          </div>
-        </div>
-      </Sheet>
-
-      <ImageUploadField
-        kind="item"
-        label="Foto opcional"
-        value={imageUrl}
-        onChange={(url) => setValue('imageUrl', url, { shouldDirty: true, shouldValidate: true })}
-        fallback={<span className="text-6xl" aria-hidden>{placeholderEmoji}</span>}
-      />
-
-      <Input
-        label="Nombre del platillo"
-        placeholder="Ej: Tacos al pastor"
-        error={errors.name?.message}
-        {...register('name')}
-      />
-
-      <div>
-        <label id="category-label" className="mb-1.5 block text-sm font-medium text-ink-700" htmlFor="categoryId">
-          Categoría
-        </label>
-        {localCategories.length === 0 ? (
-          <div className="flex flex-col gap-2 rounded-md border border-ink-200 bg-[var(--brand-surface)] p-4">
-            <p className="text-sm text-ink-700">Crea categoría primero</p>
-            {!showCategoryForm ? (
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setShowCategoryForm(true)}
-              >
-                Crear categoría
-              </Button>
-            ) : (
-              <div className="flex flex-col gap-3">
-                <Input
-                  label="Nombre de categoría"
-                  value={newCategoryName}
-                  onChange={(e) => setNewCategoryName(e.target.value)}
-                  placeholder="Ej: Tacos"
-                  autoFocus
-                />
-                <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    className="flex-1"
-                    onClick={handleCreateCategory}
-                    loading={isCategoryPending}
-                  >
-                    Guardar
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="flex-1"
-                    onClick={() => {
-                      setShowCategoryForm(false);
-                      setNewCategoryName('');
-                    }}
-                  >
-                    Cancelar
-                  </Button>
-                </div>
-              </div>
-            )}
-          </div>
-        ) : localCategories.length === 1 ? (
-          <div className="flex h-14 items-center rounded-md border-[1.5px] border-ink-300 bg-[var(--brand-surface)] px-4 text-base text-ink-900">
-            {localCategories[0].name}
-          </div>
-        ) : (
-          <>
-            <div
-              role="radiogroup"
-              aria-labelledby="category-label"
-              className="flex flex-wrap gap-2"
-            >
-              {localCategories.map((category) => (
-                <button
-                  key={category.id}
-                  type="button"
-                  role="radio"
-                  aria-checked={selectedCategoryId === category.id}
-                  onClick={() => setValue('categoryId', category.id, { shouldValidate: true })}
-                  className={cn(
-                    'rounded-full border-[1.5px] px-3 py-1.5 text-sm font-medium transition-colors',
-                    selectedCategoryId === category.id
-                      ? 'border-mostaza-500 bg-mostaza-100 text-mostaza-800'
-                      : 'border-ink-300 bg-[var(--brand-card)] text-ink-700 hover:border-mostaza-400 hover:bg-[var(--brand-surface)]',
-                  )}
-                >
-                  {category.name}
-                </button>
-              ))}
-            </div>
-            {errors.categoryId?.message && (
-              <p className="mt-1 text-sm text-red-600">{errors.categoryId.message}</p>
-            )}
-          </>
-        )}
-      </div>
-
-      <Input
-        label="Precio"
-        type="text"
-        prefix="$"
-        inputMode="decimal"
-        placeholder="0"
-        error={errors.priceCents?.message}
-        value={priceDisplayValue}
-        onChange={(e) => handlePriceChange(e.target.value)}
-      />
-
-      <Card className="space-y-3 border border-coral-500/20 bg-coral-50 shadow-sm">
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <p className="font-bold text-ink-900">Especial de hoy</p>
-            <p className="text-xs text-ink-500">Aparece arriba en el menú público.</p>
-          </div>
-          <Toggle
-            checked={isSpecialToday}
-            onChange={(next) => setValue('isSpecialToday', next, { shouldDirty: true })}
-            ariaLabel="Especial de hoy"
-          />
-        </div>
-        {isSpecialToday && (
-          <Input
-            label="Precio especial"
-            type="text"
-            prefix="$"
-            inputMode="decimal"
-            placeholder="Opcional"
-            value={specialPriceDisplayValue}
-            onChange={(event) => handleSpecialPriceChange(event.target.value)}
-          />
-        )}
-      </Card>
-
-      <div>
-        <label className="mb-1.5 block text-sm font-medium text-ink-700">Descripción</label>
-        <textarea
-          {...register('description')}
-          rows={4}
-          maxLength={DESCRIPTION_MAX_CHARS}
-          placeholder="¿Qué lleva? ¿Por qué les va a encantar?"
-          className="w-full rounded-md border-[1.5px] border-ink-300 bg-[var(--brand-card)] p-4 text-base text-ink-900 outline-none placeholder:text-ink-500 focus-within:border-mostaza-500 focus-within:shadow-glow-mostaza"
+          keepLocalChanges={() => {
+            if (!conflictMutationIdRef.current) return;
+            void keepLocalOfflineMutation(conflictMutationIdRef.current);
+            setConflictDraft(null);
+            toast.info('Intentando guardar tus cambios');
+          }}
         />
-        <div className="mt-1 flex justify-end">
-          <span
-            className={cn(
-              'text-xs tabular-nums',
-              isNearDescriptionLimit ? 'font-bold text-coral-500' : 'text-ink-500',
-              charCount === DESCRIPTION_MAX_CHARS && 'text-red-500',
-            )}
-          >
-            {charCount}/{DESCRIPTION_MAX_CHARS}
-          </span>
-        </div>
-      </div>
 
-      <div className="sticky bottom-[88px] mt-4 flex gap-3">
-        {initial?.id && (
-          <Button
-            type="button"
-            variant="destructive"
-            size="lg"
-            aria-label="Eliminar platillo"
-            loading={isDeletePending}
-            onClick={handleDelete}
-          >
-            <Trash2 aria-hidden="true" className="h-5 w-5" />
-          </Button>
-        )}
-        <Button
-          type="button"
-          variant="outline"
-          size="lg"
-          className="flex-1"
-          onClick={() => router.back()}
-        >
-          Cancelar
-        </Button>
-        {!showCategoryForm && (
-          <Button type="submit" size="lg" className="flex-1" loading={isSubmitting}>
-            Guardar
-          </Button>
-        )}
-      </div>
+        <ImageUploadField
+          kind="item"
+          label="Foto opcional"
+          value={imageUrl}
+          onChange={(url) => setValue('imageUrl', url, { shouldDirty: true, shouldValidate: true })}
+          fallback={<span className="text-6xl" aria-hidden>{placeholderEmoji}</span>}
+        />
+
+        <Input
+          label="Nombre del platillo"
+          placeholder="Ej: Tacos al pastor"
+          error={errors.name?.message}
+          {...register('name')}
+        />
+
+        <CategoryPicker
+          categories={localCategories}
+          selectedCategoryId={selectedCategoryId}
+          error={errors.categoryId?.message}
+          showForm={showCategoryForm}
+          setShowForm={setShowCategoryForm}
+          newCategoryName={newCategoryName}
+          setNewCategoryName={setNewCategoryName}
+          createCategory={handleCreateCategory}
+          isPending={isCategoryPending}
+          selectCategory={(categoryId) => setValue('categoryId', categoryId, { shouldValidate: true })}
+        />
+
+        <Input
+          label="Precio"
+          type="text"
+          prefix="$"
+          inputMode="decimal"
+          placeholder="0"
+          error={errors.priceCents?.message}
+          value={priceDisplayValue}
+          onChange={(e) => handlePriceChange(e.target.value)}
+        />
+
+        <SpecialPriceCard
+          isSpecialToday={isSpecialToday}
+          setIsSpecialToday={(next) => setValue('isSpecialToday', next, { shouldDirty: true })}
+          displayValue={specialPriceDisplayValue}
+          handleChange={handleSpecialPriceChange}
+        />
+
+        <DescriptionField
+          register={register}
+          charCount={charCount}
+          isNearLimit={isNearDescriptionLimit}
+        />
+
+        <ItemEditorActions
+          deleteAction={initial?.id ? { pending: isDeletePending, run: handleDelete } : undefined}
+          submitAction={!showCategoryForm ? { pending: isSubmitting } : undefined}
+          cancel={() => router.back()}
+        />
       </form>
 
-      {showUpgradeModal && (
-        <div
-          className="fixed inset-0 z-50 flex items-end bg-ink-900/45 px-4 pb-4 backdrop-blur-sm"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="upgrade-item-limit-title"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setShowUpgradeModal(false);
-          }}
+      {showUpgradeModal && <ItemLimitDialog close={() => setShowUpgradeModal(false)} />}
+    </div>
+  );
+}
+
+function ItemEditorActions({
+  deleteAction,
+  submitAction,
+  cancel,
+}: {
+  deleteAction?: { pending: boolean; run: () => void };
+  submitAction?: { pending: boolean };
+  cancel: () => void;
+}) {
+  return (
+    <div className="sticky bottom-[88px] mt-4 flex gap-3">
+      {deleteAction && (
+        <Button
+          type="button"
+          variant="destructive"
+          size="lg"
+          aria-label="Eliminar platillo"
+          loading={deleteAction.pending}
+          onClick={deleteAction.run}
         >
-          <Card className="w-full space-y-4 rounded-lg border-[1.5px] border-mostaza-500 shadow-xl">
-            <div className="flex items-start gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-mostaza-100 text-ink-900">
-                <Lock className="h-5 w-5" />
-              </div>
-              <div>
-                <h2 id="upgrade-item-limit-title" className="text-lg font-extrabold text-ink-900">
-                  Límite Free alcanzado
-                </h2>
-                <p className="mt-1 text-sm leading-6 text-ink-700">
-                  Tu menú ya tiene {FREE_ITEM_LIMIT} platillos. Sube a Pro para agregar items
-                  ilimitados, quitar la marca FudiMenu y activar analytics.
-                </p>
-              </div>
-            </div>
-            <div className="flex gap-3">
-              <Button
-                type="button"
-                variant="outline"
-                className="flex-1"
-                onClick={() => setShowUpgradeModal(false)}
-              >
-                Ahora no
-              </Button>
-              <Link href="/settings/billing" className="flex-1">
-                <Button type="button" className="w-full">
-                  Upgrade
-                </Button>
-              </Link>
-            </div>
-          </Card>
-        </div>
+          <Trash2 aria-hidden="true" className="size-5" />
+        </Button>
+      )}
+      <Button type="button" variant="outline" size="lg" className="flex-1" onClick={cancel}>
+        Cancelar
+      </Button>
+      {submitAction && (
+        <Button type="submit" size="lg" className="flex-1" loading={submitAction.pending}>
+          Guardar
+        </Button>
       )}
     </div>
+  );
+}
+
+function StockAvailabilityCard({
+  isExistingItem,
+  available,
+  disabled,
+  onChange,
+}: {
+  isExistingItem: boolean;
+  available: boolean;
+  disabled: boolean;
+  onChange: (next: boolean) => void;
+}) {
+  return (
+    <Card className="border border-mostaza-300 bg-mostaza-50 shadow-sm">
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <p className="font-bold text-ink-900">Disponible para clientes</p>
+          <p className="text-xs text-ink-500">
+            {isExistingItem
+              ? 'Se actualiza al instante en el menú público'
+              : 'Se aplicará cuando guardes el platillo'}
+          </p>
+        </div>
+        <Toggle
+          checked={available}
+          onChange={onChange}
+          disabled={disabled}
+          ariaLabel="Disponible para clientes"
+        />
+      </div>
+    </Card>
+  );
+}
+
+function ConflictReviewSheet({
+  open,
+  rows,
+  onOpenChange,
+  keepLocalChanges,
+}: {
+  open: boolean;
+  rows: ReturnType<typeof buildConflictRows>;
+  onOpenChange: (open: boolean) => void;
+  keepLocalChanges: () => void;
+}) {
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange} title="Ver ambos">
+      <div className="space-y-4">
+        <p className="text-sm leading-6 text-ink-700">
+          Otro usuario guardó una versión nueva mientras estabas offline.
+        </p>
+        <div className="overflow-hidden rounded-md border border-ink-200">
+          <div className="grid grid-cols-3 bg-[var(--brand-surface-strong)] px-3 py-2 text-xs font-bold uppercase text-ink-500">
+            <span>Campo</span>
+            <span>Actual</span>
+            <span>Tus cambios</span>
+          </div>
+          {rows.map((row) => (
+            <div
+              key={row.label}
+              className="grid grid-cols-3 gap-2 border-t border-ink-100 p-3 text-sm"
+            >
+              <span className="font-semibold text-ink-700">{row.label}</span>
+              <span className="break-words text-ink-600">{row.current}</span>
+              <span className="break-words font-semibold text-ink-900">{row.local}</span>
+            </div>
+          ))}
+        </div>
+        <div className="flex gap-2">
+          <Button type="button" className="flex-1" onClick={keepLocalChanges}>
+            Mis cambios
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className="flex-1"
+            onClick={() => onOpenChange(false)}
+          >
+            Cerrar
+          </Button>
+        </div>
+      </div>
+    </Sheet>
+  );
+}
+
+function CategoryPicker({
+  categories,
+  selectedCategoryId,
+  error,
+  showForm,
+  setShowForm,
+  newCategoryName,
+  setNewCategoryName,
+  createCategory,
+  isPending,
+  selectCategory,
+}: {
+  categories: Category[];
+  selectedCategoryId?: string | null;
+  error?: string;
+  showForm: boolean;
+  setShowForm: (show: boolean) => void;
+  newCategoryName: string;
+  setNewCategoryName: (name: string) => void;
+  createCategory: () => void;
+  isPending: boolean;
+  selectCategory: (categoryId: string) => void;
+}) {
+  return (
+    <div>
+      <p id="category-label" className="mb-1.5 block text-sm font-medium text-ink-700">
+        Categoría
+      </p>
+      {categories.length === 0 ? (
+        <div className="flex flex-col gap-2 rounded-md border border-ink-200 bg-[var(--brand-surface)] p-4">
+          <p className="text-sm text-ink-700">Crea categoría primero</p>
+          {!showForm ? (
+            <Button type="button" variant="outline" onClick={() => setShowForm(true)}>
+              Crear categoría
+            </Button>
+          ) : (
+            <div className="flex flex-col gap-3">
+              <Input
+                label="Nombre de categoría"
+                value={newCategoryName}
+                onChange={(event) => setNewCategoryName(event.target.value)}
+                placeholder="Ej: Tacos"
+                autoFocus
+              />
+              <div className="flex gap-2">
+                <Button type="button" className="flex-1" onClick={createCategory} loading={isPending}>
+                  Guardar
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => {
+                    setShowForm(false);
+                    setNewCategoryName('');
+                  }}
+                >
+                  Cancelar
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+      ) : categories.length === 1 ? (
+        <div className="flex h-14 items-center rounded-md border-[1.5px] border-ink-300 bg-[var(--brand-surface)] px-4 text-base text-ink-900">
+          {categories[0].name}
+        </div>
+      ) : (
+        <>
+          <div role="radiogroup" aria-labelledby="category-label" className="flex flex-wrap gap-2">
+            {categories.map((category) => (
+              <button
+                key={category.id}
+                type="button"
+                role="radio"
+                aria-checked={selectedCategoryId === category.id}
+                onClick={() => selectCategory(category.id)}
+                className={cn(
+                  'rounded-full border-[1.5px] px-3 py-1.5 text-sm font-medium transition-colors',
+                  selectedCategoryId === category.id
+                    ? 'border-mostaza-500 bg-mostaza-100 text-mostaza-800'
+                    : 'border-ink-300 bg-[var(--brand-card)] text-ink-700 hover:border-mostaza-400 hover:bg-[var(--brand-surface)]',
+                )}
+              >
+                {category.name}
+              </button>
+            ))}
+          </div>
+          {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
+        </>
+      )}
+    </div>
+  );
+}
+
+function SpecialPriceCard({
+  isSpecialToday,
+  setIsSpecialToday,
+  displayValue,
+  handleChange,
+}: {
+  isSpecialToday: boolean;
+  setIsSpecialToday: (isSpecial: boolean) => void;
+  displayValue: string;
+  handleChange: (value: string) => void;
+}) {
+  return (
+    <Card className="space-y-3 border border-coral-500/20 bg-coral-50 shadow-sm">
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <p className="font-bold text-ink-900">Especial de hoy</p>
+          <p className="text-xs text-ink-500">Aparece arriba en el menú público.</p>
+        </div>
+        <Toggle
+          checked={isSpecialToday}
+          onChange={setIsSpecialToday}
+          ariaLabel="Especial de hoy"
+        />
+      </div>
+      {isSpecialToday && (
+        <Input
+          label="Precio especial"
+          type="text"
+          prefix="$"
+          inputMode="decimal"
+          placeholder="Opcional"
+          value={displayValue}
+          onChange={(event) => handleChange(event.target.value)}
+        />
+      )}
+    </Card>
+  );
+}
+
+function DescriptionField({
+  register,
+  charCount,
+  isNearLimit,
+}: {
+  register: UseFormRegister<ItemInput>;
+  charCount: number;
+  isNearLimit: boolean;
+}) {
+  return (
+    <div>
+      <label htmlFor="description" className="mb-1.5 block text-sm font-medium text-ink-700">
+        Descripción
+      </label>
+      <textarea
+        {...register('description')}
+        id="description"
+        rows={4}
+        maxLength={DESCRIPTION_MAX_CHARS}
+        placeholder="¿Qué lleva? ¿Por qué les va a encantar?"
+        className="w-full rounded-md border-[1.5px] border-ink-300 bg-[var(--brand-card)] p-4 text-base text-ink-900 outline-none placeholder:text-ink-500 focus-within:border-mostaza-500 focus-within:shadow-glow-mostaza"
+      />
+      <div className="mt-1 flex justify-end">
+        <span
+          className={cn(
+            'text-xs tabular-nums',
+            isNearLimit ? 'font-bold text-coral-500' : 'text-ink-500',
+            charCount === DESCRIPTION_MAX_CHARS && 'text-red-500',
+          )}
+        >
+          {charCount}/{DESCRIPTION_MAX_CHARS}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function ItemLimitDialog({ close }: { close: () => void }) {
+  return (
+    <dialog
+      ref={(dialog) => {
+        if (dialog && !dialog.open) dialog.showModal();
+      }}
+      className="fixed inset-0 z-50 m-0 flex size-full max-h-none max-w-none items-end bg-transparent px-4 pb-4 backdrop:bg-ink-900/45 backdrop:backdrop-blur-sm"
+      aria-labelledby="upgrade-item-limit-title"
+      onPointerDown={(event) => {
+        if (event.target === event.currentTarget) close();
+      }}
+      onCancel={close}
+    >
+      <Card className="w-full space-y-4 rounded-lg border-[1.5px] border-mostaza-500 shadow-xl">
+        <div className="flex items-start gap-3">
+          <div className="flex size-10 shrink-0 items-center justify-center rounded-md bg-mostaza-100 text-ink-900">
+            <Lock className="size-5" />
+          </div>
+          <div>
+            <h2 id="upgrade-item-limit-title" className="text-lg font-extrabold text-ink-900">
+              Límite Free alcanzado
+            </h2>
+            <p className="mt-1 text-sm leading-6 text-ink-700">
+              Tu menú ya tiene {FREE_ITEM_LIMIT} platillos. Sube a Pro para agregar items ilimitados,
+              quitar la marca FudiMenu y activar analytics.
+            </p>
+          </div>
+        </div>
+        <div className="flex gap-3">
+          <Button type="button" variant="outline" className="flex-1" onClick={close}>
+            Ahora no
+          </Button>
+          <Link href="/settings/billing" className="flex-1">
+            <Button type="button" className="w-full">
+              Upgrade
+            </Button>
+          </Link>
+        </div>
+      </Card>
+    </dialog>
   );
 }
 
@@ -603,8 +706,8 @@ function buildConflictRows(
     },
     {
       label: 'Precio',
-      current: formatPrice(current?.priceCents, current?.currency),
-      local: formatPrice(local?.priceCents, local?.currency),
+      current: formatPrice(current?.priceCents ?? 0, current?.currency),
+      local: formatPrice(local?.priceCents ?? 0, local?.currency),
     },
     {
       label: 'Categoría',
@@ -617,11 +720,4 @@ function buildConflictRows(
       local: local?.description || 'Sin descripción',
     },
   ];
-}
-
-function formatPrice(priceCents?: number, currency = 'MXN') {
-  return new Intl.NumberFormat('es-MX', {
-    style: 'currency',
-    currency,
-  }).format((priceCents ?? 0) / 100);
 }

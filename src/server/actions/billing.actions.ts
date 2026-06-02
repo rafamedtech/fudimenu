@@ -18,14 +18,11 @@ const checkoutSchema = z.object({
   method: z.enum(['card', 'cash']).default('card'),
 });
 
-let stripeClient: Stripe | null = null;
-
 function getStripe() {
   const secretKey = process.env.STRIPE_SECRET_KEY;
   if (!secretKey) throw new Error('missing_stripe_secret_key');
 
-  stripeClient ??= new Stripe(secretKey, { apiVersion: '2025-02-24.acacia' });
-  return stripeClient;
+  return new Stripe(secretKey, { apiVersion: '2025-02-24.acacia' });
 }
 
 function getAppUrl() {

@@ -15,7 +15,9 @@ interface Props {
 
 export function PublicMenuStickyNav({ anchors, ariaLabel }: Props) {
   const [active, setActive] = useState<string | null>(anchors[0]?.id ?? null);
-  const pillRefs = useRef(new Map<string, HTMLAnchorElement>());
+  const pillRefs = useRef<Map<string, HTMLAnchorElement> | null>(null);
+  pillRefs.current ??= new Map<string, HTMLAnchorElement>();
+  const pillElements = pillRefs.current;
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -59,10 +61,10 @@ export function PublicMenuStickyNav({ anchors, ariaLabel }: Props) {
 
   useEffect(() => {
     if (!active) return;
-    const pill = pillRefs.current.get(active);
+    const pill = pillElements.get(active);
     if (!pill) return;
     pill.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-  }, [active]);
+  }, [active, pillElements]);
 
   if (anchors.length === 0) return null;
 
@@ -93,8 +95,8 @@ export function PublicMenuStickyNav({ anchors, ariaLabel }: Props) {
             <a
               key={a.id}
               ref={(node) => {
-                if (node) pillRefs.current.set(a.id, node);
-                else pillRefs.current.delete(a.id);
+                if (node) pillElements.set(a.id, node);
+                else pillElements.delete(a.id);
               }}
               href={`#${a.id}`}
               aria-current={isActive ? 'true' : undefined}

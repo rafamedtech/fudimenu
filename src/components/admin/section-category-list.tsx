@@ -18,7 +18,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
-import { useMemo, useState, useTransition } from 'react';
+import { useMemo, useReducer, useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { StockToggle } from '@/components/admin/stock-toggle';
 import { Button } from '@/components/ui/button';
@@ -38,7 +38,7 @@ export function SectionCategoryList({
   sectionId: string;
   groups: SectionCategoryGroup[];
 }) {
-  const [items, setItems] = useState(groups);
+  const [items, setItems] = useReducer((_: SectionCategoryGroup[], next: SectionCategoryGroup[]) => next, groups);
   const [reorderMode, setReorderMode] = useState(false);
   const [isPending, startTransition] = useTransition();
   const sensors = useSensors(
@@ -81,7 +81,7 @@ export function SectionCategoryList({
             disabled={isPending}
             onClick={() => setReorderMode((value) => !value)}
           >
-            <GripVertical className="h-4 w-4" aria-hidden />
+            <GripVertical className="size-4" aria-hidden />
             Reordenar
           </Button>
         </div>
@@ -136,12 +136,12 @@ function SortableCategoryGroup({
           {reorderMode && (
             <button
               type="button"
-              className="flex h-10 w-10 items-center justify-center rounded-md bg-[var(--brand-card)] text-ink-700 shadow-sm"
+              className="flex size-10 items-center justify-center rounded-md bg-[var(--brand-card)] text-ink-700 shadow-sm"
               aria-label={`Mover ${group.category.name}`}
               {...attributes}
               {...listeners}
             >
-              <GripVertical className="h-5 w-5" aria-hidden />
+              <GripVertical className="size-5" aria-hidden />
             </button>
           )}
           <h2 className="text-lg font-bold text-ink-900">{group.category.name}</h2>

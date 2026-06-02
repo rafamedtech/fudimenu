@@ -21,7 +21,7 @@ export function TenantSwitcher({ activeTenantId, memberships }: TenantSwitcherPr
 
   if (memberships.length < 2 && !canAddMenu) return null;
 
-  function handleChange(event: React.ChangeEvent<HTMLSelectElement>) {
+  function switchTenant(event: React.ChangeEvent<HTMLSelectElement>) {
     const value = event.target.value;
     if (value === activeTenantId) return;
 
@@ -44,7 +44,7 @@ export function TenantSwitcher({ activeTenantId, memberships }: TenantSwitcherPr
       />
       <select
         value={activeTenantId}
-        onChange={handleChange}
+        onChange={switchTenant}
         disabled={isPending}
         className="h-9 max-w-[8.5rem] appearance-none rounded-md border border-ink-100 bg-[var(--brand-card)] py-1 pl-7 pr-2 text-xs font-semibold text-ink-800 shadow-sm outline-none focus:border-mostaza-500 focus:ring-2 focus:ring-mostaza-100 disabled:opacity-60"
         aria-label="Menú activo"

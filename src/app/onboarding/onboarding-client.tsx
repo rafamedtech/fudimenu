@@ -1,7 +1,7 @@
 'use client';
-import { useState } from 'react';
+import { useReducer, useRef } from 'react';
 import Image from 'next/image';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { ArrowRight, Check, ChevronLeft, Utensils } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -39,20 +39,25 @@ function splitCuisineLabel(label: string) {
   return { emoji, name: rest.join(' ') };
 }
 
-export function OnboardingClient() {
+export function OnboardingClient({ isAddingMenu }: { isAddingMenu: boolean }) {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const isAddingMenu = searchParams.get('new') === '1';
-  const [name, setName] = useState('');
-  const [cuisine, setCuisine] = useState<string>('');
-  const [otherCuisine, setOtherCuisine] = useState('');
-  const [itemName, setItemName] = useState('');
-  const [priceCents, setPriceCents] = useState<number>(0);
-  const [isDishOpen, setIsDishOpen] = useState(true);
-  const [loading, setLoading] = useState(false);
-  const [creatingSecondTenant, setCreatingSecondTenant] = useState(false);
-  const [existingTenant, setExistingTenant] = useState<{ tenantId: string; slug: string } | null>(null);
-  const [lastPayload, setLastPayload] = useState<OnboardingPayload | null>(null);
+  const [name, setName] = useReducer((_: string, next: string) => next, '');
+  const [cuisine, setCuisine] = useReducer((_: string, next: string) => next, '');
+  const [otherCuisine, setOtherCuisine] = useReducer((_: string, next: string) => next, '');
+  const [itemName, setItemName] = useReducer((_: string, next: string) => next, '');
+  const [priceCents, setPriceCents] = useReducer((_: number, next: number) => next, 0);
+  const [isDishOpen, setIsDishOpen] = useReducer(
+    (current: boolean, next: boolean | ((value: boolean) => boolean)) =>
+      typeof next === 'function' ? next(current) : next,
+    true,
+  );
+  const [loading, setLoading] = useReducer((_: boolean, next: boolean) => next, false);
+  const [creatingSecondTenant, setCreatingSecondTenant] = useReducer((_: boolean, next: boolean) => next, false);
+  const [existingTenant, setExistingTenant] = useReducer(
+    (_: { tenantId: string; slug: string } | null, next: { tenantId: string; slug: string } | null) => next,
+    null,
+  );
+  const lastPayloadRef = useRef<OnboardingPayload | null>(null);
   const { displayValue: priceDisplayValue, handleChange: handlePriceChange } = usePriceInput(
     0,
     setPriceCents,
@@ -90,7 +95,7 @@ export function OnboardingClient() {
     setLoading(true);
     try {
       const payload = buildPayload();
-      setLastPayload(payload);
+      lastPayloadRef.current = payload;
 
       if (isAddingMenu) {
         try {
@@ -128,7 +133,7 @@ export function OnboardingClient() {
   }
 
   async function createAnotherRestaurant() {
-    const payload = lastPayload ?? buildPayload();
+    const payload = lastPayloadRef.current ?? buildPayload();
     setCreatingSecondTenant(true);
     try {
       const res = await createSecondTenantAction(payload);
@@ -154,7 +159,7 @@ export function OnboardingClient() {
               aria-label="Volver"
               className="text-ink-500 hover:text-ink-900"
             >
-              <ChevronLeft className="h-6 w-6" />
+              <ChevronLeft className="size-6" />
             </Button>
             <span className="font-heading text-sm font-bold">Paso 2 de 3</span>
           </div>
@@ -175,7 +180,7 @@ export function OnboardingClient() {
             width={128}
             height={128}
             priority
-            className="h-24 w-24 shrink-0 object-contain ipad:h-32 ipad:w-32"
+            className="size-24 shrink-0 object-contain ipad:h-32 ipad:w-32"
           />
           <div className="space-y-1">
             <h1 className="font-heading text-2xl font-bold leading-tight text-ink-900">
@@ -195,7 +200,7 @@ export function OnboardingClient() {
         <Card className="flex items-center justify-between rounded-2xl border-[1.5px] border-[var(--brand-card-border)] p-5 opacity-90 shadow-sm">
           <div className="flex min-w-0 flex-1 items-center gap-4">
             <div className="shrink-0 rounded-full bg-menta-100 p-2 text-menta-600">
-              <Check className="h-5 w-5" aria-hidden="true" />
+              <Check className="size-5" aria-hidden="true" />
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-[10px] font-bold uppercase tracking-wider text-ink-500">
@@ -276,7 +281,7 @@ export function OnboardingClient() {
             aria-expanded={isDishOpen}
             className="w-full rounded-2xl border-[1.5px] border-dashed border-[var(--brand-card-border)] bg-ink-100/30 p-6 text-center transition-colors hover:bg-ink-100/50"
           >
-            <Utensils className="mx-auto h-8 w-8 text-ink-500" aria-hidden="true" />
+            <Utensils className="mx-auto size-8 text-ink-500" aria-hidden="true" />
             <p className="mt-2 font-bold text-ink-500">Paso 3: Tu primer platillo</p>
             <p className="mt-1 text-xs text-ink-500/70">
               Agregaremos un ítem para que veas cómo queda.
@@ -317,41 +322,64 @@ export function OnboardingClient() {
           </Button>
           <Button size="xl" className="flex-1 rounded-2xl font-bold shadow-lg" disabled={!canSubmit} loading={loading} onClick={finish}>
             {isAddingMenu ? 'Crear nuevo menú' : 'Siguiente paso'}
-            {!loading && <ArrowRight className="h-5 w-5" />}
+            {!loading && <ArrowRight className="size-5" />}
           </Button>
         </div>
       </footer>
 
       {existingTenant && (
-        <div
-          className="fixed inset-0 z-50 flex items-end bg-ink-900/40 px-4 py-6 sm:items-center sm:justify-center"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="existing-tenant-title"
-        >
-          <div className="w-full max-w-sm rounded-md bg-[var(--brand-card)] p-6 shadow-xl">
-            <h2 id="existing-tenant-title" className="text-2xl font-extrabold text-ink-900">
-              Ya tienes este restaurante: {existingTenant.slug}
-            </h2>
-            <p className="mt-2 text-sm text-ink-500">
-              Puedes ir al panel actual o crear otro restaurante con estos datos.
-            </p>
-            <div className="mt-5 flex flex-col gap-3">
-              <Button size="lg" onClick={() => router.push('/dashboard')}>
-                Ir al panel
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                loading={creatingSecondTenant}
-                onClick={createAnotherRestaurant}
-              >
-                Crear otro restaurante
-              </Button>
-            </div>
-          </div>
-        </div>
+        <ExistingTenantDialog
+          slug={existingTenant.slug}
+          creatingSecondTenant={creatingSecondTenant}
+          openDashboard={() => router.push('/dashboard')}
+          createAnotherRestaurant={createAnotherRestaurant}
+        />
       )}
     </main>
+  );
+}
+
+function ExistingTenantDialog({
+  slug,
+  creatingSecondTenant,
+  openDashboard,
+  createAnotherRestaurant,
+}: {
+  slug: string;
+  creatingSecondTenant: boolean;
+  openDashboard: () => void;
+  createAnotherRestaurant: () => void;
+}) {
+  return (
+    <dialog
+      ref={(dialog) => {
+        if (dialog && !dialog.open) dialog.showModal();
+      }}
+      className="fixed inset-0 z-50 m-0 flex size-full max-h-none max-w-none items-end bg-transparent px-4 py-6 sm:items-center sm:justify-center backdrop:bg-ink-900/40"
+      aria-labelledby="existing-tenant-title"
+      onCancel={(event) => event.preventDefault()}
+    >
+      <div className="w-full max-w-sm rounded-md bg-[var(--brand-card)] p-6 shadow-xl">
+        <h2 id="existing-tenant-title" className="text-2xl font-extrabold text-ink-900">
+          Ya tienes este restaurante: {slug}
+        </h2>
+        <p className="mt-2 text-sm text-ink-500">
+          Puedes ir al panel actual o crear otro restaurante con estos datos.
+        </p>
+        <div className="mt-5 flex flex-col gap-3">
+          <Button size="lg" onClick={openDashboard}>
+            Ir al panel
+          </Button>
+          <Button
+            variant="outline"
+            size="lg"
+            loading={creatingSecondTenant}
+            onClick={createAnotherRestaurant}
+          >
+            Crear otro restaurante
+          </Button>
+        </div>
+      </div>
+    </dialog>
   );
 }

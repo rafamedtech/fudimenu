@@ -110,7 +110,7 @@ export default async function SettingsPage() {
   const tabs: SettingsTab[] = SECTIONS.map((section) => ({
     id: section.id,
     label: section.title,
-    icon: <section.icon className="h-4 w-4" strokeWidth={2.25} />,
+    icon: <section.icon className="size-4" strokeWidth={2.25} />,
     panel: (
       <section aria-labelledby={`section-${section.id}`}>
         <SectionHeader
@@ -131,7 +131,7 @@ export default async function SettingsPage() {
   tabs.push({
     id: 'pro',
     label: 'Más herramientas',
-    icon: <Sparkles className="h-4 w-4" strokeWidth={2.25} />,
+    icon: <Sparkles className="size-4" strokeWidth={2.25} />,
     panel: (
       <section aria-labelledby="section-pro">
         <SectionHeader
@@ -168,8 +168,8 @@ export default async function SettingsPage() {
             </>
           ) : (
             <Card className="flex items-center gap-4 opacity-90 ipad:min-h-24 ipad:p-5">
-              <span className="inline-flex h-11 w-11 items-center justify-center rounded-lg bg-[var(--brand-surface-strong)] text-ink-500">
-                <Building2 className="h-5 w-5" />
+              <span className="inline-flex size-11 items-center justify-center rounded-lg bg-[var(--brand-surface-strong)] text-ink-500">
+                <Building2 className="size-5" />
               </span>
               <div className="flex-1">
                 <p className="font-semibold text-ink-900">Sucursales</p>
@@ -191,7 +191,7 @@ export default async function SettingsPage() {
     tabs.push({
       id: 'danger',
       label: 'Eliminar menú',
-      icon: <Trash2 className="h-4 w-4" strokeWidth={2.25} />,
+      icon: <Trash2 className="size-4" strokeWidth={2.25} />,
       panel: (
         <section aria-labelledby="section-danger">
           <SectionHeader
@@ -260,8 +260,8 @@ function SettingsRow({ href, label, description, icon: Icon }: SettingLink) {
   return (
     <Link href={href} className="group block">
       <Card className="flex items-center gap-4 transition-colors group-hover:border-mostaza-300 ipad:min-h-24 ipad:p-5">
-        <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-mostaza-50 text-mostaza-700 transition-colors group-hover:bg-white group-hover:ring-1 group-hover:ring-mostaza-300">
-          <Icon className="h-5 w-5" strokeWidth={2.25} />
+        <span className="inline-flex size-11 shrink-0 items-center justify-center rounded-lg bg-mostaza-50 text-mostaza-700 transition-colors group-hover:bg-white group-hover:ring-1 group-hover:ring-mostaza-300">
+          <Icon className="size-5" strokeWidth={2.25} />
         </span>
         <div className="min-w-0 flex-1">
           <p className="font-semibold text-ink-900">{label}</p>
@@ -287,8 +287,8 @@ function ProRow({
 }) {
   return (
     <Card className="flex items-center gap-4 border-[1.5px] border-mostaza-500 bg-mostaza-50 shadow-sm ipad:min-h-24 ipad:p-5">
-      <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-white text-mostaza-700 ring-1 ring-mostaza-300">
-        <Icon className="h-5 w-5" strokeWidth={2.25} />
+      <span className="inline-flex size-11 shrink-0 items-center justify-center rounded-lg bg-white text-mostaza-700 ring-1 ring-mostaza-300">
+        <Icon className="size-5" strokeWidth={2.25} />
       </span>
       <div className="min-w-0 flex-1">
         <p className="font-semibold text-ink-900">{label}</p>

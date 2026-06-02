@@ -74,9 +74,9 @@ export default function LandingPage() {
           <div className="grid items-center gap-12 ipad-landscape:grid-cols-2 ipad-landscape:gap-8">
             <div className="mx-auto flex max-w-2xl flex-col items-center text-center ipad-landscape:mx-0 ipad-landscape:items-start ipad-landscape:text-left">
               <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-[var(--brand-primary-soft)] px-3 py-1 text-sm font-semibold text-[var(--brand-accent-text)]">
-                <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-menta-500 opacity-75" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-menta-500" />
+                <span className="relative flex size-2">
+                  <span className="absolute inline-flex size-full animate-ping rounded-full bg-menta-500 opacity-75" />
+                  <span className="relative inline-flex size-2 rounded-full bg-menta-500" />
                 </span>
                 Nuevo: Soporte multi-sucursal
               </div>
@@ -101,13 +101,13 @@ export default function LandingPage() {
                   href="/m/brunette-demo"
                   className="inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-md border-[1.5px] border-[var(--brand-card-border)] bg-[var(--brand-card)] px-8 text-base font-semibold text-ink-900 shadow-sm transition-all hover:bg-[var(--brand-surface-strong)] active:scale-95 sm:w-auto"
                 >
-                  <Smartphone className="h-5 w-5 text-ink-500" aria-hidden="true" />
+                  <Smartphone className="size-5 text-ink-500" aria-hidden="true" />
                   Ver demo
                 </Link>
               </div>
 
               <div className="mt-8 flex items-center gap-4 text-sm text-ink-500">
-                <div className="flex -space-x-2">
+                <div className="flex">
                   {faces.map((src) => (
                     <Image
                       key={src}
@@ -115,7 +115,7 @@ export default function LandingPage() {
                       alt=""
                       width={32}
                       height={32}
-                      className="h-8 w-8 rounded-full object-cover ring-2 ring-[var(--brand-surface)]"
+                      className="-ml-2 size-8 rounded-full object-cover ring-2 ring-[var(--brand-surface)] first:ml-0"
                     />
                   ))}
                 </div>
@@ -124,7 +124,7 @@ export default function LandingPage() {
             </div>
 
             <div id="demo" className="relative mx-auto flex w-full max-w-lg justify-center ipad-landscape:max-w-none ipad-landscape:justify-end">
-              <div className="absolute inset-0 -z-10 m-auto h-[80%] w-[80%] rounded-full bg-[var(--brand-primary-faint)] blur-3xl" />
+              <div className="absolute inset-0 -z-10 m-auto size-[80%] rounded-full bg-[var(--brand-primary-faint)] blur-3xl" />
               <Image
                 src={heroImage}
                 alt="Ilustración de platillo, celular y QR"
@@ -136,7 +136,7 @@ export default function LandingPage() {
 
               <div className="absolute left-0 top-8 flex animate-[bounce_3s_infinite] items-center gap-3 rounded-lg border-2 border-[var(--brand-card-border)] bg-[var(--brand-card)] p-3 shadow-xl sm:-left-6 ipad:top-12">
                 <div className="rounded-md bg-menta-100 p-2 text-menta-600">
-                  <Check className="h-5 w-5" aria-hidden="true" />
+                  <Check className="size-5" aria-hidden="true" />
                 </div>
                 <div>
                   <p className="text-xs font-black">¡Menú actualizado!</p>
@@ -146,7 +146,7 @@ export default function LandingPage() {
 
               <div className="absolute bottom-6 right-0 flex animate-[bounce_3.5s_infinite] items-center gap-3 rounded-lg border-2 border-[var(--brand-card-border)] bg-[var(--brand-card)] p-3 shadow-xl sm:-right-4 ipad:bottom-10">
                 <div className="rounded-md bg-coral-100 p-2 text-coral-500">
-                  <AlertCircle className="h-5 w-5" aria-hidden="true" />
+                  <AlertCircle className="size-5" aria-hidden="true" />
                 </div>
                 <div>
                   <p className="text-xs font-black text-ink-500 line-through">Flan agotado</p>
@@ -162,8 +162,8 @@ export default function LandingPage() {
             <div className="grid grid-cols-1 gap-8 ipad:grid-cols-3">
               {benefits.map(({ title, description, Icon }) => (
                 <div key={title} className="flex flex-col items-center p-6 text-center">
-                  <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-lg bg-[var(--brand-primary-soft)] text-[var(--brand-accent-text)]">
-                    <Icon className="h-7 w-7" aria-hidden="true" />
+                  <div className="mb-4 flex size-14 items-center justify-center rounded-lg bg-[var(--brand-primary-soft)] text-[var(--brand-accent-text)]">
+                    <Icon className="size-7" aria-hidden="true" />
                   </div>
                   <h2 className="font-heading mb-2 text-xl font-black">{title}</h2>
                   <p className="leading-7 text-ink-500">{description}</p>

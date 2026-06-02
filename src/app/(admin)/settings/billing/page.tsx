@@ -24,7 +24,7 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
         {checkout === 'success' && (
           <Card className="border border-menta-500/40 bg-menta-50 shadow-sm ipad:p-5">
             <div className="flex gap-3">
-              <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-menta-700" />
+              <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-menta-700" />
               <div className="space-y-1">
                 <h2 className="font-bold text-ink-900">Pago iniciado</h2>
                 <p className="text-sm text-ink-700">
@@ -44,7 +44,7 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
         {checkout === 'cancelled' && (
           <Card className="border border-coral-500/40 bg-coral-50 shadow-sm ipad:p-5">
             <div className="flex gap-3">
-              <XCircle className="mt-0.5 h-5 w-5 shrink-0 text-coral-600" />
+              <XCircle className="mt-0.5 size-5 shrink-0 text-coral-600" />
               <p className="text-sm text-ink-700">Pago cancelado. Puedes intentarlo de nuevo.</p>
             </div>
           </Card>

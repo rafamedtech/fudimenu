@@ -20,8 +20,8 @@ export default async function BrandSettingsPage({ searchParams }: BrandSettingsP
       <main className="mx-auto w-full max-w-6xl px-4 pb-16 ipad:px-6 ipad-landscape:px-7 desktop:px-8">
         <div className="flex flex-col gap-6 ipad:gap-8">
           <header className="flex items-start gap-3">
-            <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-mostaza-50 text-mostaza-700">
-              <Palette className="h-5 w-5" strokeWidth={2.25} />
+            <span className="inline-flex size-11 shrink-0 items-center justify-center rounded-lg bg-mostaza-50 text-mostaza-700">
+              <Palette className="size-5" strokeWidth={2.25} />
             </span>
             <div>
               <p className="text-[11px] font-black uppercase tracking-wider text-ink-500">
@@ -38,13 +38,13 @@ export default async function BrandSettingsPage({ searchParams }: BrandSettingsP
 
           {saved === '1' && (
             <Card className="flex items-center gap-3 border border-menta-500/40 bg-menta-100 shadow-sm">
-              <CheckCircle2 className="h-5 w-5 text-ink-700" />
+              <CheckCircle2 className="size-5 text-ink-700" />
               <span className="text-sm font-semibold text-ink-800">Ajustes actualizados</span>
             </Card>
           )}
           {slugTaken && (
             <Card className="border border-red-200 bg-red-50 text-sm font-semibold text-red-700 shadow-sm">
-              Slug tomado — prueba: {slugTaken}
+              Slug tomado. Prueba: {slugTaken}
             </Card>
           )}
 

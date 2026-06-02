@@ -12,12 +12,11 @@ import { menuService } from '@/server/services/menu.service';
 
 interface Props {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ sectionId?: string }>;
+  searchParams: Promise<{ sectionId?: string; offlineConflict?: string }>;
 }
 
 export default async function ItemEditPage({ params, searchParams }: Props) {
-  const [{ id }, { sectionId }] = await Promise.all([params, searchParams]);
-  const ctx = await requireAuth();
+  const [{ id }, { sectionId, offlineConflict }, ctx] = await Promise.all([params, searchParams, requireAuth()]);
   const { tenant, categories, items } = await menuService.getCachedMenuByTenantId(ctx.tenantId);
   const item = items.find((i) => i.id === id);
   const freeItemLimit = PLAN_CONFIG.free.limits.items ?? 20;
@@ -35,8 +34,8 @@ export default async function ItemEditPage({ params, searchParams }: Props) {
         <main className="flex-1 px-4 pt-4">
           <Card className="space-y-4 border-[1.5px] border-mostaza-500 shadow-xl">
             <div className="flex items-start gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-mostaza-100 text-ink-900">
-                <Lock className="h-5 w-5" />
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-md bg-mostaza-100 text-ink-900">
+                <Lock className="size-5" />
               </div>
               <div>
                 <p className="text-sm font-extrabold uppercase text-mostaza-600">Plan Free</p>
@@ -83,6 +82,7 @@ export default async function ItemEditPage({ params, searchParams }: Props) {
           initial={item ?? null}
           categories={filteredCategories}
           sectionId={sectionId ?? null}
+          offlineConflictId={Number(offlineConflict)}
         />
       </main>
     </>

@@ -74,13 +74,7 @@ export function SectionEditorForm({ initial, nextSortOrder = 0 }: SectionEditorF
   }
 
   return (
-    <form
-      className="space-y-5 pt-4"
-      onSubmit={(event) => {
-        event.preventDefault();
-        handleSave();
-      }}
-    >
+    <form className="space-y-5 pt-4" action={handleSave}>
       <Card
         className="relative aspect-[4/5] overflow-hidden p-0 shadow-sm"
         style={{ backgroundColor: resolveBrandSurfaceColor(accentColor) }}
@@ -153,7 +147,7 @@ export function SectionEditorForm({ initial, nextSortOrder = 0 }: SectionEditorF
             loading={isDeleting}
             onClick={handleDelete}
           >
-            <Trash2 className="h-5 w-5" aria-hidden />
+            <Trash2 className="size-5" aria-hidden />
           </Button>
         )}
         <Button type="button" variant="outline" size="lg" className="flex-1" onClick={() => router.back()}>

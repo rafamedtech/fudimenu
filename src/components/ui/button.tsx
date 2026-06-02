@@ -1,5 +1,4 @@
 import { cva, type VariantProps } from 'class-variance-authority';
-import { forwardRef } from 'react';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
@@ -23,7 +22,7 @@ const buttonVariants = cva(
         md: 'h-11 px-5 text-sm',
         lg: 'h-12 px-6 text-base',
         xl: 'h-14 px-8 text-base',
-        icon: 'h-11 w-11 p-0',
+        icon: 'size-11 p-0',
       },
     },
     defaultVariants: {
@@ -34,31 +33,38 @@ const buttonVariants = cva(
 );
 
 export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+  extends React.ComponentPropsWithRef<'button'>,
     VariantProps<typeof buttonVariants> {
   loading?: boolean;
 }
 
-export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, loading, disabled, children, ...props }, ref) => {
-    return (
-      <button
-        ref={ref}
-        className={cn(buttonVariants({ variant, size }), className)}
-        disabled={disabled || loading}
-        {...props}
-      >
-        {loading ? <Spinner /> : children}
-      </button>
-    );
-  },
-);
-Button.displayName = 'Button';
+export function Button({
+  className,
+  variant,
+  size,
+  loading,
+  disabled,
+  children,
+  ref,
+  ...props
+}: ButtonProps) {
+  return (
+    <button
+      ref={ref}
+      type="button"
+      className={cn(buttonVariants({ variant, size }), className)}
+      disabled={disabled || loading}
+      {...props}
+    >
+      {loading ? <Spinner /> : children}
+    </button>
+  );
+}
 
 function Spinner() {
   return (
     <span
-      className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"
+      className="inline-block size-4 animate-spin rounded-full border-2 border-current border-t-transparent"
       aria-hidden
     />
   );

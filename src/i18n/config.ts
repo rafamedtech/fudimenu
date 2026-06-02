@@ -1,13 +1,13 @@
 import { defineRouting } from 'next-intl/routing';
 
-export const locales = ['es', 'en'] as const;
+const locales = ['es', 'en'] as const;
 export type AppLocale = (typeof locales)[number];
 
 export const defaultLocale: AppLocale = 'es';
 export const localeCookieName = 'NEXT_LOCALE';
 export const localeQueryParam = 'lang';
 
-export const routing = defineRouting({
+const routing = defineRouting({
   locales,
   defaultLocale,
   localePrefix: 'never',
@@ -20,7 +20,7 @@ export const routing = defineRouting({
   alternateLinks: false,
 });
 
-export function isAppLocale(value: string | null | undefined): value is AppLocale {
+function isAppLocale(value: string | null | undefined): value is AppLocale {
   return locales.includes(value as AppLocale);
 }
 
