@@ -17,7 +17,7 @@ export function AdminProviders({ children }: { children: React.ReactNode }) {
         position="top-center"
         toastOptions={{
           style: {
-            background: '#FFFCF5',
+            background: 'var(--brand-surface)',
             color: '#1A1611',
             border: '1px solid #EDE7DB',
             borderRadius: '14px',
