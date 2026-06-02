@@ -7,7 +7,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         primary:
-          'bg-[var(--brand-primary)] text-[var(--brand-on-primary)] hover:bg-[var(--brand-primary-hover)] shadow-[0_6px_14px_rgba(244,180,0,0.24)] hover:shadow-[0_8px_20px_rgba(244,180,0,0.32)]',
+          'bg-[var(--brand-primary)] text-[var(--brand-on-primary)] hover:bg-[var(--brand-primary-hover)] shadow-mostaza-sm hover:shadow-mostaza-md',
         secondary: 'bg-[var(--brand-primary-soft)] text-[var(--brand-accent-text)] hover:bg-[var(--brand-primary-muted)]',
         ghost: 'bg-transparent text-ink-700 hover:bg-[var(--brand-primary-faint)]',
         outline:
@@ -15,7 +15,7 @@ const buttonVariants = cva(
         destructive: 'bg-red-500 text-white hover:bg-red-600 shadow-md',
         success: 'bg-menta-500 text-ink-900 hover:opacity-90 shadow-md',
         premium:
-          'bg-[linear-gradient(135deg,var(--brand-primary),var(--brand-primary-hover))] text-[var(--brand-on-primary)] hover:opacity-95 shadow-[0_6px_14px_rgba(244,180,0,0.28)]',
+          'bg-[linear-gradient(135deg,var(--brand-primary),var(--brand-primary-hover))] text-[var(--brand-on-primary)] hover:opacity-95 shadow-mostaza-premium',
       },
       size: {
         sm: 'h-10 px-4 text-sm',
@@ -54,6 +54,7 @@ export function Button({
       type="button"
       className={cn(buttonVariants({ variant, size }), className)}
       disabled={disabled || loading}
+      aria-busy={loading || undefined}
       {...props}
     >
       {loading ? <Spinner /> : children}
