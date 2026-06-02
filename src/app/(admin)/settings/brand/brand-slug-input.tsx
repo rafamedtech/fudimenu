@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useReducer, useState } from 'react';
 import { Link2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 
@@ -16,14 +16,28 @@ type BrandSlugInputProps = {
 };
 
 export function BrandSlugInput({ currentSlug }: BrandSlugInputProps) {
-  const [slug, setSlug] = useState(currentSlug);
+  const [slug, setSlug] = useReducer((_: string, next: string) => next, currentSlug);
   const [checkState, setCheckState] = useState<SlugCheckState>(
     currentSlug ? { status: 'available', suggestion: currentSlug } : { status: 'idle' },
   );
-
-  const trimmedSlug = useMemo(() => slug.trim(), [slug]);
+  const pending = useMemo<{ timer: number | null; controller: AbortController | null }>(
+    () => ({ timer: null, controller: null }),
+    [],
+  );
 
   useEffect(() => {
+    return () => {
+      pending.controller?.abort();
+      if (pending.timer !== null) window.clearTimeout(pending.timer);
+    };
+  }, [pending]);
+
+  function updateSlug(nextSlug: string) {
+    setSlug(nextSlug);
+    pending.controller?.abort();
+    if (pending.timer !== null) window.clearTimeout(pending.timer);
+
+    const trimmedSlug = nextSlug.trim();
     if (!trimmedSlug) {
       setCheckState({ status: 'idle' });
       return;
@@ -35,7 +49,8 @@ export function BrandSlugInput({ currentSlug }: BrandSlugInputProps) {
     }
 
     const controller = new AbortController();
-    const timer = window.setTimeout(async () => {
+    pending.controller = controller;
+    pending.timer = window.setTimeout(async () => {
       setCheckState({ status: 'checking' });
 
       try {
@@ -59,12 +74,7 @@ export function BrandSlugInput({ currentSlug }: BrandSlugInputProps) {
         setCheckState({ status: 'error' });
       }
     }, 400);
-
-    return () => {
-      controller.abort();
-      window.clearTimeout(timer);
-    };
-  }, [currentSlug, trimmedSlug]);
+  }
 
   const hint =
     checkState.status === 'checking'
@@ -72,7 +82,7 @@ export function BrandSlugInput({ currentSlug }: BrandSlugInputProps) {
       : checkState.status === 'available'
         ? '✓ Disponible'
         : checkState.status === 'taken'
-          ? `✗ Tomado — prueba: ${checkState.suggestion}`
+          ? `✗ Tomado. Prueba: ${checkState.suggestion}`
           : checkState.status === 'error'
             ? 'No se pudo revisar el slug ahora.'
             : 'URL publica del menu.';
@@ -90,10 +100,10 @@ export function BrandSlugInput({ currentSlug }: BrandSlugInputProps) {
         name="slug"
         label="Slug publico"
         value={slug}
-        onChange={(event) => setSlug(event.target.value)}
+        onChange={(event) => updateSlug(event.target.value)}
         maxLength={48}
         autoComplete="off"
-        prefix={<Link2 className="h-4 w-4" />}
+        prefix={<Link2 className="size-4" />}
       />
       <p className={hintClassName} aria-live="polite">
         {hint}

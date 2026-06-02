@@ -78,11 +78,11 @@ async function QrPageContent({
           <Card className="relative overflow-hidden border-[1.5px] border-mostaza-500 bg-mostaza-50 shadow-sm ipad:p-7 ipad-landscape:p-8">
             <div
               aria-hidden
-              className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-mostaza-500/15 blur-2xl"
+              className="pointer-events-none absolute -right-16 -top-16 size-56 rounded-full bg-mostaza-500/15 blur-2xl"
             />
             <div
               aria-hidden
-              className="pointer-events-none absolute -bottom-20 -left-12 h-48 w-48 rounded-full bg-coral-500/10 blur-2xl"
+              className="pointer-events-none absolute -bottom-20 -left-12 size-48 rounded-full bg-coral-500/10 blur-2xl"
             />
 
             <div className="relative">
@@ -119,7 +119,7 @@ async function QrPageContent({
                   key={title}
                   className="group rounded-md border border-ink-100 bg-[var(--brand-surface)] p-4 transition-colors hover:border-mostaza-300 hover:bg-mostaza-50"
                 >
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-md bg-mostaza-50 text-mostaza-700 transition-colors group-hover:bg-white">
+                  <span className="inline-flex size-9 items-center justify-center rounded-md bg-mostaza-50 text-mostaza-700 transition-colors group-hover:bg-white">
                     <Icon size={18} strokeWidth={2.25} />
                   </span>
                   <p className="mt-3 text-sm font-bold text-ink-900">{title}</p>
@@ -159,10 +159,10 @@ async function QrPageContent({
                 />
               </div>
               {/* corner anchors */}
-              <span aria-hidden className="absolute -left-1 -top-1 h-3 w-3 rounded-tl-md border-l-2 border-t-2 border-mostaza-500" />
-              <span aria-hidden className="absolute -right-1 -top-1 h-3 w-3 rounded-tr-md border-r-2 border-t-2 border-mostaza-500" />
-              <span aria-hidden className="absolute -bottom-1 -left-1 h-3 w-3 rounded-bl-md border-b-2 border-l-2 border-mostaza-500" />
-              <span aria-hidden className="absolute -bottom-1 -right-1 h-3 w-3 rounded-br-md border-b-2 border-r-2 border-mostaza-500" />
+              <span aria-hidden className="absolute -left-1 -top-1 size-3 rounded-tl-md border-l border-t border-mostaza-500" />
+              <span aria-hidden className="absolute -right-1 -top-1 size-3 rounded-tr-md border-r border-t border-mostaza-500" />
+              <span aria-hidden className="absolute -bottom-1 -left-1 size-3 rounded-bl-md border-b border-l border-mostaza-500" />
+              <span aria-hidden className="absolute -bottom-1 -right-1 size-3 rounded-br-md border-b border-r border-mostaza-500" />
             </div>
 
             <div className="w-full rounded-md bg-[var(--brand-surface-strong)] p-4">

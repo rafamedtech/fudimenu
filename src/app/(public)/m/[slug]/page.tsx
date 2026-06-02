@@ -71,15 +71,22 @@ async function PublicMenuContent({
   });
   const hasSections = sections.length > 0;
 
-  const sectionAnchors: NavAnchor[] = hasSections
-    ? Array.from(
-        new Map(
-          groups
-            .filter((g) => g.sectionId)
-            .map((g) => [g.sectionId!, { id: `sec-${g.sectionId}`, label: g.sectionName! }]),
-        ).values(),
-      )
-    : groups.map((g) => ({ id: `cat-${g.categoryId}`, label: g.categoryName }));
+  const sectionAnchors: NavAnchor[] = [];
+  if (hasSections) {
+    const anchorsBySectionId = new Map<string, NavAnchor>();
+    for (const group of groups) {
+      if (!group.sectionId) continue;
+      anchorsBySectionId.set(group.sectionId, {
+        id: `sec-${group.sectionId}`,
+        label: group.sectionName!,
+      });
+    }
+    sectionAnchors.push(...anchorsBySectionId.values());
+  } else {
+    for (const group of groups) {
+      sectionAnchors.push({ id: `cat-${group.categoryId}`, label: group.categoryName });
+    }
+  }
 
   const navAnchors: NavAnchor[] = [
     ...(dailySpecials.length > 0

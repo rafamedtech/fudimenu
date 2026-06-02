@@ -22,7 +22,7 @@ export default async function ContactSettingsPage({ searchParams }: ContactSetti
       <main className="flex flex-col gap-4 px-4">
         {saved === '1' && (
           <Card className="flex items-center gap-3 border border-menta-500/40 bg-menta-100 shadow-sm">
-            <CheckCircle2 className="h-5 w-5 text-ink-700" />
+            <CheckCircle2 className="size-5 text-ink-700" />
             <span className="text-sm font-semibold text-ink-800">Contacto actualizado</span>
           </Card>
         )}
@@ -50,7 +50,7 @@ async function ContactSettingsContent({ tenantId }: { tenantId: string }) {
   return (
     <Card className="space-y-5">
       <div className="flex items-start gap-3">
-        <MessageCircle className="mt-1 h-6 w-6 shrink-0 text-menta-700" />
+        <MessageCircle className="mt-1 size-6 shrink-0 text-menta-700" />
         <div>
           <h2 className="text-lg font-extrabold text-ink-900">WhatsApp y horarios</h2>
           <p className="mt-1 text-sm leading-6 text-ink-600">
@@ -76,7 +76,7 @@ async function ContactSettingsContent({ tenantId }: { tenantId: string }) {
           placeholder="Lun-Vie 8am-10pm"
           defaultValue={tenant?.businessHours ?? ''}
           maxLength={120}
-          prefix={<Clock3 className="h-4 w-4" />}
+          prefix={<Clock3 className="size-4" />}
           hint="Texto libre para mostrar el horario operativo."
         />
         <Button type="submit" className="w-full">

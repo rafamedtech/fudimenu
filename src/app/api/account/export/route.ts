@@ -14,7 +14,7 @@ function secondsUntil(date: Date) {
   return Math.max(1, Math.ceil((date.getTime() - Date.now()) / 1000));
 }
 
-export async function GET(request: Request) {
+export async function POST(request: Request) {
   const rateLimit = await checkRateLimit(getClientIp(request.headers), {
     identifier: 'account-export',
     requests: 5,

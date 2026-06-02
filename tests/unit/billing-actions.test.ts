@@ -49,6 +49,8 @@ vi.mock('next/navigation', () => ({
 }));
 
 async function loadActions() {
+  // These tests exercise action-level billing validation, not the global env schema.
+  vi.stubEnv('SKIP_ENV_VALIDATION', '1');
   return import('../../src/server/actions/billing.actions');
 }
 

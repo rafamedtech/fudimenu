@@ -7,12 +7,14 @@ import { referralService } from '@/server/services/referral.service';
 
 export const dynamic = 'force-dynamic';
 
+const MONEY_FORMATTER = new Intl.NumberFormat('es-MX', {
+  style: 'currency',
+  currency: 'MXN',
+  maximumFractionDigits: 0,
+});
+
 function formatMoney(cents: number) {
-  return new Intl.NumberFormat('es-MX', {
-    style: 'currency',
-    currency: 'MXN',
-    maximumFractionDigits: 0,
-  }).format(cents / 100);
+  return MONEY_FORMATTER.format(cents / 100);
 }
 
 export default async function ReferralSettingsPage() {
@@ -46,7 +48,7 @@ export default async function ReferralSettingsPage() {
       <main className="flex flex-col gap-4 px-4">
         <Card className="space-y-5 border-[1.5px] border-mostaza-500/40 bg-mostaza-50 shadow-sm">
           <div className="flex items-start gap-3">
-            <Gift className="mt-1 h-6 w-6 shrink-0 text-mostaza-700" />
+            <Gift className="mt-1 size-6 shrink-0 text-mostaza-700" />
             <div>
               <h2 className="text-xl font-extrabold text-ink-900">Comparte FudiMenu</h2>
               <p className="mt-1 text-sm leading-6 text-ink-700">
@@ -57,7 +59,7 @@ export default async function ReferralSettingsPage() {
 
           <div className="rounded-md border-[1.5px] border-ink-100 bg-[var(--brand-card)] p-3">
             <div className="flex items-center gap-2 text-xs font-bold uppercase text-ink-500">
-              <Link2 className="h-4 w-4" />
+              <Link2 className="size-4" />
               Link referral
             </div>
             <p className="mt-2 break-all text-sm font-bold text-ink-900">{dashboard.url}</p>
@@ -70,7 +72,7 @@ export default async function ReferralSettingsPage() {
 
             return (
               <Card key={stat.label} className="min-h-28 p-3">
-                <Icon className="h-5 w-5 text-mostaza-700" />
+                <Icon className="size-5 text-mostaza-700" />
                 <p className="mt-3 text-2xl font-extrabold text-ink-900">{stat.value}</p>
                 <p className="mt-1 text-xs font-semibold leading-4 text-ink-500">{stat.label}</p>
               </Card>
@@ -80,7 +82,7 @@ export default async function ReferralSettingsPage() {
 
         <Card className="space-y-4">
           <div className="flex items-center gap-3">
-            <QrCode className="h-6 w-6 text-menta-700" />
+            <QrCode className="size-6 text-menta-700" />
             <h2 className="text-lg font-extrabold text-ink-900">QR referral</h2>
           </div>
 

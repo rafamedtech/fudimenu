@@ -28,14 +28,14 @@ export default function DpaPage() {
 
         <h2 className="text-xl font-bold">3. Subprocesadores</h2>
         <ul className="list-inside list-disc space-y-1">
-          <li>Supabase (autenticación + base de datos PostgreSQL — EE.UU.)</li>
-          <li>Cloudinary (almacenamiento de imágenes — EE.UU.)</li>
-          <li>Stripe (procesamiento de pagos — EE.UU.)</li>
-          <li>Resend (envío de correos transaccionales — EE.UU.)</li>
-          <li>PostHog (analytics de producto — EE.UU.)</li>
-          <li>Sentry (telemetría de errores — EE.UU.)</li>
-          <li>Upstash (rate limiting — Global)</li>
-          <li>Vercel (hospedaje — EE.UU.)</li>
+          <li>Supabase (autenticación + base de datos PostgreSQL, EE.UU.)</li>
+          <li>Cloudinary (almacenamiento de imágenes, EE.UU.)</li>
+          <li>Stripe (procesamiento de pagos, EE.UU.)</li>
+          <li>Resend (envío de correos transaccionales, EE.UU.)</li>
+          <li>PostHog (analytics de producto, EE.UU.)</li>
+          <li>Sentry (telemetría de errores, EE.UU.)</li>
+          <li>Upstash (rate limiting, Global)</li>
+          <li>Vercel (hospedaje, EE.UU.)</li>
         </ul>
 
         <h2 className="text-xl font-bold">4. Derechos del titular</h2>

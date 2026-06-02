@@ -33,7 +33,7 @@ export function ProFeatureLock({
       >
         {children ?? (
           <span className="inline-flex items-center gap-1 rounded-full bg-ink-900 px-2.5 py-1 text-xs font-extrabold text-mostaza-500 shadow-sm">
-            <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
+            <Sparkles className="size-3.5" aria-hidden="true" />
             {label.replace('✨ ', '')}
           </span>
         )}
@@ -42,8 +42,8 @@ export function ProFeatureLock({
       <Sheet open={open} onOpenChange={setOpen} title="Desbloquea Pro">
         <div className="space-y-5">
           <div className="flex items-start gap-3">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-mostaza-100 text-ink-900">
-              <Lock className="h-5 w-5" aria-hidden="true" />
+            <div className="flex size-11 shrink-0 items-center justify-center rounded-md bg-mostaza-100 text-ink-900">
+              <Lock className="size-5" aria-hidden="true" />
             </div>
             <div>
               <h2 className="text-xl font-extrabold text-ink-900">{title}</h2>
@@ -71,7 +71,7 @@ export function ProFeatureLock({
 export function ProBadge() {
   return (
     <span className="inline-flex items-center gap-1 rounded-full bg-ink-900 px-2 py-0.5 text-[11px] font-extrabold text-mostaza-500 shadow-sm">
-      <Sparkles className="h-3 w-3" aria-hidden="true" />
+      <Sparkles className="size-3" aria-hidden="true" />
       Pro
     </span>
   );

@@ -1,6 +1,6 @@
 'use client';
 
-import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
+import { useDeferredValue, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { getCategoryEmoji } from '@/lib/category-placeholder';
 import { formatPrice } from '@/lib/utils';
@@ -58,8 +58,12 @@ export function PublicMenuIsland({
   strings,
 }: IslandProps) {
   const [query, setQuery] = useState('');
-  const [openItem, setOpenItem] = useState<MenuItem | null>(null);
-  const [openCategory, setOpenCategory] = useState<string>('');
+  const [sheetSelection, setSheetSelection] = useState<{
+    item: MenuItem;
+    categoryName: string;
+    whatsappUrl: string | null;
+  } | null>(null);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
   const deferredQuery = useDeferredValue(query);
 
   const normalizedQuery = normalize(deferredQuery.trim());
@@ -70,20 +74,12 @@ export function PublicMenuIsland({
     return normalize(haystack).includes(normalizedQuery);
   };
 
-  const filteredSpecials = useMemo(
-    () => dailySpecials.filter(matchItem),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [dailySpecials, normalizedQuery],
-  );
-
-  const filteredGroups = useMemo(
-    () =>
-      groups
-        .map((g) => ({ ...g, items: g.items.filter(matchItem) }))
-        .filter((g) => g.items.length > 0),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [groups, normalizedQuery],
-  );
+  const filteredSpecials = dailySpecials.filter(matchItem);
+  const filteredGroups: IslandGroup[] = [];
+  for (const group of groups) {
+    const matchingItems = group.items.filter(matchItem);
+    if (matchingItems.length > 0) filteredGroups.push({ ...group, items: matchingItems });
+  }
 
   const hasResults = filteredSpecials.length + filteredGroups.length > 0;
 
@@ -97,17 +93,25 @@ export function PublicMenuIsland({
       price: formatPrice(getItemPrice(item), item.currency, priceLocale),
     });
 
-  const sections = useMemo(() => {
-    const map = new Map<string, { id: string; name: string | null; accent: string | null; groups: IslandGroup[] }>();
-    for (const g of filteredGroups) {
-      const key = g.sectionId ?? '__nosec__';
-      if (!map.has(key)) {
-        map.set(key, { id: key, name: g.sectionName, accent: g.sectionAccent, groups: [] });
-      }
-      map.get(key)!.groups.push(g);
+  const openItemSheet = (item: MenuItem, categoryName: string) => {
+    setSheetSelection({ item, categoryName, whatsappUrl: buildWhatsapp(item) });
+    setIsSheetOpen(true);
+  };
+
+  const sectionsById = new Map<string, { id: string; name: string | null; accent: string | null; groups: IslandGroup[] }>();
+  for (const group of filteredGroups) {
+    const key = group.sectionId ?? '__nosec__';
+    if (!sectionsById.has(key)) {
+      sectionsById.set(key, {
+        id: key,
+        name: group.sectionName,
+        accent: group.sectionAccent,
+        groups: [],
+      });
     }
-    return Array.from(map.values());
-  }, [filteredGroups]);
+    sectionsById.get(key)!.groups.push(group);
+  }
+  const sections = Array.from(sectionsById.values());
 
   return (
     <>
@@ -136,10 +140,7 @@ export function PublicMenuIsland({
             <ItemList
               items={filteredSpecials}
               categoryName={strings.dailySpecials}
-              onSelect={(item, catName) => {
-                setOpenItem(item);
-                setOpenCategory(catName);
-              }}
+              onSelect={openItemSheet}
               priceLocale={priceLocale}
               strings={strings}
             />
@@ -167,10 +168,7 @@ export function PublicMenuIsland({
                   <ItemList
                     items={g.items}
                     categoryName={g.categoryName}
-                    onSelect={(item, catName) => {
-                      setOpenItem(item);
-                      setOpenCategory(catName);
-                    }}
+                    onSelect={openItemSheet}
                     priceLocale={priceLocale}
                     strings={strings}
                   />
@@ -185,14 +183,19 @@ export function PublicMenuIsland({
         )}
       </div>
 
-      <ItemSheet
-        item={openItem}
-        categoryName={openCategory}
-        onClose={() => setOpenItem(null)}
-        priceLocale={priceLocale}
-        whatsappUrl={openItem ? buildWhatsapp(openItem) : null}
-        strings={strings}
-      />
+      {sheetSelection && (
+        <ItemSheet
+          key={sheetSelection.item.id}
+          item={sheetSelection.item}
+          categoryName={sheetSelection.categoryName}
+          open={isSheetOpen}
+          onClose={() => setIsSheetOpen(false)}
+          onClosed={() => setSheetSelection(null)}
+          priceLocale={priceLocale}
+          whatsappUrl={sheetSelection.whatsappUrl}
+          strings={strings}
+        />
+      )}
     </>
   );
 }
@@ -236,14 +239,14 @@ function SearchInput({
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         autoComplete="off"
-        className="h-full w-full appearance-none bg-transparent text-base font-medium text-ink-900 outline-none placeholder:text-ink-500 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
+        className="size-full appearance-none bg-transparent text-base font-medium text-ink-900 outline-none placeholder:text-ink-500 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
       />
       {value && (
         <button
           type="button"
           aria-label={clearLabel}
           onClick={() => onChange('')}
-          className="inline-flex h-8 w-8 items-center justify-center rounded-full text-ink-500 transition-colors hover:bg-[var(--brand-primary-faint)] hover:text-ink-900"
+          className="inline-flex size-8 items-center justify-center rounded-full text-ink-500 transition-colors hover:bg-[var(--brand-primary-faint)] hover:text-ink-900"
         >
           <svg
             aria-hidden
@@ -330,7 +333,7 @@ function ItemThumb({
   soldOutLabel: string;
 }) {
   return (
-    <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-md bg-[var(--brand-primary-soft)] ipad:h-24 ipad:w-24 ipad-landscape:h-28 ipad-landscape:w-28">
+    <div className="relative size-20 flex-shrink-0 overflow-hidden rounded-md bg-[var(--brand-primary-soft)] ipad:h-24 ipad:w-24 ipad-landscape:h-28 ipad-landscape:w-28">
       {item.imageUrl ? (
         <Image
           src={item.imageUrl}
@@ -340,7 +343,7 @@ function ItemThumb({
           className="object-cover"
         />
       ) : (
-        <div className="flex h-full w-full items-center justify-center text-4xl">
+        <div className="flex size-full items-center justify-center text-4xl">
           {getCategoryEmoji(categoryName)}
         </div>
       )}
@@ -356,32 +359,33 @@ function ItemThumb({
 function ItemSheet({
   item,
   categoryName,
+  open,
   onClose,
+  onClosed,
   priceLocale,
   whatsappUrl,
   strings,
 }: {
-  item: MenuItem | null;
+  item: MenuItem;
   categoryName: string;
+  open: boolean;
   onClose: () => void;
+  onClosed: () => void;
   priceLocale: string;
   whatsappUrl: string | null;
   strings: IslandStrings;
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
-  const [displayItem, setDisplayItem] = useState<MenuItem | null>(item);
-  const [displayCategory, setDisplayCategory] = useState(categoryName);
-  const [displayWhatsapp, setDisplayWhatsapp] = useState<string | null>(whatsappUrl);
-  const [isClosing, setIsClosing] = useState(false);
+  const onClosedRef = useRef(onClosed);
+
+  useEffect(() => {
+    onClosedRef.current = onClosed;
+  }, [onClosed]);
 
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
-    if (item) {
-      setDisplayItem(item);
-      setDisplayCategory(categoryName);
-      setDisplayWhatsapp(whatsappUrl);
-      setIsClosing(false);
+    if (open) {
       if (!dialog.open) {
         dialog.showModal();
         dialog.getAnimations().forEach((a) => a.cancel());
@@ -393,15 +397,9 @@ function ItemSheet({
           { duration: 320, easing: 'cubic-bezier(0.16, 1, 0.3, 1)', fill: 'forwards' },
         );
       }
-    } else if (dialog.open) {
-      setIsClosing(true);
+      return;
     }
-  }, [item, categoryName, whatsappUrl]);
-
-  useEffect(() => {
-    if (!isClosing) return;
-    const dialog = dialogRef.current;
-    if (!dialog) return;
+    if (!dialog.open) return;
     const cs = getComputedStyle(dialog);
     const fromOpacity = cs.opacity;
     const fromTransform = cs.transform === 'none' ? 'translateY(0) scale(1)' : cs.transform;
@@ -416,15 +414,14 @@ function ItemSheet({
     const onFinish = () => {
       anim.cancel();
       dialog.close();
-      setDisplayItem(null);
-      setIsClosing(false);
+      onClosedRef.current();
     };
     anim.addEventListener('finish', onFinish);
     return () => {
       anim.removeEventListener('finish', onFinish);
       anim.cancel();
     };
-  }, [isClosing]);
+  }, [open]);
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -437,25 +434,24 @@ function ItemSheet({
     return () => dialog.removeEventListener('cancel', handleCancel);
   }, [onClose]);
 
-  const handleBackdropClick = (e: React.MouseEvent<HTMLDialogElement>) => {
-    if (e.target === dialogRef.current && !isClosing) {
+  const handleBackdropPointerDown = (e: React.PointerEvent<HTMLDialogElement>) => {
+    if (e.target === dialogRef.current && open) {
       onClose();
     }
   };
 
-  const stateClasses = isClosing
-    ? '[&::backdrop]:animate-backdrop-out'
-    : 'open:[&::backdrop]:animate-backdrop-in';
+  const stateClasses = open
+    ? 'open:[&::backdrop]:animate-backdrop-in'
+    : '[&::backdrop]:animate-backdrop-out';
 
   return (
     <dialog
       ref={dialogRef}
-      onClick={handleBackdropClick}
-      aria-labelledby={displayItem ? `sheet-title-${displayItem.id}` : undefined}
+      onPointerDown={handleBackdropPointerDown}
+      aria-labelledby={`sheet-title-${item.id}`}
       className={`fixed inset-x-0 bottom-0 top-auto mx-auto w-full max-w-md rounded-t-3xl bg-[var(--brand-card)] p-0 text-ink-900 shadow-2xl backdrop:bg-black/60 backdrop:backdrop-blur-sm ipad:max-w-[640px] ${stateClasses}`}
     >
-      {displayItem && ((item: MenuItem) => (
-        <div className="flex max-h-[92dvh] flex-col overflow-hidden">
+      <div className="flex max-h-[92dvh] flex-col overflow-hidden">
           <div className="absolute inset-x-0 top-0 z-10 flex justify-center pt-2.5">
             <span className="h-1.5 w-12 rounded-full bg-white/70 shadow-sm" aria-hidden />
           </div>
@@ -470,8 +466,8 @@ function ItemSheet({
                 className="object-cover"
               />
             ) : (
-              <div className="flex h-full w-full items-center justify-center text-7xl">
-                {getCategoryEmoji(displayCategory)}
+              <div className="flex size-full items-center justify-center text-7xl">
+                {getCategoryEmoji(categoryName)}
               </div>
             )}
             <div
@@ -482,7 +478,7 @@ function ItemSheet({
               type="button"
               onClick={onClose}
               aria-label={strings.closeSheet}
-              className="absolute right-3 top-3 inline-flex h-10 w-10 items-center justify-center rounded-full bg-[var(--brand-card)]/95 text-ink-900 shadow-md backdrop-blur-sm transition-all hover:scale-105 hover:bg-[var(--brand-card)] active:scale-95 focus-visible:outline-none focus-visible:shadow-glow-mostaza"
+              className="absolute right-3 top-3 inline-flex size-10 items-center justify-center rounded-full bg-[var(--brand-card)]/95 text-ink-900 shadow-md backdrop-blur-sm transition-all hover:scale-105 hover:bg-[var(--brand-card)] active:scale-95 focus-visible:outline-none focus-visible:shadow-glow-mostaza"
             >
               <svg
                 aria-hidden
@@ -515,7 +511,7 @@ function ItemSheet({
 
           <div className="flex flex-1 flex-col gap-4 overflow-y-auto px-6 pb-4 pt-5 ipad:px-8 ipad:pt-6">
             <span className="inline-flex w-fit items-center rounded-full bg-[var(--brand-primary-soft)] px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-[var(--brand-primary)]">
-              {displayCategory}
+              {categoryName}
             </span>
             <h2
               id={`sheet-title-${item.id}`}
@@ -539,9 +535,9 @@ function ItemSheet({
           </div>
 
           <div className="shrink-0 border-t border-[var(--brand-card-border)] bg-[var(--brand-card)] px-6 pb-safe pt-4 ipad:px-8">
-            {displayWhatsapp && item.isAvailable ? (
+            {whatsappUrl && item.isAvailable ? (
               <a
-                href={displayWhatsapp}
+                href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 data-track-wa={item.id}
@@ -557,8 +553,7 @@ function ItemSheet({
               )
             )}
           </div>
-        </div>
-      ))(displayItem)}
+      </div>
     </dialog>
   );
 }

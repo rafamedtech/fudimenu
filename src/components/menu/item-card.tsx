@@ -16,11 +16,11 @@ export function ItemCard({ item, categoryName, href, showToggle = true }: ItemCa
   const placeholderEmoji = getCategoryEmoji(categoryName);
   const content = (
     <div className="flex items-center gap-4 rounded-[24px] bg-[var(--brand-card)] p-4 shadow-[0_4px_20px_rgba(222,18,91,0.04)] border border-[var(--brand-card-border)] transition-all duration-300 ease-spring hover:shadow-[0_8px_28px_rgba(222,18,91,0.08)] hover:-translate-y-0.5 active:scale-[0.98] ipad:gap-5 ipad:p-5 ipad-landscape:flex-col ipad-landscape:items-stretch ipad-landscape:gap-3 ipad-landscape:p-0 ipad-landscape:overflow-hidden">
-      <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-2xl bg-[var(--brand-surface-strong)] shadow-inner ipad-landscape:h-44 ipad-landscape:w-full ipad-landscape:rounded-none ipad-landscape:rounded-t-[24px]">
+      <div className="relative size-20 flex-shrink-0 overflow-hidden rounded-2xl bg-[var(--brand-surface-strong)] shadow-inner ipad-landscape:h-44 ipad-landscape:w-full ipad-landscape:rounded-none ipad-landscape:rounded-t-[24px]">
         {item.imageUrl ? (
           <Image src={item.imageUrl} alt={item.name} fill sizes="(min-width: 1024px) 280px, (min-width: 768px) 80px, 64px" className="object-cover" />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-3xl select-none bg-gradient-to-br from-[var(--brand-primary-muted)] to-[var(--brand-primary-soft)] ipad-landscape:text-5xl">
+          <div className="flex size-full items-center justify-center text-3xl select-none bg-gradient-to-br from-[var(--brand-primary-muted)] to-[var(--brand-primary-soft)] ipad-landscape:text-5xl">
             {placeholderEmoji}
           </div>
         )}

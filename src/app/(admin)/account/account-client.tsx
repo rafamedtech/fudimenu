@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useReducer, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { Download, LogOut, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -20,18 +20,18 @@ type AccountClientProps = {
 
 export function AccountClient({ email, tenantName, tenantSlug, plan }: AccountClientProps) {
   const router = useRouter();
-  const [deleteOpen, setDeleteOpen] = useState(false);
-  const [confirmText, setConfirmText] = useState('');
-  const [deleteCode, setDeleteCode] = useState('');
-  const [requestingDeleteCode, setRequestingDeleteCode] = useState(false);
-  const [exporting, setExporting] = useState(false);
-  const [deleting, setDeleting] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useReducer((_: boolean, next: boolean) => next, false);
+  const [confirmText, setConfirmText] = useReducer((_: string, next: string) => next, '');
+  const [deleteCode, setDeleteCode] = useReducer((_: string, next: string) => next, '');
+  const [requestingDeleteCode, setRequestingDeleteCode] = useReducer((_: boolean, next: boolean) => next, false);
+  const [exporting, setExporting] = useReducer((_: boolean, next: boolean) => next, false);
+  const [deleting, setDeleting] = useReducer((_: boolean, next: boolean) => next, false);
   const [isSigningOut, startSignOut] = useTransition();
 
   async function exportData() {
     setExporting(true);
     try {
-      const response = await fetch('/api/account/export', { method: 'GET' });
+      const response = await fetch('/api/account/export', { method: 'POST' });
       if (!response.ok) {
         toast.error(response.status === 429 ? 'Exportación limitada por ahora' : 'No pude exportar tus datos');
         return;
@@ -152,7 +152,7 @@ export function AccountClient({ email, tenantName, tenantSlug, plan }: AccountCl
         </Button>
 
         <p className="pb-4 text-center text-xs font-semibold text-ink-400">
-          Versión 0.1.0 — hecho en MX
+          Versión 0.1.0, hecho en MX
         </p>
       </main>
 

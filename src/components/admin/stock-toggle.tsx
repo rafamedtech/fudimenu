@@ -1,6 +1,6 @@
 'use client';
 import { useLocale, useTranslations } from 'next-intl';
-import { useState, useTransition } from 'react';
+import { useReducer, useTransition } from 'react';
 import { toast } from 'sonner';
 import { Toggle } from '@/components/ui/toggle';
 import { toggleItemAvailabilityAction } from '@/server/actions/items.actions';
@@ -15,10 +15,10 @@ interface StockToggleProps {
 export function StockToggle({ itemId, initial }: StockToggleProps) {
   const locale = useLocale();
   const t = useTranslations('menu');
-  const [available, setAvailable] = useState(initial);
+  const [available, setAvailable] = useReducer((_: boolean, next: boolean) => next, initial);
   const [isPending, startTransition] = useTransition();
 
-  function handleChange(next: boolean) {
+  function toggleAvailability(next: boolean) {
     const previous = available;
     setAvailable(next);
     if (typeof navigator !== 'undefined' && 'vibrate' in navigator) navigator.vibrate(10);
@@ -40,7 +40,7 @@ export function StockToggle({ itemId, initial }: StockToggleProps) {
     });
   }
 
-  return <Toggle checked={available} onChange={handleChange} disabled={isPending} ariaLabel={t('available')} />;
+  return <Toggle checked={available} onChange={toggleAvailability} disabled={isPending} ariaLabel={t('available')} />;
 }
 
 function actionErrorToApiError(code: string) {

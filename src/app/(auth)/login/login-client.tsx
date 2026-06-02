@@ -1,8 +1,8 @@
 'use client';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useReducer } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { ArrowRight, CheckCircle2, QrCode, Utensils } from 'lucide-react';
 import { FudiLogo } from '@/components/brand/fudi-logo';
@@ -17,17 +17,13 @@ const MAGIC_LINK_POLL_TIMEOUT_MS = 30_000;
 const MAIL_IMAGE =
   'https://ggrhecslgdflloszjkwl.supabase.co/storage/v1/object/public/user-assets/T5aFVdCanUY/components/8YmDwAg9deN.png';
 
-export function LoginClient() {
+export function LoginClient({ nextPath }: { nextPath: string }) {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const nextPath = searchParams.get('next')?.startsWith('/')
-    ? searchParams.get('next')!
-    : '/dashboard';
-  const [email, setEmail] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
-  const [magicLinkSentAt, setMagicLinkSentAt] = useState<number | null>(null);
-  const [magicLinkPollExpired, setMagicLinkPollExpired] = useState(false);
+  const [email, setEmail] = useReducer((_: string, next: string) => next, '');
+  const [loading, setLoading] = useReducer((_: boolean, next: boolean) => next, false);
+  const [googleLoading, setGoogleLoading] = useReducer((_: boolean, next: boolean) => next, false);
+  const [magicLinkSentAt, setMagicLinkSentAt] = useReducer((_: number | null, next: number | null) => next, null);
+  const [magicLinkPollExpired, setMagicLinkPollExpired] = useReducer((_: boolean, next: boolean) => next, false);
 
   const handleDetectedSignIn = useCallback(() => {
     if (!magicLinkSentAt) return;
@@ -43,8 +39,6 @@ export function LoginClient() {
 
     let cancelled = false;
     const supabase = createSupabaseBrowser();
-    setMagicLinkPollExpired(false);
-
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
@@ -76,6 +70,7 @@ export function LoginClient() {
       fd.set('next', nextPath);
       const res = await signInWithMagicLinkAction(fd);
       if (res.ok) {
+        setMagicLinkPollExpired(false);
         setMagicLinkSentAt(Date.now());
         track('login_magic_link_sent', { email_domain: email.split('@')[1] ?? '' });
         toast.success(res.message);
@@ -142,7 +137,7 @@ export function LoginClient() {
                 width={96}
                 height={96}
                 priority
-                className="relative z-10 h-24 w-24 object-contain"
+                className="relative z-10 size-24 object-contain"
               />
             </div>
           </div>
@@ -180,7 +175,7 @@ export function LoginClient() {
                 className="w-full rounded-xl font-bold shadow-sm"
               >
                 Enviar enlace de acceso
-                {!loading && <ArrowRight className="h-5 w-5" aria-hidden="true" />}
+                {!loading && <ArrowRight className="size-5" aria-hidden="true" />}
               </Button>
 
               <div className="relative my-8">
@@ -207,13 +202,12 @@ export function LoginClient() {
               </Button>
             </form>
           ) : (
-            <div
-              role="status"
+            <output
               aria-live="polite"
-              className="flex animate-fade-in flex-col items-center space-y-4 py-4 text-center"
+              className="flex animate-fade-in flex-col items-center gap-4 py-4 text-center"
             >
               <div className="rounded-full bg-menta-100 p-3 text-menta-600">
-                <CheckCircle2 className="h-10 w-10" aria-hidden="true" />
+                <CheckCircle2 className="size-10" aria-hidden="true" />
               </div>
               <h2 className="font-heading text-xl font-bold text-ink-900">
                 ¡Revisa tu bandeja!
@@ -232,7 +226,7 @@ export function LoginClient() {
               >
                 {magicLinkPollExpired ? '¿No recibiste nada? Reenviar' : 'Reenviar enlace'}
               </Button>
-            </div>
+            </output>
           )}
         </div>
 
@@ -247,10 +241,10 @@ export function LoginClient() {
       </div>
 
       <div className="fixed -bottom-10 -left-10 hidden rotate-12 text-[var(--brand-primary)] opacity-20 ipad-landscape:block">
-        <Utensils className="h-64 w-64" aria-hidden="true" />
+        <Utensils className="size-64" aria-hidden="true" />
       </div>
       <div className="fixed -right-10 -top-10 hidden -rotate-12 text-menta-500 opacity-20 ipad-landscape:block">
-        <QrCode className="h-64 w-64" aria-hidden="true" />
+        <QrCode className="size-64" aria-hidden="true" />
       </div>
     </main>
   );
@@ -259,7 +253,7 @@ export function LoginClient() {
 function GoogleIcon() {
   return (
     <svg
-      className="h-5 w-5 flex-shrink-0"
+      className="size-5 flex-shrink-0"
       viewBox="0 0 24 24"
       width="24"
       height="24"

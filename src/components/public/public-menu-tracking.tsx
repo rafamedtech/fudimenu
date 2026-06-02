@@ -17,23 +17,37 @@ function getSessionId() {
 // Tracks which item IDs have already fired item_viewed this session.
 const viewedItems = new Set<string>();
 
+function recordMenuView(payload: {
+  tenantId: string;
+  slug: string;
+  sessionId: string;
+  locale: string;
+  referrer: string | null;
+}) {
+  const body = JSON.stringify(payload);
+  const blob = new Blob([body], { type: 'application/json' });
+  if (navigator.sendBeacon('/api/track/view', blob)) return;
+
+  void fetch('/api/track/view', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body,
+    keepalive: true,
+  });
+}
+
 export function PublicMenuTracker({ tenantId, slug, locale }: { tenantId: string; slug: string; locale: string }) {
   useEffect(() => {
     initAnalytics();
 
     const sessionId = getSessionId();
     track('menu_viewed', { tenantId });
-    void fetch('/api/track/view', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
-        tenantId,
-        slug,
-        sessionId,
-        locale,
-        referrer: document.referrer || null,
-      }),
-      keepalive: true,
+    recordMenuView({
+      tenantId,
+      slug,
+      sessionId,
+      locale,
+      referrer: document.referrer || null,
     });
 
     // item_viewed via Intersection Observer — fires once per item per session

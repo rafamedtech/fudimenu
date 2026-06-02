@@ -64,19 +64,20 @@ export function ImageUploadField({
           <Image src={value} alt="" fill sizes="400px" className="object-cover" />
         ) : (
           <div className="flex flex-col items-center gap-2 text-ink-500">
-            {fallback ?? <ImagePlus className="h-10 w-10" aria-hidden />}
+            {fallback ?? <ImagePlus className="size-10" aria-hidden />}
             <span className="text-sm font-semibold">Sin imagen</span>
           </div>
         )}
         {uploading && (
           <div className="absolute inset-0 flex items-center justify-center bg-[var(--brand-card)]">
-            <Loader2 className="h-7 w-7 animate-spin text-ink-700" aria-hidden />
+            <Loader2 className="size-7 animate-spin text-ink-700" aria-hidden />
           </div>
         )}
       </div>
       <input
         ref={inputRef}
         type="file"
+        aria-label={label}
         accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
         className="sr-only"
         onChange={(event) => {
@@ -91,11 +92,11 @@ export function ImageUploadField({
           onClick={() => inputRef.current?.click()}
           loading={uploading}
         >
-          <ImagePlus className="h-4 w-4" aria-hidden />
+          <ImagePlus className="size-4" aria-hidden />
           Subir
         </Button>
         <Button type="button" variant="ghost" onClick={() => onChange(null)} disabled={!value}>
-          <X className="h-4 w-4" aria-hidden />
+          <X className="size-4" aria-hidden />
           Quitar
         </Button>
       </div>

@@ -50,7 +50,7 @@ test.describe('privacy: export and delete', () => {
     });
     cleanupTenantIds.push(tenantId);
 
-    const res = await request.get('/api/account/export', {
+    const res = await request.post('/api/account/export', {
       headers: { cookie: authCookie(tenantId, userId) },
     });
 

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { startReferralSignupAction } from '@/server/actions/referral.actions';
@@ -8,6 +9,11 @@ type ReferralPageProps = {
   params: Promise<{
     code: string;
   }>;
+};
+
+export const metadata: Metadata = {
+  title: 'Programa de referidos | FudiMenu',
+  description: 'Crea tu menú digital con la recomendación de un restaurante FudiMenu.',
 };
 
 function getSignupUrl(code: string, restaurantSlug: string) {

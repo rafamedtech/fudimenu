@@ -1,7 +1,7 @@
 'use client';
 
 import { X } from 'lucide-react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 
@@ -9,16 +9,12 @@ export function WelcomeBanner() {
   const [dismissed, setDismissed] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
 
   if (dismissed) return null;
 
   function handleDismiss() {
     setDismissed(true);
-    const next = new URLSearchParams(searchParams);
-    next.delete('welcome');
-    const qs = next.toString();
-    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+    router.replace(pathname, { scroll: false });
   }
 
   return (
@@ -30,9 +26,9 @@ export function WelcomeBanner() {
         type="button"
         onClick={handleDismiss}
         aria-label="Cerrar"
-        className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-md text-ink-700 hover:bg-mostaza-100"
+        className="absolute right-2 top-2 flex size-8 items-center justify-center rounded-md text-ink-700 hover:bg-mostaza-100"
       >
-        <X className="h-4 w-4" aria-hidden />
+        <X className="size-4" aria-hidden />
       </button>
     </Card>
   );

@@ -240,6 +240,7 @@ test.describe('brand theme propagation', () => {
 
     for (const path of ['/dashboard', '/menu', `/m/${slug}`]) {
       await page.goto(path);
+      await expect(page.locator('main')).toHaveCount(1);
       await expect(page.locator('main')).toBeVisible();
       await expectThemeApplied(page, UPDATED_PRIMARY);
     }

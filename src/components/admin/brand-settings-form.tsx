@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { ImageIcon } from 'lucide-react';
-import { useState } from 'react';
+import { useReducer } from 'react';
 import { BrandSlugInput } from '@/app/(admin)/settings/brand/brand-slug-input';
 import { ImageUploadField } from '@/components/admin/image-upload-field';
 import { Button } from '@/components/ui/button';
@@ -40,7 +40,7 @@ function BrandPreview({ tenantName, logoUrl, color }: { tenantName: string; logo
           />
         ) : (
           <div
-            className="mx-auto mb-2 flex h-14 w-14 items-center justify-center rounded-full text-2xl"
+            className="mx-auto mb-2 flex size-14 items-center justify-center rounded-full text-2xl"
             style={{ backgroundColor: 'var(--brand-primary-faint)' }}
           >
             🍽️
@@ -88,8 +88,8 @@ export function BrandSettingsForm({
   logoUrl,
   primaryColor,
 }: BrandSettingsFormProps) {
-  const [logo, setLogo] = useState<string | null>(logoUrl);
-  const [color, setColor] = useState(primaryColor);
+  const [logo, setLogo] = useReducer((_: string | null, next: string | null) => next, logoUrl);
+  const [color, setColor] = useReducer((_: string, next: string) => next, primaryColor);
 
   return (
     <form
@@ -110,7 +110,7 @@ export function BrandSettingsForm({
             label="Sube el logo de tu restaurante"
             value={logo}
             onChange={setLogo}
-            fallback={<ImageIcon className="h-10 w-10" aria-hidden />}
+            fallback={<ImageIcon className="size-10" aria-hidden />}
           />
         </FieldSection>
 

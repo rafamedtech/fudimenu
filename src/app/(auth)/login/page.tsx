@@ -1,10 +1,17 @@
 import { Suspense } from 'react';
 import { LoginClient } from './login-client';
 
-export default function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string }>;
+}) {
+  const { next } = await searchParams;
+  const nextPath = next?.startsWith('/') ? next : '/dashboard';
+
   return (
     <Suspense>
-      <LoginClient />
+      <LoginClient nextPath={nextPath} />
     </Suspense>
   );
 }

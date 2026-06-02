@@ -70,13 +70,7 @@ export function CategoryEditorForm({
   }
 
   return (
-    <form
-      className="space-y-5 pt-4"
-      onSubmit={(event) => {
-        event.preventDefault();
-        handleSave();
-      }}
-    >
+    <form className="space-y-5 pt-4" action={handleSave}>
       <Input
         label="Nombre"
         required
@@ -96,7 +90,7 @@ export function CategoryEditorForm({
             loading={isDeleting}
             onClick={handleDelete}
           >
-            <Trash2 className="h-5 w-5" aria-hidden />
+            <Trash2 className="size-5" aria-hidden />
           </Button>
         )}
         <Button type="button" variant="outline" size="lg" className="flex-1" onClick={() => router.back()}>

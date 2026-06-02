@@ -1,36 +1,29 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
-import { getStoredAnalyticsConsent } from '@/lib/analytics/consent';
 import {
   acceptAnalyticsConsent,
   declineAnalyticsConsent,
 } from '@/lib/analytics/events';
-import { notifyCookieConsentDecided } from '@/components/public/cookie-consent-context';
+import { useCookieConsentDecided } from '@/components/public/cookie-consent-context';
+import { notifyCookieConsentDecided } from '@/components/public/cookie-consent-store';
+
+function acceptConsent() {
+  acceptAnalyticsConsent();
+  notifyCookieConsentDecided();
+}
+
+function declineConsent() {
+  declineAnalyticsConsent();
+  notifyCookieConsentDecided();
+}
 
 export function CookieConsent() {
   const t = useTranslations('public.cookies');
-  const [isVisible, setIsVisible] = useState(false);
+  const consentDecided = useCookieConsentDecided();
 
-  useEffect(() => {
-    setIsVisible(getStoredAnalyticsConsent() === null);
-  }, []);
-
-  const handleAccept = () => {
-    acceptAnalyticsConsent();
-    setIsVisible(false);
-    notifyCookieConsentDecided();
-  };
-
-  const handleDecline = () => {
-    declineAnalyticsConsent();
-    setIsVisible(false);
-    notifyCookieConsentDecided();
-  };
-
-  if (!isVisible) return null;
+  if (consentDecided) return null;
 
   return (
     <section
@@ -42,7 +35,7 @@ export function CookieConsent() {
           {t('message')}
         </p>
         <div className="grid grid-cols-2 gap-2 sm:flex sm:shrink-0">
-          <Button type="button" size="sm" className="min-h-10 px-4" onClick={handleAccept}>
+          <Button type="button" size="sm" className="min-h-10 px-4" onClick={acceptConsent}>
             {t('accept')}
           </Button>
           <Button
@@ -50,7 +43,7 @@ export function CookieConsent() {
             variant="outline"
             size="sm"
             className="min-h-10 px-4"
-            onClick={handleDecline}
+            onClick={declineConsent}
           >
             {t('decline')}
           </Button>

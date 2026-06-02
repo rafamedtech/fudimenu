@@ -19,7 +19,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, Plus, Settings2 } from 'lucide-react';
-import { useEffect, useMemo, useState, useTransition } from 'react';
+import { useMemo, useReducer, useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -34,7 +34,7 @@ interface SectionGridProps {
 }
 
 export function SectionGrid({ sections, canCreateSection, itemCountBySectionId }: SectionGridProps) {
-  const [items, setItems] = useState(sections);
+  const [items, setItems] = useReducer((_: MenuSection[], next: MenuSection[]) => next, sections);
   const [reorderMode, setReorderMode] = useState(false);
   const [isPending, startTransition] = useTransition();
   const sensors = useSensors(
@@ -42,10 +42,6 @@ export function SectionGrid({ sections, canCreateSection, itemCountBySectionId }
     useSensor(TouchSensor, { activationConstraint: { delay: 120, tolerance: 8 } }),
   );
   const ids = useMemo(() => items.map((section) => section.id), [items]);
-
-  useEffect(() => {
-    setItems(sections);
-  }, [sections]);
 
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
@@ -79,7 +75,7 @@ export function SectionGrid({ sections, canCreateSection, itemCountBySectionId }
             onClick={() => setReorderMode((value) => !value)}
             disabled={isPending}
           >
-            <GripVertical className="h-4 w-4" aria-hidden />
+            <GripVertical className="size-4" aria-hidden />
             Reordenar
           </Button>
         </div>
@@ -101,8 +97,8 @@ export function SectionGrid({ sections, canCreateSection, itemCountBySectionId }
                   href="/menu/sections/new"
                   className="flex aspect-[4/5] flex-col items-center justify-center gap-3 rounded-lg border-[1.5px] border-dashed border-ink-300 bg-[var(--brand-card)] text-center text-ink-700 shadow-sm transition-colors hover:border-mostaza-500 ipad:gap-4"
                 >
-                  <span className="flex h-12 w-12 items-center justify-center rounded-full bg-mostaza-100 text-ink-900">
-                    <Plus className="h-6 w-6" aria-hidden />
+                  <span className="flex size-12 items-center justify-center rounded-full bg-mostaza-100 text-ink-900">
+                    <Plus className="size-6" aria-hidden />
                   </span>
                   <span className="text-sm font-extrabold">Nueva sección</span>
                 </Link>
@@ -171,7 +167,7 @@ function SortableSectionCard({
             {...listeners}
           >
             <span className="rounded-md bg-ink-900/70 p-2">
-              <GripVertical className="h-5 w-5" aria-hidden />
+              <GripVertical className="size-5" aria-hidden />
             </span>
           </button>
         ) : (
@@ -179,10 +175,10 @@ function SortableSectionCard({
             <Link href={`/menu/s/${section.id}`} className="absolute inset-0" aria-label={section.name} />
             <Link
               href={`/menu/sections/${section.id}/edit`}
-              className="absolute right-2 top-2 flex h-10 w-10 items-center justify-center rounded-md bg-[var(--brand-card)] text-ink-900 shadow-sm"
+              className="absolute right-2 top-2 flex size-10 items-center justify-center rounded-md bg-[var(--brand-card)] text-ink-900 shadow-sm"
               aria-label={`Editar ${section.name}`}
             >
-              <Settings2 className="h-4 w-4" aria-hidden />
+              <Settings2 className="size-4" aria-hidden />
             </Link>
           </>
         )}

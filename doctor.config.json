@@ -1,0 +1,19 @@
+{
+  "$schema": "https://react.doctor/schema/config.json",
+  "ignore": {
+    "files": [
+      "src/generated/**",
+      "add_columns.js",
+      "check_data.js",
+      "check_migrations.js",
+      "check_tables.js"
+    ]
+  },
+  "serverAuthFunctionNames": [
+    "requireAuth",
+    "requireActionAuth",
+    "getOnboardingUser",
+    "switchTenantAction",
+    "createBillingCheckoutAction"
+  ]
+}

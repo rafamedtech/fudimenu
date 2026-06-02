@@ -18,8 +18,10 @@ function findDailySpecial(items: MenuItem[]) {
   return items.find((item) => item.isAvailable && item.isSpecialToday) ?? null;
 }
 
+const COUNT_FORMATTER = new Intl.NumberFormat('es-MX');
+
 function formatCount(value: number) {
-  return new Intl.NumberFormat('es-MX').format(value);
+  return COUNT_FORMATTER.format(value);
 }
 
 function formatDelta(value: number | null, period: 'ayer' | 'semana pasada') {

@@ -84,7 +84,8 @@ export function SidebarNav({ plan, tenantName, avatarUrl }: SidebarNavProps) {
               </h2>
             )}
             <ul className="flex flex-col gap-1.5">
-              {section.items.filter((item) => item.url !== '/account').map((item) => {
+              {section.items.map((item) => {
+                if (item.url === '/account') return null;
                 const active = isItemActive(pathname, item);
                 const hasSub = !!item.items?.length;
                 const isExpanded = expanded.includes(item.title);
@@ -99,7 +100,7 @@ export function SidebarNav({ plan, tenantName, avatarUrl }: SidebarNavProps) {
                   !isOpen && 'justify-center px-2',
                 );
 
-                const iconNode = <Icon className="h-5 w-5 shrink-0" strokeWidth={active ? 2.5 : 2} />;
+                const iconNode = <Icon className="size-5 shrink-0" strokeWidth={active ? 2.5 : 2} />;
 
                 if (locked && item.url) {
                   return (
@@ -215,7 +216,7 @@ export function SidebarNav({ plan, tenantName, avatarUrl }: SidebarNavProps) {
         >
           <span
             className={cn(
-              'flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-[var(--brand-primary-faint)] bg-cover bg-center text-sm font-black text-[var(--brand-primary)]',
+              'flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-[var(--brand-primary-faint)] bg-cover bg-center text-sm font-black text-[var(--brand-primary)]',
               avatarUrl && 'text-transparent',
             )}
             style={avatarUrl ? { backgroundImage: `url(${avatarUrl})` } : undefined}
