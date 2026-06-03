@@ -8,6 +8,7 @@ const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
   openAnalyzer: false,
 });
+const hasSentryAuthToken = Boolean(process.env.SENTRY_AUTH_TOKEN);
 
 const config: NextConfig = {
   reactStrictMode: true,
@@ -47,14 +48,20 @@ export default withSentryConfig(withBundleAnalyzer(withNextIntl(config)), {
 
   project: process.env.SENTRY_PROJECT ?? 'javascript-nextjs',
 
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+
   // Only print logs for uploading source maps in CI
   silent: !process.env.CI,
+  telemetry: false,
 
   // For all available options, see:
   // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
 
   // Upload a larger set of source maps for prettier stack traces (increases build time)
-  widenClientFileUpload: true,
+  widenClientFileUpload: hasSentryAuthToken,
+  sourcemaps: {
+    disable: !hasSentryAuthToken,
+  },
 
   // Uncomment to route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
   // This can increase your server load as well as your hosting bill.
