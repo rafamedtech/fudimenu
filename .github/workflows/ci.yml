@@ -35,7 +35,7 @@ jobs:
       - run: pnpm db:generate
       - run: pnpm typecheck
       - run: pnpm lint
-      - run: pnpm test --run
+      - run: pnpm exec vitest run
       - run: pnpm build
 
   e2e:
