@@ -59,6 +59,9 @@ export default withSentryConfig(withBundleAnalyzer(withNextIntl(config)), {
 
   // Upload a larger set of source maps for prettier stack traces (increases build time)
   widenClientFileUpload: hasSentryAuthToken,
+  release: {
+    create: hasSentryAuthToken,
+  },
   sourcemaps: {
     disable: !hasSentryAuthToken,
   },
