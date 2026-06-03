@@ -9,13 +9,25 @@ import { formatPrice } from '@/lib/utils';
 import { requireAuth } from '@/server/guards/require-auth';
 import { menuService } from '@/server/services/menu.service';
 import { getTenantAnalyticsStats } from '@/server/services/posthog-analytics.service';
-import type { MenuItem, Plan } from '@/types/domain';
+import type { MenuItem, Plan, Tenant } from '@/types/domain';
 import { ImageIcon } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
 function findDailySpecial(items: MenuItem[]) {
   return items.find((item) => item.isAvailable && item.isSpecialToday) ?? null;
+}
+
+function getLogoFrameClass(shape: Tenant['logoShape']) {
+  if (shape === 'rectangular') {
+    return 'h-32 w-full rounded-2xl desktop:h-40 desktop:w-72';
+  }
+
+  if (shape === 'square') {
+    return 'h-32 w-32 rounded-2xl desktop:h-40 desktop:w-40';
+  }
+
+  return 'h-32 w-32 rounded-full desktop:h-40 desktop:w-40';
 }
 
 const COUNT_FORMATTER = new Intl.NumberFormat('es-MX');
@@ -105,7 +117,9 @@ async function DashboardContent({ tenantId, plan }: { tenantId: string; plan: Pl
       <main className="flex flex-col gap-4 px-4 pb-6 ipad:gap-5 ipad:px-6 ipad:pb-8 ipad-landscape:px-7 desktop:px-8">
         <div className="relative overflow-hidden rounded-xl border border-[var(--brand-card-border)] bg-[var(--brand-card)] p-5 shadow-md ipad:p-7">
           <div className="flex flex-col items-center gap-5 desktop:flex-row desktop:items-center desktop:gap-7">
-            <div className="relative flex h-32 w-full shrink-0 items-center justify-center overflow-hidden rounded-2xl border-[1.5px] border-[var(--brand-card-border)] bg-[var(--brand-surface-strong)] shadow-sm desktop:h-40 desktop:w-72">
+            <div
+              className={`relative flex shrink-0 items-center justify-center overflow-hidden border-[1.5px] border-[var(--brand-card-border)] bg-[var(--brand-surface-strong)] shadow-sm ${getLogoFrameClass(tenant.logoShape)}`}
+            >
               {tenant.logoUrl ? (
                 <Image
                   src={tenant.logoUrl}
