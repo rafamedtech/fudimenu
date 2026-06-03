@@ -66,7 +66,6 @@ export async function POST(request: NextRequest) {
   const uploadParams = {
     folder,
     timestamp,
-    transformation: 'f_auto,q_auto',
   };
   const signature = signUpload(uploadParams, config.apiSecret);
   const uploadData = new FormData();
@@ -74,7 +73,6 @@ export async function POST(request: NextRequest) {
   uploadData.set('api_key', config.apiKey);
   uploadData.set('timestamp', timestamp);
   uploadData.set('folder', folder);
-  uploadData.set('transformation', uploadParams.transformation);
   uploadData.set('signature', signature);
 
   const response = await fetch(
@@ -94,9 +92,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, error: 'upload_failed' }, { status: 502 });
   }
 
+  // f_auto/q_auto belong at delivery time (browser-dependent), not at upload.
+  // Inject them into the delivery URL so the stored original stays intact.
+  const deliveryUrl = result.secure_url.replace('/image/upload/', '/image/upload/f_auto,q_auto/');
+
   return NextResponse.json({
     ok: true,
-    url: result.secure_url,
+    url: deliveryUrl,
     publicId: result.public_id ?? null,
   });
 }
