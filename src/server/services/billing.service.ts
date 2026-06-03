@@ -67,19 +67,25 @@ async function sendEmail({
   const finalSubject =
     override && process.env.NODE_ENV !== 'production' ? `[dev → ${to}] ${subject}` : subject;
 
-  const response = await fetch(RESEND_API_URL, {
-    method: 'POST',
-    headers: {
-      authorization: `Bearer ${resendApiKey}`,
-      'content-type': 'application/json',
-    },
-    body: JSON.stringify({
-      from: EMAIL_FROM,
-      to: finalTo,
-      subject: finalSubject,
-      text,
-    }),
-  });
+  let response: Response;
+  try {
+    response = await fetch(RESEND_API_URL, {
+      method: 'POST',
+      headers: {
+        authorization: `Bearer ${resendApiKey}`,
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: EMAIL_FROM,
+        to: finalTo,
+        subject: finalSubject,
+        text,
+      }),
+    });
+  } catch (err) {
+    console.error('resend_fetch_failed', { error: String(err), to, from: EMAIL_FROM });
+    return { sent: false, reason: 'resend_error' as const };
+  }
 
   if (!response.ok) {
     const body = await response.text().catch(() => '');
