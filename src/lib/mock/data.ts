@@ -10,6 +10,8 @@ export const mockTenant: Tenant = (globalStore.__mockTenant ??= {
   slug: 'taqueria-don-pepe',
   name: 'Marenca',
   logoUrl: null,
+  coverImageUrl: null,
+  logoShape: 'round',
   whatsappPhone: '+525512345678',
   businessHours: null,
   primaryColor: '#9E3F2A',

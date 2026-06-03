@@ -12,7 +12,7 @@ const ALLOWED_TYPES = new Set([
   'image/heic',
   'image/heif',
 ]);
-const ALLOWED_KINDS = new Set(['logo', 'item', 'section']);
+const ALLOWED_KINDS = new Set(['logo', 'tenant-cover', 'item', 'section', 'category']);
 
 function getCloudinaryConfig() {
   const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;

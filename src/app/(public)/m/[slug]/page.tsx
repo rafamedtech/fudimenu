@@ -42,6 +42,18 @@ function formatPhoneDisplay(raw: string): string {
   return local;
 }
 
+function getLogoFrameClass(shape: Tenant['logoShape']) {
+  if (shape === 'rectangular') {
+    return 'h-20 w-36 rounded-lg ipad:h-24 ipad:w-44';
+  }
+
+  if (shape === 'square') {
+    return 'h-24 w-24 rounded-lg ipad:h-32 ipad:w-32';
+  }
+
+  return 'h-24 w-24 rounded-full ipad:h-32 ipad:w-32';
+}
+
 async function PublicMenuContent({
   slug,
   tenant,
@@ -70,6 +82,8 @@ async function PublicMenuContent({
     resolveSectionAccent: resolveBrandSurfaceColor,
   });
   const hasSections = sections.length > 0;
+  const logoFrameClass = getLogoFrameClass(tenant.logoShape);
+  const logoObjectClass = tenant.logoShape === 'rectangular' ? 'object-contain p-2' : 'object-cover';
 
   const sectionAnchors: NavAnchor[] = [];
   if (hasSections) {
@@ -133,21 +147,34 @@ async function PublicMenuContent({
           {t('skipToMenu')}
         </a>
 
-        {/* MOCK: cover image — no field on Tenant. See CLAUDE.md note */}
         <header className="relative border-b border-[var(--brand-card-border)] bg-[var(--brand-card)] shadow-sm">
           <div
             className="relative h-40 w-full overflow-hidden ipad:h-56 desktop:h-64"
             style={{ backgroundColor: 'var(--brand-primary-faint)' }}
           >
-            {/* MOCK: tenant.coverImageUrl not in schema. Falls back to gradient. */}
-            <div
-              aria-hidden
-              className="absolute inset-0"
-              style={{
-                background:
-                  'linear-gradient(135deg, var(--brand-primary-faint) 0%, var(--brand-card-strong) 100%)',
-              }}
-            />
+            {tenant.coverImageUrl ? (
+              <>
+                <Image
+                  src={tenant.coverImageUrl}
+                  alt=""
+                  fill
+                  priority
+                  fetchPriority="high"
+                  sizes="(min-width: 1180px) 1180px, 100vw"
+                  className="object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-ink-900/40 via-transparent to-transparent" />
+              </>
+            ) : (
+              <div
+                aria-hidden
+                className="absolute inset-0"
+                style={{
+                  background:
+                    'linear-gradient(135deg, var(--brand-primary-faint) 0%, var(--brand-card-strong) 100%)',
+                }}
+              />
+            )}
             <div className="absolute right-3 top-3 ipad:right-4 ipad:top-4">
               <Suspense fallback={null}>
                 <PublicMenuLanguageSwitcher
@@ -165,15 +192,15 @@ async function PublicMenuContent({
                   <Image
                     src={tenant.logoUrl}
                     alt={tenant.name}
-                    width={128}
+                    width={tenant.logoShape === 'rectangular' ? 176 : 128}
                     height={128}
                     priority
                     fetchPriority="high"
-                    className="h-24 w-24 rounded-full border-4 border-[var(--brand-card)] object-cover shadow-md ipad:h-32 ipad:w-32"
+                    className={`${logoFrameClass} border-4 border-[var(--brand-card)] bg-[var(--brand-card)] ${logoObjectClass} shadow-md`}
                   />
                 ) : (
                   <div
-                    className="flex h-24 w-24 items-center justify-center rounded-full border-4 border-[var(--brand-card)] text-3xl shadow-md ipad:h-32 ipad:w-32 ipad:text-4xl"
+                    className={`flex ${logoFrameClass} items-center justify-center border-4 border-[var(--brand-card)] text-3xl shadow-md ipad:text-4xl`}
                     style={{ backgroundColor: 'var(--brand-primary-faint)' }}
                   >
                     🍽️

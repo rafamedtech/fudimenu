@@ -1,12 +1,15 @@
 export type Role = 'owner' | 'admin' | 'staff';
 export type Plan = 'free' | 'pro' | 'business';
 export type Locale = 'es' | 'en';
+export type LogoShape = 'rectangular' | 'square' | 'round';
 
 export type Tenant = {
   id: string;
   slug: string;
   name: string;
   logoUrl: string | null;
+  coverImageUrl: string | null;
+  logoShape: LogoShape;
   whatsappPhone: string | null;
   businessHours: string | null;
   primaryColor: string;

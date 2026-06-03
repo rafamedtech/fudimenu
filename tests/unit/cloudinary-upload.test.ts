@@ -78,7 +78,7 @@ describe('POST /api/uploads/cloudinary', () => {
     expect(body.error).toBe('missing_file');
   });
 
-  it('returns 400 invalid_kind when kind is not logo/item/section', async () => {
+  it('returns 400 invalid_kind when kind is not logo/tenant-cover/item/section/category', async () => {
     const POST = await loadRoute();
     const fd = new FormData();
     fd.set('kind', 'avatar');
@@ -142,7 +142,7 @@ describe('POST /api/uploads/cloudinary', () => {
     },
   );
 
-  it.each(['logo', 'item', 'section'])('accepts kind=%s', async (kind) => {
+  it.each(['logo', 'tenant-cover', 'item', 'section', 'category'])('accepts kind=%s', async (kind) => {
     mocks.fetch.mockResolvedValueOnce({
       ok: true,
       json: async () => ({ secure_url: 'https://res.cloudinary.com/test/img.jpg', public_id: 'p' }),

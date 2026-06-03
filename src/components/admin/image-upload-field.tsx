@@ -6,7 +6,7 @@ import { useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 
-type ImageKind = 'logo' | 'item' | 'section';
+type ImageKind = 'logo' | 'tenant-cover' | 'item' | 'section' | 'category';
 
 interface ImageUploadFieldProps {
   kind: ImageKind;

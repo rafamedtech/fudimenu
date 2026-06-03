@@ -39,6 +39,7 @@ export type CategoryMinAggregateOutputType = {
   tenantId: string | null
   sectionId: string | null
   name: string | null
+  coverImageUrl: string | null
   sortOrder: number | null
   isVisible: boolean | null
   createdAt: Date | null
@@ -51,6 +52,7 @@ export type CategoryMaxAggregateOutputType = {
   tenantId: string | null
   sectionId: string | null
   name: string | null
+  coverImageUrl: string | null
   sortOrder: number | null
   isVisible: boolean | null
   createdAt: Date | null
@@ -63,6 +65,7 @@ export type CategoryCountAggregateOutputType = {
   tenantId: number
   sectionId: number
   name: number
+  coverImageUrl: number
   sortOrder: number
   isVisible: number
   createdAt: number
@@ -85,6 +88,7 @@ export type CategoryMinAggregateInputType = {
   tenantId?: true
   sectionId?: true
   name?: true
+  coverImageUrl?: true
   sortOrder?: true
   isVisible?: true
   createdAt?: true
@@ -97,6 +101,7 @@ export type CategoryMaxAggregateInputType = {
   tenantId?: true
   sectionId?: true
   name?: true
+  coverImageUrl?: true
   sortOrder?: true
   isVisible?: true
   createdAt?: true
@@ -109,6 +114,7 @@ export type CategoryCountAggregateInputType = {
   tenantId?: true
   sectionId?: true
   name?: true
+  coverImageUrl?: true
   sortOrder?: true
   isVisible?: true
   createdAt?: true
@@ -208,6 +214,7 @@ export type CategoryGroupByOutputType = {
   tenantId: string
   sectionId: string | null
   name: string
+  coverImageUrl: string | null
   sortOrder: number
   isVisible: boolean
   createdAt: Date
@@ -243,6 +250,7 @@ export type CategoryWhereInput = {
   tenantId?: Prisma.UuidFilter<"Category"> | string
   sectionId?: Prisma.UuidNullableFilter<"Category"> | string | null
   name?: Prisma.StringFilter<"Category"> | string
+  coverImageUrl?: Prisma.StringNullableFilter<"Category"> | string | null
   sortOrder?: Prisma.IntFilter<"Category"> | number
   isVisible?: Prisma.BoolFilter<"Category"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Category"> | Date | string
@@ -258,6 +266,7 @@ export type CategoryOrderByWithRelationInput = {
   tenantId?: Prisma.SortOrder
   sectionId?: Prisma.SortOrderInput | Prisma.SortOrder
   name?: Prisma.SortOrder
+  coverImageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   isVisible?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -277,6 +286,7 @@ export type CategoryWhereUniqueInput = Prisma.AtLeast<{
   tenantId?: Prisma.UuidFilter<"Category"> | string
   sectionId?: Prisma.UuidNullableFilter<"Category"> | string | null
   name?: Prisma.StringFilter<"Category"> | string
+  coverImageUrl?: Prisma.StringNullableFilter<"Category"> | string | null
   sortOrder?: Prisma.IntFilter<"Category"> | number
   isVisible?: Prisma.BoolFilter<"Category"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Category"> | Date | string
@@ -292,6 +302,7 @@ export type CategoryOrderByWithAggregationInput = {
   tenantId?: Prisma.SortOrder
   sectionId?: Prisma.SortOrderInput | Prisma.SortOrder
   name?: Prisma.SortOrder
+  coverImageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   isVisible?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -312,6 +323,7 @@ export type CategoryScalarWhereWithAggregatesInput = {
   tenantId?: Prisma.UuidWithAggregatesFilter<"Category"> | string
   sectionId?: Prisma.UuidNullableWithAggregatesFilter<"Category"> | string | null
   name?: Prisma.StringWithAggregatesFilter<"Category"> | string
+  coverImageUrl?: Prisma.StringNullableWithAggregatesFilter<"Category"> | string | null
   sortOrder?: Prisma.IntWithAggregatesFilter<"Category"> | number
   isVisible?: Prisma.BoolWithAggregatesFilter<"Category"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Category"> | Date | string
@@ -322,6 +334,7 @@ export type CategoryScalarWhereWithAggregatesInput = {
 export type CategoryCreateInput = {
   id?: string
   name: string
+  coverImageUrl?: string | null
   sortOrder?: number
   isVisible?: boolean
   createdAt?: Date | string
@@ -337,6 +350,7 @@ export type CategoryUncheckedCreateInput = {
   tenantId: string
   sectionId?: string | null
   name: string
+  coverImageUrl?: string | null
   sortOrder?: number
   isVisible?: boolean
   createdAt?: Date | string
@@ -348,6 +362,7 @@ export type CategoryUncheckedCreateInput = {
 export type CategoryUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -363,6 +378,7 @@ export type CategoryUncheckedUpdateInput = {
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   sectionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -376,6 +392,7 @@ export type CategoryCreateManyInput = {
   tenantId: string
   sectionId?: string | null
   name: string
+  coverImageUrl?: string | null
   sortOrder?: number
   isVisible?: boolean
   createdAt?: Date | string
@@ -386,6 +403,7 @@ export type CategoryCreateManyInput = {
 export type CategoryUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -398,6 +416,7 @@ export type CategoryUncheckedUpdateManyInput = {
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   sectionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -425,6 +444,7 @@ export type CategoryCountOrderByAggregateInput = {
   tenantId?: Prisma.SortOrder
   sectionId?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  coverImageUrl?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   isVisible?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -441,6 +461,7 @@ export type CategoryMaxOrderByAggregateInput = {
   tenantId?: Prisma.SortOrder
   sectionId?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  coverImageUrl?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   isVisible?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -453,6 +474,7 @@ export type CategoryMinOrderByAggregateInput = {
   tenantId?: Prisma.SortOrder
   sectionId?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  coverImageUrl?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   isVisible?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -572,6 +594,7 @@ export type CategoryUpdateOneWithoutItemsNestedInput = {
 export type CategoryCreateWithoutTenantInput = {
   id?: string
   name: string
+  coverImageUrl?: string | null
   sortOrder?: number
   isVisible?: boolean
   createdAt?: Date | string
@@ -585,6 +608,7 @@ export type CategoryUncheckedCreateWithoutTenantInput = {
   id?: string
   sectionId?: string | null
   name: string
+  coverImageUrl?: string | null
   sortOrder?: number
   isVisible?: boolean
   createdAt?: Date | string
@@ -627,6 +651,7 @@ export type CategoryScalarWhereInput = {
   tenantId?: Prisma.UuidFilter<"Category"> | string
   sectionId?: Prisma.UuidNullableFilter<"Category"> | string | null
   name?: Prisma.StringFilter<"Category"> | string
+  coverImageUrl?: Prisma.StringNullableFilter<"Category"> | string | null
   sortOrder?: Prisma.IntFilter<"Category"> | number
   isVisible?: Prisma.BoolFilter<"Category"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Category"> | Date | string
@@ -637,6 +662,7 @@ export type CategoryScalarWhereInput = {
 export type CategoryCreateWithoutSectionInput = {
   id?: string
   name: string
+  coverImageUrl?: string | null
   sortOrder?: number
   isVisible?: boolean
   createdAt?: Date | string
@@ -650,6 +676,7 @@ export type CategoryUncheckedCreateWithoutSectionInput = {
   id?: string
   tenantId: string
   name: string
+  coverImageUrl?: string | null
   sortOrder?: number
   isVisible?: boolean
   createdAt?: Date | string
@@ -687,6 +714,7 @@ export type CategoryUpdateManyWithWhereWithoutSectionInput = {
 export type CategoryCreateWithoutItemsInput = {
   id?: string
   name: string
+  coverImageUrl?: string | null
   sortOrder?: number
   isVisible?: boolean
   createdAt?: Date | string
@@ -701,6 +729,7 @@ export type CategoryUncheckedCreateWithoutItemsInput = {
   tenantId: string
   sectionId?: string | null
   name: string
+  coverImageUrl?: string | null
   sortOrder?: number
   isVisible?: boolean
   createdAt?: Date | string
@@ -727,6 +756,7 @@ export type CategoryUpdateToOneWithWhereWithoutItemsInput = {
 export type CategoryUpdateWithoutItemsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -741,6 +771,7 @@ export type CategoryUncheckedUpdateWithoutItemsInput = {
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   sectionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -752,6 +783,7 @@ export type CategoryCreateManyTenantInput = {
   id?: string
   sectionId?: string | null
   name: string
+  coverImageUrl?: string | null
   sortOrder?: number
   isVisible?: boolean
   createdAt?: Date | string
@@ -762,6 +794,7 @@ export type CategoryCreateManyTenantInput = {
 export type CategoryUpdateWithoutTenantInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -775,6 +808,7 @@ export type CategoryUncheckedUpdateWithoutTenantInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   sectionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -787,6 +821,7 @@ export type CategoryUncheckedUpdateManyWithoutTenantInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   sectionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -798,6 +833,7 @@ export type CategoryCreateManySectionInput = {
   id?: string
   tenantId: string
   name: string
+  coverImageUrl?: string | null
   sortOrder?: number
   isVisible?: boolean
   createdAt?: Date | string
@@ -808,6 +844,7 @@ export type CategoryCreateManySectionInput = {
 export type CategoryUpdateWithoutSectionInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -821,6 +858,7 @@ export type CategoryUncheckedUpdateWithoutSectionInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -833,6 +871,7 @@ export type CategoryUncheckedUpdateManyWithoutSectionInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -876,6 +915,7 @@ export type CategorySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   tenantId?: boolean
   sectionId?: boolean
   name?: boolean
+  coverImageUrl?: boolean
   sortOrder?: boolean
   isVisible?: boolean
   createdAt?: boolean
@@ -892,6 +932,7 @@ export type CategorySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   tenantId?: boolean
   sectionId?: boolean
   name?: boolean
+  coverImageUrl?: boolean
   sortOrder?: boolean
   isVisible?: boolean
   createdAt?: boolean
@@ -906,6 +947,7 @@ export type CategorySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   tenantId?: boolean
   sectionId?: boolean
   name?: boolean
+  coverImageUrl?: boolean
   sortOrder?: boolean
   isVisible?: boolean
   createdAt?: boolean
@@ -920,6 +962,7 @@ export type CategorySelectScalar = {
   tenantId?: boolean
   sectionId?: boolean
   name?: boolean
+  coverImageUrl?: boolean
   sortOrder?: boolean
   isVisible?: boolean
   createdAt?: boolean
@@ -927,7 +970,7 @@ export type CategorySelectScalar = {
   deletedAt?: boolean
 }
 
-export type CategoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "sectionId" | "name" | "sortOrder" | "isVisible" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["category"]>
+export type CategoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "sectionId" | "name" | "coverImageUrl" | "sortOrder" | "isVisible" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["category"]>
 export type CategoryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   section?: boolean | Prisma.Category$sectionArgs<ExtArgs>
@@ -955,6 +998,7 @@ export type $CategoryPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     tenantId: string
     sectionId: string | null
     name: string
+    coverImageUrl: string | null
     sortOrder: number
     isVisible: boolean
     createdAt: Date
@@ -1390,6 +1434,7 @@ export interface CategoryFieldRefs {
   readonly tenantId: Prisma.FieldRef<"Category", 'String'>
   readonly sectionId: Prisma.FieldRef<"Category", 'String'>
   readonly name: Prisma.FieldRef<"Category", 'String'>
+  readonly coverImageUrl: Prisma.FieldRef<"Category", 'String'>
   readonly sortOrder: Prisma.FieldRef<"Category", 'Int'>
   readonly isVisible: Prisma.FieldRef<"Category", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Category", 'DateTime'>

@@ -4,6 +4,7 @@ import { Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
+import { ImageUploadField } from '@/components/admin/image-upload-field';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -25,6 +26,7 @@ export function CategoryEditorForm({
 }: CategoryEditorFormProps) {
   const router = useRouter();
   const [name, setName] = useState(initial?.name ?? '');
+  const [coverImageUrl, setCoverImageUrl] = useState<string | null>(initial?.coverImageUrl ?? null);
   const [isPending, startTransition] = useTransition();
   const [isDeleting, startDeleteTransition] = useTransition();
 
@@ -37,6 +39,7 @@ export function CategoryEditorForm({
       const result = await upsertCategoryAction({
         id: initial?.id,
         name: name.trim(),
+        coverImageUrl,
         sectionId,
         sortOrder: initial?.sortOrder ?? nextSortOrder,
         isVisible: true,
@@ -78,6 +81,13 @@ export function CategoryEditorForm({
         value={name}
         onChange={(event) => setName(event.target.value)}
         placeholder="Ej: Tacos"
+      />
+
+      <ImageUploadField
+        kind="category"
+        label="Portada de categoría"
+        value={coverImageUrl}
+        onChange={setCoverImageUrl}
       />
 
       <div className="sticky bottom-[88px] flex gap-3">

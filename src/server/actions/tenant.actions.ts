@@ -40,6 +40,12 @@ const brandSettingsSchema = z.object({
     .url('Usa una URL valida para el logo')
     .or(z.literal(''))
     .transform((value) => normalizeOptionalText(value)),
+  coverImageUrl: z
+    .string()
+    .url('Usa una URL valida para la portada')
+    .or(z.literal(''))
+    .transform((value) => normalizeOptionalText(value)),
+  logoShape: z.enum(['rectangular', 'square', 'round']).default('round'),
   primaryColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Color hex invalido'),
 });
 
@@ -48,12 +54,16 @@ export async function updateBrandSettingsFormAction(formData: FormData) {
   const data = brandSettingsSchema.parse({
     slug: formData.get('slug')?.toString() ?? '',
     logoUrl: formData.get('logoUrl')?.toString() ?? '',
+    coverImageUrl: formData.get('coverImageUrl')?.toString() ?? '',
+    logoShape: formData.get('logoShape')?.toString() ?? 'round',
     primaryColor: formData.get('primaryColor')?.toString() ?? '#F4B400',
   });
 
   if (process.env.USE_MOCKS === 'true') {
     mockTenant.slug = data.slug;
     mockTenant.logoUrl = data.logoUrl ?? null;
+    mockTenant.coverImageUrl = data.coverImageUrl ?? null;
+    mockTenant.logoShape = data.logoShape;
     mockTenant.primaryColor = data.primaryColor;
     revalidatePath('/', 'layout');
     redirect('/settings/brand?saved=1');
@@ -84,6 +94,8 @@ export async function updateBrandSettingsFormAction(formData: FormData) {
         data: {
           slug: newSlug,
           logoUrl: data.logoUrl,
+          coverImageUrl: data.coverImageUrl,
+          logoShape: data.logoShape,
           primaryColor: data.primaryColor,
         },
       });
@@ -98,6 +110,8 @@ export async function updateBrandSettingsFormAction(formData: FormData) {
       where: { id: ctx.tenantId },
       data: {
         logoUrl: data.logoUrl,
+        coverImageUrl: data.coverImageUrl,
+        logoShape: data.logoShape,
         primaryColor: data.primaryColor,
       },
     });

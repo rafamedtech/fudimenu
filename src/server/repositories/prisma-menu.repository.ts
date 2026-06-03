@@ -11,6 +11,8 @@ type TenantRow = {
   slug: string;
   name: string;
   logoUrl: string | null;
+  coverImageUrl: string | null;
+  logoShape: string;
   whatsappPhone: string | null;
   businessHours: string | null;
   primaryColor: string;
@@ -41,6 +43,7 @@ type CategoryRow = {
   tenantId: string;
   sectionId: string | null;
   name: string;
+  coverImageUrl: string | null;
   sortOrder: number;
   isVisible: boolean;
 };
@@ -69,6 +72,8 @@ function mapTenant(row: TenantRow): Tenant {
     slug: row.slug,
     name: row.name,
     logoUrl: row.logoUrl,
+    coverImageUrl: row.coverImageUrl,
+    logoShape: row.logoShape as Tenant['logoShape'],
     whatsappPhone: row.whatsappPhone,
     businessHours: row.businessHours,
     primaryColor: row.primaryColor,
@@ -103,7 +108,7 @@ function mapCategory(row: CategoryRow): Category {
     tenantId: row.tenantId,
     sectionId: row.sectionId ?? null,
     name: row.name,
-    coverImageUrl: null,
+    coverImageUrl: row.coverImageUrl,
     sortOrder: row.sortOrder,
     isVisible: row.isVisible,
   };
@@ -366,6 +371,7 @@ export class PrismaMenuRepository implements IMenuRepository {
         where: { id: input.id, tenantId, deletedAt: null },
         data: {
           name,
+          coverImageUrl: input.coverImageUrl ?? null,
           sectionId: input.sectionId ?? null,
           sortOrder: input.sortOrder ?? 0,
           isVisible: input.isVisible ?? true,
@@ -384,6 +390,7 @@ export class PrismaMenuRepository implements IMenuRepository {
       data: {
         tenantId,
         name,
+        coverImageUrl: input.coverImageUrl ?? null,
         sectionId: input.sectionId ?? null,
         sortOrder: input.sortOrder ?? 0,
         isVisible: input.isVisible ?? true,

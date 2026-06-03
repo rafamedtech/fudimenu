@@ -236,6 +236,7 @@ export class MockMenuRepository implements IMenuRepository {
       this.categories[idx] = {
         ...this.categories[idx],
         name,
+        coverImageUrl: input.coverImageUrl ?? null,
         sectionId: input.sectionId ?? null,
         sortOrder: input.sortOrder ?? 0,
         isVisible: input.isVisible ?? true,
@@ -248,7 +249,7 @@ export class MockMenuRepository implements IMenuRepository {
       tenantId,
       sectionId: input.sectionId ?? null,
       name,
-      coverImageUrl: null,
+      coverImageUrl: input.coverImageUrl ?? null,
       sortOrder: input.sortOrder ?? 0,
       isVisible: input.isVisible ?? true,
     };

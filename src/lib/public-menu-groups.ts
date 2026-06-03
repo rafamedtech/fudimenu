@@ -4,8 +4,10 @@ export interface PublicMenuGroup {
   sectionId: string | null;
   sectionName: string | null;
   sectionAccent: string | null;
+  sectionCoverImageUrl: string | null;
   categoryId: string;
   categoryName: string;
+  categoryCoverImageUrl: string | null;
   items: MenuItem[];
 }
 
@@ -78,8 +80,10 @@ export function buildPublicMenuGroups({
           sectionId: section.id,
           sectionName: section.name,
           sectionAccent: resolveSectionAccent(section.accentColor),
+          sectionCoverImageUrl: section.coverImageUrl,
           categoryId: category.id,
           categoryName: category.name,
+          categoryCoverImageUrl: category.coverImageUrl,
           items: categoryItems,
         });
       }
@@ -99,8 +103,10 @@ export function buildPublicMenuGroups({
         sectionId: null,
         sectionName: null,
         sectionAccent: null,
+        sectionCoverImageUrl: null,
         categoryId: category.id,
         categoryName: category.name,
+        categoryCoverImageUrl: category.coverImageUrl,
         items: mergedItems,
       });
     }
@@ -110,8 +116,10 @@ export function buildPublicMenuGroups({
         sectionId: null,
         sectionName: null,
         sectionAccent: null,
+        sectionCoverImageUrl: null,
         categoryId: 'uncategorized',
         categoryName: otherCategoryName,
+        categoryCoverImageUrl: null,
         items: uncategorizedItems,
       });
     }

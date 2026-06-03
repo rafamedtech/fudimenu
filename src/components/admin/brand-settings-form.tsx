@@ -10,17 +10,45 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { buildBrandThemeStyle } from '@/lib/brand-theme';
 import { updateBrandSettingsFormAction } from '@/server/actions/tenant.actions';
+import type { LogoShape } from '@/types/domain';
 
 const BRAND_COLORS = ['#F4B400', '#32D583', '#FF6B4A', '#3B82F6', '#A855F7', '#1A1611'];
+const LOGO_SHAPES: Array<{ value: LogoShape; label: string }> = [
+  { value: 'rectangular', label: 'Rectangular' },
+  { value: 'square', label: 'Cuadrado' },
+  { value: 'round', label: 'Redondo' },
+];
 
 interface BrandSettingsFormProps {
   currentSlug: string;
   tenantName: string;
   logoUrl: string | null;
+  coverImageUrl: string | null;
+  logoShape: LogoShape;
   primaryColor: string;
 }
 
-function BrandPreview({ tenantName, logoUrl, color }: { tenantName: string; logoUrl: string | null; color: string }) {
+function getPreviewLogoClass(shape: LogoShape) {
+  if (shape === 'rectangular') return 'h-12 w-24 rounded-md object-contain p-1';
+  if (shape === 'square') return 'size-14 rounded-md object-cover';
+  return 'size-14 rounded-full object-cover';
+}
+
+function BrandPreview({
+  tenantName,
+  logoUrl,
+  coverImageUrl,
+  logoShape,
+  color,
+}: {
+  tenantName: string;
+  logoUrl: string | null;
+  coverImageUrl: string | null;
+  logoShape: LogoShape;
+  color: string;
+}) {
+  const logoClassName = getPreviewLogoClass(logoShape);
+
   return (
     <div
       className="overflow-hidden rounded-xl border border-[var(--brand-card-border)] bg-[var(--brand-surface)] shadow-sm"
@@ -29,18 +57,32 @@ function BrandPreview({ tenantName, logoUrl, color }: { tenantName: string; logo
       <p className="border-b border-[var(--brand-card-border)] bg-[var(--brand-card)] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-ink-400">
         Vista previa
       </p>
+      <div className="relative h-24 bg-[var(--brand-primary-faint)]">
+        {coverImageUrl ? (
+          <Image src={coverImageUrl} alt="" fill sizes="340px" className="object-cover" />
+        ) : (
+          <div
+            aria-hidden
+            className="absolute inset-0"
+            style={{
+              background:
+                'linear-gradient(135deg, var(--brand-primary-faint) 0%, var(--brand-card-strong) 100%)',
+            }}
+          />
+        )}
+      </div>
       <div className="bg-[var(--brand-card)] px-4 py-5 text-center">
         {logoUrl ? (
           <Image
             src={logoUrl}
             alt={tenantName}
-            width={56}
+            width={logoShape === 'rectangular' ? 96 : 56}
             height={56}
-            className="mx-auto mb-2 rounded-full object-cover"
+            className={`mx-auto mb-2 border border-[var(--brand-card-border)] bg-[var(--brand-card)] ${logoClassName}`}
           />
         ) : (
           <div
-            className="mx-auto mb-2 flex size-14 items-center justify-center rounded-full text-2xl"
+            className={`mx-auto mb-2 flex items-center justify-center text-2xl ${logoClassName}`}
             style={{ backgroundColor: 'var(--brand-primary-faint)' }}
           >
             🍽️
@@ -86,9 +128,16 @@ export function BrandSettingsForm({
   currentSlug,
   tenantName,
   logoUrl,
+  coverImageUrl,
+  logoShape,
   primaryColor,
 }: BrandSettingsFormProps) {
   const [logo, setLogo] = useReducer((_: string | null, next: string | null) => next, logoUrl);
+  const [cover, setCover] = useReducer(
+    (_: string | null, next: string | null) => next,
+    coverImageUrl,
+  );
+  const [shape, setShape] = useReducer((_: LogoShape, next: LogoShape) => next, logoShape);
   const [color, setColor] = useReducer((_: string, next: string) => next, primaryColor);
 
   return (
@@ -98,6 +147,8 @@ export function BrandSettingsForm({
       style={buildBrandThemeStyle(color)}
     >
       <input type="hidden" name="logoUrl" value={logo ?? ''} />
+      <input type="hidden" name="coverImageUrl" value={cover ?? ''} />
+      <input type="hidden" name="logoShape" value={shape} />
 
       <div className="flex flex-col gap-6 ipad:gap-8">
         <FieldSection eyebrow="Dirección web" title="URL pública">
@@ -105,11 +156,39 @@ export function BrandSettingsForm({
         </FieldSection>
 
         <FieldSection eyebrow="Imagen" title="Logo">
+          <div className="space-y-5">
+            <ImageUploadField
+              kind="logo"
+              label="Sube el logo de tu restaurante"
+              value={logo}
+              onChange={setLogo}
+              fallback={<ImageIcon className="size-10" aria-hidden />}
+            />
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-ink-700">Formato del logo</p>
+              <div className="grid grid-cols-3 gap-2">
+                {LOGO_SHAPES.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    aria-pressed={shape === option.value}
+                    className="h-11 rounded-md border border-ink-200 px-2 text-sm font-bold text-ink-700 transition-all aria-pressed:border-[var(--brand-primary)] aria-pressed:bg-[var(--brand-primary-faint)] aria-pressed:text-ink-900"
+                    onClick={() => setShape(option.value)}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </FieldSection>
+
+        <FieldSection eyebrow="Imagen" title="Portada">
           <ImageUploadField
-            kind="logo"
-            label="Sube el logo de tu restaurante"
-            value={logo}
-            onChange={setLogo}
+            kind="tenant-cover"
+            label="Sube una imagen de portada"
+            value={cover}
+            onChange={setCover}
             fallback={<ImageIcon className="size-10" aria-hidden />}
           />
         </FieldSection>
@@ -148,7 +227,13 @@ export function BrandSettingsForm({
           <p className="text-[11px] font-black uppercase tracking-wider text-ink-500">En vivo</p>
           <h3 className="mt-0.5 font-heading text-lg font-extrabold text-ink-900">Vista previa</h3>
         </div>
-        <BrandPreview tenantName={tenantName} logoUrl={logo} color={color} />
+        <BrandPreview
+          tenantName={tenantName}
+          logoUrl={logo}
+          coverImageUrl={cover}
+          logoShape={shape}
+          color={color}
+        />
         <Button type="submit" className="w-full">
           Guardar ajustes
         </Button>

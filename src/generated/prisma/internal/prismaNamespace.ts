@@ -1423,6 +1423,8 @@ export const TenantScalarFieldEnum = {
   slug: 'slug',
   name: 'name',
   logoUrl: 'logoUrl',
+  coverImageUrl: 'coverImageUrl',
+  logoShape: 'logoShape',
   whatsappPhone: 'whatsappPhone',
   businessHours: 'businessHours',
   primaryColor: 'primaryColor',
@@ -1487,6 +1489,7 @@ export const CategoryScalarFieldEnum = {
   tenantId: 'tenantId',
   sectionId: 'sectionId',
   name: 'name',
+  coverImageUrl: 'coverImageUrl',
   sortOrder: 'sortOrder',
   isVisible: 'isVisible',
   createdAt: 'createdAt',
@@ -1680,6 +1683,20 @@ export type StringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 
  * Reference to a field of type 'String[]'
  */
 export type ListStringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'String[]'>
+    
+
+
+/**
+ * Reference to a field of type 'LogoShape'
+ */
+export type EnumLogoShapeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LogoShape'>
+    
+
+
+/**
+ * Reference to a field of type 'LogoShape[]'
+ */
+export type ListEnumLogoShapeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LogoShape[]'>
     
 
 

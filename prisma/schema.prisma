@@ -24,6 +24,12 @@ enum TenantPlan {
   business
 }
 
+enum LogoShape {
+  rectangular
+  square
+  round
+}
+
 enum WebhookEventStatus {
   pending
   processed
@@ -43,6 +49,8 @@ model Tenant {
   slug          String
   name          String
   logoUrl       String?        @map("logo_url")
+  coverImageUrl String?        @map("cover_image_url")
+  logoShape     LogoShape      @default(round) @map("logo_shape")
   whatsappPhone String?        @map("whatsapp_phone") @db.VarChar(13)
   businessHours String?        @map("business_hours")
   primaryColor  String         @default("#F4B400") @map("primary_color")
@@ -130,6 +138,7 @@ model Category {
   tenantId  String      @map("tenant_id") @db.Uuid
   sectionId String?     @map("section_id") @db.Uuid
   name      String
+  coverImageUrl String?  @map("cover_image_url")
   sortOrder Int         @default(0) @map("sort_order")
   isVisible Boolean     @default(true) @map("is_visible")
   createdAt DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)

@@ -68,6 +68,13 @@ export type StringNullableFilter<$PrismaModel = never> = {
   not?: Prisma.NestedStringNullableFilter<$PrismaModel> | string | null
 }
 
+export type EnumLogoShapeFilter<$PrismaModel = never> = {
+  equals?: $Enums.LogoShape | Prisma.EnumLogoShapeFieldRefInput<$PrismaModel>
+  in?: $Enums.LogoShape[] | Prisma.ListEnumLogoShapeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LogoShape[] | Prisma.ListEnumLogoShapeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLogoShapeFilter<$PrismaModel> | $Enums.LogoShape
+}
+
 export type EnumLocaleFilter<$PrismaModel = never> = {
   equals?: $Enums.Locale | Prisma.EnumLocaleFieldRefInput<$PrismaModel>
   in?: $Enums.Locale[] | Prisma.ListEnumLocaleFieldRefInput<$PrismaModel>
@@ -173,6 +180,16 @@ export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
   _min?: Prisma.NestedStringNullableFilter<$PrismaModel>
   _max?: Prisma.NestedStringNullableFilter<$PrismaModel>
+}
+
+export type EnumLogoShapeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.LogoShape | Prisma.EnumLogoShapeFieldRefInput<$PrismaModel>
+  in?: $Enums.LogoShape[] | Prisma.ListEnumLogoShapeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LogoShape[] | Prisma.ListEnumLogoShapeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLogoShapeWithAggregatesFilter<$PrismaModel> | $Enums.LogoShape
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumLogoShapeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumLogoShapeFilter<$PrismaModel>
 }
 
 export type EnumLocaleWithAggregatesFilter<$PrismaModel = never> = {
@@ -459,6 +476,13 @@ export type NestedStringNullableFilter<$PrismaModel = never> = {
   not?: Prisma.NestedStringNullableFilter<$PrismaModel> | string | null
 }
 
+export type NestedEnumLogoShapeFilter<$PrismaModel = never> = {
+  equals?: $Enums.LogoShape | Prisma.EnumLogoShapeFieldRefInput<$PrismaModel>
+  in?: $Enums.LogoShape[] | Prisma.ListEnumLogoShapeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LogoShape[] | Prisma.ListEnumLogoShapeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLogoShapeFilter<$PrismaModel> | $Enums.LogoShape
+}
+
 export type NestedEnumLocaleFilter<$PrismaModel = never> = {
   equals?: $Enums.Locale | Prisma.EnumLocaleFieldRefInput<$PrismaModel>
   in?: $Enums.Locale[] | Prisma.ListEnumLocaleFieldRefInput<$PrismaModel>
@@ -577,6 +601,16 @@ export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
   _min?: Prisma.NestedStringNullableFilter<$PrismaModel>
   _max?: Prisma.NestedStringNullableFilter<$PrismaModel>
+}
+
+export type NestedEnumLogoShapeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.LogoShape | Prisma.EnumLogoShapeFieldRefInput<$PrismaModel>
+  in?: $Enums.LogoShape[] | Prisma.ListEnumLogoShapeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LogoShape[] | Prisma.ListEnumLogoShapeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLogoShapeWithAggregatesFilter<$PrismaModel> | $Enums.LogoShape
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumLogoShapeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumLogoShapeFilter<$PrismaModel>
 }
 
 export type NestedEnumLocaleWithAggregatesFilter<$PrismaModel = never> = {

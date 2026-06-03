@@ -26,6 +26,7 @@ export const itemSchema = z
 export const categorySchema = z.object({
   id: z.string().min(1).optional(),
   name: z.string().min(1).max(40),
+  coverImageUrl: z.string().url().nullable().optional(),
   sectionId: z.string().min(1).nullable().optional(),
   sortOrder: z.number().int().default(0),
   isVisible: z.boolean().default(true),
@@ -49,6 +50,8 @@ export const tenantUpdateSchema = z.object({
     .regex(/^#[0-9A-Fa-f]{6}$/, 'Color hex inválido')
     .optional(),
   logoUrl: z.string().url().nullable().optional(),
+  coverImageUrl: z.string().url().nullable().optional(),
+  logoShape: z.enum(['rectangular', 'square', 'round']).optional(),
   whatsappPhone: z.string().max(32).nullable().optional(),
   businessHours: z.string().max(120).nullable().optional(),
 });

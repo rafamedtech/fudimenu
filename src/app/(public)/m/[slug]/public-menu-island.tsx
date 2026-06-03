@@ -98,7 +98,16 @@ export function PublicMenuIsland({
     setIsSheetOpen(true);
   };
 
-  const sectionsById = new Map<string, { id: string; name: string | null; accent: string | null; groups: IslandGroup[] }>();
+  const sectionsById = new Map<
+    string,
+    {
+      id: string;
+      name: string | null;
+      accent: string | null;
+      coverImageUrl: string | null;
+      groups: IslandGroup[];
+    }
+  >();
   for (const group of filteredGroups) {
     const key = group.sectionId ?? '__nosec__';
     if (!sectionsById.has(key)) {
@@ -106,6 +115,7 @@ export function PublicMenuIsland({
         id: key,
         name: group.sectionName,
         accent: group.sectionAccent,
+        coverImageUrl: group.sectionCoverImageUrl,
         groups: [],
       });
     }
@@ -151,10 +161,26 @@ export function PublicMenuIsland({
           <section key={sec.id} id={sec.id !== '__nosec__' ? `sec-${sec.id}` : undefined}>
             {sec.name && (
               <div
-                className="mb-3 flex items-center gap-2 rounded-xl px-4 py-3 ipad:mb-4 ipad:px-5 ipad:py-4"
+                className="relative mb-3 flex min-h-24 items-end overflow-hidden rounded-xl px-4 py-3 ipad:mb-4 ipad:min-h-32 ipad:px-5 ipad:py-4"
                 style={{ backgroundColor: sec.accent ?? 'var(--brand-card-strong)' }}
               >
-                <h2 className="text-2xl font-extrabold text-ink-900 ipad:text-3xl">
+                {sec.coverImageUrl && (
+                  <>
+                    <Image
+                      src={sec.coverImageUrl}
+                      alt=""
+                      fill
+                      sizes="(min-width: 1024px) 1100px, 100vw"
+                      className="object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-ink-900/75 via-ink-900/25 to-transparent" />
+                  </>
+                )}
+                <h2
+                  className={`relative z-[1] text-2xl font-extrabold ipad:text-3xl ${
+                    sec.coverImageUrl ? 'text-white' : 'text-ink-900'
+                  }`}
+                >
                   {sec.name}
                 </h2>
               </div>
@@ -162,9 +188,22 @@ export function PublicMenuIsland({
             <div className="flex flex-col gap-6">
               {sec.groups.map((g) => (
                 <div key={g.categoryId} id={`cat-${g.categoryId}`}>
-                  <h3 className="mb-2 px-1 text-base font-bold text-ink-700 ipad:text-lg">
-                    {g.categoryName}
-                  </h3>
+                  <div className="mb-2 flex items-center gap-3 px-1">
+                    {g.categoryCoverImageUrl && (
+                      <div className="relative size-12 shrink-0 overflow-hidden rounded-md bg-[var(--brand-primary-soft)] ipad:size-14">
+                        <Image
+                          src={g.categoryCoverImageUrl}
+                          alt=""
+                          fill
+                          sizes="56px"
+                          className="object-cover"
+                        />
+                      </div>
+                    )}
+                    <h3 className="text-base font-bold text-ink-700 ipad:text-lg">
+                      {g.categoryName}
+                    </h3>
+                  </div>
                   <ItemList
                     items={g.items}
                     categoryName={g.categoryName}

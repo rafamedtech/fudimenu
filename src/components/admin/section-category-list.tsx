@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import {
   DndContext,
@@ -143,6 +144,17 @@ function SortableCategoryGroup({
             >
               <GripVertical className="size-5" aria-hidden />
             </button>
+          )}
+          {group.category.coverImageUrl && (
+            <div className="relative size-10 shrink-0 overflow-hidden rounded-md bg-[var(--brand-primary-soft)]">
+              <Image
+                src={group.category.coverImageUrl}
+                alt=""
+                fill
+                sizes="40px"
+                className="object-cover"
+              />
+            </div>
           )}
           <h2 className="text-lg font-bold text-ink-900">{group.category.name}</h2>
         </div>

@@ -30,6 +30,8 @@ export type TenantMinAggregateOutputType = {
   slug: string | null
   name: string | null
   logoUrl: string | null
+  coverImageUrl: string | null
+  logoShape: $Enums.LogoShape | null
   whatsappPhone: string | null
   businessHours: string | null
   primaryColor: string | null
@@ -50,6 +52,8 @@ export type TenantMaxAggregateOutputType = {
   slug: string | null
   name: string | null
   logoUrl: string | null
+  coverImageUrl: string | null
+  logoShape: $Enums.LogoShape | null
   whatsappPhone: string | null
   businessHours: string | null
   primaryColor: string | null
@@ -70,6 +74,8 @@ export type TenantCountAggregateOutputType = {
   slug: number
   name: number
   logoUrl: number
+  coverImageUrl: number
+  logoShape: number
   whatsappPhone: number
   businessHours: number
   primaryColor: number
@@ -92,6 +98,8 @@ export type TenantMinAggregateInputType = {
   slug?: true
   name?: true
   logoUrl?: true
+  coverImageUrl?: true
+  logoShape?: true
   whatsappPhone?: true
   businessHours?: true
   primaryColor?: true
@@ -112,6 +120,8 @@ export type TenantMaxAggregateInputType = {
   slug?: true
   name?: true
   logoUrl?: true
+  coverImageUrl?: true
+  logoShape?: true
   whatsappPhone?: true
   businessHours?: true
   primaryColor?: true
@@ -132,6 +142,8 @@ export type TenantCountAggregateInputType = {
   slug?: true
   name?: true
   logoUrl?: true
+  coverImageUrl?: true
+  logoShape?: true
   whatsappPhone?: true
   businessHours?: true
   primaryColor?: true
@@ -225,6 +237,8 @@ export type TenantGroupByOutputType = {
   slug: string
   name: string
   logoUrl: string | null
+  coverImageUrl: string | null
+  logoShape: $Enums.LogoShape
   whatsappPhone: string | null
   businessHours: string | null
   primaryColor: string
@@ -266,6 +280,8 @@ export type TenantWhereInput = {
   slug?: Prisma.StringFilter<"Tenant"> | string
   name?: Prisma.StringFilter<"Tenant"> | string
   logoUrl?: Prisma.StringNullableFilter<"Tenant"> | string | null
+  coverImageUrl?: Prisma.StringNullableFilter<"Tenant"> | string | null
+  logoShape?: Prisma.EnumLogoShapeFilter<"Tenant"> | $Enums.LogoShape
   whatsappPhone?: Prisma.StringNullableFilter<"Tenant"> | string | null
   businessHours?: Prisma.StringNullableFilter<"Tenant"> | string | null
   primaryColor?: Prisma.StringFilter<"Tenant"> | string
@@ -296,6 +312,8 @@ export type TenantOrderByWithRelationInput = {
   slug?: Prisma.SortOrder
   name?: Prisma.SortOrder
   logoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  coverImageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  logoShape?: Prisma.SortOrder
   whatsappPhone?: Prisma.SortOrderInput | Prisma.SortOrder
   businessHours?: Prisma.SortOrderInput | Prisma.SortOrder
   primaryColor?: Prisma.SortOrder
@@ -329,6 +347,8 @@ export type TenantWhereUniqueInput = Prisma.AtLeast<{
   createdBy?: Prisma.UuidNullableFilter<"Tenant"> | string | null
   name?: Prisma.StringFilter<"Tenant"> | string
   logoUrl?: Prisma.StringNullableFilter<"Tenant"> | string | null
+  coverImageUrl?: Prisma.StringNullableFilter<"Tenant"> | string | null
+  logoShape?: Prisma.EnumLogoShapeFilter<"Tenant"> | $Enums.LogoShape
   whatsappPhone?: Prisma.StringNullableFilter<"Tenant"> | string | null
   businessHours?: Prisma.StringNullableFilter<"Tenant"> | string | null
   primaryColor?: Prisma.StringFilter<"Tenant"> | string
@@ -359,6 +379,8 @@ export type TenantOrderByWithAggregationInput = {
   slug?: Prisma.SortOrder
   name?: Prisma.SortOrder
   logoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  coverImageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  logoShape?: Prisma.SortOrder
   whatsappPhone?: Prisma.SortOrderInput | Prisma.SortOrder
   businessHours?: Prisma.SortOrderInput | Prisma.SortOrder
   primaryColor?: Prisma.SortOrder
@@ -385,6 +407,8 @@ export type TenantScalarWhereWithAggregatesInput = {
   slug?: Prisma.StringWithAggregatesFilter<"Tenant"> | string
   name?: Prisma.StringWithAggregatesFilter<"Tenant"> | string
   logoUrl?: Prisma.StringNullableWithAggregatesFilter<"Tenant"> | string | null
+  coverImageUrl?: Prisma.StringNullableWithAggregatesFilter<"Tenant"> | string | null
+  logoShape?: Prisma.EnumLogoShapeWithAggregatesFilter<"Tenant"> | $Enums.LogoShape
   whatsappPhone?: Prisma.StringNullableWithAggregatesFilter<"Tenant"> | string | null
   businessHours?: Prisma.StringNullableWithAggregatesFilter<"Tenant"> | string | null
   primaryColor?: Prisma.StringWithAggregatesFilter<"Tenant"> | string
@@ -405,6 +429,8 @@ export type TenantCreateInput = {
   slug: string
   name: string
   logoUrl?: string | null
+  coverImageUrl?: string | null
+  logoShape?: $Enums.LogoShape
   whatsappPhone?: string | null
   businessHours?: string | null
   primaryColor?: string
@@ -435,6 +461,8 @@ export type TenantUncheckedCreateInput = {
   slug: string
   name: string
   logoUrl?: string | null
+  coverImageUrl?: string | null
+  logoShape?: $Enums.LogoShape
   whatsappPhone?: string | null
   businessHours?: string | null
   primaryColor?: string
@@ -465,6 +493,8 @@ export type TenantUpdateInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoShape?: Prisma.EnumLogoShapeFieldUpdateOperationsInput | $Enums.LogoShape
   whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
@@ -495,6 +525,8 @@ export type TenantUncheckedUpdateInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoShape?: Prisma.EnumLogoShapeFieldUpdateOperationsInput | $Enums.LogoShape
   whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
@@ -525,6 +557,8 @@ export type TenantCreateManyInput = {
   slug: string
   name: string
   logoUrl?: string | null
+  coverImageUrl?: string | null
+  logoShape?: $Enums.LogoShape
   whatsappPhone?: string | null
   businessHours?: string | null
   primaryColor?: string
@@ -545,6 +579,8 @@ export type TenantUpdateManyMutationInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoShape?: Prisma.EnumLogoShapeFieldUpdateOperationsInput | $Enums.LogoShape
   whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
@@ -565,6 +601,8 @@ export type TenantUncheckedUpdateManyInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoShape?: Prisma.EnumLogoShapeFieldUpdateOperationsInput | $Enums.LogoShape
   whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
@@ -585,6 +623,8 @@ export type TenantCountOrderByAggregateInput = {
   slug?: Prisma.SortOrder
   name?: Prisma.SortOrder
   logoUrl?: Prisma.SortOrder
+  coverImageUrl?: Prisma.SortOrder
+  logoShape?: Prisma.SortOrder
   whatsappPhone?: Prisma.SortOrder
   businessHours?: Prisma.SortOrder
   primaryColor?: Prisma.SortOrder
@@ -605,6 +645,8 @@ export type TenantMaxOrderByAggregateInput = {
   slug?: Prisma.SortOrder
   name?: Prisma.SortOrder
   logoUrl?: Prisma.SortOrder
+  coverImageUrl?: Prisma.SortOrder
+  logoShape?: Prisma.SortOrder
   whatsappPhone?: Prisma.SortOrder
   businessHours?: Prisma.SortOrder
   primaryColor?: Prisma.SortOrder
@@ -625,6 +667,8 @@ export type TenantMinOrderByAggregateInput = {
   slug?: Prisma.SortOrder
   name?: Prisma.SortOrder
   logoUrl?: Prisma.SortOrder
+  coverImageUrl?: Prisma.SortOrder
+  logoShape?: Prisma.SortOrder
   whatsappPhone?: Prisma.SortOrder
   businessHours?: Prisma.SortOrder
   primaryColor?: Prisma.SortOrder
@@ -655,6 +699,10 @@ export type StringFieldUpdateOperationsInput = {
 
 export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
+}
+
+export type EnumLogoShapeFieldUpdateOperationsInput = {
+  set?: $Enums.LogoShape
 }
 
 export type EnumLocaleFieldUpdateOperationsInput = {
@@ -823,6 +871,8 @@ export type TenantCreateWithoutMembershipsInput = {
   slug: string
   name: string
   logoUrl?: string | null
+  coverImageUrl?: string | null
+  logoShape?: $Enums.LogoShape
   whatsappPhone?: string | null
   businessHours?: string | null
   primaryColor?: string
@@ -852,6 +902,8 @@ export type TenantUncheckedCreateWithoutMembershipsInput = {
   slug: string
   name: string
   logoUrl?: string | null
+  coverImageUrl?: string | null
+  logoShape?: $Enums.LogoShape
   whatsappPhone?: string | null
   businessHours?: string | null
   primaryColor?: string
@@ -897,6 +949,8 @@ export type TenantUpdateWithoutMembershipsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoShape?: Prisma.EnumLogoShapeFieldUpdateOperationsInput | $Enums.LogoShape
   whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
@@ -926,6 +980,8 @@ export type TenantUncheckedUpdateWithoutMembershipsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoShape?: Prisma.EnumLogoShapeFieldUpdateOperationsInput | $Enums.LogoShape
   whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
@@ -955,6 +1011,8 @@ export type TenantCreateWithoutSectionsInput = {
   slug: string
   name: string
   logoUrl?: string | null
+  coverImageUrl?: string | null
+  logoShape?: $Enums.LogoShape
   whatsappPhone?: string | null
   businessHours?: string | null
   primaryColor?: string
@@ -984,6 +1042,8 @@ export type TenantUncheckedCreateWithoutSectionsInput = {
   slug: string
   name: string
   logoUrl?: string | null
+  coverImageUrl?: string | null
+  logoShape?: $Enums.LogoShape
   whatsappPhone?: string | null
   businessHours?: string | null
   primaryColor?: string
@@ -1029,6 +1089,8 @@ export type TenantUpdateWithoutSectionsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoShape?: Prisma.EnumLogoShapeFieldUpdateOperationsInput | $Enums.LogoShape
   whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1058,6 +1120,8 @@ export type TenantUncheckedUpdateWithoutSectionsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoShape?: Prisma.EnumLogoShapeFieldUpdateOperationsInput | $Enums.LogoShape
   whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1087,6 +1151,8 @@ export type TenantCreateWithoutCategoriesInput = {
   slug: string
   name: string
   logoUrl?: string | null
+  coverImageUrl?: string | null
+  logoShape?: $Enums.LogoShape
   whatsappPhone?: string | null
   businessHours?: string | null
   primaryColor?: string
@@ -1116,6 +1182,8 @@ export type TenantUncheckedCreateWithoutCategoriesInput = {
   slug: string
   name: string
   logoUrl?: string | null
+  coverImageUrl?: string | null
+  logoShape?: $Enums.LogoShape
   whatsappPhone?: string | null
   businessHours?: string | null
   primaryColor?: string
@@ -1161,6 +1229,8 @@ export type TenantUpdateWithoutCategoriesInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoShape?: Prisma.EnumLogoShapeFieldUpdateOperationsInput | $Enums.LogoShape
   whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1190,6 +1260,8 @@ export type TenantUncheckedUpdateWithoutCategoriesInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoShape?: Prisma.EnumLogoShapeFieldUpdateOperationsInput | $Enums.LogoShape
   whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1219,6 +1291,8 @@ export type TenantCreateWithoutItemsInput = {
   slug: string
   name: string
   logoUrl?: string | null
+  coverImageUrl?: string | null
+  logoShape?: $Enums.LogoShape
   whatsappPhone?: string | null
   businessHours?: string | null
   primaryColor?: string
@@ -1248,6 +1322,8 @@ export type TenantUncheckedCreateWithoutItemsInput = {
   slug: string
   name: string
   logoUrl?: string | null
+  coverImageUrl?: string | null
+  logoShape?: $Enums.LogoShape
   whatsappPhone?: string | null
   businessHours?: string | null
   primaryColor?: string
@@ -1293,6 +1369,8 @@ export type TenantUpdateWithoutItemsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoShape?: Prisma.EnumLogoShapeFieldUpdateOperationsInput | $Enums.LogoShape
   whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1322,6 +1400,8 @@ export type TenantUncheckedUpdateWithoutItemsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoShape?: Prisma.EnumLogoShapeFieldUpdateOperationsInput | $Enums.LogoShape
   whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1351,6 +1431,8 @@ export type TenantCreateWithoutSlugHistoryInput = {
   slug: string
   name: string
   logoUrl?: string | null
+  coverImageUrl?: string | null
+  logoShape?: $Enums.LogoShape
   whatsappPhone?: string | null
   businessHours?: string | null
   primaryColor?: string
@@ -1380,6 +1462,8 @@ export type TenantUncheckedCreateWithoutSlugHistoryInput = {
   slug: string
   name: string
   logoUrl?: string | null
+  coverImageUrl?: string | null
+  logoShape?: $Enums.LogoShape
   whatsappPhone?: string | null
   businessHours?: string | null
   primaryColor?: string
@@ -1425,6 +1509,8 @@ export type TenantUpdateWithoutSlugHistoryInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoShape?: Prisma.EnumLogoShapeFieldUpdateOperationsInput | $Enums.LogoShape
   whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1454,6 +1540,8 @@ export type TenantUncheckedUpdateWithoutSlugHistoryInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoShape?: Prisma.EnumLogoShapeFieldUpdateOperationsInput | $Enums.LogoShape
   whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1483,6 +1571,8 @@ export type TenantCreateWithoutMenuViewsInput = {
   slug: string
   name: string
   logoUrl?: string | null
+  coverImageUrl?: string | null
+  logoShape?: $Enums.LogoShape
   whatsappPhone?: string | null
   businessHours?: string | null
   primaryColor?: string
@@ -1512,6 +1602,8 @@ export type TenantUncheckedCreateWithoutMenuViewsInput = {
   slug: string
   name: string
   logoUrl?: string | null
+  coverImageUrl?: string | null
+  logoShape?: $Enums.LogoShape
   whatsappPhone?: string | null
   businessHours?: string | null
   primaryColor?: string
@@ -1557,6 +1649,8 @@ export type TenantUpdateWithoutMenuViewsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoShape?: Prisma.EnumLogoShapeFieldUpdateOperationsInput | $Enums.LogoShape
   whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1586,6 +1680,8 @@ export type TenantUncheckedUpdateWithoutMenuViewsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoShape?: Prisma.EnumLogoShapeFieldUpdateOperationsInput | $Enums.LogoShape
   whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1615,6 +1711,8 @@ export type TenantCreateWithoutItemViewsInput = {
   slug: string
   name: string
   logoUrl?: string | null
+  coverImageUrl?: string | null
+  logoShape?: $Enums.LogoShape
   whatsappPhone?: string | null
   businessHours?: string | null
   primaryColor?: string
@@ -1644,6 +1742,8 @@ export type TenantUncheckedCreateWithoutItemViewsInput = {
   slug: string
   name: string
   logoUrl?: string | null
+  coverImageUrl?: string | null
+  logoShape?: $Enums.LogoShape
   whatsappPhone?: string | null
   businessHours?: string | null
   primaryColor?: string
@@ -1689,6 +1789,8 @@ export type TenantUpdateWithoutItemViewsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoShape?: Prisma.EnumLogoShapeFieldUpdateOperationsInput | $Enums.LogoShape
   whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1718,6 +1820,8 @@ export type TenantUncheckedUpdateWithoutItemViewsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoShape?: Prisma.EnumLogoShapeFieldUpdateOperationsInput | $Enums.LogoShape
   whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1747,6 +1851,8 @@ export type TenantCreateWithoutAuditLogsInput = {
   slug: string
   name: string
   logoUrl?: string | null
+  coverImageUrl?: string | null
+  logoShape?: $Enums.LogoShape
   whatsappPhone?: string | null
   businessHours?: string | null
   primaryColor?: string
@@ -1776,6 +1882,8 @@ export type TenantUncheckedCreateWithoutAuditLogsInput = {
   slug: string
   name: string
   logoUrl?: string | null
+  coverImageUrl?: string | null
+  logoShape?: $Enums.LogoShape
   whatsappPhone?: string | null
   businessHours?: string | null
   primaryColor?: string
@@ -1821,6 +1929,8 @@ export type TenantUpdateWithoutAuditLogsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoShape?: Prisma.EnumLogoShapeFieldUpdateOperationsInput | $Enums.LogoShape
   whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1850,6 +1960,8 @@ export type TenantUncheckedUpdateWithoutAuditLogsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoShape?: Prisma.EnumLogoShapeFieldUpdateOperationsInput | $Enums.LogoShape
   whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1879,6 +1991,8 @@ export type TenantCreateWithoutWebhookEventsInput = {
   slug: string
   name: string
   logoUrl?: string | null
+  coverImageUrl?: string | null
+  logoShape?: $Enums.LogoShape
   whatsappPhone?: string | null
   businessHours?: string | null
   primaryColor?: string
@@ -1908,6 +2022,8 @@ export type TenantUncheckedCreateWithoutWebhookEventsInput = {
   slug: string
   name: string
   logoUrl?: string | null
+  coverImageUrl?: string | null
+  logoShape?: $Enums.LogoShape
   whatsappPhone?: string | null
   businessHours?: string | null
   primaryColor?: string
@@ -1953,6 +2069,8 @@ export type TenantUpdateWithoutWebhookEventsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoShape?: Prisma.EnumLogoShapeFieldUpdateOperationsInput | $Enums.LogoShape
   whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1982,6 +2100,8 @@ export type TenantUncheckedUpdateWithoutWebhookEventsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoShape?: Prisma.EnumLogoShapeFieldUpdateOperationsInput | $Enums.LogoShape
   whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2011,6 +2131,8 @@ export type TenantCreateWithoutReferralsInput = {
   slug: string
   name: string
   logoUrl?: string | null
+  coverImageUrl?: string | null
+  logoShape?: $Enums.LogoShape
   whatsappPhone?: string | null
   businessHours?: string | null
   primaryColor?: string
@@ -2040,6 +2162,8 @@ export type TenantUncheckedCreateWithoutReferralsInput = {
   slug: string
   name: string
   logoUrl?: string | null
+  coverImageUrl?: string | null
+  logoShape?: $Enums.LogoShape
   whatsappPhone?: string | null
   businessHours?: string | null
   primaryColor?: string
@@ -2085,6 +2209,8 @@ export type TenantUpdateWithoutReferralsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoShape?: Prisma.EnumLogoShapeFieldUpdateOperationsInput | $Enums.LogoShape
   whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2114,6 +2240,8 @@ export type TenantUncheckedUpdateWithoutReferralsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoShape?: Prisma.EnumLogoShapeFieldUpdateOperationsInput | $Enums.LogoShape
   whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2255,6 +2383,8 @@ export type TenantSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   slug?: boolean
   name?: boolean
   logoUrl?: boolean
+  coverImageUrl?: boolean
+  logoShape?: boolean
   whatsappPhone?: boolean
   businessHours?: boolean
   primaryColor?: boolean
@@ -2286,6 +2416,8 @@ export type TenantSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   slug?: boolean
   name?: boolean
   logoUrl?: boolean
+  coverImageUrl?: boolean
+  logoShape?: boolean
   whatsappPhone?: boolean
   businessHours?: boolean
   primaryColor?: boolean
@@ -2306,6 +2438,8 @@ export type TenantSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   slug?: boolean
   name?: boolean
   logoUrl?: boolean
+  coverImageUrl?: boolean
+  logoShape?: boolean
   whatsappPhone?: boolean
   businessHours?: boolean
   primaryColor?: boolean
@@ -2326,6 +2460,8 @@ export type TenantSelectScalar = {
   slug?: boolean
   name?: boolean
   logoUrl?: boolean
+  coverImageUrl?: boolean
+  logoShape?: boolean
   whatsappPhone?: boolean
   businessHours?: boolean
   primaryColor?: boolean
@@ -2340,7 +2476,7 @@ export type TenantSelectScalar = {
   deletedAt?: boolean
 }
 
-export type TenantOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "createdBy" | "slug" | "name" | "logoUrl" | "whatsappPhone" | "businessHours" | "primaryColor" | "cuisineType" | "defaultLocale" | "currency" | "plan" | "stripeCustomerId" | "stripeSubscriptionId" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["tenant"]>
+export type TenantOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "createdBy" | "slug" | "name" | "logoUrl" | "coverImageUrl" | "logoShape" | "whatsappPhone" | "businessHours" | "primaryColor" | "cuisineType" | "defaultLocale" | "currency" | "plan" | "stripeCustomerId" | "stripeSubscriptionId" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["tenant"]>
 export type TenantInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   memberships?: boolean | Prisma.Tenant$membershipsArgs<ExtArgs>
   sections?: boolean | Prisma.Tenant$sectionsArgs<ExtArgs>
@@ -2377,6 +2513,8 @@ export type $TenantPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     slug: string
     name: string
     logoUrl: string | null
+    coverImageUrl: string | null
+    logoShape: $Enums.LogoShape
     whatsappPhone: string | null
     businessHours: string | null
     primaryColor: string
@@ -2827,6 +2965,8 @@ export interface TenantFieldRefs {
   readonly slug: Prisma.FieldRef<"Tenant", 'String'>
   readonly name: Prisma.FieldRef<"Tenant", 'String'>
   readonly logoUrl: Prisma.FieldRef<"Tenant", 'String'>
+  readonly coverImageUrl: Prisma.FieldRef<"Tenant", 'String'>
+  readonly logoShape: Prisma.FieldRef<"Tenant", 'LogoShape'>
   readonly whatsappPhone: Prisma.FieldRef<"Tenant", 'String'>
   readonly businessHours: Prisma.FieldRef<"Tenant", 'String'>
   readonly primaryColor: Prisma.FieldRef<"Tenant", 'String'>

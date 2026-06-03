@@ -67,6 +67,8 @@ async function BrandSettingsContent({ tenantId }: { tenantId: string }) {
             slug: true,
             name: true,
             logoUrl: true,
+            coverImageUrl: true,
+            logoShape: true,
             primaryColor: true,
           },
         });
@@ -76,6 +78,8 @@ async function BrandSettingsContent({ tenantId }: { tenantId: string }) {
       currentSlug={tenant?.slug ?? ''}
       tenantName={tenant?.name ?? ''}
       logoUrl={tenant?.logoUrl ?? null}
+      coverImageUrl={tenant?.coverImageUrl ?? null}
+      logoShape={tenant?.logoShape ?? 'round'}
       primaryColor={tenant?.primaryColor ?? '#F4B400'}
     />
   );

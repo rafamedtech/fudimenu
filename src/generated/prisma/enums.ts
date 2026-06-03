@@ -35,6 +35,15 @@ export const TenantPlan = {
 export type TenantPlan = (typeof TenantPlan)[keyof typeof TenantPlan]
 
 
+export const LogoShape = {
+  rectangular: 'rectangular',
+  square: 'square',
+  round: 'round'
+} as const
+
+export type LogoShape = (typeof LogoShape)[keyof typeof LogoShape]
+
+
 export const WebhookEventStatus = {
   pending: 'pending',
   processed: 'processed',
