@@ -83,7 +83,7 @@ async function PublicMenuContent({
   });
   const hasSections = sections.length > 0;
   const logoFrameClass = getLogoFrameClass(tenant.logoShape);
-  const logoObjectClass = tenant.logoShape === 'rectangular' ? 'object-contain p-2' : 'object-cover';
+  const logoObjectClass = 'object-cover';
 
   const sectionAnchors: NavAnchor[] = [];
   if (hasSections) {

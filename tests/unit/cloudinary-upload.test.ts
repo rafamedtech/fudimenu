@@ -216,4 +216,31 @@ describe('POST /api/uploads/cloudinary', () => {
     expect(body.url).toContain('cloudinary.com');
     expect(body.publicId).toBe('fudimenu/tenant-1/item/abc');
   });
+
+  it('applies f_auto,q_auto at delivery time, not as an upload transformation', async () => {
+    // f_auto needs the requesting browser; as an incoming/upload transform it
+    // rewrites the stored original and corrupts the asset. Must be delivery-only.
+    mocks.fetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        secure_url: 'https://res.cloudinary.com/test-cloud/image/upload/v1/fudimenu/tenant-1/item/abc.jpg',
+        public_id: 'fudimenu/tenant-1/item/abc',
+      }),
+    });
+    const POST = await loadRoute();
+    const fd = new FormData();
+    fd.set('kind', 'item');
+    fd.set('file', validFile());
+    const res = await POST(makeRequest(fd));
+    const body = await res.json();
+
+    // No transformation sent to Cloudinary on upload → original stored intact.
+    const [, init] = mocks.fetch.mock.calls[0] as [string, { body: FormData }];
+    expect((init.body as FormData).get('transformation')).toBeNull();
+
+    // f_auto,q_auto injected into the returned delivery URL instead.
+    expect(body.url).toBe(
+      'https://res.cloudinary.com/test-cloud/image/upload/f_auto,q_auto/v1/fudimenu/tenant-1/item/abc.jpg',
+    );
+  });
 });
