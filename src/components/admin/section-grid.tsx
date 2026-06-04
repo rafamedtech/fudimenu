@@ -18,7 +18,7 @@ import {
   useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Plus, Settings2 } from 'lucide-react';
+import { GripVertical, Layers3, Plus, Settings2, Utensils } from 'lucide-react';
 import { useMemo, useReducer, useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -66,8 +66,17 @@ export function SectionGrid({ sections, canCreateSection, itemCountBySectionId }
 
   return (
     <section className="space-y-3 ipad:space-y-4">
-      {items.length > 1 && (
-        <div className="flex justify-end">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-[var(--brand-accent-text)]">
+            Arquitectura del menú
+          </p>
+          <h2 className="mt-1 text-xl font-black text-ink-900 ipad:text-2xl">Secciones</h2>
+          <p className="mt-1 hidden max-w-xl text-sm font-medium leading-6 text-ink-500 ipad:block">
+            Ordena la carta como la ve el cliente: primero secciones, después categorías y platillos.
+          </p>
+        </div>
+        {items.length > 1 && (
           <Button
             type="button"
             size="sm"
@@ -78,11 +87,11 @@ export function SectionGrid({ sections, canCreateSection, itemCountBySectionId }
             <GripVertical className="size-4" aria-hidden />
             Reordenar
           </Button>
-        </div>
-      )}
+        )}
+      </div>
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={ids} strategy={rectSortingStrategy}>
-          <ul className="grid grid-cols-2 gap-3 ipad:grid-cols-3 ipad:gap-4 ipad-landscape:grid-cols-4 desktop:grid-cols-5">
+          <ul className="grid grid-cols-2 gap-3 ipad:grid-cols-[repeat(auto-fill,minmax(220px,1fr))] ipad:gap-4 desktop:gap-5">
             {items.map((section) => (
               <SortableSectionCard
                 key={section.id}
@@ -95,12 +104,17 @@ export function SectionGrid({ sections, canCreateSection, itemCountBySectionId }
               <li>
                 <Link
                   href="/menu/sections/new"
-                  className="flex aspect-[4/5] flex-col items-center justify-center gap-3 rounded-lg border-[1.5px] border-dashed border-ink-300 bg-[var(--brand-card)] text-center text-ink-700 shadow-sm transition-colors hover:border-mostaza-500 ipad:gap-4"
+                  className="group flex aspect-[6/5] min-h-40 flex-col items-center justify-center gap-3 rounded-xl border-[1.5px] border-dashed border-ink-300 bg-[rgb(var(--brand-card-rgb)/0.72)] px-5 text-center text-ink-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--brand-primary)] hover:bg-[var(--brand-primary-faint)] hover:shadow-md focus-visible:outline-none focus-visible:shadow-glow-mostaza ipad:aspect-[5/4] ipad:min-h-44 ipad:gap-4"
                 >
-                  <span className="flex size-12 items-center justify-center rounded-full bg-mostaza-100 text-ink-900">
+                  <span className="flex size-14 items-center justify-center rounded-full bg-[var(--brand-coral-soft)] text-ink-900 transition-transform duration-200 group-hover:scale-105">
                     <Plus className="size-6" aria-hidden />
                   </span>
-                  <span className="text-sm font-extrabold">Nueva sección</span>
+                  <span>
+                    <span className="block text-base font-extrabold text-ink-900">Nueva sección</span>
+                    <span className="mt-1 block text-xs font-semibold leading-5 text-ink-500">
+                      Desayunos, bebidas, postres
+                    </span>
+                  </span>
                 </Link>
               </li>
             )}
@@ -132,7 +146,7 @@ function SortableSectionCard({
   return (
     <li ref={setNodeRef} style={style} className={isDragging ? 'z-10 opacity-80' : undefined}>
       <Card
-        className="relative aspect-[4/5] overflow-hidden p-0 shadow-sm"
+        className="group relative aspect-[6/5] min-h-40 overflow-hidden p-0 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg ipad:aspect-[5/4] ipad:min-h-44"
         style={{ backgroundColor: resolveBrandSurfaceColor(section.accentColor) }}
       >
         {section.coverImageUrl ? (
@@ -141,22 +155,35 @@ function SortableSectionCard({
             alt=""
             fill
             sizes="(min-width: 1280px) 220px, (min-width: 1024px) 230px, (min-width: 768px) 230px, 50vw"
-            className="object-cover opacity-80"
+            className="object-cover opacity-85 transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
-          <div className="absolute inset-0 flex items-center justify-center text-5xl" aria-hidden>
-            🍽️
+          <div className="absolute inset-0 flex items-center justify-center" aria-hidden>
+            <div className="absolute inset-4 rounded-xl border border-white/60 bg-white/30" />
+            <span className="relative flex size-16 items-center justify-center rounded-full bg-white/70 text-ink-700 shadow-sm">
+              <Utensils className="size-8" strokeWidth={1.8} />
+            </span>
           </div>
         )}
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink-900/80 to-transparent p-3 ipad:p-4">
-          <h2 className="line-clamp-2 text-base font-extrabold text-white ipad:text-lg">{section.name}</h2>
-          <p className="mt-0.5 text-xs font-semibold text-white/90">
-            {itemCount === 0
-              ? 'Sin platillos'
-              : itemCount === 1
-                ? '1 platillo'
-                : `${itemCount} platillos`}
-          </p>
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink-900/85 via-ink-900/55 to-transparent p-3 pt-14 ipad:p-4 ipad:pt-16">
+          <div className="flex items-end justify-between gap-3">
+            <div className="min-w-0">
+              <h2 className="line-clamp-2 text-base font-extrabold leading-tight text-white ipad:text-lg">
+                {section.name}
+              </h2>
+              <p className="mt-1 text-xs font-semibold text-white/90">
+                {itemCount === 0
+                  ? 'Sin platillos'
+                  : itemCount === 1
+                    ? '1 platillo'
+                    : `${itemCount} platillos`}
+              </p>
+            </div>
+            <span className="hidden shrink-0 items-center gap-1 rounded-full bg-white/15 px-2 py-1 text-[11px] font-bold text-white backdrop-blur ipad:inline-flex">
+              <Layers3 className="size-3" aria-hidden />
+              Sección
+            </span>
+          </div>
         </div>
         {reorderMode ? (
           <button

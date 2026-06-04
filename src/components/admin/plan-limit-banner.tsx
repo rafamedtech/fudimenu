@@ -13,7 +13,9 @@ type PlanLimitBannerProps = {
   plan: Plan;
   itemCount: number;
   addHref?: string;
+  addLabel?: string;
   sectionCount?: number;
+  showFloatingAction?: boolean;
 };
 
 const FREE_ITEM_LIMIT = PLAN_CONFIG.free.limits.items ?? 20;
@@ -23,7 +25,9 @@ export function PlanLimitBanner({
   plan,
   itemCount,
   addHref = '/menu/new',
+  addLabel = 'Agregar platillo',
   sectionCount,
+  showFloatingAction = true,
 }: PlanLimitBannerProps) {
   const [isUpgradeOpen, setIsUpgradeOpen] = useState(false);
   const isFree = plan === 'free';
@@ -60,10 +64,10 @@ export function PlanLimitBanner({
         </Link>
       )}
 
-      {isAtItemLimit ? (
+      {showFloatingAction && isAtItemLimit ? (
         <button
           type="button"
-          aria-label="Agregar platillo"
+          aria-label={addLabel}
           onClick={() => setIsUpgradeOpen(true)}
           className={cn(
             'fixed bottom-[88px] right-4 z-30 flex size-14 items-center justify-center rounded-full bg-ink-900 text-mostaza-500 shadow-lg transition-transform active:scale-90 hover:scale-105 ipad:bottom-[104px] ipad:right-[max(1rem,calc((100vw-744px)/2+1rem))] ipad-landscape:right-[max(1rem,calc((100vw-984px)/2+1rem))] desktop:right-[max(1rem,calc((100vw-1180px)/2+1rem))]',
@@ -71,15 +75,15 @@ export function PlanLimitBanner({
         >
           <Lock size={24} strokeWidth={2.5} />
         </button>
-      ) : (
+      ) : showFloatingAction ? (
         <Link
           href={addHref}
-          aria-label="Agregar platillo"
+          aria-label={addLabel}
           className="fixed bottom-[88px] right-4 z-30 flex size-14 items-center justify-center rounded-full bg-[var(--brand-primary)] text-[var(--brand-on-primary)] shadow-lg transition-transform active:scale-90 hover:scale-105 ipad:bottom-[104px] ipad:right-[max(1rem,calc((100vw-744px)/2+1rem))] ipad-landscape:right-[max(1rem,calc((100vw-984px)/2+1rem))] desktop:right-[max(1rem,calc((100vw-1180px)/2+1rem))]"
         >
           <Plus size={28} strokeWidth={2.5} />
         </Link>
-      )}
+      ) : null}
 
       {isUpgradeOpen && (
         <dialog

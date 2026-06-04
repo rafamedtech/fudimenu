@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { cookies } from 'next/headers';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, Layers3, Plus, Utensils, type LucideIcon } from 'lucide-react';
 import { PlanLimitBanner } from '@/components/admin/plan-limit-banner';
 import { TenantSwitcher } from '@/components/admin/tenant-switcher';
 import { SectionGrid } from '@/components/admin/section-grid';
@@ -84,7 +84,13 @@ async function MenuList({
             </Link>
           }
         />
-        <PlanLimitBanner plan={tenant.plan} itemCount={visibleItems.length} />
+        <PlanLimitBanner
+          plan={tenant.plan}
+          itemCount={visibleItems.length}
+          addHref="/menu/sections/new"
+          addLabel="Crear sección"
+          showFloatingAction={false}
+        />
       </>
     );
   }
@@ -95,19 +101,17 @@ async function MenuList({
         plan={tenant.plan}
         itemCount={visibleItems.length}
         sectionCount={sections.length}
+        addHref="/menu/sections/new"
+        addLabel="Crear sección"
+        showFloatingAction={false}
       />
 
-      <div className="mb-3 flex justify-end ipad:mb-4">
-        <Link
-          href={`/m/${tenant.slug}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 rounded-md border border-[var(--brand-primary-border)] bg-[var(--brand-card)] px-3 py-2 text-sm font-bold text-ink-900 shadow-sm transition-colors hover:border-[var(--brand-primary)] hover:bg-[var(--brand-primary-faint)] ipad:px-4"
-        >
-          <ExternalLink className="size-4" aria-hidden />
-          Ver menú público
-        </Link>
-      </div>
+      <MenuOverviewPanel
+        publicHref={`/m/${tenant.slug}`}
+        sectionCount={sections.length}
+        itemCount={visibleItems.length}
+        canCreateSection={canCreateSection}
+      />
 
       {hasSections && (
         <SectionGrid
@@ -132,6 +136,96 @@ async function MenuList({
         </ul>
       )}
     </>
+  );
+}
+
+function MenuOverviewPanel({
+  publicHref,
+  sectionCount,
+  itemCount,
+  canCreateSection,
+}: {
+  publicHref: string;
+  sectionCount: number;
+  itemCount: number;
+  canCreateSection: boolean;
+}) {
+  return (
+    <section className="mb-4 overflow-hidden rounded-xl border border-[var(--brand-card-border)] bg-[rgb(var(--brand-card-rgb)/0.84)] shadow-sm ipad:mb-6">
+      <div className="grid gap-0 ipad-landscape:grid-cols-[1fr_auto]">
+        <div className="relative px-4 py-4 ipad:min-h-36 ipad:px-6 ipad:py-6">
+          <div className="absolute right-4 top-4 hidden size-24 rounded-full bg-[var(--brand-primary-faint)] blur-2xl ipad:block" />
+          <div className="relative flex flex-col gap-4 ipad:flex-row ipad:items-center ipad:justify-between">
+            <div className="max-w-2xl">
+              <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-[var(--brand-accent-text)]">
+                Centro de operaciones
+              </p>
+              <h2 className="mt-2 text-xl font-black leading-tight text-ink-900 ipad:text-3xl">
+                Construye tu carta por bloques
+              </h2>
+              <p className="mt-2 max-w-xl text-sm font-medium leading-6 text-ink-500 ipad:block">
+                Revisa la estructura, abre la vista pública y crea nuevas secciones sin salir del flujo.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 ipad:min-w-64">
+              <MetricTile icon={Layers3} label="Secciones" value={sectionCount} />
+              <MetricTile icon={Utensils} label="Platillos" value={itemCount} />
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 gap-2 border-t border-[var(--brand-card-border)] bg-[var(--brand-surface-strong)] p-3 ipad:flex ipad:flex-row ipad:p-4 ipad-landscape:w-72 ipad-landscape:flex-col ipad-landscape:border-l ipad-landscape:border-t-0">
+          {canCreateSection ? (
+            <Link href="/menu/sections/new" className="w-full">
+              <Button type="button" className="h-11 w-full justify-center rounded-lg ipad:h-12">
+                <Plus className="size-4" aria-hidden />
+                Nueva sección
+              </Button>
+            </Link>
+          ) : (
+            <Link href="/settings/billing" className="w-full">
+              <Button
+                type="button"
+                className="h-11 w-full justify-center rounded-lg ipad:h-12"
+                variant="premium"
+              >
+                Upgrade para más secciones
+              </Button>
+            </Link>
+          )}
+          <Link
+            href={publicHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg border-[1.5px] border-[var(--brand-primary-border)] bg-[var(--brand-card)] px-4 text-sm font-extrabold text-ink-900 shadow-sm transition-all hover:border-[var(--brand-primary)] hover:bg-[var(--brand-primary-faint)] focus-visible:outline-none focus-visible:shadow-glow-mostaza ipad:h-12"
+          >
+            <ExternalLink className="size-4" aria-hidden />
+            Ver menú público
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function MetricTile({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: LucideIcon;
+  label: string;
+  value: number;
+}) {
+  return (
+    <div className="rounded-lg border border-[var(--brand-card-border)] bg-[var(--brand-card)] p-3 shadow-sm ipad:p-3">
+      <div className="mb-2 flex size-8 items-center justify-center rounded-md bg-[var(--brand-primary-faint)] text-[var(--brand-accent-text)] ipad:size-9">
+        <Icon className="size-4" aria-hidden />
+      </div>
+      <p className="text-xl font-black leading-none text-ink-900 ipad:text-2xl">{value}</p>
+      <p className="mt-1 text-xs font-bold text-ink-500">{label}</p>
+    </div>
   );
 }
 
