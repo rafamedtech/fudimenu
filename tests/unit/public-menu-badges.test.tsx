@@ -20,6 +20,8 @@ const strings: IslandStrings = {
   viewDetail: 'View detail',
   dailySpecials: 'Specials',
   otherCategory: 'Other',
+  variantsFrom: 'From',
+  variantsTitle: 'Options',
   allergenDisclaimer: 'Allergen and dietary information is managed by the restaurant.',
   containsAllergens: 'Contains',
   badges: {
@@ -83,6 +85,62 @@ describe('public card badge render', () => {
   // ...and the visual chips are hidden from the a11y tree to avoid double reads.
   it('marks the visual chip list aria-hidden on the card', () => {
     expect(html).toContain('aria-hidden="true"');
+  });
+});
+
+// Visual variants: the card advertises "from <min>", the sheet lists each
+// option with its own price instead of a single price.
+const variantItem: MenuItem = {
+  ...item,
+  id: 'i2',
+  name: 'Jugo',
+  dietaryTags: [],
+  allergenTags: [],
+  priceCents: 8500,
+  variants: [
+    { id: 'v1', name: 'Chico', priceCents: 8500, sortOrder: 0 },
+    { id: 'v2', name: 'Grande', priceCents: 9500, sortOrder: 1 },
+  ],
+};
+
+describe('public card variant render', () => {
+  const html = renderToStaticMarkup(
+    <ItemList
+      items={[variantItem]}
+      categoryName="Jugos"
+      onSelect={() => {}}
+      priceLocale="es-MX"
+      strings={strings}
+    />,
+  );
+
+  it('shows the from-price using the cheapest variant', () => {
+    expect(html).toContain('From $85');
+    // The pricier variant should not leak into the card price line.
+    expect(html).not.toContain('$95');
+  });
+});
+
+describe('public detail variant render', () => {
+  const html = renderToStaticMarkup(
+    <ItemSheet
+      item={variantItem}
+      categoryName="Jugos"
+      open
+      onClose={() => {}}
+      onClosed={() => {}}
+      priceLocale="es-MX"
+      whatsappUrl={null}
+      strings={strings}
+    />,
+  );
+
+  it('lists each variant with its own price', () => {
+    expect(html).toContain('Options');
+    expect(html).toContain('Chico');
+    expect(html).toContain('$85');
+    expect(html).toContain('Grande');
+    expect(html).toContain('$95');
   });
 });
 

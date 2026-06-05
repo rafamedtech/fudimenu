@@ -5,7 +5,13 @@ import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useReducer, useRef, useTransition } from 'react';
-import { useForm, type UseFormRegister } from 'react-hook-form';
+import {
+  useFieldArray,
+  useForm,
+  type Control,
+  type UseFormRegister,
+  type UseFormSetValue,
+} from 'react-hook-form';
 import { toast } from 'sonner';
 import { PLAN_CONFIG } from '@/config/plans';
 import { Button } from '@/components/ui/button';
@@ -28,6 +34,7 @@ import {
   type AllergenTag,
   type DietaryTag,
 } from '@/lib/item-attributes';
+import { MAX_VARIANT_NAME_CHARS, MAX_VARIANTS_PER_ITEM } from '@/lib/item-variants';
 import { itemSchema, type ItemInput } from '@/lib/validators/item.schema';
 import {
   restoreItemAction,
@@ -99,6 +106,7 @@ export function ItemEditorForm({ initial, categories, sectionId, offlineConflict
     handleSubmit,
     setValue,
     watch,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<ItemInput>({
     resolver: zodResolver(itemSchema),
@@ -114,6 +122,10 @@ export function ItemEditorForm({ initial, categories, sectionId, offlineConflict
       specialPrice: initial?.specialPrice ?? null,
       dietaryTags: (initial?.dietaryTags ?? []) as DietaryTag[],
       allergenTags: (initial?.allergenTags ?? []) as AllergenTag[],
+      variants: (initial?.variants ?? []).map((variant) => ({
+        name: variant.name,
+        priceCents: variant.priceCents,
+      })),
       translations: [
         {
           locale: translationLocale,
@@ -388,6 +400,8 @@ export function ItemEditorForm({ initial, categories, sectionId, offlineConflict
           onToggleDietary={toggleDietaryTag}
           onToggleAllergen={toggleAllergenTag}
         />
+
+        <VariantsCard register={register} control={control} setValue={setValue} />
 
         <TranslationCard
           register={register}
@@ -773,6 +787,109 @@ function TagToggle({
     >
       {label}
     </button>
+  );
+}
+
+function VariantsCard({
+  register,
+  control,
+  setValue,
+}: {
+  register: UseFormRegister<ItemInput>;
+  control: Control<ItemInput>;
+  setValue: UseFormSetValue<ItemInput>;
+}) {
+  const { fields, append, remove } = useFieldArray({ control, name: 'variants' });
+  const atLimit = fields.length >= MAX_VARIANTS_PER_ITEM;
+
+  return (
+    <Card className="space-y-4 border border-ink-200 bg-[var(--brand-surface)] shadow-sm">
+      <div>
+        <p className="font-bold text-ink-900">Variantes</p>
+        <p className="text-xs text-ink-500">
+          Opcional. Opciones del mismo platillo con su propio precio (ej. Chico / Grande). Solo
+          nombre y precio — el orden es el de la lista.
+        </p>
+      </div>
+
+      {fields.length > 0 && (
+        <ul className="space-y-3">
+          {fields.map((field, index) => (
+            <VariantRow
+              key={field.id}
+              index={index}
+              defaultPriceCents={field.priceCents ?? 0}
+              register={register}
+              setValue={setValue}
+              onRemove={() => remove(index)}
+            />
+          ))}
+        </ul>
+      )}
+
+      <Button
+        type="button"
+        variant="outline"
+        disabled={atLimit}
+        onClick={() => append({ name: '', priceCents: 0 })}
+      >
+        + Agregar variante
+      </Button>
+      {atLimit && (
+        <p className="text-xs text-ink-500">Máximo {MAX_VARIANTS_PER_ITEM} variantes.</p>
+      )}
+    </Card>
+  );
+}
+
+function VariantRow({
+  index,
+  defaultPriceCents,
+  register,
+  setValue,
+  onRemove,
+}: {
+  index: number;
+  defaultPriceCents: number;
+  register: UseFormRegister<ItemInput>;
+  setValue: UseFormSetValue<ItemInput>;
+  onRemove: () => void;
+}) {
+  const { displayValue, handleChange } = usePriceInput(defaultPriceCents, (cents) =>
+    setValue(`variants.${index}.priceCents`, cents, { shouldDirty: true, shouldValidate: true }),
+  );
+
+  return (
+    <li className="flex items-end gap-2">
+      <div className="flex-1">
+        <Input
+          label="Nombre"
+          placeholder="Ej: Grande"
+          maxLength={MAX_VARIANT_NAME_CHARS}
+          {...register(`variants.${index}.name`)}
+        />
+      </div>
+      <div className="w-28">
+        <Input
+          label="Precio"
+          type="text"
+          prefix="$"
+          inputMode="decimal"
+          placeholder="0"
+          value={displayValue}
+          onChange={(event) => handleChange(event.target.value)}
+        />
+      </div>
+      <Button
+        type="button"
+        variant="destructive"
+        aria-label="Quitar variante"
+        onClick={onRemove}
+        className="mb-0.5"
+      >
+        <Trash2 aria-hidden="true" className="size-4" />
+      </Button>
+    </li>
   );
 }
 

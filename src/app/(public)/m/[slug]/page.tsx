@@ -123,6 +123,8 @@ async function PublicMenuContent({
     viewDetail: t('viewDetail'),
     dailySpecials: t('dailySpecials'),
     otherCategory: t('otherCategory'),
+    variantsFrom: t('variantsFrom'),
+    variantsTitle: t('variantsTitle'),
     allergenDisclaimer: t('allergenDisclaimer'),
     containsAllergens: t('containsAllergens'),
     badges: {

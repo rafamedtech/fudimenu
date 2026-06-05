@@ -390,6 +390,7 @@ export const ModelName = {
   MenuSection: 'MenuSection',
   Category: 'Category',
   MenuItem: 'MenuItem',
+  ItemVariant: 'ItemVariant',
   ItemTranslation: 'ItemTranslation',
   SlugHistory: 'SlugHistory',
   MenuView: 'MenuView',
@@ -412,7 +413,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "tenant" | "membership" | "accountDeleteRequest" | "menuSection" | "category" | "menuItem" | "itemTranslation" | "slugHistory" | "menuView" | "itemView" | "auditLog" | "webhookEvent" | "referral"
+    modelProps: "tenant" | "membership" | "accountDeleteRequest" | "menuSection" | "category" | "menuItem" | "itemVariant" | "itemTranslation" | "slugHistory" | "menuView" | "itemView" | "auditLog" | "webhookEvent" | "referral"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -857,6 +858,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.MenuItemCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.MenuItemCountAggregateOutputType> | number
+        }
+      }
+    }
+    ItemVariant: {
+      payload: Prisma.$ItemVariantPayload<ExtArgs>
+      fields: Prisma.ItemVariantFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ItemVariantFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ItemVariantPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ItemVariantFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ItemVariantPayload>
+        }
+        findFirst: {
+          args: Prisma.ItemVariantFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ItemVariantPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ItemVariantFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ItemVariantPayload>
+        }
+        findMany: {
+          args: Prisma.ItemVariantFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ItemVariantPayload>[]
+        }
+        create: {
+          args: Prisma.ItemVariantCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ItemVariantPayload>
+        }
+        createMany: {
+          args: Prisma.ItemVariantCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ItemVariantCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ItemVariantPayload>[]
+        }
+        delete: {
+          args: Prisma.ItemVariantDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ItemVariantPayload>
+        }
+        update: {
+          args: Prisma.ItemVariantUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ItemVariantPayload>
+        }
+        deleteMany: {
+          args: Prisma.ItemVariantDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ItemVariantUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ItemVariantUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ItemVariantPayload>[]
+        }
+        upsert: {
+          args: Prisma.ItemVariantUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ItemVariantPayload>
+        }
+        aggregate: {
+          args: Prisma.ItemVariantAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateItemVariant>
+        }
+        groupBy: {
+          args: Prisma.ItemVariantGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ItemVariantGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ItemVariantCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ItemVariantCountAggregateOutputType> | number
         }
       }
     }
@@ -1523,6 +1598,20 @@ export const MenuItemScalarFieldEnum = {
 export type MenuItemScalarFieldEnum = (typeof MenuItemScalarFieldEnum)[keyof typeof MenuItemScalarFieldEnum]
 
 
+export const ItemVariantScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  itemId: 'itemId',
+  name: 'name',
+  priceCents: 'priceCents',
+  sortOrder: 'sortOrder',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ItemVariantScalarFieldEnum = (typeof ItemVariantScalarFieldEnum)[keyof typeof ItemVariantScalarFieldEnum]
+
+
 export const ItemTranslationScalarFieldEnum = {
   itemId: 'itemId',
   locale: 'locale',
@@ -1950,6 +2039,7 @@ export type GlobalOmitConfig = {
   menuSection?: Prisma.MenuSectionOmit
   category?: Prisma.CategoryOmit
   menuItem?: Prisma.MenuItemOmit
+  itemVariant?: Prisma.ItemVariantOmit
   itemTranslation?: Prisma.ItemTranslationOmit
   slugHistory?: Prisma.SlugHistoryOmit
   menuView?: Prisma.MenuViewOmit

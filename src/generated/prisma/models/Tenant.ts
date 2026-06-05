@@ -304,6 +304,7 @@ export type TenantWhereInput = {
   auditLogs?: Prisma.AuditLogListRelationFilter
   webhookEvents?: Prisma.WebhookEventListRelationFilter
   referrals?: Prisma.ReferralListRelationFilter
+  itemVariants?: Prisma.ItemVariantListRelationFilter
 }
 
 export type TenantOrderByWithRelationInput = {
@@ -336,6 +337,7 @@ export type TenantOrderByWithRelationInput = {
   auditLogs?: Prisma.AuditLogOrderByRelationAggregateInput
   webhookEvents?: Prisma.WebhookEventOrderByRelationAggregateInput
   referrals?: Prisma.ReferralOrderByRelationAggregateInput
+  itemVariants?: Prisma.ItemVariantOrderByRelationAggregateInput
 }
 
 export type TenantWhereUniqueInput = Prisma.AtLeast<{
@@ -371,6 +373,7 @@ export type TenantWhereUniqueInput = Prisma.AtLeast<{
   auditLogs?: Prisma.AuditLogListRelationFilter
   webhookEvents?: Prisma.WebhookEventListRelationFilter
   referrals?: Prisma.ReferralListRelationFilter
+  itemVariants?: Prisma.ItemVariantListRelationFilter
 }, "id" | "slug">
 
 export type TenantOrderByWithAggregationInput = {
@@ -453,6 +456,7 @@ export type TenantCreateInput = {
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
   webhookEvents?: Prisma.WebhookEventCreateNestedManyWithoutTenantInput
   referrals?: Prisma.ReferralCreateNestedManyWithoutReferredTenantInput
+  itemVariants?: Prisma.ItemVariantCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateInput = {
@@ -485,6 +489,7 @@ export type TenantUncheckedCreateInput = {
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
   webhookEvents?: Prisma.WebhookEventUncheckedCreateNestedManyWithoutTenantInput
   referrals?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredTenantInput
+  itemVariants?: Prisma.ItemVariantUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUpdateInput = {
@@ -517,6 +522,7 @@ export type TenantUpdateInput = {
   auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
   webhookEvents?: Prisma.WebhookEventUpdateManyWithoutTenantNestedInput
   referrals?: Prisma.ReferralUpdateManyWithoutReferredTenantNestedInput
+  itemVariants?: Prisma.ItemVariantUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateInput = {
@@ -549,6 +555,7 @@ export type TenantUncheckedUpdateInput = {
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
   webhookEvents?: Prisma.WebhookEventUncheckedUpdateManyWithoutTenantNestedInput
   referrals?: Prisma.ReferralUncheckedUpdateManyWithoutReferredTenantNestedInput
+  itemVariants?: Prisma.ItemVariantUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateManyInput = {
@@ -777,6 +784,20 @@ export type TenantUpdateOneRequiredWithoutItemsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutItemsInput, Prisma.TenantUpdateWithoutItemsInput>, Prisma.TenantUncheckedUpdateWithoutItemsInput>
 }
 
+export type TenantCreateNestedOneWithoutItemVariantsInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutItemVariantsInput, Prisma.TenantUncheckedCreateWithoutItemVariantsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutItemVariantsInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutItemVariantsNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutItemVariantsInput, Prisma.TenantUncheckedCreateWithoutItemVariantsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutItemVariantsInput
+  upsert?: Prisma.TenantUpsertWithoutItemVariantsInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutItemVariantsInput, Prisma.TenantUpdateWithoutItemVariantsInput>, Prisma.TenantUncheckedUpdateWithoutItemVariantsInput>
+}
+
 export type TenantCreateNestedOneWithoutSlugHistoryInput = {
   create?: Prisma.XOR<Prisma.TenantCreateWithoutSlugHistoryInput, Prisma.TenantUncheckedCreateWithoutSlugHistoryInput>
   connectOrCreate?: Prisma.TenantCreateOrConnectWithoutSlugHistoryInput
@@ -894,6 +915,7 @@ export type TenantCreateWithoutMembershipsInput = {
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
   webhookEvents?: Prisma.WebhookEventCreateNestedManyWithoutTenantInput
   referrals?: Prisma.ReferralCreateNestedManyWithoutReferredTenantInput
+  itemVariants?: Prisma.ItemVariantCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutMembershipsInput = {
@@ -925,6 +947,7 @@ export type TenantUncheckedCreateWithoutMembershipsInput = {
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
   webhookEvents?: Prisma.WebhookEventUncheckedCreateNestedManyWithoutTenantInput
   referrals?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredTenantInput
+  itemVariants?: Prisma.ItemVariantUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutMembershipsInput = {
@@ -972,6 +995,7 @@ export type TenantUpdateWithoutMembershipsInput = {
   auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
   webhookEvents?: Prisma.WebhookEventUpdateManyWithoutTenantNestedInput
   referrals?: Prisma.ReferralUpdateManyWithoutReferredTenantNestedInput
+  itemVariants?: Prisma.ItemVariantUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutMembershipsInput = {
@@ -1003,6 +1027,7 @@ export type TenantUncheckedUpdateWithoutMembershipsInput = {
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
   webhookEvents?: Prisma.WebhookEventUncheckedUpdateManyWithoutTenantNestedInput
   referrals?: Prisma.ReferralUncheckedUpdateManyWithoutReferredTenantNestedInput
+  itemVariants?: Prisma.ItemVariantUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutSectionsInput = {
@@ -1034,6 +1059,7 @@ export type TenantCreateWithoutSectionsInput = {
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
   webhookEvents?: Prisma.WebhookEventCreateNestedManyWithoutTenantInput
   referrals?: Prisma.ReferralCreateNestedManyWithoutReferredTenantInput
+  itemVariants?: Prisma.ItemVariantCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutSectionsInput = {
@@ -1065,6 +1091,7 @@ export type TenantUncheckedCreateWithoutSectionsInput = {
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
   webhookEvents?: Prisma.WebhookEventUncheckedCreateNestedManyWithoutTenantInput
   referrals?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredTenantInput
+  itemVariants?: Prisma.ItemVariantUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutSectionsInput = {
@@ -1112,6 +1139,7 @@ export type TenantUpdateWithoutSectionsInput = {
   auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
   webhookEvents?: Prisma.WebhookEventUpdateManyWithoutTenantNestedInput
   referrals?: Prisma.ReferralUpdateManyWithoutReferredTenantNestedInput
+  itemVariants?: Prisma.ItemVariantUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutSectionsInput = {
@@ -1143,6 +1171,7 @@ export type TenantUncheckedUpdateWithoutSectionsInput = {
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
   webhookEvents?: Prisma.WebhookEventUncheckedUpdateManyWithoutTenantNestedInput
   referrals?: Prisma.ReferralUncheckedUpdateManyWithoutReferredTenantNestedInput
+  itemVariants?: Prisma.ItemVariantUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutCategoriesInput = {
@@ -1174,6 +1203,7 @@ export type TenantCreateWithoutCategoriesInput = {
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
   webhookEvents?: Prisma.WebhookEventCreateNestedManyWithoutTenantInput
   referrals?: Prisma.ReferralCreateNestedManyWithoutReferredTenantInput
+  itemVariants?: Prisma.ItemVariantCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutCategoriesInput = {
@@ -1205,6 +1235,7 @@ export type TenantUncheckedCreateWithoutCategoriesInput = {
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
   webhookEvents?: Prisma.WebhookEventUncheckedCreateNestedManyWithoutTenantInput
   referrals?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredTenantInput
+  itemVariants?: Prisma.ItemVariantUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutCategoriesInput = {
@@ -1252,6 +1283,7 @@ export type TenantUpdateWithoutCategoriesInput = {
   auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
   webhookEvents?: Prisma.WebhookEventUpdateManyWithoutTenantNestedInput
   referrals?: Prisma.ReferralUpdateManyWithoutReferredTenantNestedInput
+  itemVariants?: Prisma.ItemVariantUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutCategoriesInput = {
@@ -1283,6 +1315,7 @@ export type TenantUncheckedUpdateWithoutCategoriesInput = {
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
   webhookEvents?: Prisma.WebhookEventUncheckedUpdateManyWithoutTenantNestedInput
   referrals?: Prisma.ReferralUncheckedUpdateManyWithoutReferredTenantNestedInput
+  itemVariants?: Prisma.ItemVariantUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutItemsInput = {
@@ -1314,6 +1347,7 @@ export type TenantCreateWithoutItemsInput = {
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
   webhookEvents?: Prisma.WebhookEventCreateNestedManyWithoutTenantInput
   referrals?: Prisma.ReferralCreateNestedManyWithoutReferredTenantInput
+  itemVariants?: Prisma.ItemVariantCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutItemsInput = {
@@ -1345,6 +1379,7 @@ export type TenantUncheckedCreateWithoutItemsInput = {
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
   webhookEvents?: Prisma.WebhookEventUncheckedCreateNestedManyWithoutTenantInput
   referrals?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredTenantInput
+  itemVariants?: Prisma.ItemVariantUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutItemsInput = {
@@ -1392,6 +1427,7 @@ export type TenantUpdateWithoutItemsInput = {
   auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
   webhookEvents?: Prisma.WebhookEventUpdateManyWithoutTenantNestedInput
   referrals?: Prisma.ReferralUpdateManyWithoutReferredTenantNestedInput
+  itemVariants?: Prisma.ItemVariantUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutItemsInput = {
@@ -1417,6 +1453,151 @@ export type TenantUncheckedUpdateWithoutItemsInput = {
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutTenantNestedInput
   sections?: Prisma.MenuSectionUncheckedUpdateManyWithoutTenantNestedInput
   categories?: Prisma.CategoryUncheckedUpdateManyWithoutTenantNestedInput
+  slugHistory?: Prisma.SlugHistoryUncheckedUpdateManyWithoutTenantNestedInput
+  menuViews?: Prisma.MenuViewUncheckedUpdateManyWithoutTenantNestedInput
+  itemViews?: Prisma.ItemViewUncheckedUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  webhookEvents?: Prisma.WebhookEventUncheckedUpdateManyWithoutTenantNestedInput
+  referrals?: Prisma.ReferralUncheckedUpdateManyWithoutReferredTenantNestedInput
+  itemVariants?: Prisma.ItemVariantUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutItemVariantsInput = {
+  id?: string
+  createdBy?: string | null
+  slug: string
+  name: string
+  logoUrl?: string | null
+  coverImageUrl?: string | null
+  logoShape?: $Enums.LogoShape
+  whatsappPhone?: string | null
+  businessHours?: string | null
+  primaryColor?: string
+  cuisineType?: string | null
+  defaultLocale?: $Enums.Locale
+  currency?: string
+  plan?: $Enums.TenantPlan
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  memberships?: Prisma.MembershipCreateNestedManyWithoutTenantInput
+  sections?: Prisma.MenuSectionCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryCreateNestedManyWithoutTenantInput
+  items?: Prisma.MenuItemCreateNestedManyWithoutTenantInput
+  slugHistory?: Prisma.SlugHistoryCreateNestedManyWithoutTenantInput
+  menuViews?: Prisma.MenuViewCreateNestedManyWithoutTenantInput
+  itemViews?: Prisma.ItemViewCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  webhookEvents?: Prisma.WebhookEventCreateNestedManyWithoutTenantInput
+  referrals?: Prisma.ReferralCreateNestedManyWithoutReferredTenantInput
+}
+
+export type TenantUncheckedCreateWithoutItemVariantsInput = {
+  id?: string
+  createdBy?: string | null
+  slug: string
+  name: string
+  logoUrl?: string | null
+  coverImageUrl?: string | null
+  logoShape?: $Enums.LogoShape
+  whatsappPhone?: string | null
+  businessHours?: string | null
+  primaryColor?: string
+  cuisineType?: string | null
+  defaultLocale?: $Enums.Locale
+  currency?: string
+  plan?: $Enums.TenantPlan
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutTenantInput
+  sections?: Prisma.MenuSectionUncheckedCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutTenantInput
+  items?: Prisma.MenuItemUncheckedCreateNestedManyWithoutTenantInput
+  slugHistory?: Prisma.SlugHistoryUncheckedCreateNestedManyWithoutTenantInput
+  menuViews?: Prisma.MenuViewUncheckedCreateNestedManyWithoutTenantInput
+  itemViews?: Prisma.ItemViewUncheckedCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  webhookEvents?: Prisma.WebhookEventUncheckedCreateNestedManyWithoutTenantInput
+  referrals?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredTenantInput
+}
+
+export type TenantCreateOrConnectWithoutItemVariantsInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutItemVariantsInput, Prisma.TenantUncheckedCreateWithoutItemVariantsInput>
+}
+
+export type TenantUpsertWithoutItemVariantsInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutItemVariantsInput, Prisma.TenantUncheckedUpdateWithoutItemVariantsInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutItemVariantsInput, Prisma.TenantUncheckedCreateWithoutItemVariantsInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutItemVariantsInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutItemVariantsInput, Prisma.TenantUncheckedUpdateWithoutItemVariantsInput>
+}
+
+export type TenantUpdateWithoutItemVariantsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoShape?: Prisma.EnumLogoShapeFieldUpdateOperationsInput | $Enums.LogoShape
+  whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  memberships?: Prisma.MembershipUpdateManyWithoutTenantNestedInput
+  sections?: Prisma.MenuSectionUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUpdateManyWithoutTenantNestedInput
+  items?: Prisma.MenuItemUpdateManyWithoutTenantNestedInput
+  slugHistory?: Prisma.SlugHistoryUpdateManyWithoutTenantNestedInput
+  menuViews?: Prisma.MenuViewUpdateManyWithoutTenantNestedInput
+  itemViews?: Prisma.ItemViewUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  webhookEvents?: Prisma.WebhookEventUpdateManyWithoutTenantNestedInput
+  referrals?: Prisma.ReferralUpdateManyWithoutReferredTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutItemVariantsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoShape?: Prisma.EnumLogoShapeFieldUpdateOperationsInput | $Enums.LogoShape
+  whatsappPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  businessHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  memberships?: Prisma.MembershipUncheckedUpdateManyWithoutTenantNestedInput
+  sections?: Prisma.MenuSectionUncheckedUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUncheckedUpdateManyWithoutTenantNestedInput
+  items?: Prisma.MenuItemUncheckedUpdateManyWithoutTenantNestedInput
   slugHistory?: Prisma.SlugHistoryUncheckedUpdateManyWithoutTenantNestedInput
   menuViews?: Prisma.MenuViewUncheckedUpdateManyWithoutTenantNestedInput
   itemViews?: Prisma.ItemViewUncheckedUpdateManyWithoutTenantNestedInput
@@ -1454,6 +1635,7 @@ export type TenantCreateWithoutSlugHistoryInput = {
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
   webhookEvents?: Prisma.WebhookEventCreateNestedManyWithoutTenantInput
   referrals?: Prisma.ReferralCreateNestedManyWithoutReferredTenantInput
+  itemVariants?: Prisma.ItemVariantCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutSlugHistoryInput = {
@@ -1485,6 +1667,7 @@ export type TenantUncheckedCreateWithoutSlugHistoryInput = {
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
   webhookEvents?: Prisma.WebhookEventUncheckedCreateNestedManyWithoutTenantInput
   referrals?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredTenantInput
+  itemVariants?: Prisma.ItemVariantUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutSlugHistoryInput = {
@@ -1532,6 +1715,7 @@ export type TenantUpdateWithoutSlugHistoryInput = {
   auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
   webhookEvents?: Prisma.WebhookEventUpdateManyWithoutTenantNestedInput
   referrals?: Prisma.ReferralUpdateManyWithoutReferredTenantNestedInput
+  itemVariants?: Prisma.ItemVariantUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutSlugHistoryInput = {
@@ -1563,6 +1747,7 @@ export type TenantUncheckedUpdateWithoutSlugHistoryInput = {
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
   webhookEvents?: Prisma.WebhookEventUncheckedUpdateManyWithoutTenantNestedInput
   referrals?: Prisma.ReferralUncheckedUpdateManyWithoutReferredTenantNestedInput
+  itemVariants?: Prisma.ItemVariantUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutMenuViewsInput = {
@@ -1594,6 +1779,7 @@ export type TenantCreateWithoutMenuViewsInput = {
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
   webhookEvents?: Prisma.WebhookEventCreateNestedManyWithoutTenantInput
   referrals?: Prisma.ReferralCreateNestedManyWithoutReferredTenantInput
+  itemVariants?: Prisma.ItemVariantCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutMenuViewsInput = {
@@ -1625,6 +1811,7 @@ export type TenantUncheckedCreateWithoutMenuViewsInput = {
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
   webhookEvents?: Prisma.WebhookEventUncheckedCreateNestedManyWithoutTenantInput
   referrals?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredTenantInput
+  itemVariants?: Prisma.ItemVariantUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutMenuViewsInput = {
@@ -1672,6 +1859,7 @@ export type TenantUpdateWithoutMenuViewsInput = {
   auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
   webhookEvents?: Prisma.WebhookEventUpdateManyWithoutTenantNestedInput
   referrals?: Prisma.ReferralUpdateManyWithoutReferredTenantNestedInput
+  itemVariants?: Prisma.ItemVariantUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutMenuViewsInput = {
@@ -1703,6 +1891,7 @@ export type TenantUncheckedUpdateWithoutMenuViewsInput = {
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
   webhookEvents?: Prisma.WebhookEventUncheckedUpdateManyWithoutTenantNestedInput
   referrals?: Prisma.ReferralUncheckedUpdateManyWithoutReferredTenantNestedInput
+  itemVariants?: Prisma.ItemVariantUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutItemViewsInput = {
@@ -1734,6 +1923,7 @@ export type TenantCreateWithoutItemViewsInput = {
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
   webhookEvents?: Prisma.WebhookEventCreateNestedManyWithoutTenantInput
   referrals?: Prisma.ReferralCreateNestedManyWithoutReferredTenantInput
+  itemVariants?: Prisma.ItemVariantCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutItemViewsInput = {
@@ -1765,6 +1955,7 @@ export type TenantUncheckedCreateWithoutItemViewsInput = {
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
   webhookEvents?: Prisma.WebhookEventUncheckedCreateNestedManyWithoutTenantInput
   referrals?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredTenantInput
+  itemVariants?: Prisma.ItemVariantUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutItemViewsInput = {
@@ -1812,6 +2003,7 @@ export type TenantUpdateWithoutItemViewsInput = {
   auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
   webhookEvents?: Prisma.WebhookEventUpdateManyWithoutTenantNestedInput
   referrals?: Prisma.ReferralUpdateManyWithoutReferredTenantNestedInput
+  itemVariants?: Prisma.ItemVariantUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutItemViewsInput = {
@@ -1843,6 +2035,7 @@ export type TenantUncheckedUpdateWithoutItemViewsInput = {
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
   webhookEvents?: Prisma.WebhookEventUncheckedUpdateManyWithoutTenantNestedInput
   referrals?: Prisma.ReferralUncheckedUpdateManyWithoutReferredTenantNestedInput
+  itemVariants?: Prisma.ItemVariantUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutAuditLogsInput = {
@@ -1874,6 +2067,7 @@ export type TenantCreateWithoutAuditLogsInput = {
   itemViews?: Prisma.ItemViewCreateNestedManyWithoutTenantInput
   webhookEvents?: Prisma.WebhookEventCreateNestedManyWithoutTenantInput
   referrals?: Prisma.ReferralCreateNestedManyWithoutReferredTenantInput
+  itemVariants?: Prisma.ItemVariantCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutAuditLogsInput = {
@@ -1905,6 +2099,7 @@ export type TenantUncheckedCreateWithoutAuditLogsInput = {
   itemViews?: Prisma.ItemViewUncheckedCreateNestedManyWithoutTenantInput
   webhookEvents?: Prisma.WebhookEventUncheckedCreateNestedManyWithoutTenantInput
   referrals?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredTenantInput
+  itemVariants?: Prisma.ItemVariantUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutAuditLogsInput = {
@@ -1952,6 +2147,7 @@ export type TenantUpdateWithoutAuditLogsInput = {
   itemViews?: Prisma.ItemViewUpdateManyWithoutTenantNestedInput
   webhookEvents?: Prisma.WebhookEventUpdateManyWithoutTenantNestedInput
   referrals?: Prisma.ReferralUpdateManyWithoutReferredTenantNestedInput
+  itemVariants?: Prisma.ItemVariantUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutAuditLogsInput = {
@@ -1983,6 +2179,7 @@ export type TenantUncheckedUpdateWithoutAuditLogsInput = {
   itemViews?: Prisma.ItemViewUncheckedUpdateManyWithoutTenantNestedInput
   webhookEvents?: Prisma.WebhookEventUncheckedUpdateManyWithoutTenantNestedInput
   referrals?: Prisma.ReferralUncheckedUpdateManyWithoutReferredTenantNestedInput
+  itemVariants?: Prisma.ItemVariantUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutWebhookEventsInput = {
@@ -2014,6 +2211,7 @@ export type TenantCreateWithoutWebhookEventsInput = {
   itemViews?: Prisma.ItemViewCreateNestedManyWithoutTenantInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
   referrals?: Prisma.ReferralCreateNestedManyWithoutReferredTenantInput
+  itemVariants?: Prisma.ItemVariantCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutWebhookEventsInput = {
@@ -2045,6 +2243,7 @@ export type TenantUncheckedCreateWithoutWebhookEventsInput = {
   itemViews?: Prisma.ItemViewUncheckedCreateNestedManyWithoutTenantInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
   referrals?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredTenantInput
+  itemVariants?: Prisma.ItemVariantUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutWebhookEventsInput = {
@@ -2092,6 +2291,7 @@ export type TenantUpdateWithoutWebhookEventsInput = {
   itemViews?: Prisma.ItemViewUpdateManyWithoutTenantNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
   referrals?: Prisma.ReferralUpdateManyWithoutReferredTenantNestedInput
+  itemVariants?: Prisma.ItemVariantUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutWebhookEventsInput = {
@@ -2123,6 +2323,7 @@ export type TenantUncheckedUpdateWithoutWebhookEventsInput = {
   itemViews?: Prisma.ItemViewUncheckedUpdateManyWithoutTenantNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
   referrals?: Prisma.ReferralUncheckedUpdateManyWithoutReferredTenantNestedInput
+  itemVariants?: Prisma.ItemVariantUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutReferralsInput = {
@@ -2154,6 +2355,7 @@ export type TenantCreateWithoutReferralsInput = {
   itemViews?: Prisma.ItemViewCreateNestedManyWithoutTenantInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
   webhookEvents?: Prisma.WebhookEventCreateNestedManyWithoutTenantInput
+  itemVariants?: Prisma.ItemVariantCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutReferralsInput = {
@@ -2185,6 +2387,7 @@ export type TenantUncheckedCreateWithoutReferralsInput = {
   itemViews?: Prisma.ItemViewUncheckedCreateNestedManyWithoutTenantInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
   webhookEvents?: Prisma.WebhookEventUncheckedCreateNestedManyWithoutTenantInput
+  itemVariants?: Prisma.ItemVariantUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutReferralsInput = {
@@ -2232,6 +2435,7 @@ export type TenantUpdateWithoutReferralsInput = {
   itemViews?: Prisma.ItemViewUpdateManyWithoutTenantNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
   webhookEvents?: Prisma.WebhookEventUpdateManyWithoutTenantNestedInput
+  itemVariants?: Prisma.ItemVariantUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutReferralsInput = {
@@ -2263,6 +2467,7 @@ export type TenantUncheckedUpdateWithoutReferralsInput = {
   itemViews?: Prisma.ItemViewUncheckedUpdateManyWithoutTenantNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
   webhookEvents?: Prisma.WebhookEventUncheckedUpdateManyWithoutTenantNestedInput
+  itemVariants?: Prisma.ItemVariantUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 
@@ -2281,6 +2486,7 @@ export type TenantCountOutputType = {
   auditLogs: number
   webhookEvents: number
   referrals: number
+  itemVariants: number
 }
 
 export type TenantCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2294,6 +2500,7 @@ export type TenantCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions
   auditLogs?: boolean | TenantCountOutputTypeCountAuditLogsArgs
   webhookEvents?: boolean | TenantCountOutputTypeCountWebhookEventsArgs
   referrals?: boolean | TenantCountOutputTypeCountReferralsArgs
+  itemVariants?: boolean | TenantCountOutputTypeCountItemVariantsArgs
 }
 
 /**
@@ -2376,6 +2583,13 @@ export type TenantCountOutputTypeCountReferralsArgs<ExtArgs extends runtime.Type
   where?: Prisma.ReferralWhereInput
 }
 
+/**
+ * TenantCountOutputType without action
+ */
+export type TenantCountOutputTypeCountItemVariantsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ItemVariantWhereInput
+}
+
 
 export type TenantSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -2407,6 +2621,7 @@ export type TenantSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   auditLogs?: boolean | Prisma.Tenant$auditLogsArgs<ExtArgs>
   webhookEvents?: boolean | Prisma.Tenant$webhookEventsArgs<ExtArgs>
   referrals?: boolean | Prisma.Tenant$referralsArgs<ExtArgs>
+  itemVariants?: boolean | Prisma.Tenant$itemVariantsArgs<ExtArgs>
   _count?: boolean | Prisma.TenantCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["tenant"]>
 
@@ -2488,6 +2703,7 @@ export type TenantInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   auditLogs?: boolean | Prisma.Tenant$auditLogsArgs<ExtArgs>
   webhookEvents?: boolean | Prisma.Tenant$webhookEventsArgs<ExtArgs>
   referrals?: boolean | Prisma.Tenant$referralsArgs<ExtArgs>
+  itemVariants?: boolean | Prisma.Tenant$itemVariantsArgs<ExtArgs>
   _count?: boolean | Prisma.TenantCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type TenantIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -2506,6 +2722,7 @@ export type $TenantPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     auditLogs: Prisma.$AuditLogPayload<ExtArgs>[]
     webhookEvents: Prisma.$WebhookEventPayload<ExtArgs>[]
     referrals: Prisma.$ReferralPayload<ExtArgs>[]
+    itemVariants: Prisma.$ItemVariantPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2931,6 +3148,7 @@ export interface Prisma__TenantClient<T, Null = never, ExtArgs extends runtime.T
   auditLogs<T extends Prisma.Tenant$auditLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$auditLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   webhookEvents<T extends Prisma.Tenant$webhookEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$webhookEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WebhookEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   referrals<T extends Prisma.Tenant$referralsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$referralsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReferralPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  itemVariants<T extends Prisma.Tenant$itemVariantsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$itemVariantsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ItemVariantPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3609,6 +3827,30 @@ export type Tenant$referralsArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   distinct?: Prisma.ReferralScalarFieldEnum | Prisma.ReferralScalarFieldEnum[]
+}
+
+/**
+ * Tenant.itemVariants
+ */
+export type Tenant$itemVariantsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ItemVariant
+   */
+  select?: Prisma.ItemVariantSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ItemVariant
+   */
+  omit?: Prisma.ItemVariantOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ItemVariantInclude<ExtArgs> | null
+  where?: Prisma.ItemVariantWhereInput
+  orderBy?: Prisma.ItemVariantOrderByWithRelationInput | Prisma.ItemVariantOrderByWithRelationInput[]
+  cursor?: Prisma.ItemVariantWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ItemVariantScalarFieldEnum | Prisma.ItemVariantScalarFieldEnum[]
 }
 
 /**

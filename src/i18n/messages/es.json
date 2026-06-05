@@ -37,6 +37,8 @@
     "closeSheet": "Cerrar",
     "sectionLabel": "Sección",
     "viewDetail": "Ver detalle",
+    "variantsFrom": "Desde",
+    "variantsTitle": "Opciones",
     "allergenDisclaimer": "La información de alérgenos y dietas la administra el restaurante.",
     "containsAllergens": "Contiene",
     "dietary": {

@@ -3,7 +3,7 @@ import { getPrisma } from '@/lib/db/prisma';
 import { sanitizePlainText } from '@/lib/sanitize';
 import { normalizeAllergenTags, normalizeDietaryTags } from '@/lib/item-attributes';
 import type { MenuData, IMenuRepository, ImportResult } from '@/server/repositories/menu.repository';
-import type { Category, ItemTranslation, ItemUpsertInput, MenuItem, MenuSection, Tenant } from '@/types/domain';
+import type { Category, ItemTranslation, ItemUpsertInput, ItemVariant, MenuItem, MenuSection, Tenant } from '@/types/domain';
 import type { SectionInput } from '@/lib/validators/section.schema';
 import type { CategoryInput } from '@/lib/validators/item.schema';
 import type { ImportItem } from '@/lib/validators/import.schema';
@@ -69,6 +69,7 @@ type MenuItemRow = {
   updatedAt: Date;
   deletedAt: Date | null;
   translations?: ItemTranslationRow[];
+  variants?: ItemVariantRow[];
 };
 
 type ItemTranslationRow = {
@@ -76,6 +77,13 @@ type ItemTranslationRow = {
   locale: string;
   name: string | null;
   description: string | null;
+};
+
+type ItemVariantRow = {
+  id: string;
+  name: string;
+  priceCents: number;
+  sortOrder: number;
 };
 
 function mapTenant(row: TenantRow): Tenant {
@@ -146,6 +154,16 @@ function mapMenuItem(row: MenuItemRow): MenuItem {
     updatedAt: row.updatedAt.toISOString(),
     deletedAt: row.deletedAt?.toISOString() ?? null,
     translations: row.translations?.map(mapItemTranslation),
+    variants: row.variants?.map(mapItemVariant),
+  };
+}
+
+function mapItemVariant(row: ItemVariantRow): ItemVariant {
+  return {
+    id: row.id,
+    name: row.name,
+    priceCents: row.priceCents,
+    sortOrder: row.sortOrder,
   };
 }
 
@@ -180,7 +198,10 @@ export class PrismaMenuRepository implements IMenuRepository {
       prisma.menuItem.findMany({
         where: { tenantId, deletedAt: null },
         orderBy: { sortOrder: 'asc' },
-        include: { translations: { where: { deletedAt: null } } },
+        include: {
+          translations: { where: { deletedAt: null } },
+          variants: { orderBy: { sortOrder: 'asc' } },
+        },
       }),
     ]);
 
@@ -199,6 +220,10 @@ export class PrismaMenuRepository implements IMenuRepository {
     const items = await prisma.menuItem.findMany({
       where: { tenantId, deletedAt: null },
       orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+      include: {
+        translations: { where: { deletedAt: null } },
+        variants: { orderBy: { sortOrder: 'asc' } },
+      },
     });
     return items.map(mapMenuItem);
   }
@@ -357,9 +382,31 @@ export class PrismaMenuRepository implements IMenuRepository {
         });
       }
 
+      // Variants are fully owned by the item: only touch them when the caller
+      // actually sent the field (so a partial update — e.g. stock toggle — never
+      // wipes them). Then replace the whole set; array order becomes sortOrder.
+      if (!input.id || 'variants' in input) {
+        await tx.itemVariant.deleteMany({ where: { itemId, tenantId } });
+        const variants = input.variants ?? [];
+        if (variants.length > 0) {
+          await tx.itemVariant.createMany({
+            data: variants.map((variant, index) => ({
+              tenantId,
+              itemId,
+              name: sanitizePlainText(variant.name, 60) ?? 'Opción',
+              priceCents: variant.priceCents,
+              sortOrder: index,
+            })),
+          });
+        }
+      }
+
       const item = await tx.menuItem.findFirst({
         where: { id: itemId, tenantId, deletedAt: null },
-        include: { translations: { where: { deletedAt: null } } },
+        include: {
+          translations: { where: { deletedAt: null } },
+          variants: { orderBy: { sortOrder: 'asc' } },
+        },
       });
       if (!item) throw new Error('not_found');
       return mapMenuItem(item);

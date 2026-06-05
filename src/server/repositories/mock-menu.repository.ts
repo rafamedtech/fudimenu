@@ -26,7 +26,18 @@ function cloneMenuItem(item: MenuItem): MenuItem {
     dietaryTags: [...(item.dietaryTags ?? [])],
     allergenTags: [...(item.allergenTags ?? [])],
     translations: item.translations?.map((translation) => ({ ...translation })),
+    variants: item.variants?.map((variant) => ({ ...variant })),
   };
+}
+
+/** Replace an item's variants from upsert input; array order → sortOrder. */
+function buildMockVariants(input: ItemUpsertInput['variants']): MenuItem['variants'] {
+  return (input ?? []).map((variant, index) => ({
+    id: `var_${crypto.randomUUID().slice(0, 8)}`,
+    name: sanitizePlainText(variant.name, 60) ?? 'Opción',
+    priceCents: variant.priceCents,
+    sortOrder: index,
+  }));
 }
 
 /**
@@ -159,7 +170,7 @@ export class MockMenuRepository implements IMenuRepository {
   }
 
   async upsertItem(tenantId: string, input: ItemUpsertInput): Promise<MenuItem> {
-    const { translations: _translations, ...rest } = input;
+    const { translations: _translations, variants: _variants, ...rest } = input;
     const sanitizedInput = {
       ...rest,
       name: sanitizePlainText(input.name, 80) ?? 'Sin nombre',
@@ -172,6 +183,9 @@ export class MockMenuRepository implements IMenuRepository {
       ...('allergenTags' in input
         ? { allergenTags: normalizeAllergenTags(input.allergenTags ?? []) }
         : {}),
+      // Variants are fully owned by the item: replace only when sent, so a
+      // partial update never wipes them (mirrors the Prisma repo).
+      ...('variants' in input ? { variants: buildMockVariants(input.variants) } : {}),
     };
 
     if (input.id) {
@@ -214,6 +228,7 @@ export class MockMenuRepository implements IMenuRepository {
       translations: input.translations
         ? applyMockTranslations(undefined, id, input.translations)
         : undefined,
+      variants: 'variants' in input ? buildMockVariants(input.variants) : undefined,
     };
     this.items.push(created);
     return cloneMenuItem(created);

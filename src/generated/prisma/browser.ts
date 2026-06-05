@@ -48,6 +48,11 @@ export type Category = Prisma.CategoryModel
  */
 export type MenuItem = Prisma.MenuItemModel
 /**
+ * Model ItemVariant
+ * 
+ */
+export type ItemVariant = Prisma.ItemVariantModel
+/**
  * Model ItemTranslation
  * 
  */

@@ -64,6 +64,19 @@ export type MenuItem = {
   updatedAt: string;
   deletedAt?: string | null;
   translations?: ItemTranslation[];
+  variants?: ItemVariant[];
+};
+
+export type ItemVariant = {
+  id: string;
+  name: string;
+  priceCents: number;
+  sortOrder: number;
+};
+
+export type ItemVariantInput = {
+  name: string;
+  priceCents: number;
 };
 
 export type ItemTranslation = {
@@ -79,8 +92,9 @@ export type ItemTranslationInput = {
   description?: string | null;
 };
 
-export type ItemUpsertInput = Partial<Omit<MenuItem, 'translations'>> & {
+export type ItemUpsertInput = Partial<Omit<MenuItem, 'translations' | 'variants'>> & {
   translations?: ItemTranslationInput[];
+  variants?: ItemVariantInput[];
 };
 
 export type Membership = {

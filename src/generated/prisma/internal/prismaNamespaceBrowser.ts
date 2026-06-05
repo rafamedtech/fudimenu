@@ -57,6 +57,7 @@ export const ModelName = {
   MenuSection: 'MenuSection',
   Category: 'Category',
   MenuItem: 'MenuItem',
+  ItemVariant: 'ItemVariant',
   ItemTranslation: 'ItemTranslation',
   SlugHistory: 'SlugHistory',
   MenuView: 'MenuView',
@@ -186,6 +187,20 @@ export const MenuItemScalarFieldEnum = {
 } as const
 
 export type MenuItemScalarFieldEnum = (typeof MenuItemScalarFieldEnum)[keyof typeof MenuItemScalarFieldEnum]
+
+
+export const ItemVariantScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  itemId: 'itemId',
+  name: 'name',
+  priceCents: 'priceCents',
+  sortOrder: 'sortOrder',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ItemVariantScalarFieldEnum = (typeof ItemVariantScalarFieldEnum)[keyof typeof ItemVariantScalarFieldEnum]
 
 
 export const ItemTranslationScalarFieldEnum = {

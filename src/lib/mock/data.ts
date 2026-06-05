@@ -283,6 +283,19 @@ const mockAllergenTags: Record<string, string[]> = {
   itm_38: ['nuts', 'dairy'],
 };
 
+// A few demonstrative visual variants (name + price) so the mock public menu
+// renders the "from $X" card price and the options list in the detail sheet.
+const mockVariants: Record<string, { name: string; priceCents: number }[]> = {
+  itm_28: [
+    { name: 'Chico', priceCents: 8500 },
+    { name: 'Grande', priceCents: 9500 },
+  ],
+  itm_31: [
+    { name: 'Chico', priceCents: 8500 },
+    { name: 'Grande', priceCents: 9500 },
+  ],
+};
+
 export const mockItems: MenuItem[] = itemRows.map(
   ([id, categoryId, name, description, priceCents, sortOrder]) => ({
     id,
@@ -299,6 +312,12 @@ export const mockItems: MenuItem[] = itemRows.map(
     sortOrder,
     createdAt: now,
     updatedAt: now,
+    variants: (mockVariants[id] ?? []).map((variant, index) => ({
+      id: `${id}_var_${index}`,
+      name: variant.name,
+      priceCents: variant.priceCents,
+      sortOrder: index,
+    })),
   }),
 );
 

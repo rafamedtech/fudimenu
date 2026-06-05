@@ -37,6 +37,8 @@
     "closeSheet": "Close",
     "sectionLabel": "Section",
     "viewDetail": "View detail",
+    "variantsFrom": "From",
+    "variantsTitle": "Options",
     "allergenDisclaimer": "Allergen and dietary information is managed by the restaurant.",
     "containsAllergens": "Contains",
     "dietary": {

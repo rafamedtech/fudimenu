@@ -11,6 +11,7 @@ import {
   type BadgeLabels,
   type ItemBadge,
 } from '@/lib/item-attributes';
+import { getVariantPriceRange } from '@/lib/item-variants';
 import type { MenuItem } from '@/types/domain';
 import type { PublicMenuGroup as IslandGroup } from '@/lib/public-menu-groups';
 
@@ -29,6 +30,8 @@ export interface IslandStrings {
   viewDetail: string;
   dailySpecials: string;
   otherCategory: string;
+  variantsFrom: string;
+  variantsTitle: string;
   badges: BadgeLabels;
   allergenDisclaimer: string;
   containsAllergens: string;
@@ -365,19 +368,54 @@ export function ItemList({
                   aria-label, so hide the chips from the a11y tree to avoid a
                   duplicate/confusing announcement. */}
               <BadgeRow badges={badges} size="sm" ariaHidden />
-              <p
-                className={`mt-2 font-extrabold tabular-nums text-ink-900 ipad:text-lg ${
-                  !item.isAvailable ? 'line-through opacity-50' : ''
-                }`}
-              >
-                {formatPrice(getItemPrice(item), item.currency, priceLocale)}
-              </p>
+              {(() => {
+                const range = getVariantPriceRange(item.variants);
+                return (
+                  <p
+                    className={`mt-2 font-extrabold tabular-nums text-ink-900 ipad:text-lg ${
+                      !item.isAvailable ? 'line-through opacity-50' : ''
+                    }`}
+                  >
+                    {range
+                      ? `${strings.variantsFrom} ${formatPrice(range.minCents, item.currency, priceLocale)}`
+                      : formatPrice(getItemPrice(item), item.currency, priceLocale)}
+                  </p>
+                );
+              })()}
             </div>
           </button>
         </li>
         );
       })}
     </ul>
+  );
+}
+
+function VariantList({
+  variants,
+  currency,
+  priceLocale,
+  title,
+}: {
+  variants: NonNullable<MenuItem['variants']>;
+  currency: string;
+  priceLocale: string;
+  title: string;
+}) {
+  return (
+    <div className="pt-1">
+      <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-ink-500">{title}</p>
+      <ul className="divide-y divide-[var(--brand-card-border)] rounded-xl border border-[var(--brand-card-border)]">
+        {variants.map((variant) => (
+          <li key={variant.id} className="flex items-center justify-between gap-3 px-4 py-3">
+            <span className="font-medium text-ink-900">{variant.name}</span>
+            <span className="shrink-0 font-extrabold tabular-nums text-ink-900">
+              {formatPrice(variant.priceCents, currency, priceLocale)}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
@@ -624,16 +662,25 @@ export function ItemSheet({
                 </div>
               );
             })()}
-            <div className="flex items-baseline gap-3 pt-1">
-              <span className="text-3xl font-extrabold text-ink-900 tabular-nums ipad:text-4xl">
-                {formatPrice(getItemPrice(item), item.currency, priceLocale)}
-              </span>
-              {item.isSpecialToday && item.specialPrice !== null && (
-                <span className="text-base text-ink-500 line-through tabular-nums">
-                  {formatPrice(item.priceCents, item.currency, priceLocale)}
+            {item.variants && item.variants.length > 0 ? (
+              <VariantList
+                variants={item.variants}
+                currency={item.currency}
+                priceLocale={priceLocale}
+                title={strings.variantsTitle}
+              />
+            ) : (
+              <div className="flex items-baseline gap-3 pt-1">
+                <span className="text-3xl font-extrabold text-ink-900 tabular-nums ipad:text-4xl">
+                  {formatPrice(getItemPrice(item), item.currency, priceLocale)}
                 </span>
-              )}
-            </div>
+                {item.isSpecialToday && item.specialPrice !== null && (
+                  <span className="text-base text-ink-500 line-through tabular-nums">
+                    {formatPrice(item.priceCents, item.currency, priceLocale)}
+                  </span>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="shrink-0 border-t border-[var(--brand-card-border)] bg-[var(--brand-card)] px-6 pb-safe pt-4 ipad:px-8">

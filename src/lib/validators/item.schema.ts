@@ -4,6 +4,7 @@ import {
   normalizeAllergenTags,
   normalizeDietaryTags,
 } from '@/lib/item-attributes';
+import { MAX_VARIANT_NAME_CHARS, MAX_VARIANTS_PER_ITEM } from '@/lib/item-variants';
 
 export const itemSchema = z
   .object({
@@ -37,6 +38,19 @@ export const itemSchema = z
           description: z.string().max(500).nullable().optional(),
         }),
       )
+      .optional(),
+    // Simple visual variants (name + price). Order is the array order. Rows the
+    // owner left incomplete (no name or no price) are dropped, not rejected, so
+    // a stray empty row in the editor never blocks the whole save.
+    variants: z
+      .array(
+        z.object({
+          name: z.string().max(MAX_VARIANT_NAME_CHARS),
+          priceCents: z.number().int().min(0).max(10_000_00),
+        }),
+      )
+      .max(MAX_VARIANTS_PER_ITEM)
+      .transform((rows) => rows.filter((row) => row.name.trim().length > 0 && row.priceCents > 0))
       .optional(),
   })
   .superRefine((data, ctx) => {
