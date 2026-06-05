@@ -1,4 +1,9 @@
 import { z } from 'zod';
+import {
+  MAX_TAGS_PER_LIST,
+  normalizeAllergenTags,
+  normalizeDietaryTags,
+} from '@/lib/item-attributes';
 
 export const itemSchema = z
   .object({
@@ -12,6 +17,18 @@ export const itemSchema = z
     currency: z.string().length(3).default('MXN'),
     imageUrl: z.string().url().nullable().optional(),
     isAvailable: z.boolean().optional(),
+    // Public diet/allergen attributes. Cap raw input length to bound payload,
+    // then normalize: drop non-allowlisted values + dedupe + canonical order.
+    dietaryTags: z
+      .array(z.string())
+      .max(MAX_TAGS_PER_LIST)
+      .transform(normalizeDietaryTags)
+      .optional(),
+    allergenTags: z
+      .array(z.string())
+      .max(MAX_TAGS_PER_LIST)
+      .transform(normalizeAllergenTags)
+      .optional(),
     translations: z
       .array(
         z.object({

@@ -5,6 +5,12 @@ import Image from 'next/image';
 import { getCategoryEmoji } from '@/lib/category-placeholder';
 import { formatPrice } from '@/lib/utils';
 import { buildWhatsAppOrderUrl } from '@/lib/whatsapp';
+import {
+  getItemBadges,
+  getItemBadgesAccessibleLabel,
+  type BadgeLabels,
+  type ItemBadge,
+} from '@/lib/item-attributes';
 import type { MenuItem } from '@/types/domain';
 import type { PublicMenuGroup as IslandGroup } from '@/lib/public-menu-groups';
 
@@ -23,6 +29,9 @@ export interface IslandStrings {
   viewDetail: string;
   dailySpecials: string;
   otherCategory: string;
+  badges: BadgeLabels;
+  allergenDisclaimer: string;
+  containsAllergens: string;
 }
 
 interface IslandProps {
@@ -307,7 +316,7 @@ function SearchInput({
   );
 }
 
-function ItemList({
+export function ItemList({
   items,
   categoryName,
   onSelect,
@@ -322,7 +331,12 @@ function ItemList({
 }) {
   return (
     <ul className="grid gap-3 ipad:gap-4 ipad-landscape:grid-cols-2">
-      {items.map((item) => (
+      {items.map((item) => {
+        const badges = getItemBadges(item, strings.badges);
+        const badgeLabel = getItemBadgesAccessibleLabel(badges, {
+          contains: strings.containsAllergens,
+        });
+        return (
         <li key={item.id}>
           <button
             type="button"
@@ -330,7 +344,7 @@ function ItemList({
             data-item-id={item.id}
             data-item-category={categoryName}
             className="flex w-full items-start gap-3 rounded-xl border border-[var(--brand-card-border)] bg-[var(--brand-card)] p-3 text-left shadow-sm transition-all hover:border-[var(--brand-primary-border)] hover:shadow-md active:scale-[0.99] focus-visible:outline-none focus-visible:shadow-glow-mostaza ipad:gap-4 ipad:p-4"
-            aria-label={`${item.name} — ${strings.viewDetail}`}
+            aria-label={`${item.name}${badgeLabel ? `. ${badgeLabel}` : ''} — ${strings.viewDetail}`}
           >
             <ItemThumb item={item} categoryName={categoryName} soldOutLabel={strings.soldOut} />
             <div className="flex min-w-0 flex-1 flex-col">
@@ -347,6 +361,10 @@ function ItemList({
                   {item.description}
                 </p>
               )}
+              {/* Visual only: the badge meaning is carried by the button's
+                  aria-label, so hide the chips from the a11y tree to avoid a
+                  duplicate/confusing announcement. */}
+              <BadgeRow badges={badges} size="sm" ariaHidden />
               <p
                 className={`mt-2 font-extrabold tabular-nums text-ink-900 ipad:text-lg ${
                   !item.isAvailable ? 'line-through opacity-50' : ''
@@ -356,6 +374,39 @@ function ItemList({
               </p>
             </div>
           </button>
+        </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+function BadgeRow({
+  badges,
+  size,
+  ariaHidden = false,
+}: {
+  badges: ItemBadge[];
+  size: 'sm' | 'md';
+  ariaHidden?: boolean;
+}) {
+  if (badges.length === 0) return null;
+  const sizeClass = size === 'sm' ? 'px-2 py-0.5 text-[10px]' : 'px-2.5 py-1 text-xs';
+  return (
+    <ul
+      aria-hidden={ariaHidden || undefined}
+      className={`mt-2 flex flex-wrap gap-1.5 ${size === 'sm' ? '' : 'gap-2'}`}
+    >
+      {badges.map((badge) => (
+        <li
+          key={`${badge.kind}-${badge.key}`}
+          className={`inline-flex items-center rounded-full font-bold uppercase tracking-wide ${sizeClass} ${
+            badge.kind === 'dietary'
+              ? 'bg-emerald-100 text-emerald-800'
+              : 'bg-amber-100 text-amber-900'
+          }`}
+        >
+          {badge.label}
         </li>
       ))}
     </ul>
@@ -395,7 +446,7 @@ function ItemThumb({
   );
 }
 
-function ItemSheet({
+export function ItemSheet({
   item,
   categoryName,
   open,
@@ -561,6 +612,18 @@ function ItemSheet({
             {item.description && (
               <p className="text-base leading-relaxed text-ink-700">{item.description}</p>
             )}
+            {(() => {
+              const badges = getItemBadges(item, strings.badges);
+              if (badges.length === 0) return null;
+              return (
+                <div className="space-y-2">
+                  <BadgeRow badges={badges} size="md" />
+                  <p className="text-xs leading-relaxed text-ink-500">
+                    {strings.allergenDisclaimer}
+                  </p>
+                </div>
+              );
+            })()}
             <div className="flex items-baseline gap-3 pt-1">
               <span className="text-3xl font-extrabold text-ink-900 tabular-nums ipad:text-4xl">
                 {formatPrice(getItemPrice(item), item.currency, priceLocale)}

@@ -168,6 +168,8 @@ model MenuItem {
   currency       String            @default("MXN") @db.Char(3)
   imageUrl       String?           @map("image_url")
   isAvailable    Boolean           @default(true) @map("is_available")
+  dietaryTags    String[]          @default([]) @map("dietary_tags")
+  allergenTags   String[]          @default([]) @map("allergen_tags")
   sortOrder      Int               @default(999) @map("sort_order")
   createdAt      DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt      DateTime          @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)

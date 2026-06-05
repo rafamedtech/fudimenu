@@ -22,6 +22,12 @@ import {
   type JsonValue,
 } from '@/lib/storage/offline-queue';
 import { cn, formatPrice } from '@/lib/utils';
+import {
+  ALLERGEN_TAGS,
+  DIETARY_TAGS,
+  type AllergenTag,
+  type DietaryTag,
+} from '@/lib/item-attributes';
 import { itemSchema, type ItemInput } from '@/lib/validators/item.schema';
 import {
   restoreItemAction,
@@ -45,6 +51,24 @@ interface Props {
 const DESCRIPTION_MAX_CHARS = 500;
 const FREE_ITEM_LIMIT = PLAN_CONFIG.free.limits.items ?? 20;
 const LOCALE_LABEL: Record<Locale, string> = { es: 'Español', en: 'Inglés' };
+
+const DIETARY_LABEL: Record<DietaryTag, string> = {
+  vegan: 'Vegano',
+  vegetarian: 'Vegetariano',
+  gluten_free: 'Sin gluten',
+  spicy: 'Picante',
+};
+const ALLERGEN_LABEL: Record<AllergenTag, string> = {
+  dairy: 'Lácteos',
+  nuts: 'Nueces',
+  peanuts: 'Cacahuate',
+  gluten: 'Gluten',
+  shellfish: 'Mariscos',
+  fish: 'Pescado',
+  eggs: 'Huevo',
+  soy: 'Soya',
+  sesame: 'Ajonjolí',
+};
 
 export function ItemEditorForm({ initial, categories, sectionId, offlineConflictId, defaultLocale }: Props) {
   const locale = useLocale();
@@ -88,6 +112,8 @@ export function ItemEditorForm({ initial, categories, sectionId, offlineConflict
       imageUrl: initial?.imageUrl ?? null,
       isSpecialToday: initial?.isSpecialToday ?? false,
       specialPrice: initial?.specialPrice ?? null,
+      dietaryTags: (initial?.dietaryTags ?? []) as DietaryTag[],
+      allergenTags: (initial?.allergenTags ?? []) as AllergenTag[],
       translations: [
         {
           locale: translationLocale,
@@ -120,6 +146,22 @@ export function ItemEditorForm({ initial, categories, sectionId, offlineConflict
   const placeholderEmoji = getCategoryEmoji(selectedCategory?.name);
   const imageUrl = watch('imageUrl');
   const isSpecialToday = watch('isSpecialToday') ?? false;
+  const dietaryTags = watch('dietaryTags') ?? [];
+  const allergenTags = watch('allergenTags') ?? [];
+
+  function toggleDietaryTag(tag: DietaryTag) {
+    const next = dietaryTags.includes(tag)
+      ? dietaryTags.filter((t) => t !== tag)
+      : [...dietaryTags, tag];
+    setValue('dietaryTags', next, { shouldDirty: true, shouldValidate: true });
+  }
+
+  function toggleAllergenTag(tag: AllergenTag) {
+    const next = allergenTags.includes(tag)
+      ? allergenTags.filter((t) => t !== tag)
+      : [...allergenTags, tag];
+    setValue('allergenTags', next, { shouldDirty: true, shouldValidate: true });
+  }
   const conflictRows = useMemo(
     () => buildConflictRows(initial, conflictDraft, localCategories),
     [localCategories, conflictDraft, initial],
@@ -338,6 +380,13 @@ export function ItemEditorForm({ initial, categories, sectionId, offlineConflict
           register={register}
           charCount={charCount}
           isNearLimit={isNearDescriptionLimit}
+        />
+
+        <AttributesCard
+          dietaryTags={dietaryTags}
+          allergenTags={allergenTags}
+          onToggleDietary={toggleDietaryTag}
+          onToggleAllergen={toggleAllergenTag}
         />
 
         <TranslationCard
@@ -646,6 +695,84 @@ function DescriptionField({
         </span>
       </div>
     </div>
+  );
+}
+
+function AttributesCard({
+  dietaryTags,
+  allergenTags,
+  onToggleDietary,
+  onToggleAllergen,
+}: {
+  dietaryTags: string[];
+  allergenTags: string[];
+  onToggleDietary: (tag: DietaryTag) => void;
+  onToggleAllergen: (tag: AllergenTag) => void;
+}) {
+  return (
+    <Card className="space-y-4 border border-ink-200 bg-[var(--brand-surface)] shadow-sm">
+      <div>
+        <p className="font-bold text-ink-900">Dietas y alérgenos</p>
+        <p className="text-xs text-ink-500">
+          Opcional. Se muestra a tus clientes como etiquetas. Tú administras esta información.
+        </p>
+      </div>
+
+      <fieldset>
+        <legend className="mb-2 text-sm font-medium text-ink-700">Dieta</legend>
+        <div className="flex flex-wrap gap-2">
+          {DIETARY_TAGS.map((tag) => (
+            <TagToggle
+              key={tag}
+              label={DIETARY_LABEL[tag]}
+              selected={dietaryTags.includes(tag)}
+              onClick={() => onToggleDietary(tag)}
+            />
+          ))}
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend className="mb-2 text-sm font-medium text-ink-700">Contiene alérgenos</legend>
+        <div className="flex flex-wrap gap-2">
+          {ALLERGEN_TAGS.map((tag) => (
+            <TagToggle
+              key={tag}
+              label={ALLERGEN_LABEL[tag]}
+              selected={allergenTags.includes(tag)}
+              onClick={() => onToggleAllergen(tag)}
+            />
+          ))}
+        </div>
+      </fieldset>
+    </Card>
+  );
+}
+
+function TagToggle({
+  label,
+  selected,
+  onClick,
+}: {
+  label: string;
+  selected: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      role="checkbox"
+      aria-checked={selected}
+      onClick={onClick}
+      className={cn(
+        'rounded-full border-[1.5px] px-3 py-1.5 text-sm font-medium transition-colors',
+        selected
+          ? 'border-mostaza-500 bg-mostaza-100 text-mostaza-800'
+          : 'border-ink-300 bg-[var(--brand-card)] text-ink-700 hover:border-mostaza-400 hover:bg-[var(--brand-surface)]',
+      )}
+    >
+      {label}
+    </button>
   );
 }
 

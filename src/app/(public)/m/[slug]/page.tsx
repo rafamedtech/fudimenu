@@ -123,6 +123,27 @@ async function PublicMenuContent({
     viewDetail: t('viewDetail'),
     dailySpecials: t('dailySpecials'),
     otherCategory: t('otherCategory'),
+    allergenDisclaimer: t('allergenDisclaimer'),
+    containsAllergens: t('containsAllergens'),
+    badges: {
+      dietary: {
+        vegan: t('dietary.vegan'),
+        vegetarian: t('dietary.vegetarian'),
+        gluten_free: t('dietary.gluten_free'),
+        spicy: t('dietary.spicy'),
+      },
+      allergen: {
+        dairy: t('allergen.dairy'),
+        nuts: t('allergen.nuts'),
+        peanuts: t('allergen.peanuts'),
+        gluten: t('allergen.gluten'),
+        shellfish: t('allergen.shellfish'),
+        fish: t('allergen.fish'),
+        eggs: t('allergen.eggs'),
+        soy: t('allergen.soy'),
+        sesame: t('allergen.sesame'),
+      },
+    },
   };
 
   return (

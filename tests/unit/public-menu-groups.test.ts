@@ -13,6 +13,8 @@ const item = (id: string, categoryId: string | null, isSpecialToday = false): Me
   currency: 'MXN',
   imageUrl: null,
   isAvailable: true,
+  dietaryTags: [],
+  allergenTags: [],
   sortOrder: 0,
   createdAt: '2026-01-01T00:00:00.000Z',
   updatedAt: '2026-01-01T00:00:00.000Z',

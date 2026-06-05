@@ -37,6 +37,25 @@
     "closeSheet": "Cerrar",
     "sectionLabel": "Sección",
     "viewDetail": "Ver detalle",
+    "allergenDisclaimer": "La información de alérgenos y dietas la administra el restaurante.",
+    "containsAllergens": "Contiene",
+    "dietary": {
+      "vegan": "Vegano",
+      "vegetarian": "Vegetariano",
+      "gluten_free": "Sin gluten",
+      "spicy": "Picante"
+    },
+    "allergen": {
+      "dairy": "Lácteos",
+      "nuts": "Nueces",
+      "peanuts": "Cacahuate",
+      "gluten": "Gluten",
+      "shellfish": "Mariscos",
+      "fish": "Pescado",
+      "eggs": "Huevo",
+      "soy": "Soya",
+      "sesame": "Ajonjolí"
+    },
     "pwaPrompt": "Guarda este menú en tu inicio — acceso en 1 tap 📱",
     "pwaInstall": "Agregar menú a inicio",
     "pwaClose": "Cerrar sugerencia",
