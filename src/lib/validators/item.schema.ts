@@ -12,6 +12,15 @@ export const itemSchema = z
     currency: z.string().length(3).default('MXN'),
     imageUrl: z.string().url().nullable().optional(),
     isAvailable: z.boolean().optional(),
+    translations: z
+      .array(
+        z.object({
+          locale: z.enum(['es', 'en']),
+          name: z.string().max(80).nullable().optional(),
+          description: z.string().max(500).nullable().optional(),
+        }),
+      )
+      .optional(),
   })
   .superRefine((data, ctx) => {
     if (data.isSpecialToday && data.specialPrice != null && data.specialPrice >= data.priceCents) {

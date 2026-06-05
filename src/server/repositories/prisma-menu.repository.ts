@@ -2,7 +2,7 @@ import 'server-only';
 import { getPrisma } from '@/lib/db/prisma';
 import { sanitizePlainText } from '@/lib/sanitize';
 import type { MenuData, IMenuRepository, ImportResult } from '@/server/repositories/menu.repository';
-import type { Category, MenuItem, MenuSection, Tenant } from '@/types/domain';
+import type { Category, ItemTranslation, ItemUpsertInput, MenuItem, MenuSection, Tenant } from '@/types/domain';
 import type { SectionInput } from '@/lib/validators/section.schema';
 import type { CategoryInput } from '@/lib/validators/item.schema';
 import type { ImportItem } from '@/lib/validators/import.schema';
@@ -65,6 +65,14 @@ type MenuItemRow = {
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
+  translations?: ItemTranslationRow[];
+};
+
+type ItemTranslationRow = {
+  itemId: string;
+  locale: string;
+  name: string | null;
+  description: string | null;
 };
 
 function mapTenant(row: TenantRow): Tenant {
@@ -132,6 +140,16 @@ function mapMenuItem(row: MenuItemRow): MenuItem {
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
     deletedAt: row.deletedAt?.toISOString() ?? null,
+    translations: row.translations?.map(mapItemTranslation),
+  };
+}
+
+function mapItemTranslation(row: ItemTranslationRow): ItemTranslation {
+  return {
+    itemId: row.itemId,
+    locale: row.locale as ItemTranslation['locale'],
+    name: row.name,
+    description: row.description,
   };
 }
 
@@ -157,6 +175,7 @@ export class PrismaMenuRepository implements IMenuRepository {
       prisma.menuItem.findMany({
         where: { tenantId, deletedAt: null },
         orderBy: { sortOrder: 'asc' },
+        include: { translations: { where: { deletedAt: null } } },
       }),
     ]);
 
@@ -249,7 +268,7 @@ export class PrismaMenuRepository implements IMenuRepository {
     return mapMenuItem(item);
   }
 
-  async upsertItem(tenantId: string, input: Partial<MenuItem>): Promise<MenuItem> {
+  async upsertItem(tenantId: string, input: ItemUpsertInput): Promise<MenuItem> {
     const payload: {
       categoryId: string | null;
       name: string;
@@ -285,25 +304,49 @@ export class PrismaMenuRepository implements IMenuRepository {
 
     const prisma = getPrisma();
 
-    if (input.id) {
-      const result = await prisma.menuItem.updateMany({
-        where: { id: input.id, tenantId, deletedAt: null },
-        data: payload,
-      });
+    return prisma.$transaction(async (tx) => {
+      let itemId: string;
 
-      if (result.count === 0) throw new Error('not_found');
+      if (input.id) {
+        const result = await tx.menuItem.updateMany({
+          where: { id: input.id, tenantId, deletedAt: null },
+          data: payload,
+        });
+        if (result.count === 0) throw new Error('not_found');
+        itemId = input.id;
+      } else {
+        const created = await tx.menuItem.create({ data: { ...payload, tenantId } });
+        itemId = created.id;
+      }
 
-      const item = await prisma.menuItem.findFirst({
-        where: { id: input.id, tenantId, deletedAt: null },
+      for (const translation of input.translations ?? []) {
+        const name = sanitizePlainText(translation.name, 80);
+        const description = sanitizePlainText(translation.description, 500);
+
+        // Empty translation → soft-delete so the public read (deletedAt: null)
+        // falls back to the base locale instead of showing a blank override.
+        if (name === null && description === null) {
+          await tx.itemTranslation.updateMany({
+            where: { itemId, locale: translation.locale, deletedAt: null },
+            data: { deletedAt: new Date() },
+          });
+          continue;
+        }
+
+        await tx.itemTranslation.upsert({
+          where: { itemId_locale: { itemId, locale: translation.locale } },
+          create: { itemId, locale: translation.locale, name, description },
+          update: { name, description, deletedAt: null },
+        });
+      }
+
+      const item = await tx.menuItem.findFirst({
+        where: { id: itemId, tenantId, deletedAt: null },
+        include: { translations: { where: { deletedAt: null } } },
       });
       if (!item) throw new Error('not_found');
       return mapMenuItem(item);
-    }
-
-    const item = await prisma.menuItem.create({
-      data: { ...payload, tenantId },
     });
-    return mapMenuItem(item);
   }
 
   async upsertSection(tenantId: string, input: SectionInput): Promise<MenuSection> {

@@ -83,6 +83,7 @@ export default async function ItemEditPage({ params, searchParams }: Props) {
           categories={filteredCategories}
           sectionId={sectionId ?? null}
           offlineConflictId={Number(offlineConflict)}
+          defaultLocale={tenant.defaultLocale}
         />
       </main>
     </>

@@ -20,11 +20,13 @@ const mocks = vi.hoisted(() => ({
   categoryUpdateMany: vi.fn(),
   categoryFindFirst: vi.fn(),
   categoryCreate: vi.fn(),
+  itemTranslationUpsert: vi.fn(),
+  itemTranslationUpdateMany: vi.fn(),
   transaction: vi.fn(),
 }));
 
-vi.mock('@/lib/db/prisma', () => ({
-  getPrisma: vi.fn(() => ({
+vi.mock('@/lib/db/prisma', () => {
+  const client = {
     menuItem: {
       updateMany: mocks.menuItemUpdateMany,
       findFirst: mocks.menuItemFindFirst,
@@ -41,9 +43,20 @@ vi.mock('@/lib/db/prisma', () => ({
       findFirst: mocks.categoryFindFirst,
       create: mocks.categoryCreate,
     },
-    $transaction: mocks.transaction,
-  })),
-}));
+    itemTranslation: {
+      upsert: mocks.itemTranslationUpsert,
+      updateMany: mocks.itemTranslationUpdateMany,
+    },
+    // Execute transactions in-line: run callbacks against the same client and
+    // resolve array form so transactional repo methods exercise their
+    // tenant-scoped queries under test.
+    $transaction: (arg: unknown) =>
+      typeof arg === 'function'
+        ? (arg as (tx: typeof client) => unknown)(client)
+        : Promise.all(arg as Promise<unknown>[]),
+  };
+  return { getPrisma: vi.fn(() => client) };
+});
 
 async function loadRepo() {
   const { PrismaMenuRepository } = await import('../../src/server/repositories/prisma-menu.repository');
