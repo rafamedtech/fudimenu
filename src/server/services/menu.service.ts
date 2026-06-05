@@ -1,10 +1,11 @@
 import 'server-only';
 import { unstable_cache } from 'next/cache';
 import { getMenuRepository } from '@/server/repositories/get-repository';
-import type { MenuData } from '@/server/repositories/menu.repository';
+import type { MenuData, ImportResult } from '@/server/repositories/menu.repository';
 import type { MenuItem, MenuSection, Category, Tenant } from '@/types/domain';
 import type { SectionInput } from '@/lib/validators/section.schema';
 import type { CategoryInput } from '@/lib/validators/item.schema';
+import type { ImportItem } from '@/lib/validators/import.schema';
 
 const MENU_CACHE_REVALIDATE_SECONDS = 300;
 const TENANT_CACHE_REVALIDATE_SECONDS = 300;
@@ -110,5 +111,9 @@ export const menuService = {
     categoryIds: string[],
   ): Promise<void> {
     return (await getMenuRepository()).reorderCategories(tenantId, sectionId, categoryIds);
+  },
+
+  async importMenu(tenantId: string, items: ImportItem[]): Promise<ImportResult> {
+    return (await getMenuRepository()).importMenu(tenantId, items);
   },
 };
