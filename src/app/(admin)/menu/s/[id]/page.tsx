@@ -72,7 +72,12 @@ export default async function SectionDetailPage({ params }: Props) {
             }
           />
         ) : (
-          <SectionCategoryList sectionId={section.id} groups={groups} defaultLocale={tenant.defaultLocale} />
+          <SectionCategoryList
+            sectionId={section.id}
+            groups={groups}
+            defaultLocale={tenant.defaultLocale}
+            timezone={tenant.timezone}
+          />
         )}
         <AddItemFab sectionId={section.id} />
       </main>

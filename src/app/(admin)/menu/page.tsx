@@ -119,6 +119,7 @@ async function MenuList({
           sections={sections}
           canCreateSection={canCreateSection}
           itemCountBySectionId={itemCountBySectionId}
+          timezone={tenant.timezone}
         />
       )}
 
@@ -131,6 +132,7 @@ async function MenuList({
                 categoryName={item.categoryId ? categoryNamesById.get(item.categoryId) : null}
                 href={`/menu/${item.id}`}
                 defaultLocale={tenant.defaultLocale}
+                timezone={tenant.timezone}
               />
             </li>
           ))}

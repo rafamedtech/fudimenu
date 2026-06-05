@@ -38,6 +38,7 @@ export type TenantMinAggregateOutputType = {
   cuisineType: string | null
   defaultLocale: $Enums.Locale | null
   currency: string | null
+  timezone: string | null
   plan: $Enums.TenantPlan | null
   stripeCustomerId: string | null
   stripeSubscriptionId: string | null
@@ -60,6 +61,7 @@ export type TenantMaxAggregateOutputType = {
   cuisineType: string | null
   defaultLocale: $Enums.Locale | null
   currency: string | null
+  timezone: string | null
   plan: $Enums.TenantPlan | null
   stripeCustomerId: string | null
   stripeSubscriptionId: string | null
@@ -82,6 +84,7 @@ export type TenantCountAggregateOutputType = {
   cuisineType: number
   defaultLocale: number
   currency: number
+  timezone: number
   plan: number
   stripeCustomerId: number
   stripeSubscriptionId: number
@@ -106,6 +109,7 @@ export type TenantMinAggregateInputType = {
   cuisineType?: true
   defaultLocale?: true
   currency?: true
+  timezone?: true
   plan?: true
   stripeCustomerId?: true
   stripeSubscriptionId?: true
@@ -128,6 +132,7 @@ export type TenantMaxAggregateInputType = {
   cuisineType?: true
   defaultLocale?: true
   currency?: true
+  timezone?: true
   plan?: true
   stripeCustomerId?: true
   stripeSubscriptionId?: true
@@ -150,6 +155,7 @@ export type TenantCountAggregateInputType = {
   cuisineType?: true
   defaultLocale?: true
   currency?: true
+  timezone?: true
   plan?: true
   stripeCustomerId?: true
   stripeSubscriptionId?: true
@@ -245,6 +251,7 @@ export type TenantGroupByOutputType = {
   cuisineType: string | null
   defaultLocale: $Enums.Locale
   currency: string
+  timezone: string | null
   plan: $Enums.TenantPlan
   stripeCustomerId: string | null
   stripeSubscriptionId: string | null
@@ -288,6 +295,7 @@ export type TenantWhereInput = {
   cuisineType?: Prisma.StringNullableFilter<"Tenant"> | string | null
   defaultLocale?: Prisma.EnumLocaleFilter<"Tenant"> | $Enums.Locale
   currency?: Prisma.StringFilter<"Tenant"> | string
+  timezone?: Prisma.StringNullableFilter<"Tenant"> | string | null
   plan?: Prisma.EnumTenantPlanFilter<"Tenant"> | $Enums.TenantPlan
   stripeCustomerId?: Prisma.StringNullableFilter<"Tenant"> | string | null
   stripeSubscriptionId?: Prisma.StringNullableFilter<"Tenant"> | string | null
@@ -321,6 +329,7 @@ export type TenantOrderByWithRelationInput = {
   cuisineType?: Prisma.SortOrderInput | Prisma.SortOrder
   defaultLocale?: Prisma.SortOrder
   currency?: Prisma.SortOrder
+  timezone?: Prisma.SortOrderInput | Prisma.SortOrder
   plan?: Prisma.SortOrder
   stripeCustomerId?: Prisma.SortOrderInput | Prisma.SortOrder
   stripeSubscriptionId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -357,6 +366,7 @@ export type TenantWhereUniqueInput = Prisma.AtLeast<{
   cuisineType?: Prisma.StringNullableFilter<"Tenant"> | string | null
   defaultLocale?: Prisma.EnumLocaleFilter<"Tenant"> | $Enums.Locale
   currency?: Prisma.StringFilter<"Tenant"> | string
+  timezone?: Prisma.StringNullableFilter<"Tenant"> | string | null
   plan?: Prisma.EnumTenantPlanFilter<"Tenant"> | $Enums.TenantPlan
   stripeCustomerId?: Prisma.StringNullableFilter<"Tenant"> | string | null
   stripeSubscriptionId?: Prisma.StringNullableFilter<"Tenant"> | string | null
@@ -390,6 +400,7 @@ export type TenantOrderByWithAggregationInput = {
   cuisineType?: Prisma.SortOrderInput | Prisma.SortOrder
   defaultLocale?: Prisma.SortOrder
   currency?: Prisma.SortOrder
+  timezone?: Prisma.SortOrderInput | Prisma.SortOrder
   plan?: Prisma.SortOrder
   stripeCustomerId?: Prisma.SortOrderInput | Prisma.SortOrder
   stripeSubscriptionId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -418,6 +429,7 @@ export type TenantScalarWhereWithAggregatesInput = {
   cuisineType?: Prisma.StringNullableWithAggregatesFilter<"Tenant"> | string | null
   defaultLocale?: Prisma.EnumLocaleWithAggregatesFilter<"Tenant"> | $Enums.Locale
   currency?: Prisma.StringWithAggregatesFilter<"Tenant"> | string
+  timezone?: Prisma.StringNullableWithAggregatesFilter<"Tenant"> | string | null
   plan?: Prisma.EnumTenantPlanWithAggregatesFilter<"Tenant"> | $Enums.TenantPlan
   stripeCustomerId?: Prisma.StringNullableWithAggregatesFilter<"Tenant"> | string | null
   stripeSubscriptionId?: Prisma.StringNullableWithAggregatesFilter<"Tenant"> | string | null
@@ -440,6 +452,7 @@ export type TenantCreateInput = {
   cuisineType?: string | null
   defaultLocale?: $Enums.Locale
   currency?: string
+  timezone?: string | null
   plan?: $Enums.TenantPlan
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
@@ -473,6 +486,7 @@ export type TenantUncheckedCreateInput = {
   cuisineType?: string | null
   defaultLocale?: $Enums.Locale
   currency?: string
+  timezone?: string | null
   plan?: $Enums.TenantPlan
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
@@ -506,6 +520,7 @@ export type TenantUpdateInput = {
   cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -539,6 +554,7 @@ export type TenantUncheckedUpdateInput = {
   cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -572,6 +588,7 @@ export type TenantCreateManyInput = {
   cuisineType?: string | null
   defaultLocale?: $Enums.Locale
   currency?: string
+  timezone?: string | null
   plan?: $Enums.TenantPlan
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
@@ -594,6 +611,7 @@ export type TenantUpdateManyMutationInput = {
   cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -616,6 +634,7 @@ export type TenantUncheckedUpdateManyInput = {
   cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -638,6 +657,7 @@ export type TenantCountOrderByAggregateInput = {
   cuisineType?: Prisma.SortOrder
   defaultLocale?: Prisma.SortOrder
   currency?: Prisma.SortOrder
+  timezone?: Prisma.SortOrder
   plan?: Prisma.SortOrder
   stripeCustomerId?: Prisma.SortOrder
   stripeSubscriptionId?: Prisma.SortOrder
@@ -660,6 +680,7 @@ export type TenantMaxOrderByAggregateInput = {
   cuisineType?: Prisma.SortOrder
   defaultLocale?: Prisma.SortOrder
   currency?: Prisma.SortOrder
+  timezone?: Prisma.SortOrder
   plan?: Prisma.SortOrder
   stripeCustomerId?: Prisma.SortOrder
   stripeSubscriptionId?: Prisma.SortOrder
@@ -682,6 +703,7 @@ export type TenantMinOrderByAggregateInput = {
   cuisineType?: Prisma.SortOrder
   defaultLocale?: Prisma.SortOrder
   currency?: Prisma.SortOrder
+  timezone?: Prisma.SortOrder
   plan?: Prisma.SortOrder
   stripeCustomerId?: Prisma.SortOrder
   stripeSubscriptionId?: Prisma.SortOrder
@@ -900,6 +922,7 @@ export type TenantCreateWithoutMembershipsInput = {
   cuisineType?: string | null
   defaultLocale?: $Enums.Locale
   currency?: string
+  timezone?: string | null
   plan?: $Enums.TenantPlan
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
@@ -932,6 +955,7 @@ export type TenantUncheckedCreateWithoutMembershipsInput = {
   cuisineType?: string | null
   defaultLocale?: $Enums.Locale
   currency?: string
+  timezone?: string | null
   plan?: $Enums.TenantPlan
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
@@ -980,6 +1004,7 @@ export type TenantUpdateWithoutMembershipsInput = {
   cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1012,6 +1037,7 @@ export type TenantUncheckedUpdateWithoutMembershipsInput = {
   cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1044,6 +1070,7 @@ export type TenantCreateWithoutSectionsInput = {
   cuisineType?: string | null
   defaultLocale?: $Enums.Locale
   currency?: string
+  timezone?: string | null
   plan?: $Enums.TenantPlan
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
@@ -1076,6 +1103,7 @@ export type TenantUncheckedCreateWithoutSectionsInput = {
   cuisineType?: string | null
   defaultLocale?: $Enums.Locale
   currency?: string
+  timezone?: string | null
   plan?: $Enums.TenantPlan
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
@@ -1124,6 +1152,7 @@ export type TenantUpdateWithoutSectionsInput = {
   cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1156,6 +1185,7 @@ export type TenantUncheckedUpdateWithoutSectionsInput = {
   cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1188,6 +1218,7 @@ export type TenantCreateWithoutCategoriesInput = {
   cuisineType?: string | null
   defaultLocale?: $Enums.Locale
   currency?: string
+  timezone?: string | null
   plan?: $Enums.TenantPlan
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
@@ -1220,6 +1251,7 @@ export type TenantUncheckedCreateWithoutCategoriesInput = {
   cuisineType?: string | null
   defaultLocale?: $Enums.Locale
   currency?: string
+  timezone?: string | null
   plan?: $Enums.TenantPlan
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
@@ -1268,6 +1300,7 @@ export type TenantUpdateWithoutCategoriesInput = {
   cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1300,6 +1333,7 @@ export type TenantUncheckedUpdateWithoutCategoriesInput = {
   cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1332,6 +1366,7 @@ export type TenantCreateWithoutItemsInput = {
   cuisineType?: string | null
   defaultLocale?: $Enums.Locale
   currency?: string
+  timezone?: string | null
   plan?: $Enums.TenantPlan
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
@@ -1364,6 +1399,7 @@ export type TenantUncheckedCreateWithoutItemsInput = {
   cuisineType?: string | null
   defaultLocale?: $Enums.Locale
   currency?: string
+  timezone?: string | null
   plan?: $Enums.TenantPlan
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
@@ -1412,6 +1448,7 @@ export type TenantUpdateWithoutItemsInput = {
   cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1444,6 +1481,7 @@ export type TenantUncheckedUpdateWithoutItemsInput = {
   cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1476,6 +1514,7 @@ export type TenantCreateWithoutItemVariantsInput = {
   cuisineType?: string | null
   defaultLocale?: $Enums.Locale
   currency?: string
+  timezone?: string | null
   plan?: $Enums.TenantPlan
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
@@ -1508,6 +1547,7 @@ export type TenantUncheckedCreateWithoutItemVariantsInput = {
   cuisineType?: string | null
   defaultLocale?: $Enums.Locale
   currency?: string
+  timezone?: string | null
   plan?: $Enums.TenantPlan
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
@@ -1556,6 +1596,7 @@ export type TenantUpdateWithoutItemVariantsInput = {
   cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1588,6 +1629,7 @@ export type TenantUncheckedUpdateWithoutItemVariantsInput = {
   cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1620,6 +1662,7 @@ export type TenantCreateWithoutSlugHistoryInput = {
   cuisineType?: string | null
   defaultLocale?: $Enums.Locale
   currency?: string
+  timezone?: string | null
   plan?: $Enums.TenantPlan
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
@@ -1652,6 +1695,7 @@ export type TenantUncheckedCreateWithoutSlugHistoryInput = {
   cuisineType?: string | null
   defaultLocale?: $Enums.Locale
   currency?: string
+  timezone?: string | null
   plan?: $Enums.TenantPlan
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
@@ -1700,6 +1744,7 @@ export type TenantUpdateWithoutSlugHistoryInput = {
   cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1732,6 +1777,7 @@ export type TenantUncheckedUpdateWithoutSlugHistoryInput = {
   cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1764,6 +1810,7 @@ export type TenantCreateWithoutMenuViewsInput = {
   cuisineType?: string | null
   defaultLocale?: $Enums.Locale
   currency?: string
+  timezone?: string | null
   plan?: $Enums.TenantPlan
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
@@ -1796,6 +1843,7 @@ export type TenantUncheckedCreateWithoutMenuViewsInput = {
   cuisineType?: string | null
   defaultLocale?: $Enums.Locale
   currency?: string
+  timezone?: string | null
   plan?: $Enums.TenantPlan
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
@@ -1844,6 +1892,7 @@ export type TenantUpdateWithoutMenuViewsInput = {
   cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1876,6 +1925,7 @@ export type TenantUncheckedUpdateWithoutMenuViewsInput = {
   cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1908,6 +1958,7 @@ export type TenantCreateWithoutItemViewsInput = {
   cuisineType?: string | null
   defaultLocale?: $Enums.Locale
   currency?: string
+  timezone?: string | null
   plan?: $Enums.TenantPlan
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
@@ -1940,6 +1991,7 @@ export type TenantUncheckedCreateWithoutItemViewsInput = {
   cuisineType?: string | null
   defaultLocale?: $Enums.Locale
   currency?: string
+  timezone?: string | null
   plan?: $Enums.TenantPlan
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
@@ -1988,6 +2040,7 @@ export type TenantUpdateWithoutItemViewsInput = {
   cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2020,6 +2073,7 @@ export type TenantUncheckedUpdateWithoutItemViewsInput = {
   cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2052,6 +2106,7 @@ export type TenantCreateWithoutAuditLogsInput = {
   cuisineType?: string | null
   defaultLocale?: $Enums.Locale
   currency?: string
+  timezone?: string | null
   plan?: $Enums.TenantPlan
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
@@ -2084,6 +2139,7 @@ export type TenantUncheckedCreateWithoutAuditLogsInput = {
   cuisineType?: string | null
   defaultLocale?: $Enums.Locale
   currency?: string
+  timezone?: string | null
   plan?: $Enums.TenantPlan
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
@@ -2132,6 +2188,7 @@ export type TenantUpdateWithoutAuditLogsInput = {
   cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2164,6 +2221,7 @@ export type TenantUncheckedUpdateWithoutAuditLogsInput = {
   cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2196,6 +2254,7 @@ export type TenantCreateWithoutWebhookEventsInput = {
   cuisineType?: string | null
   defaultLocale?: $Enums.Locale
   currency?: string
+  timezone?: string | null
   plan?: $Enums.TenantPlan
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
@@ -2228,6 +2287,7 @@ export type TenantUncheckedCreateWithoutWebhookEventsInput = {
   cuisineType?: string | null
   defaultLocale?: $Enums.Locale
   currency?: string
+  timezone?: string | null
   plan?: $Enums.TenantPlan
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
@@ -2276,6 +2336,7 @@ export type TenantUpdateWithoutWebhookEventsInput = {
   cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2308,6 +2369,7 @@ export type TenantUncheckedUpdateWithoutWebhookEventsInput = {
   cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2340,6 +2402,7 @@ export type TenantCreateWithoutReferralsInput = {
   cuisineType?: string | null
   defaultLocale?: $Enums.Locale
   currency?: string
+  timezone?: string | null
   plan?: $Enums.TenantPlan
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
@@ -2372,6 +2435,7 @@ export type TenantUncheckedCreateWithoutReferralsInput = {
   cuisineType?: string | null
   defaultLocale?: $Enums.Locale
   currency?: string
+  timezone?: string | null
   plan?: $Enums.TenantPlan
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
@@ -2420,6 +2484,7 @@ export type TenantUpdateWithoutReferralsInput = {
   cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2452,6 +2517,7 @@ export type TenantUncheckedUpdateWithoutReferralsInput = {
   cuisineType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultLocale?: Prisma.EnumLocaleFieldUpdateOperationsInput | $Enums.Locale
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2605,6 +2671,7 @@ export type TenantSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   cuisineType?: boolean
   defaultLocale?: boolean
   currency?: boolean
+  timezone?: boolean
   plan?: boolean
   stripeCustomerId?: boolean
   stripeSubscriptionId?: boolean
@@ -2639,6 +2706,7 @@ export type TenantSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   cuisineType?: boolean
   defaultLocale?: boolean
   currency?: boolean
+  timezone?: boolean
   plan?: boolean
   stripeCustomerId?: boolean
   stripeSubscriptionId?: boolean
@@ -2661,6 +2729,7 @@ export type TenantSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   cuisineType?: boolean
   defaultLocale?: boolean
   currency?: boolean
+  timezone?: boolean
   plan?: boolean
   stripeCustomerId?: boolean
   stripeSubscriptionId?: boolean
@@ -2683,6 +2752,7 @@ export type TenantSelectScalar = {
   cuisineType?: boolean
   defaultLocale?: boolean
   currency?: boolean
+  timezone?: boolean
   plan?: boolean
   stripeCustomerId?: boolean
   stripeSubscriptionId?: boolean
@@ -2691,7 +2761,7 @@ export type TenantSelectScalar = {
   deletedAt?: boolean
 }
 
-export type TenantOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "createdBy" | "slug" | "name" | "logoUrl" | "coverImageUrl" | "logoShape" | "whatsappPhone" | "businessHours" | "primaryColor" | "cuisineType" | "defaultLocale" | "currency" | "plan" | "stripeCustomerId" | "stripeSubscriptionId" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["tenant"]>
+export type TenantOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "createdBy" | "slug" | "name" | "logoUrl" | "coverImageUrl" | "logoShape" | "whatsappPhone" | "businessHours" | "primaryColor" | "cuisineType" | "defaultLocale" | "currency" | "timezone" | "plan" | "stripeCustomerId" | "stripeSubscriptionId" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["tenant"]>
 export type TenantInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   memberships?: boolean | Prisma.Tenant$membershipsArgs<ExtArgs>
   sections?: boolean | Prisma.Tenant$sectionsArgs<ExtArgs>
@@ -2738,6 +2808,7 @@ export type $TenantPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     cuisineType: string | null
     defaultLocale: $Enums.Locale
     currency: string
+    timezone: string | null
     plan: $Enums.TenantPlan
     stripeCustomerId: string | null
     stripeSubscriptionId: string | null
@@ -3191,6 +3262,7 @@ export interface TenantFieldRefs {
   readonly cuisineType: Prisma.FieldRef<"Tenant", 'String'>
   readonly defaultLocale: Prisma.FieldRef<"Tenant", 'Locale'>
   readonly currency: Prisma.FieldRef<"Tenant", 'String'>
+  readonly timezone: Prisma.FieldRef<"Tenant", 'String'>
   readonly plan: Prisma.FieldRef<"Tenant", 'TenantPlan'>
   readonly stripeCustomerId: Prisma.FieldRef<"Tenant", 'String'>
   readonly stripeSubscriptionId: Prisma.FieldRef<"Tenant", 'String'>

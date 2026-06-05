@@ -28,10 +28,16 @@ export type AggregateCategory = {
 
 export type CategoryAvgAggregateOutputType = {
   sortOrder: number | null
+  scheduleDays: number | null
+  scheduleStartMinute: number | null
+  scheduleEndMinute: number | null
 }
 
 export type CategorySumAggregateOutputType = {
   sortOrder: number | null
+  scheduleDays: number[]
+  scheduleStartMinute: number | null
+  scheduleEndMinute: number | null
 }
 
 export type CategoryMinAggregateOutputType = {
@@ -42,6 +48,10 @@ export type CategoryMinAggregateOutputType = {
   coverImageUrl: string | null
   sortOrder: number | null
   isVisible: boolean | null
+  scheduleStartMinute: number | null
+  scheduleEndMinute: number | null
+  scheduleStartDate: Date | null
+  scheduleEndDate: Date | null
   createdAt: Date | null
   updatedAt: Date | null
   deletedAt: Date | null
@@ -55,6 +65,10 @@ export type CategoryMaxAggregateOutputType = {
   coverImageUrl: string | null
   sortOrder: number | null
   isVisible: boolean | null
+  scheduleStartMinute: number | null
+  scheduleEndMinute: number | null
+  scheduleStartDate: Date | null
+  scheduleEndDate: Date | null
   createdAt: Date | null
   updatedAt: Date | null
   deletedAt: Date | null
@@ -68,6 +82,11 @@ export type CategoryCountAggregateOutputType = {
   coverImageUrl: number
   sortOrder: number
   isVisible: number
+  scheduleDays: number
+  scheduleStartMinute: number
+  scheduleEndMinute: number
+  scheduleStartDate: number
+  scheduleEndDate: number
   createdAt: number
   updatedAt: number
   deletedAt: number
@@ -77,10 +96,16 @@ export type CategoryCountAggregateOutputType = {
 
 export type CategoryAvgAggregateInputType = {
   sortOrder?: true
+  scheduleDays?: true
+  scheduleStartMinute?: true
+  scheduleEndMinute?: true
 }
 
 export type CategorySumAggregateInputType = {
   sortOrder?: true
+  scheduleDays?: true
+  scheduleStartMinute?: true
+  scheduleEndMinute?: true
 }
 
 export type CategoryMinAggregateInputType = {
@@ -91,6 +116,10 @@ export type CategoryMinAggregateInputType = {
   coverImageUrl?: true
   sortOrder?: true
   isVisible?: true
+  scheduleStartMinute?: true
+  scheduleEndMinute?: true
+  scheduleStartDate?: true
+  scheduleEndDate?: true
   createdAt?: true
   updatedAt?: true
   deletedAt?: true
@@ -104,6 +133,10 @@ export type CategoryMaxAggregateInputType = {
   coverImageUrl?: true
   sortOrder?: true
   isVisible?: true
+  scheduleStartMinute?: true
+  scheduleEndMinute?: true
+  scheduleStartDate?: true
+  scheduleEndDate?: true
   createdAt?: true
   updatedAt?: true
   deletedAt?: true
@@ -117,6 +150,11 @@ export type CategoryCountAggregateInputType = {
   coverImageUrl?: true
   sortOrder?: true
   isVisible?: true
+  scheduleDays?: true
+  scheduleStartMinute?: true
+  scheduleEndMinute?: true
+  scheduleStartDate?: true
+  scheduleEndDate?: true
   createdAt?: true
   updatedAt?: true
   deletedAt?: true
@@ -217,6 +255,11 @@ export type CategoryGroupByOutputType = {
   coverImageUrl: string | null
   sortOrder: number
   isVisible: boolean
+  scheduleDays: number[]
+  scheduleStartMinute: number | null
+  scheduleEndMinute: number | null
+  scheduleStartDate: Date | null
+  scheduleEndDate: Date | null
   createdAt: Date
   updatedAt: Date
   deletedAt: Date | null
@@ -253,6 +296,11 @@ export type CategoryWhereInput = {
   coverImageUrl?: Prisma.StringNullableFilter<"Category"> | string | null
   sortOrder?: Prisma.IntFilter<"Category"> | number
   isVisible?: Prisma.BoolFilter<"Category"> | boolean
+  scheduleDays?: Prisma.IntNullableListFilter<"Category">
+  scheduleStartMinute?: Prisma.IntNullableFilter<"Category"> | number | null
+  scheduleEndMinute?: Prisma.IntNullableFilter<"Category"> | number | null
+  scheduleStartDate?: Prisma.DateTimeNullableFilter<"Category"> | Date | string | null
+  scheduleEndDate?: Prisma.DateTimeNullableFilter<"Category"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Category"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Category"> | Date | string
   deletedAt?: Prisma.DateTimeNullableFilter<"Category"> | Date | string | null
@@ -269,6 +317,11 @@ export type CategoryOrderByWithRelationInput = {
   coverImageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   isVisible?: Prisma.SortOrder
+  scheduleDays?: Prisma.SortOrder
+  scheduleStartMinute?: Prisma.SortOrderInput | Prisma.SortOrder
+  scheduleEndMinute?: Prisma.SortOrderInput | Prisma.SortOrder
+  scheduleStartDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  scheduleEndDate?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -289,6 +342,11 @@ export type CategoryWhereUniqueInput = Prisma.AtLeast<{
   coverImageUrl?: Prisma.StringNullableFilter<"Category"> | string | null
   sortOrder?: Prisma.IntFilter<"Category"> | number
   isVisible?: Prisma.BoolFilter<"Category"> | boolean
+  scheduleDays?: Prisma.IntNullableListFilter<"Category">
+  scheduleStartMinute?: Prisma.IntNullableFilter<"Category"> | number | null
+  scheduleEndMinute?: Prisma.IntNullableFilter<"Category"> | number | null
+  scheduleStartDate?: Prisma.DateTimeNullableFilter<"Category"> | Date | string | null
+  scheduleEndDate?: Prisma.DateTimeNullableFilter<"Category"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Category"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Category"> | Date | string
   deletedAt?: Prisma.DateTimeNullableFilter<"Category"> | Date | string | null
@@ -305,6 +363,11 @@ export type CategoryOrderByWithAggregationInput = {
   coverImageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   isVisible?: Prisma.SortOrder
+  scheduleDays?: Prisma.SortOrder
+  scheduleStartMinute?: Prisma.SortOrderInput | Prisma.SortOrder
+  scheduleEndMinute?: Prisma.SortOrderInput | Prisma.SortOrder
+  scheduleStartDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  scheduleEndDate?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -326,6 +389,11 @@ export type CategoryScalarWhereWithAggregatesInput = {
   coverImageUrl?: Prisma.StringNullableWithAggregatesFilter<"Category"> | string | null
   sortOrder?: Prisma.IntWithAggregatesFilter<"Category"> | number
   isVisible?: Prisma.BoolWithAggregatesFilter<"Category"> | boolean
+  scheduleDays?: Prisma.IntNullableListFilter<"Category">
+  scheduleStartMinute?: Prisma.IntNullableWithAggregatesFilter<"Category"> | number | null
+  scheduleEndMinute?: Prisma.IntNullableWithAggregatesFilter<"Category"> | number | null
+  scheduleStartDate?: Prisma.DateTimeNullableWithAggregatesFilter<"Category"> | Date | string | null
+  scheduleEndDate?: Prisma.DateTimeNullableWithAggregatesFilter<"Category"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Category"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Category"> | Date | string
   deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Category"> | Date | string | null
@@ -337,6 +405,11 @@ export type CategoryCreateInput = {
   coverImageUrl?: string | null
   sortOrder?: number
   isVisible?: boolean
+  scheduleDays?: Prisma.CategoryCreatescheduleDaysInput | number[]
+  scheduleStartMinute?: number | null
+  scheduleEndMinute?: number | null
+  scheduleStartDate?: Date | string | null
+  scheduleEndDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
@@ -353,6 +426,11 @@ export type CategoryUncheckedCreateInput = {
   coverImageUrl?: string | null
   sortOrder?: number
   isVisible?: boolean
+  scheduleDays?: Prisma.CategoryCreatescheduleDaysInput | number[]
+  scheduleStartMinute?: number | null
+  scheduleEndMinute?: number | null
+  scheduleStartDate?: Date | string | null
+  scheduleEndDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
@@ -365,6 +443,11 @@ export type CategoryUpdateInput = {
   coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  scheduleDays?: Prisma.CategoryUpdatescheduleDaysInput | number[]
+  scheduleStartMinute?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scheduleEndMinute?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scheduleStartDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  scheduleEndDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -381,6 +464,11 @@ export type CategoryUncheckedUpdateInput = {
   coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  scheduleDays?: Prisma.CategoryUpdatescheduleDaysInput | number[]
+  scheduleStartMinute?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scheduleEndMinute?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scheduleStartDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  scheduleEndDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -395,6 +483,11 @@ export type CategoryCreateManyInput = {
   coverImageUrl?: string | null
   sortOrder?: number
   isVisible?: boolean
+  scheduleDays?: Prisma.CategoryCreatescheduleDaysInput | number[]
+  scheduleStartMinute?: number | null
+  scheduleEndMinute?: number | null
+  scheduleStartDate?: Date | string | null
+  scheduleEndDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
@@ -406,6 +499,11 @@ export type CategoryUpdateManyMutationInput = {
   coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  scheduleDays?: Prisma.CategoryUpdatescheduleDaysInput | number[]
+  scheduleStartMinute?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scheduleEndMinute?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scheduleStartDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  scheduleEndDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -419,6 +517,11 @@ export type CategoryUncheckedUpdateManyInput = {
   coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  scheduleDays?: Prisma.CategoryUpdatescheduleDaysInput | number[]
+  scheduleStartMinute?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scheduleEndMinute?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scheduleStartDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  scheduleEndDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -447,6 +550,11 @@ export type CategoryCountOrderByAggregateInput = {
   coverImageUrl?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   isVisible?: Prisma.SortOrder
+  scheduleDays?: Prisma.SortOrder
+  scheduleStartMinute?: Prisma.SortOrder
+  scheduleEndMinute?: Prisma.SortOrder
+  scheduleStartDate?: Prisma.SortOrder
+  scheduleEndDate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
@@ -454,6 +562,9 @@ export type CategoryCountOrderByAggregateInput = {
 
 export type CategoryAvgOrderByAggregateInput = {
   sortOrder?: Prisma.SortOrder
+  scheduleDays?: Prisma.SortOrder
+  scheduleStartMinute?: Prisma.SortOrder
+  scheduleEndMinute?: Prisma.SortOrder
 }
 
 export type CategoryMaxOrderByAggregateInput = {
@@ -464,6 +575,10 @@ export type CategoryMaxOrderByAggregateInput = {
   coverImageUrl?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   isVisible?: Prisma.SortOrder
+  scheduleStartMinute?: Prisma.SortOrder
+  scheduleEndMinute?: Prisma.SortOrder
+  scheduleStartDate?: Prisma.SortOrder
+  scheduleEndDate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
@@ -477,6 +592,10 @@ export type CategoryMinOrderByAggregateInput = {
   coverImageUrl?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   isVisible?: Prisma.SortOrder
+  scheduleStartMinute?: Prisma.SortOrder
+  scheduleEndMinute?: Prisma.SortOrder
+  scheduleStartDate?: Prisma.SortOrder
+  scheduleEndDate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
@@ -484,6 +603,9 @@ export type CategoryMinOrderByAggregateInput = {
 
 export type CategorySumOrderByAggregateInput = {
   sortOrder?: Prisma.SortOrder
+  scheduleDays?: Prisma.SortOrder
+  scheduleStartMinute?: Prisma.SortOrder
+  scheduleEndMinute?: Prisma.SortOrder
 }
 
 export type CategoryNullableScalarRelationFilter = {
@@ -575,6 +697,15 @@ export type CategoryUncheckedUpdateManyWithoutSectionNestedInput = {
   deleteMany?: Prisma.CategoryScalarWhereInput | Prisma.CategoryScalarWhereInput[]
 }
 
+export type CategoryCreatescheduleDaysInput = {
+  set: number[]
+}
+
+export type CategoryUpdatescheduleDaysInput = {
+  set?: number[]
+  push?: number | number[]
+}
+
 export type CategoryCreateNestedOneWithoutItemsInput = {
   create?: Prisma.XOR<Prisma.CategoryCreateWithoutItemsInput, Prisma.CategoryUncheckedCreateWithoutItemsInput>
   connectOrCreate?: Prisma.CategoryCreateOrConnectWithoutItemsInput
@@ -597,6 +728,11 @@ export type CategoryCreateWithoutTenantInput = {
   coverImageUrl?: string | null
   sortOrder?: number
   isVisible?: boolean
+  scheduleDays?: Prisma.CategoryCreatescheduleDaysInput | number[]
+  scheduleStartMinute?: number | null
+  scheduleEndMinute?: number | null
+  scheduleStartDate?: Date | string | null
+  scheduleEndDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
@@ -611,6 +747,11 @@ export type CategoryUncheckedCreateWithoutTenantInput = {
   coverImageUrl?: string | null
   sortOrder?: number
   isVisible?: boolean
+  scheduleDays?: Prisma.CategoryCreatescheduleDaysInput | number[]
+  scheduleStartMinute?: number | null
+  scheduleEndMinute?: number | null
+  scheduleStartDate?: Date | string | null
+  scheduleEndDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
@@ -654,6 +795,11 @@ export type CategoryScalarWhereInput = {
   coverImageUrl?: Prisma.StringNullableFilter<"Category"> | string | null
   sortOrder?: Prisma.IntFilter<"Category"> | number
   isVisible?: Prisma.BoolFilter<"Category"> | boolean
+  scheduleDays?: Prisma.IntNullableListFilter<"Category">
+  scheduleStartMinute?: Prisma.IntNullableFilter<"Category"> | number | null
+  scheduleEndMinute?: Prisma.IntNullableFilter<"Category"> | number | null
+  scheduleStartDate?: Prisma.DateTimeNullableFilter<"Category"> | Date | string | null
+  scheduleEndDate?: Prisma.DateTimeNullableFilter<"Category"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Category"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Category"> | Date | string
   deletedAt?: Prisma.DateTimeNullableFilter<"Category"> | Date | string | null
@@ -665,6 +811,11 @@ export type CategoryCreateWithoutSectionInput = {
   coverImageUrl?: string | null
   sortOrder?: number
   isVisible?: boolean
+  scheduleDays?: Prisma.CategoryCreatescheduleDaysInput | number[]
+  scheduleStartMinute?: number | null
+  scheduleEndMinute?: number | null
+  scheduleStartDate?: Date | string | null
+  scheduleEndDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
@@ -679,6 +830,11 @@ export type CategoryUncheckedCreateWithoutSectionInput = {
   coverImageUrl?: string | null
   sortOrder?: number
   isVisible?: boolean
+  scheduleDays?: Prisma.CategoryCreatescheduleDaysInput | number[]
+  scheduleStartMinute?: number | null
+  scheduleEndMinute?: number | null
+  scheduleStartDate?: Date | string | null
+  scheduleEndDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
@@ -717,6 +873,11 @@ export type CategoryCreateWithoutItemsInput = {
   coverImageUrl?: string | null
   sortOrder?: number
   isVisible?: boolean
+  scheduleDays?: Prisma.CategoryCreatescheduleDaysInput | number[]
+  scheduleStartMinute?: number | null
+  scheduleEndMinute?: number | null
+  scheduleStartDate?: Date | string | null
+  scheduleEndDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
@@ -732,6 +893,11 @@ export type CategoryUncheckedCreateWithoutItemsInput = {
   coverImageUrl?: string | null
   sortOrder?: number
   isVisible?: boolean
+  scheduleDays?: Prisma.CategoryCreatescheduleDaysInput | number[]
+  scheduleStartMinute?: number | null
+  scheduleEndMinute?: number | null
+  scheduleStartDate?: Date | string | null
+  scheduleEndDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
@@ -759,6 +925,11 @@ export type CategoryUpdateWithoutItemsInput = {
   coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  scheduleDays?: Prisma.CategoryUpdatescheduleDaysInput | number[]
+  scheduleStartMinute?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scheduleEndMinute?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scheduleStartDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  scheduleEndDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -774,6 +945,11 @@ export type CategoryUncheckedUpdateWithoutItemsInput = {
   coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  scheduleDays?: Prisma.CategoryUpdatescheduleDaysInput | number[]
+  scheduleStartMinute?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scheduleEndMinute?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scheduleStartDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  scheduleEndDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -786,6 +962,11 @@ export type CategoryCreateManyTenantInput = {
   coverImageUrl?: string | null
   sortOrder?: number
   isVisible?: boolean
+  scheduleDays?: Prisma.CategoryCreatescheduleDaysInput | number[]
+  scheduleStartMinute?: number | null
+  scheduleEndMinute?: number | null
+  scheduleStartDate?: Date | string | null
+  scheduleEndDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
@@ -797,6 +978,11 @@ export type CategoryUpdateWithoutTenantInput = {
   coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  scheduleDays?: Prisma.CategoryUpdatescheduleDaysInput | number[]
+  scheduleStartMinute?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scheduleEndMinute?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scheduleStartDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  scheduleEndDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -811,6 +997,11 @@ export type CategoryUncheckedUpdateWithoutTenantInput = {
   coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  scheduleDays?: Prisma.CategoryUpdatescheduleDaysInput | number[]
+  scheduleStartMinute?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scheduleEndMinute?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scheduleStartDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  scheduleEndDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -824,6 +1015,11 @@ export type CategoryUncheckedUpdateManyWithoutTenantInput = {
   coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  scheduleDays?: Prisma.CategoryUpdatescheduleDaysInput | number[]
+  scheduleStartMinute?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scheduleEndMinute?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scheduleStartDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  scheduleEndDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -836,6 +1032,11 @@ export type CategoryCreateManySectionInput = {
   coverImageUrl?: string | null
   sortOrder?: number
   isVisible?: boolean
+  scheduleDays?: Prisma.CategoryCreatescheduleDaysInput | number[]
+  scheduleStartMinute?: number | null
+  scheduleEndMinute?: number | null
+  scheduleStartDate?: Date | string | null
+  scheduleEndDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
@@ -847,6 +1048,11 @@ export type CategoryUpdateWithoutSectionInput = {
   coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  scheduleDays?: Prisma.CategoryUpdatescheduleDaysInput | number[]
+  scheduleStartMinute?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scheduleEndMinute?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scheduleStartDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  scheduleEndDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -861,6 +1067,11 @@ export type CategoryUncheckedUpdateWithoutSectionInput = {
   coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  scheduleDays?: Prisma.CategoryUpdatescheduleDaysInput | number[]
+  scheduleStartMinute?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scheduleEndMinute?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scheduleStartDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  scheduleEndDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -874,6 +1085,11 @@ export type CategoryUncheckedUpdateManyWithoutSectionInput = {
   coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  scheduleDays?: Prisma.CategoryUpdatescheduleDaysInput | number[]
+  scheduleStartMinute?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scheduleEndMinute?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scheduleStartDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  scheduleEndDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -918,6 +1134,11 @@ export type CategorySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   coverImageUrl?: boolean
   sortOrder?: boolean
   isVisible?: boolean
+  scheduleDays?: boolean
+  scheduleStartMinute?: boolean
+  scheduleEndMinute?: boolean
+  scheduleStartDate?: boolean
+  scheduleEndDate?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   deletedAt?: boolean
@@ -935,6 +1156,11 @@ export type CategorySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   coverImageUrl?: boolean
   sortOrder?: boolean
   isVisible?: boolean
+  scheduleDays?: boolean
+  scheduleStartMinute?: boolean
+  scheduleEndMinute?: boolean
+  scheduleStartDate?: boolean
+  scheduleEndDate?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   deletedAt?: boolean
@@ -950,6 +1176,11 @@ export type CategorySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   coverImageUrl?: boolean
   sortOrder?: boolean
   isVisible?: boolean
+  scheduleDays?: boolean
+  scheduleStartMinute?: boolean
+  scheduleEndMinute?: boolean
+  scheduleStartDate?: boolean
+  scheduleEndDate?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   deletedAt?: boolean
@@ -965,12 +1196,17 @@ export type CategorySelectScalar = {
   coverImageUrl?: boolean
   sortOrder?: boolean
   isVisible?: boolean
+  scheduleDays?: boolean
+  scheduleStartMinute?: boolean
+  scheduleEndMinute?: boolean
+  scheduleStartDate?: boolean
+  scheduleEndDate?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   deletedAt?: boolean
 }
 
-export type CategoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "sectionId" | "name" | "coverImageUrl" | "sortOrder" | "isVisible" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["category"]>
+export type CategoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "sectionId" | "name" | "coverImageUrl" | "sortOrder" | "isVisible" | "scheduleDays" | "scheduleStartMinute" | "scheduleEndMinute" | "scheduleStartDate" | "scheduleEndDate" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["category"]>
 export type CategoryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   section?: boolean | Prisma.Category$sectionArgs<ExtArgs>
@@ -1001,6 +1237,11 @@ export type $CategoryPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     coverImageUrl: string | null
     sortOrder: number
     isVisible: boolean
+    scheduleDays: number[]
+    scheduleStartMinute: number | null
+    scheduleEndMinute: number | null
+    scheduleStartDate: Date | null
+    scheduleEndDate: Date | null
     createdAt: Date
     updatedAt: Date
     deletedAt: Date | null
@@ -1437,6 +1678,11 @@ export interface CategoryFieldRefs {
   readonly coverImageUrl: Prisma.FieldRef<"Category", 'String'>
   readonly sortOrder: Prisma.FieldRef<"Category", 'Int'>
   readonly isVisible: Prisma.FieldRef<"Category", 'Boolean'>
+  readonly scheduleDays: Prisma.FieldRef<"Category", 'Int[]'>
+  readonly scheduleStartMinute: Prisma.FieldRef<"Category", 'Int'>
+  readonly scheduleEndMinute: Prisma.FieldRef<"Category", 'Int'>
+  readonly scheduleStartDate: Prisma.FieldRef<"Category", 'DateTime'>
+  readonly scheduleEndDate: Prisma.FieldRef<"Category", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Category", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Category", 'DateTime'>
   readonly deletedAt: Prisma.FieldRef<"Category", 'DateTime'>

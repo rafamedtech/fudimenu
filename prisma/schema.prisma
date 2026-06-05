@@ -57,6 +57,8 @@ model Tenant {
   cuisineType   String?        @map("cuisine_type")
   defaultLocale Locale         @default(es) @map("default_locale")
   currency      String         @default("MXN") @db.Char(3)
+  // IANA timezone for visibility scheduling. NULL = DEFAULT_TIME_ZONE in code.
+  timezone      String?        @map("timezone")
   plan          TenantPlan     @default(free)
   stripeCustomerId     String?  @map("stripe_customer_id")
   stripeSubscriptionId String?  @map("stripe_subscription_id")
@@ -122,6 +124,12 @@ model MenuSection {
   accentColor   String     @default("#FFF8E7") @map("accent_color")
   sortOrder     Int        @default(0) @map("sort_order")
   isVisible     Boolean    @default(true) @map("is_visible")
+  // Publishing visibility (see lib/visibility-schedule). NOT availability.
+  scheduleDays        Int[]      @default([]) @map("schedule_days")
+  scheduleStartMinute Int?       @map("schedule_start_minute")
+  scheduleEndMinute   Int?       @map("schedule_end_minute")
+  scheduleStartDate   DateTime?  @map("schedule_start_date") @db.Date
+  scheduleEndDate     DateTime?  @map("schedule_end_date") @db.Date
   createdAt     DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt     DateTime   @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
   deletedAt     DateTime?  @map("deleted_at") @db.Timestamptz(6)
@@ -142,6 +150,12 @@ model Category {
   coverImageUrl String?  @map("cover_image_url")
   sortOrder Int         @default(0) @map("sort_order")
   isVisible Boolean     @default(true) @map("is_visible")
+  // Publishing visibility (see lib/visibility-schedule). NOT availability.
+  scheduleDays        Int[]       @default([]) @map("schedule_days")
+  scheduleStartMinute Int?        @map("schedule_start_minute")
+  scheduleEndMinute   Int?        @map("schedule_end_minute")
+  scheduleStartDate   DateTime?   @map("schedule_start_date") @db.Date
+  scheduleEndDate     DateTime?   @map("schedule_end_date") @db.Date
   createdAt DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt DateTime    @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
   deletedAt DateTime?   @map("deleted_at") @db.Timestamptz(6)
@@ -176,6 +190,8 @@ model MenuItem {
   scheduleDays        Int[]        @default([]) @map("schedule_days")
   scheduleStartMinute Int?         @map("schedule_start_minute")
   scheduleEndMinute   Int?         @map("schedule_end_minute")
+  scheduleStartDate   DateTime?    @map("schedule_start_date") @db.Date
+  scheduleEndDate     DateTime?    @map("schedule_end_date") @db.Date
   sortOrder      Int               @default(999) @map("sort_order")
   createdAt      DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt      DateTime          @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)

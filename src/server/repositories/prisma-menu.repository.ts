@@ -3,7 +3,7 @@ import { getPrisma } from '@/lib/db/prisma';
 import { sanitizePlainText } from '@/lib/sanitize';
 import { normalizeAllergenTags, normalizeDietaryTags } from '@/lib/item-attributes';
 import type { MenuData, IMenuRepository, ImportResult } from '@/server/repositories/menu.repository';
-import type { Category, ItemTranslation, ItemUpsertInput, ItemVariant, MenuItem, MenuSection, Tenant } from '@/types/domain';
+import type { Category, ItemTranslation, ItemUpsertInput, ItemVariant, MenuItem, MenuSection, Tenant, VisibilityScheduleFields } from '@/types/domain';
 import type { SectionInput } from '@/lib/validators/section.schema';
 import type { CategoryInput } from '@/lib/validators/item.schema';
 import type { ImportItem } from '@/lib/validators/import.schema';
@@ -21,11 +21,51 @@ type TenantRow = {
   cuisineType: string | null;
   defaultLocale: string;
   currency: string;
+  timezone: string | null;
   plan: string;
   stripeCustomerId: string | null;
   stripeSubscriptionId: string | null;
   createdAt: Date;
 };
+
+// Raw schedule columns as Prisma returns them (DATE → Date at UTC midnight).
+type ScheduleRow = {
+  scheduleDays?: number[] | null;
+  scheduleStartMinute?: number | null;
+  scheduleEndMinute?: number | null;
+  scheduleStartDate?: Date | null;
+  scheduleEndDate?: Date | null;
+};
+
+function dateToIso(d: Date | null | undefined): string | null {
+  return d ? d.toISOString().slice(0, 10) : null;
+}
+
+function isoToDate(s: string | null | undefined): Date | null {
+  return s ? new Date(`${s}T00:00:00.000Z`) : null;
+}
+
+function mapSchedule(row: ScheduleRow): VisibilityScheduleFields {
+  return {
+    scheduleDays: row.scheduleDays ?? [],
+    scheduleStartMinute: row.scheduleStartMinute ?? null,
+    scheduleEndMinute: row.scheduleEndMinute ?? null,
+    scheduleStartDate: dateToIso(row.scheduleStartDate),
+    scheduleEndDate: dateToIso(row.scheduleEndDate),
+  };
+}
+
+// Full-replace schedule payload for entities whose editor always sends the
+// whole schedule (sections + categories). Items use a partial guard instead.
+function scheduleWriteData(input: Partial<VisibilityScheduleFields>) {
+  return {
+    scheduleDays: input.scheduleDays ?? [],
+    scheduleStartMinute: input.scheduleStartMinute ?? null,
+    scheduleEndMinute: input.scheduleEndMinute ?? null,
+    scheduleStartDate: isoToDate(input.scheduleStartDate),
+    scheduleEndDate: isoToDate(input.scheduleEndDate),
+  };
+}
 
 type SectionRow = {
   id: string;
@@ -38,7 +78,7 @@ type SectionRow = {
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
-};
+} & ScheduleRow;
 
 type CategoryRow = {
   id: string;
@@ -48,7 +88,7 @@ type CategoryRow = {
   coverImageUrl: string | null;
   sortOrder: number;
   isVisible: boolean;
-};
+} & ScheduleRow;
 
 type MenuItemRow = {
   id: string;
@@ -64,16 +104,13 @@ type MenuItemRow = {
   isAvailable: boolean;
   dietaryTags: string[];
   allergenTags: string[];
-  scheduleDays?: number[];
-  scheduleStartMinute?: number | null;
-  scheduleEndMinute?: number | null;
   sortOrder: number;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
   translations?: ItemTranslationRow[];
   variants?: ItemVariantRow[];
-};
+} & ScheduleRow;
 
 type ItemTranslationRow = {
   itemId: string;
@@ -103,6 +140,7 @@ function mapTenant(row: TenantRow): Tenant {
     cuisineType: row.cuisineType,
     defaultLocale: row.defaultLocale as Tenant['defaultLocale'],
     currency: row.currency,
+    timezone: row.timezone ?? null,
     plan: row.plan as Tenant['plan'],
     stripeCustomerId: row.stripeCustomerId,
     stripeSubscriptionId: row.stripeSubscriptionId,
@@ -119,6 +157,7 @@ function mapSection(row: SectionRow): MenuSection {
     accentColor: row.accentColor,
     sortOrder: row.sortOrder,
     isVisible: row.isVisible,
+    ...mapSchedule(row),
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
     deletedAt: row.deletedAt?.toISOString() ?? null,
@@ -132,6 +171,7 @@ function mapCategory(row: CategoryRow): Category {
     sectionId: row.sectionId ?? null,
     name: row.name,
     coverImageUrl: row.coverImageUrl,
+    ...mapSchedule(row),
     sortOrder: row.sortOrder,
     isVisible: row.isVisible,
   };
@@ -152,9 +192,7 @@ function mapMenuItem(row: MenuItemRow): MenuItem {
     isAvailable: row.isAvailable,
     dietaryTags: row.dietaryTags ?? [],
     allergenTags: row.allergenTags ?? [],
-    scheduleDays: row.scheduleDays ?? [],
-    scheduleStartMinute: row.scheduleStartMinute ?? null,
-    scheduleEndMinute: row.scheduleEndMinute ?? null,
+    ...mapSchedule(row),
     sortOrder: row.sortOrder,
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
@@ -320,6 +358,8 @@ export class PrismaMenuRepository implements IMenuRepository {
       scheduleDays?: number[];
       scheduleStartMinute?: number | null;
       scheduleEndMinute?: number | null;
+      scheduleStartDate?: Date | null;
+      scheduleEndDate?: Date | null;
       sortOrder: number;
     } = {
       categoryId: input.categoryId ?? null,
@@ -365,6 +405,14 @@ export class PrismaMenuRepository implements IMenuRepository {
 
     if (!input.id || 'scheduleEndMinute' in input) {
       payload.scheduleEndMinute = input.scheduleEndMinute ?? null;
+    }
+
+    if (!input.id || 'scheduleStartDate' in input) {
+      payload.scheduleStartDate = isoToDate(input.scheduleStartDate);
+    }
+
+    if (!input.id || 'scheduleEndDate' in input) {
+      payload.scheduleEndDate = isoToDate(input.scheduleEndDate);
     }
 
     const prisma = getPrisma();
@@ -448,6 +496,7 @@ export class PrismaMenuRepository implements IMenuRepository {
           accentColor: input.accentColor,
           sortOrder: input.sortOrder,
           isVisible: input.isVisible,
+          ...scheduleWriteData(input),
         },
       });
       if (result.count === 0) throw new Error('not_found');
@@ -467,6 +516,7 @@ export class PrismaMenuRepository implements IMenuRepository {
         accentColor: input.accentColor,
         sortOrder: input.sortOrder,
         isVisible: input.isVisible,
+        ...scheduleWriteData(input),
       },
     });
     return mapSection(row);
@@ -506,6 +556,7 @@ export class PrismaMenuRepository implements IMenuRepository {
           sectionId: input.sectionId ?? null,
           sortOrder: input.sortOrder ?? 0,
           isVisible: input.isVisible ?? true,
+          ...scheduleWriteData(input),
         },
       });
       if (result.count === 0) throw new Error('not_found');
@@ -525,6 +576,7 @@ export class PrismaMenuRepository implements IMenuRepository {
         sectionId: input.sectionId ?? null,
         sortOrder: input.sortOrder ?? 0,
         isVisible: input.isVisible ?? true,
+        ...scheduleWriteData(input),
       },
     });
     return mapCategory(row);

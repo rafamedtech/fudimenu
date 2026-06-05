@@ -1,5 +1,9 @@
 import type { Category, MenuItem, MenuSection } from '@/types/domain';
-import { isItemVisibleNow } from '@/lib/visibility-schedule';
+import {
+  DEFAULT_TIME_ZONE,
+  getLocalSchedulePoint,
+  isScheduleVisibleAt,
+} from '@/lib/visibility-schedule';
 
 export interface PublicMenuGroup {
   sectionId: string | null;
@@ -20,6 +24,8 @@ interface BuildPublicMenuGroupsOptions {
   resolveSectionAccent: (accentColor: string) => string;
   /** Evaluation instant for visibility scheduling. Defaults to now. */
   now?: Date;
+  /** Tenant timezone for visibility scheduling. Defaults to DEFAULT_TIME_ZONE. */
+  timeZone?: string;
 }
 
 export function buildPublicMenuGroups({
@@ -29,10 +35,16 @@ export function buildPublicMenuGroups({
   otherCategoryName,
   resolveSectionAccent,
   now = new Date(),
+  timeZone = DEFAULT_TIME_ZONE,
 }: BuildPublicMenuGroupsOptions): {
   dailySpecials: MenuItem[];
   groups: PublicMenuGroup[];
 } {
+  // Resolve the local instant once; gate the whole hierarchy against it.
+  const point = getLocalSchedulePoint(now, timeZone);
+  const visible = (schedule: MenuSection | Category | MenuItem) =>
+    isScheduleVisibleAt(schedule, point);
+
   const categoriesBySectionId = new Map<string, Category[]>();
   let otherCategory: Category | undefined;
 
@@ -54,8 +66,11 @@ export function buildPublicMenuGroups({
 
   for (const item of items) {
     // Off-schedule items are absent from the public menu entirely — applied
-    // before the specials branch so a scheduled-off item can't leak as a special.
-    if (!isItemVisibleNow(item, now)) continue;
+    // before the specials branch so a scheduled-off item can't leak as a
+    // special. Specials respect only their own schedule (the specials rail is
+    // not nested under a section/category); parent gating applies to grouped
+    // items below.
+    if (!visible(item)) continue;
 
     if (item.isSpecialToday) {
       dailySpecials.push(item);
@@ -76,10 +91,10 @@ export function buildPublicMenuGroups({
 
   if (sections.length > 0) {
     for (const section of sections) {
-      if (!section.isVisible) continue;
+      if (!section.isVisible || !visible(section)) continue;
 
       for (const category of categoriesBySectionId.get(section.id) ?? []) {
-        if (!category.isVisible) continue;
+        if (!category.isVisible || !visible(category)) continue;
 
         const categoryItems = itemsByCategoryId.get(category.id) ?? [];
         if (categoryItems.length === 0) continue;
@@ -98,7 +113,7 @@ export function buildPublicMenuGroups({
     }
   } else {
     for (const category of categories) {
-      if (!category.isVisible) continue;
+      if (!category.isVisible || !visible(category)) continue;
 
       const categoryItems = itemsByCategoryId.get(category.id) ?? [];
       const mergedItems =

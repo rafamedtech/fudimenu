@@ -25,15 +25,22 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { resolveBrandSurfaceColor } from '@/lib/brand-theme';
 import { reorderSectionsAction } from '@/server/actions/sections.actions';
+import { VisibilityStatusBadge } from '@/components/menu/visibility-status-badge';
 import type { MenuSection } from '@/types/domain';
 
 interface SectionGridProps {
   sections: MenuSection[];
   canCreateSection: boolean;
   itemCountBySectionId?: Record<string, number>;
+  timezone: string | null;
 }
 
-export function SectionGrid({ sections, canCreateSection, itemCountBySectionId }: SectionGridProps) {
+export function SectionGrid({
+  sections,
+  canCreateSection,
+  itemCountBySectionId,
+  timezone,
+}: SectionGridProps) {
   const [items, setItems] = useReducer((_: MenuSection[], next: MenuSection[]) => next, sections);
   const [reorderMode, setReorderMode] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -98,6 +105,7 @@ export function SectionGrid({ sections, canCreateSection, itemCountBySectionId }
                 section={section}
                 reorderMode={reorderMode}
                 itemCount={itemCountBySectionId?.[section.id] ?? 0}
+                timezone={timezone}
               />
             ))}
             {canCreateSection && (
@@ -129,10 +137,12 @@ function SortableSectionCard({
   section,
   reorderMode,
   itemCount,
+  timezone,
 }: {
   section: MenuSection;
   reorderMode: boolean;
   itemCount: number;
+  timezone: string | null;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: section.id,
@@ -178,6 +188,9 @@ function SortableSectionCard({
                     ? '1 platillo'
                     : `${itemCount} platillos`}
               </p>
+              <div className="mt-1.5">
+                <VisibilityStatusBadge schedule={section} timezone={timezone} />
+              </div>
             </div>
             <span className="hidden shrink-0 items-center gap-1 rounded-full bg-[rgb(var(--brand-card-rgb)/0.15)] px-2 py-1 text-[11px] font-bold text-white backdrop-blur ipad:inline-flex">
               <Layers3 className="size-3" aria-hidden />

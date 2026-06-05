@@ -26,6 +26,7 @@ import { Button } from '@/components/ui/button';
 import { reorderCategoriesAction } from '@/server/actions/categories.actions';
 import { formatPrice } from '@/lib/utils';
 import { TranslationStatusBadge } from '@/components/menu/translation-status-badge';
+import { VisibilityStatusBadge } from '@/components/menu/visibility-status-badge';
 import type { Category, Locale, MenuItem } from '@/types/domain';
 
 export type SectionCategoryGroup = {
@@ -37,10 +38,12 @@ export function SectionCategoryList({
   sectionId,
   groups,
   defaultLocale,
+  timezone,
 }: {
   sectionId: string;
   groups: SectionCategoryGroup[];
   defaultLocale: Locale;
+  timezone: string | null;
 }) {
   const [items, setItems] = useReducer((_: SectionCategoryGroup[], next: SectionCategoryGroup[]) => next, groups);
   const [reorderMode, setReorderMode] = useState(false);
@@ -99,6 +102,7 @@ export function SectionCategoryList({
               group={group}
               reorderMode={reorderMode}
               defaultLocale={defaultLocale}
+              timezone={timezone}
             />
           ))}
         </SortableContext>
@@ -117,11 +121,13 @@ function SortableCategoryGroup({
   group,
   reorderMode,
   defaultLocale,
+  timezone,
 }: {
   sectionId: string;
   group: SectionCategoryGroup;
   reorderMode: boolean;
   defaultLocale: Locale;
+  timezone: string | null;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: group.category.id,
@@ -163,6 +169,7 @@ function SortableCategoryGroup({
             </div>
           )}
           <h2 className="text-lg font-bold text-ink-900">{group.category.name}</h2>
+          <VisibilityStatusBadge schedule={group.category} timezone={timezone} />
         </div>
         {!reorderMode && (
           <Link
@@ -182,8 +189,9 @@ function SortableCategoryGroup({
             <Link href={`/menu/${item.id}?sectionId=${sectionId}`} className="min-w-0 flex-1">
               <p className="truncate font-semibold text-ink-900">{item.name}</p>
               <p className="text-sm text-ink-500">{formatPrice(item.priceCents, item.currency)}</p>
-              <div className="mt-1.5">
+              <div className="mt-1.5 flex flex-wrap gap-1.5">
                 <TranslationStatusBadge item={item} defaultLocale={defaultLocale} />
+                <VisibilityStatusBadge schedule={item} timezone={timezone} />
               </div>
             </Link>
             <StockToggle itemId={item.id} initial={item.isAvailable} />

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { EMPTY_VISIBILITY_SCHEDULE } from '@/lib/visibility-schedule';
 import {
   getAlternateLocale,
   getItemTranslationStatus,
@@ -23,9 +24,7 @@ function makeItem(
     isAvailable: true,
     dietaryTags: [],
     allergenTags: [],
-    scheduleDays: [],
-    scheduleStartMinute: null,
-    scheduleEndMinute: null,
+    ...EMPTY_VISIBILITY_SCHEDULE,
     sortOrder: 0,
     createdAt: '2026-01-01T00:00:00.000Z',
     updatedAt: '2026-01-01T00:00:00.000Z',

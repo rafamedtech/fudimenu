@@ -6,6 +6,7 @@ import {
   type IslandStrings,
 } from '@/app/(public)/m/[slug]/public-menu-island';
 import type { MenuItem } from '@/types/domain';
+import { EMPTY_VISIBILITY_SCHEDULE } from '@/lib/visibility-schedule';
 
 const strings: IslandStrings = {
   searchPlaceholder: 'Search',
@@ -54,9 +55,7 @@ const item: MenuItem = {
   isAvailable: true,
   dietaryTags: ['vegan'],
   allergenTags: ['dairy', 'nuts'],
-  scheduleDays: [],
-  scheduleStartMinute: null,
-  scheduleEndMinute: null,
+  ...EMPTY_VISIBILITY_SCHEDULE,
   sortOrder: 0,
   createdAt: '2026-01-01T00:00:00.000Z',
   updatedAt: '2026-01-01T00:00:00.000Z',

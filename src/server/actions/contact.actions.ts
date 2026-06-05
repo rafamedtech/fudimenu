@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { getPrisma } from '@/lib/db/prisma';
 import { isValidWhatsAppPhone, normalizeWhatsAppPhone } from '@/lib/whatsapp';
+import { isValidTimeZone } from '@/lib/validators/schedule.schema';
 import { requireAuth } from '@/server/guards/require-auth';
 
 function normalizeOptionalText(input: string | null | undefined) {
@@ -24,6 +25,14 @@ const contactSettingsSchema = z.object({
     .string()
     .max(120, 'Usa maximo 120 caracteres')
     .transform((value) => normalizeOptionalText(value)),
+  // Timezone for visibility scheduling. Empty → null (code default applies).
+  timezone: z
+    .string()
+    .max(64)
+    .transform((value) => normalizeOptionalText(value))
+    .refine((value) => value === null || isValidTimeZone(value), {
+      message: 'Zona horaria inválida',
+    }),
 });
 
 export async function updateContactSettingsFormAction(formData: FormData) {
@@ -31,6 +40,7 @@ export async function updateContactSettingsFormAction(formData: FormData) {
   const data = contactSettingsSchema.parse({
     whatsappPhone: formData.get('whatsappPhone')?.toString() ?? '',
     businessHours: formData.get('businessHours')?.toString() ?? '',
+    timezone: formData.get('timezone')?.toString() ?? '',
   });
 
   if (process.env.USE_MOCKS === 'true') {
@@ -43,6 +53,7 @@ export async function updateContactSettingsFormAction(formData: FormData) {
     data: {
       whatsappPhone: data.whatsappPhone,
       businessHours: data.businessHours,
+      timezone: data.timezone,
     },
     select: { slug: true },
   });

@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { ImageUploadField } from '@/components/admin/image-upload-field';
+import { ScheduleControls, pickSchedule } from '@/components/admin/schedule-controls';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -14,7 +15,7 @@ import {
   softDeleteSectionAction,
   upsertSectionAction,
 } from '@/server/actions/sections.actions';
-import type { MenuSection } from '@/types/domain';
+import type { MenuSection, VisibilityScheduleFields } from '@/types/domain';
 
 const ACCENT_COLORS = ['#FFF8E7', '#E7F8EF', '#FFE8E2', '#E9F0FF', '#F4E8FF', '#F8F8E7'];
 
@@ -28,6 +29,7 @@ export function SectionEditorForm({ initial, nextSortOrder = 0 }: SectionEditorF
   const [name, setName] = useState(initial?.name ?? '');
   const [accentColor, setAccentColor] = useState(initial?.accentColor ?? ACCENT_COLORS[0]);
   const [coverImageUrl, setCoverImageUrl] = useState<string | null>(initial?.coverImageUrl ?? null);
+  const [schedule, setSchedule] = useState<VisibilityScheduleFields>(() => pickSchedule(initial));
   const [isPending, startTransition] = useTransition();
   const [isDeleting, startDeleteTransition] = useTransition();
 
@@ -40,6 +42,7 @@ export function SectionEditorForm({ initial, nextSortOrder = 0 }: SectionEditorF
         coverImageUrl,
         sortOrder: initial?.sortOrder ?? nextSortOrder,
         isVisible: true,
+        ...schedule,
       });
 
       if (!result.ok) {
@@ -136,6 +139,14 @@ export function SectionEditorForm({ initial, nextSortOrder = 0 }: SectionEditorF
         value={coverImageUrl}
         onChange={setCoverImageUrl}
       />
+
+      <Card className="border border-ink-200 bg-[var(--brand-surface)] p-4 shadow-sm">
+        <ScheduleControls
+          value={schedule}
+          onChange={(patch) => setSchedule((prev) => ({ ...prev, ...patch }))}
+          description="Opcional. Oculta toda la sección (categorías y platillos) fuera del horario. No afecta disponibilidad ni inventario. Sin selección = siempre visible."
+        />
+      </Card>
 
       <div className="sticky bottom-[88px] flex gap-3">
         {initial?.id && (

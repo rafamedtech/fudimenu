@@ -5,6 +5,7 @@ import {
   normalizeDietaryTags,
 } from '@/lib/item-attributes';
 import { MAX_VARIANT_NAME_CHARS, MAX_VARIANTS_PER_ITEM } from '@/lib/item-variants';
+import { isValidTimeZone, refineSchedule, scheduleShape } from '@/lib/validators/schedule.schema';
 
 export const itemSchema = z
   .object({
@@ -30,15 +31,8 @@ export const itemSchema = z
       .max(MAX_TAGS_PER_LIST)
       .transform(normalizeAllergenTags)
       .optional(),
-    // Weekly publishing visibility. Days 0=Sun…6=Sat; deduped + sorted so the
-    // DB holds a canonical set. Times are local minute-of-day (0–1439).
-    scheduleDays: z
-      .array(z.number().int().min(0).max(6))
-      .max(7)
-      .transform((days) => [...new Set(days)].sort((a, b) => a - b))
-      .optional(),
-    scheduleStartMinute: z.number().int().min(0).max(1439).nullable().optional(),
-    scheduleEndMinute: z.number().int().min(1).max(1440).nullable().optional(),
+    // Publishing visibility (days + time window + date range). Shared shape.
+    ...scheduleShape,
     translations: z
       .array(
         z.object({
@@ -71,30 +65,20 @@ export const itemSchema = z
       });
     }
 
-    // Each bound is independent (open start = from 00:00, open end = until
-    // 24:00). When both are set the window must not cross midnight — keeps it on
-    // a single weekday so day + time checks stay independent.
-    if (
-      data.scheduleStartMinute != null &&
-      data.scheduleEndMinute != null &&
-      data.scheduleStartMinute >= data.scheduleEndMinute
-    ) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'La hora de fin debe ser mayor a la de inicio',
-        path: ['scheduleEndMinute'],
-      });
-    }
+    refineSchedule(data, ctx);
   });
 
-export const categorySchema = z.object({
-  id: z.string().min(1).optional(),
-  name: z.string().min(1).max(40),
-  coverImageUrl: z.string().url().nullable().optional(),
-  sectionId: z.string().min(1).nullable().optional(),
-  sortOrder: z.number().int().default(0),
-  isVisible: z.boolean().default(true),
-});
+export const categorySchema = z
+  .object({
+    id: z.string().min(1).optional(),
+    name: z.string().min(1).max(40),
+    coverImageUrl: z.string().url().nullable().optional(),
+    sectionId: z.string().min(1).nullable().optional(),
+    sortOrder: z.number().int().default(0),
+    isVisible: z.boolean().default(true),
+    ...scheduleShape,
+  })
+  .superRefine(refineSchedule);
 
 export const reorderCategoriesSchema = z.object({
   sectionId: z.string().min(1).nullable(),
@@ -118,6 +102,13 @@ export const tenantUpdateSchema = z.object({
   logoShape: z.enum(['rectangular', 'square', 'round']).optional(),
   whatsappPhone: z.string().max(32).nullable().optional(),
   businessHours: z.string().max(120).nullable().optional(),
+  // IANA timezone for visibility scheduling. null clears it (code default applies).
+  timezone: z
+    .string()
+    .max(64)
+    .refine(isValidTimeZone, 'Zona horaria inválida')
+    .nullable()
+    .optional(),
 });
 
 export type ItemInput = z.infer<typeof itemSchema>;

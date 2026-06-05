@@ -3,21 +3,33 @@ import { mockCategories, mockItems, mockSections, mockTenant } from '@/lib/mock/
 import { sanitizePlainText } from '@/lib/sanitize';
 import { normalizeAllergenTags, normalizeDietaryTags } from '@/lib/item-attributes';
 import type { IMenuRepository, MenuData, ImportResult } from '@/server/repositories/menu.repository';
-import type { Category, ItemTranslation, ItemUpsertInput, MenuItem, MenuSection, Tenant } from '@/types/domain';
+import type { Category, ItemTranslation, ItemUpsertInput, MenuItem, MenuSection, Tenant, VisibilityScheduleFields } from '@/types/domain';
 import type { SectionInput } from '@/lib/validators/section.schema';
 import type { CategoryInput } from '@/lib/validators/item.schema';
 import type { ImportItem } from '@/lib/validators/import.schema';
+
+// Full-replace schedule fields from upsert input (sections/categories editor
+// always sends the whole schedule; items pass only when present via spread).
+function mockSchedule(input: Partial<VisibilityScheduleFields>): VisibilityScheduleFields {
+  return {
+    scheduleDays: input.scheduleDays ?? [],
+    scheduleStartMinute: input.scheduleStartMinute ?? null,
+    scheduleEndMinute: input.scheduleEndMinute ?? null,
+    scheduleStartDate: input.scheduleStartDate ?? null,
+    scheduleEndDate: input.scheduleEndDate ?? null,
+  };
+}
 
 function cloneTenant(tenant: Tenant): Tenant {
   return { ...tenant };
 }
 
 function cloneSection(section: MenuSection): MenuSection {
-  return { ...section };
+  return { ...section, scheduleDays: [...section.scheduleDays] };
 }
 
 function cloneCategory(category: Category): Category {
-  return { ...category };
+  return { ...category, scheduleDays: [...category.scheduleDays] };
 }
 
 function cloneMenuItem(item: MenuItem): MenuItem {
@@ -223,9 +235,7 @@ export class MockMenuRepository implements IMenuRepository {
       isAvailable: input.isAvailable ?? true,
       dietaryTags: normalizeDietaryTags(input.dietaryTags ?? []),
       allergenTags: normalizeAllergenTags(input.allergenTags ?? []),
-      scheduleDays: input.scheduleDays ?? [],
-      scheduleStartMinute: input.scheduleStartMinute ?? null,
-      scheduleEndMinute: input.scheduleEndMinute ?? null,
+      ...mockSchedule(input),
       sortOrder: input.sortOrder ?? 999,
       createdAt: now,
       updatedAt: now,
@@ -251,6 +261,7 @@ export class MockMenuRepository implements IMenuRepository {
         accentColor: input.accentColor,
         sortOrder: input.sortOrder,
         isVisible: input.isVisible,
+        ...mockSchedule(input),
         updatedAt: new Date().toISOString(),
       };
       return cloneSection(this.sections[idx]);
@@ -264,6 +275,7 @@ export class MockMenuRepository implements IMenuRepository {
       accentColor: input.accentColor,
       sortOrder: input.sortOrder,
       isVisible: input.isVisible,
+      ...mockSchedule(input),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       deletedAt: null,
@@ -311,6 +323,7 @@ export class MockMenuRepository implements IMenuRepository {
         sectionId: input.sectionId ?? null,
         sortOrder: input.sortOrder ?? 0,
         isVisible: input.isVisible ?? true,
+        ...mockSchedule(input),
       };
       return cloneCategory(this.categories[idx]);
     }
@@ -323,6 +336,7 @@ export class MockMenuRepository implements IMenuRepository {
       coverImageUrl: input.coverImageUrl ?? null,
       sortOrder: input.sortOrder ?? 0,
       isVisible: input.isVisible ?? true,
+      ...mockSchedule(input),
     };
     this.categories.push(created);
     return cloneCategory(created);

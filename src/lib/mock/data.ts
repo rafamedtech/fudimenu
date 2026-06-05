@@ -1,4 +1,5 @@
 import type { Category, MenuSection, MenuItem, Tenant } from '@/types/domain';
+import { EMPTY_VISIBILITY_SCHEDULE } from '@/lib/visibility-schedule';
 
 const now = new Date().toISOString();
 const tenantId = 'tnt_demo';
@@ -18,6 +19,7 @@ export const mockTenant: Tenant = (globalStore.__mockTenant ??= {
   cuisineType: 'cocina mexicana contemporánea',
   defaultLocale: 'es',
   currency: 'MXN',
+  timezone: null,
   plan: 'free',
   createdAt: now,
 });
@@ -309,9 +311,7 @@ export const mockItems: MenuItem[] = itemRows.map(
     isAvailable: true,
     dietaryTags: mockDietaryTags[id] ?? [],
     allergenTags: mockAllergenTags[id] ?? [],
-    scheduleDays: [],
-    scheduleStartMinute: null,
-    scheduleEndMinute: null,
+    ...EMPTY_VISIBILITY_SCHEDULE,
     sortOrder,
     createdAt: now,
     updatedAt: now,
@@ -333,6 +333,7 @@ function section(id: string, name: string, accentColor: string, sortOrder: numbe
     accentColor,
     sortOrder,
     isVisible: true,
+    ...EMPTY_VISIBILITY_SCHEDULE,
     createdAt: now,
     updatedAt: now,
   };
@@ -347,5 +348,6 @@ function category(id: string, sectionId: string, name: string, sortOrder: number
     coverImageUrl: null,
     sortOrder,
     isVisible: true,
+    ...EMPTY_VISIBILITY_SCHEDULE,
   };
 }

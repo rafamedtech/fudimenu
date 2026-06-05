@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { buildPublicMenuGroups } from '@/lib/public-menu-groups';
+import { EMPTY_VISIBILITY_SCHEDULE } from '@/lib/visibility-schedule';
 import type { Category, MenuItem, MenuSection } from '@/types/domain';
 
 const item = (id: string, categoryId: string | null, isSpecialToday = false): MenuItem => ({
@@ -15,9 +16,7 @@ const item = (id: string, categoryId: string | null, isSpecialToday = false): Me
   isAvailable: true,
   dietaryTags: [],
   allergenTags: [],
-  scheduleDays: [],
-  scheduleStartMinute: null,
-  scheduleEndMinute: null,
+  ...EMPTY_VISIBILITY_SCHEDULE,
   sortOrder: 0,
   createdAt: '2026-01-01T00:00:00.000Z',
   updatedAt: '2026-01-01T00:00:00.000Z',
@@ -36,6 +35,7 @@ const category = (
   coverImageUrl: null,
   sortOrder: 0,
   isVisible,
+  ...EMPTY_VISIBILITY_SCHEDULE,
 });
 
 const section = (id: string, isVisible = true): MenuSection => ({
@@ -46,6 +46,7 @@ const section = (id: string, isVisible = true): MenuSection => ({
   accentColor: `accent-${id}`,
   sortOrder: 0,
   isVisible,
+  ...EMPTY_VISIBILITY_SCHEDULE,
   createdAt: '2026-01-01T00:00:00.000Z',
 });
 
@@ -140,6 +141,38 @@ describe('buildPublicMenuGroups', () => {
     });
     expect(hidden.groups).toEqual([]);
     expect(hidden.dailySpecials).toEqual([]);
+  });
+
+  it('applies the full hierarchy: section gates category gates item (CDMX default tz)', () => {
+    // 07:00–11:00 window. 2024-01-15T16:00:00Z = CDMX 10:00 (in), T21:00Z = 15:00 (out).
+    const window = { scheduleStartMinute: 420, scheduleEndMinute: 660 };
+    const monday1000 = new Date('2024-01-15T16:00:00Z');
+    const monday1500 = new Date('2024-01-15T21:00:00Z');
+
+    const scheduledSection: MenuSection = { ...section('section-1'), ...window };
+
+    const run = (now: Date, sections: MenuSection[], categories: Category[]) =>
+      buildPublicMenuGroups({
+        sections,
+        categories,
+        items: [item('it', 'category-1')],
+        otherCategoryName: 'Otros',
+        resolveSectionAccent: (a) => a,
+        now,
+      });
+
+    // Section off-window → whole branch hidden even though category + item are open.
+    const sectionOff = run(monday1500, [scheduledSection], [category('category-1', 'section-1')]);
+    expect(sectionOff.groups).toEqual([]);
+
+    // Section open but category off-window → items hidden.
+    const categoryWindowed: Category = { ...category('category-1', 'section-1'), ...window };
+    const catOff = run(monday1500, [section('section-1')], [categoryWindowed]);
+    expect(catOff.groups).toEqual([]);
+
+    // Everything in-window → item shows.
+    const allOn = run(monday1000, [scheduledSection], [categoryWindowed]);
+    expect(allOn.groups.flatMap((g) => g.items.map((i) => i.id))).toEqual(['it']);
   });
 
   it('creates an Otros group for uncategorized items when the category does not exist', () => {

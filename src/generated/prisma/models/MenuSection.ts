@@ -28,10 +28,16 @@ export type AggregateMenuSection = {
 
 export type MenuSectionAvgAggregateOutputType = {
   sortOrder: number | null
+  scheduleDays: number | null
+  scheduleStartMinute: number | null
+  scheduleEndMinute: number | null
 }
 
 export type MenuSectionSumAggregateOutputType = {
   sortOrder: number | null
+  scheduleDays: number[]
+  scheduleStartMinute: number | null
+  scheduleEndMinute: number | null
 }
 
 export type MenuSectionMinAggregateOutputType = {
@@ -42,6 +48,10 @@ export type MenuSectionMinAggregateOutputType = {
   accentColor: string | null
   sortOrder: number | null
   isVisible: boolean | null
+  scheduleStartMinute: number | null
+  scheduleEndMinute: number | null
+  scheduleStartDate: Date | null
+  scheduleEndDate: Date | null
   createdAt: Date | null
   updatedAt: Date | null
   deletedAt: Date | null
@@ -55,6 +65,10 @@ export type MenuSectionMaxAggregateOutputType = {
   accentColor: string | null
   sortOrder: number | null
   isVisible: boolean | null
+  scheduleStartMinute: number | null
+  scheduleEndMinute: number | null
+  scheduleStartDate: Date | null
+  scheduleEndDate: Date | null
   createdAt: Date | null
   updatedAt: Date | null
   deletedAt: Date | null
@@ -68,6 +82,11 @@ export type MenuSectionCountAggregateOutputType = {
   accentColor: number
   sortOrder: number
   isVisible: number
+  scheduleDays: number
+  scheduleStartMinute: number
+  scheduleEndMinute: number
+  scheduleStartDate: number
+  scheduleEndDate: number
   createdAt: number
   updatedAt: number
   deletedAt: number
@@ -77,10 +96,16 @@ export type MenuSectionCountAggregateOutputType = {
 
 export type MenuSectionAvgAggregateInputType = {
   sortOrder?: true
+  scheduleDays?: true
+  scheduleStartMinute?: true
+  scheduleEndMinute?: true
 }
 
 export type MenuSectionSumAggregateInputType = {
   sortOrder?: true
+  scheduleDays?: true
+  scheduleStartMinute?: true
+  scheduleEndMinute?: true
 }
 
 export type MenuSectionMinAggregateInputType = {
@@ -91,6 +116,10 @@ export type MenuSectionMinAggregateInputType = {
   accentColor?: true
   sortOrder?: true
   isVisible?: true
+  scheduleStartMinute?: true
+  scheduleEndMinute?: true
+  scheduleStartDate?: true
+  scheduleEndDate?: true
   createdAt?: true
   updatedAt?: true
   deletedAt?: true
@@ -104,6 +133,10 @@ export type MenuSectionMaxAggregateInputType = {
   accentColor?: true
   sortOrder?: true
   isVisible?: true
+  scheduleStartMinute?: true
+  scheduleEndMinute?: true
+  scheduleStartDate?: true
+  scheduleEndDate?: true
   createdAt?: true
   updatedAt?: true
   deletedAt?: true
@@ -117,6 +150,11 @@ export type MenuSectionCountAggregateInputType = {
   accentColor?: true
   sortOrder?: true
   isVisible?: true
+  scheduleDays?: true
+  scheduleStartMinute?: true
+  scheduleEndMinute?: true
+  scheduleStartDate?: true
+  scheduleEndDate?: true
   createdAt?: true
   updatedAt?: true
   deletedAt?: true
@@ -217,6 +255,11 @@ export type MenuSectionGroupByOutputType = {
   accentColor: string
   sortOrder: number
   isVisible: boolean
+  scheduleDays: number[]
+  scheduleStartMinute: number | null
+  scheduleEndMinute: number | null
+  scheduleStartDate: Date | null
+  scheduleEndDate: Date | null
   createdAt: Date
   updatedAt: Date
   deletedAt: Date | null
@@ -253,6 +296,11 @@ export type MenuSectionWhereInput = {
   accentColor?: Prisma.StringFilter<"MenuSection"> | string
   sortOrder?: Prisma.IntFilter<"MenuSection"> | number
   isVisible?: Prisma.BoolFilter<"MenuSection"> | boolean
+  scheduleDays?: Prisma.IntNullableListFilter<"MenuSection">
+  scheduleStartMinute?: Prisma.IntNullableFilter<"MenuSection"> | number | null
+  scheduleEndMinute?: Prisma.IntNullableFilter<"MenuSection"> | number | null
+  scheduleStartDate?: Prisma.DateTimeNullableFilter<"MenuSection"> | Date | string | null
+  scheduleEndDate?: Prisma.DateTimeNullableFilter<"MenuSection"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"MenuSection"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"MenuSection"> | Date | string
   deletedAt?: Prisma.DateTimeNullableFilter<"MenuSection"> | Date | string | null
@@ -268,6 +316,11 @@ export type MenuSectionOrderByWithRelationInput = {
   accentColor?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   isVisible?: Prisma.SortOrder
+  scheduleDays?: Prisma.SortOrder
+  scheduleStartMinute?: Prisma.SortOrderInput | Prisma.SortOrder
+  scheduleEndMinute?: Prisma.SortOrderInput | Prisma.SortOrder
+  scheduleStartDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  scheduleEndDate?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -286,6 +339,11 @@ export type MenuSectionWhereUniqueInput = Prisma.AtLeast<{
   accentColor?: Prisma.StringFilter<"MenuSection"> | string
   sortOrder?: Prisma.IntFilter<"MenuSection"> | number
   isVisible?: Prisma.BoolFilter<"MenuSection"> | boolean
+  scheduleDays?: Prisma.IntNullableListFilter<"MenuSection">
+  scheduleStartMinute?: Prisma.IntNullableFilter<"MenuSection"> | number | null
+  scheduleEndMinute?: Prisma.IntNullableFilter<"MenuSection"> | number | null
+  scheduleStartDate?: Prisma.DateTimeNullableFilter<"MenuSection"> | Date | string | null
+  scheduleEndDate?: Prisma.DateTimeNullableFilter<"MenuSection"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"MenuSection"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"MenuSection"> | Date | string
   deletedAt?: Prisma.DateTimeNullableFilter<"MenuSection"> | Date | string | null
@@ -301,6 +359,11 @@ export type MenuSectionOrderByWithAggregationInput = {
   accentColor?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   isVisible?: Prisma.SortOrder
+  scheduleDays?: Prisma.SortOrder
+  scheduleStartMinute?: Prisma.SortOrderInput | Prisma.SortOrder
+  scheduleEndMinute?: Prisma.SortOrderInput | Prisma.SortOrder
+  scheduleStartDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  scheduleEndDate?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -322,6 +385,11 @@ export type MenuSectionScalarWhereWithAggregatesInput = {
   accentColor?: Prisma.StringWithAggregatesFilter<"MenuSection"> | string
   sortOrder?: Prisma.IntWithAggregatesFilter<"MenuSection"> | number
   isVisible?: Prisma.BoolWithAggregatesFilter<"MenuSection"> | boolean
+  scheduleDays?: Prisma.IntNullableListFilter<"MenuSection">
+  scheduleStartMinute?: Prisma.IntNullableWithAggregatesFilter<"MenuSection"> | number | null
+  scheduleEndMinute?: Prisma.IntNullableWithAggregatesFilter<"MenuSection"> | number | null
+  scheduleStartDate?: Prisma.DateTimeNullableWithAggregatesFilter<"MenuSection"> | Date | string | null
+  scheduleEndDate?: Prisma.DateTimeNullableWithAggregatesFilter<"MenuSection"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"MenuSection"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"MenuSection"> | Date | string
   deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"MenuSection"> | Date | string | null
@@ -334,6 +402,11 @@ export type MenuSectionCreateInput = {
   accentColor?: string
   sortOrder?: number
   isVisible?: boolean
+  scheduleDays?: Prisma.MenuSectionCreatescheduleDaysInput | number[]
+  scheduleStartMinute?: number | null
+  scheduleEndMinute?: number | null
+  scheduleStartDate?: Date | string | null
+  scheduleEndDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
@@ -349,6 +422,11 @@ export type MenuSectionUncheckedCreateInput = {
   accentColor?: string
   sortOrder?: number
   isVisible?: boolean
+  scheduleDays?: Prisma.MenuSectionCreatescheduleDaysInput | number[]
+  scheduleStartMinute?: number | null
+  scheduleEndMinute?: number | null
+  scheduleStartDate?: Date | string | null
+  scheduleEndDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
@@ -362,6 +440,11 @@ export type MenuSectionUpdateInput = {
   accentColor?: Prisma.StringFieldUpdateOperationsInput | string
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  scheduleDays?: Prisma.MenuSectionUpdatescheduleDaysInput | number[]
+  scheduleStartMinute?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scheduleEndMinute?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scheduleStartDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  scheduleEndDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -377,6 +460,11 @@ export type MenuSectionUncheckedUpdateInput = {
   accentColor?: Prisma.StringFieldUpdateOperationsInput | string
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  scheduleDays?: Prisma.MenuSectionUpdatescheduleDaysInput | number[]
+  scheduleStartMinute?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scheduleEndMinute?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scheduleStartDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  scheduleEndDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -391,6 +479,11 @@ export type MenuSectionCreateManyInput = {
   accentColor?: string
   sortOrder?: number
   isVisible?: boolean
+  scheduleDays?: Prisma.MenuSectionCreatescheduleDaysInput | number[]
+  scheduleStartMinute?: number | null
+  scheduleEndMinute?: number | null
+  scheduleStartDate?: Date | string | null
+  scheduleEndDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
@@ -403,6 +496,11 @@ export type MenuSectionUpdateManyMutationInput = {
   accentColor?: Prisma.StringFieldUpdateOperationsInput | string
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  scheduleDays?: Prisma.MenuSectionUpdatescheduleDaysInput | number[]
+  scheduleStartMinute?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scheduleEndMinute?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scheduleStartDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  scheduleEndDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -416,6 +514,11 @@ export type MenuSectionUncheckedUpdateManyInput = {
   accentColor?: Prisma.StringFieldUpdateOperationsInput | string
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  scheduleDays?: Prisma.MenuSectionUpdatescheduleDaysInput | number[]
+  scheduleStartMinute?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scheduleEndMinute?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scheduleStartDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  scheduleEndDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -431,6 +534,14 @@ export type MenuSectionOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type IntNullableListFilter<$PrismaModel = never> = {
+  equals?: number[] | Prisma.ListIntFieldRefInput<$PrismaModel> | null
+  has?: number | Prisma.IntFieldRefInput<$PrismaModel> | null
+  hasEvery?: number[] | Prisma.ListIntFieldRefInput<$PrismaModel>
+  hasSome?: number[] | Prisma.ListIntFieldRefInput<$PrismaModel>
+  isEmpty?: boolean
+}
+
 export type MenuSectionCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   tenantId?: Prisma.SortOrder
@@ -439,6 +550,11 @@ export type MenuSectionCountOrderByAggregateInput = {
   accentColor?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   isVisible?: Prisma.SortOrder
+  scheduleDays?: Prisma.SortOrder
+  scheduleStartMinute?: Prisma.SortOrder
+  scheduleEndMinute?: Prisma.SortOrder
+  scheduleStartDate?: Prisma.SortOrder
+  scheduleEndDate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
@@ -446,6 +562,9 @@ export type MenuSectionCountOrderByAggregateInput = {
 
 export type MenuSectionAvgOrderByAggregateInput = {
   sortOrder?: Prisma.SortOrder
+  scheduleDays?: Prisma.SortOrder
+  scheduleStartMinute?: Prisma.SortOrder
+  scheduleEndMinute?: Prisma.SortOrder
 }
 
 export type MenuSectionMaxOrderByAggregateInput = {
@@ -456,6 +575,10 @@ export type MenuSectionMaxOrderByAggregateInput = {
   accentColor?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   isVisible?: Prisma.SortOrder
+  scheduleStartMinute?: Prisma.SortOrder
+  scheduleEndMinute?: Prisma.SortOrder
+  scheduleStartDate?: Prisma.SortOrder
+  scheduleEndDate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
@@ -469,6 +592,10 @@ export type MenuSectionMinOrderByAggregateInput = {
   accentColor?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   isVisible?: Prisma.SortOrder
+  scheduleStartMinute?: Prisma.SortOrder
+  scheduleEndMinute?: Prisma.SortOrder
+  scheduleStartDate?: Prisma.SortOrder
+  scheduleEndDate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
@@ -476,6 +603,9 @@ export type MenuSectionMinOrderByAggregateInput = {
 
 export type MenuSectionSumOrderByAggregateInput = {
   sortOrder?: Prisma.SortOrder
+  scheduleDays?: Prisma.SortOrder
+  scheduleStartMinute?: Prisma.SortOrder
+  scheduleEndMinute?: Prisma.SortOrder
 }
 
 export type MenuSectionNullableScalarRelationFilter = {
@@ -525,6 +655,10 @@ export type MenuSectionUncheckedUpdateManyWithoutTenantNestedInput = {
   deleteMany?: Prisma.MenuSectionScalarWhereInput | Prisma.MenuSectionScalarWhereInput[]
 }
 
+export type MenuSectionCreatescheduleDaysInput = {
+  set: number[]
+}
+
 export type IntFieldUpdateOperationsInput = {
   set?: number
   increment?: number
@@ -535,6 +669,19 @@ export type IntFieldUpdateOperationsInput = {
 
 export type BoolFieldUpdateOperationsInput = {
   set?: boolean
+}
+
+export type MenuSectionUpdatescheduleDaysInput = {
+  set?: number[]
+  push?: number | number[]
+}
+
+export type NullableIntFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
 }
 
 export type MenuSectionCreateNestedOneWithoutCategoriesInput = {
@@ -560,6 +707,11 @@ export type MenuSectionCreateWithoutTenantInput = {
   accentColor?: string
   sortOrder?: number
   isVisible?: boolean
+  scheduleDays?: Prisma.MenuSectionCreatescheduleDaysInput | number[]
+  scheduleStartMinute?: number | null
+  scheduleEndMinute?: number | null
+  scheduleStartDate?: Date | string | null
+  scheduleEndDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
@@ -573,6 +725,11 @@ export type MenuSectionUncheckedCreateWithoutTenantInput = {
   accentColor?: string
   sortOrder?: number
   isVisible?: boolean
+  scheduleDays?: Prisma.MenuSectionCreatescheduleDaysInput | number[]
+  scheduleStartMinute?: number | null
+  scheduleEndMinute?: number | null
+  scheduleStartDate?: Date | string | null
+  scheduleEndDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
@@ -616,6 +773,11 @@ export type MenuSectionScalarWhereInput = {
   accentColor?: Prisma.StringFilter<"MenuSection"> | string
   sortOrder?: Prisma.IntFilter<"MenuSection"> | number
   isVisible?: Prisma.BoolFilter<"MenuSection"> | boolean
+  scheduleDays?: Prisma.IntNullableListFilter<"MenuSection">
+  scheduleStartMinute?: Prisma.IntNullableFilter<"MenuSection"> | number | null
+  scheduleEndMinute?: Prisma.IntNullableFilter<"MenuSection"> | number | null
+  scheduleStartDate?: Prisma.DateTimeNullableFilter<"MenuSection"> | Date | string | null
+  scheduleEndDate?: Prisma.DateTimeNullableFilter<"MenuSection"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"MenuSection"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"MenuSection"> | Date | string
   deletedAt?: Prisma.DateTimeNullableFilter<"MenuSection"> | Date | string | null
@@ -628,6 +790,11 @@ export type MenuSectionCreateWithoutCategoriesInput = {
   accentColor?: string
   sortOrder?: number
   isVisible?: boolean
+  scheduleDays?: Prisma.MenuSectionCreatescheduleDaysInput | number[]
+  scheduleStartMinute?: number | null
+  scheduleEndMinute?: number | null
+  scheduleStartDate?: Date | string | null
+  scheduleEndDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
@@ -642,6 +809,11 @@ export type MenuSectionUncheckedCreateWithoutCategoriesInput = {
   accentColor?: string
   sortOrder?: number
   isVisible?: boolean
+  scheduleDays?: Prisma.MenuSectionCreatescheduleDaysInput | number[]
+  scheduleStartMinute?: number | null
+  scheduleEndMinute?: number | null
+  scheduleStartDate?: Date | string | null
+  scheduleEndDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
@@ -670,6 +842,11 @@ export type MenuSectionUpdateWithoutCategoriesInput = {
   accentColor?: Prisma.StringFieldUpdateOperationsInput | string
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  scheduleDays?: Prisma.MenuSectionUpdatescheduleDaysInput | number[]
+  scheduleStartMinute?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scheduleEndMinute?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scheduleStartDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  scheduleEndDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -684,6 +861,11 @@ export type MenuSectionUncheckedUpdateWithoutCategoriesInput = {
   accentColor?: Prisma.StringFieldUpdateOperationsInput | string
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  scheduleDays?: Prisma.MenuSectionUpdatescheduleDaysInput | number[]
+  scheduleStartMinute?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scheduleEndMinute?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scheduleStartDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  scheduleEndDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -696,6 +878,11 @@ export type MenuSectionCreateManyTenantInput = {
   accentColor?: string
   sortOrder?: number
   isVisible?: boolean
+  scheduleDays?: Prisma.MenuSectionCreatescheduleDaysInput | number[]
+  scheduleStartMinute?: number | null
+  scheduleEndMinute?: number | null
+  scheduleStartDate?: Date | string | null
+  scheduleEndDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
@@ -708,6 +895,11 @@ export type MenuSectionUpdateWithoutTenantInput = {
   accentColor?: Prisma.StringFieldUpdateOperationsInput | string
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  scheduleDays?: Prisma.MenuSectionUpdatescheduleDaysInput | number[]
+  scheduleStartMinute?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scheduleEndMinute?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scheduleStartDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  scheduleEndDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -721,6 +913,11 @@ export type MenuSectionUncheckedUpdateWithoutTenantInput = {
   accentColor?: Prisma.StringFieldUpdateOperationsInput | string
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  scheduleDays?: Prisma.MenuSectionUpdatescheduleDaysInput | number[]
+  scheduleStartMinute?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scheduleEndMinute?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scheduleStartDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  scheduleEndDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -734,6 +931,11 @@ export type MenuSectionUncheckedUpdateManyWithoutTenantInput = {
   accentColor?: Prisma.StringFieldUpdateOperationsInput | string
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  scheduleDays?: Prisma.MenuSectionUpdatescheduleDaysInput | number[]
+  scheduleStartMinute?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scheduleEndMinute?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scheduleStartDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  scheduleEndDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -778,6 +980,11 @@ export type MenuSectionSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   accentColor?: boolean
   sortOrder?: boolean
   isVisible?: boolean
+  scheduleDays?: boolean
+  scheduleStartMinute?: boolean
+  scheduleEndMinute?: boolean
+  scheduleStartDate?: boolean
+  scheduleEndDate?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   deletedAt?: boolean
@@ -794,6 +1001,11 @@ export type MenuSectionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   accentColor?: boolean
   sortOrder?: boolean
   isVisible?: boolean
+  scheduleDays?: boolean
+  scheduleStartMinute?: boolean
+  scheduleEndMinute?: boolean
+  scheduleStartDate?: boolean
+  scheduleEndDate?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   deletedAt?: boolean
@@ -808,6 +1020,11 @@ export type MenuSectionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   accentColor?: boolean
   sortOrder?: boolean
   isVisible?: boolean
+  scheduleDays?: boolean
+  scheduleStartMinute?: boolean
+  scheduleEndMinute?: boolean
+  scheduleStartDate?: boolean
+  scheduleEndDate?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   deletedAt?: boolean
@@ -822,12 +1039,17 @@ export type MenuSectionSelectScalar = {
   accentColor?: boolean
   sortOrder?: boolean
   isVisible?: boolean
+  scheduleDays?: boolean
+  scheduleStartMinute?: boolean
+  scheduleEndMinute?: boolean
+  scheduleStartDate?: boolean
+  scheduleEndDate?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   deletedAt?: boolean
 }
 
-export type MenuSectionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "name" | "coverImageUrl" | "accentColor" | "sortOrder" | "isVisible" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["menuSection"]>
+export type MenuSectionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "name" | "coverImageUrl" | "accentColor" | "sortOrder" | "isVisible" | "scheduleDays" | "scheduleStartMinute" | "scheduleEndMinute" | "scheduleStartDate" | "scheduleEndDate" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["menuSection"]>
 export type MenuSectionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   categories?: boolean | Prisma.MenuSection$categoriesArgs<ExtArgs>
@@ -854,6 +1076,11 @@ export type $MenuSectionPayload<ExtArgs extends runtime.Types.Extensions.Interna
     accentColor: string
     sortOrder: number
     isVisible: boolean
+    scheduleDays: number[]
+    scheduleStartMinute: number | null
+    scheduleEndMinute: number | null
+    scheduleStartDate: Date | null
+    scheduleEndDate: Date | null
     createdAt: Date
     updatedAt: Date
     deletedAt: Date | null
@@ -1289,6 +1516,11 @@ export interface MenuSectionFieldRefs {
   readonly accentColor: Prisma.FieldRef<"MenuSection", 'String'>
   readonly sortOrder: Prisma.FieldRef<"MenuSection", 'Int'>
   readonly isVisible: Prisma.FieldRef<"MenuSection", 'Boolean'>
+  readonly scheduleDays: Prisma.FieldRef<"MenuSection", 'Int[]'>
+  readonly scheduleStartMinute: Prisma.FieldRef<"MenuSection", 'Int'>
+  readonly scheduleEndMinute: Prisma.FieldRef<"MenuSection", 'Int'>
+  readonly scheduleStartDate: Prisma.FieldRef<"MenuSection", 'DateTime'>
+  readonly scheduleEndDate: Prisma.FieldRef<"MenuSection", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"MenuSection", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"MenuSection", 'DateTime'>
   readonly deletedAt: Prisma.FieldRef<"MenuSection", 'DateTime'>

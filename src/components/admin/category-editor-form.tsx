@@ -5,13 +5,15 @@ import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { ImageUploadField } from '@/components/admin/image-upload-field';
+import { ScheduleControls, pickSchedule } from '@/components/admin/schedule-controls';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import {
   softDeleteCategoryAction,
   upsertCategoryAction,
 } from '@/server/actions/categories.actions';
-import type { Category } from '@/types/domain';
+import type { Category, VisibilityScheduleFields } from '@/types/domain';
 
 interface CategoryEditorFormProps {
   initial?: Category | null;
@@ -27,6 +29,7 @@ export function CategoryEditorForm({
   const router = useRouter();
   const [name, setName] = useState(initial?.name ?? '');
   const [coverImageUrl, setCoverImageUrl] = useState<string | null>(initial?.coverImageUrl ?? null);
+  const [schedule, setSchedule] = useState<VisibilityScheduleFields>(() => pickSchedule(initial));
   const [isPending, startTransition] = useTransition();
   const [isDeleting, startDeleteTransition] = useTransition();
 
@@ -43,6 +46,7 @@ export function CategoryEditorForm({
         sectionId,
         sortOrder: initial?.sortOrder ?? nextSortOrder,
         isVisible: true,
+        ...schedule,
       });
 
       if (!result.ok) {
@@ -89,6 +93,14 @@ export function CategoryEditorForm({
         value={coverImageUrl}
         onChange={setCoverImageUrl}
       />
+
+      <Card className="border border-ink-200 bg-[var(--brand-surface)] shadow-sm">
+        <ScheduleControls
+          value={schedule}
+          onChange={(patch) => setSchedule((prev) => ({ ...prev, ...patch }))}
+          description="Opcional. Oculta toda la categoría fuera del horario. No afecta disponibilidad ni inventario. Sin selección = siempre visible."
+        />
+      </Card>
 
       <div className="sticky bottom-[88px] flex gap-3">
         {initial?.id && (

@@ -8,6 +8,7 @@ import { FormSkeleton } from '@/components/ui/skeleton';
 import { getPrisma } from '@/lib/db/prisma';
 import { mockTenant } from '@/lib/mock/data';
 import { updateContactSettingsFormAction } from '@/server/actions/contact.actions';
+import { MX_TIME_ZONES } from '@/lib/timezones';
 import { requireAuth } from '@/server/guards/require-auth';
 
 type ContactSettingsPageProps = {
@@ -44,6 +45,7 @@ async function ContactSettingsContent({ tenantId }: { tenantId: string }) {
           select: {
             whatsappPhone: true,
             businessHours: true,
+            timezone: true,
           },
         });
 
@@ -79,6 +81,27 @@ async function ContactSettingsContent({ tenantId }: { tenantId: string }) {
           prefix={<Clock3 className="size-4" />}
           hint="Texto libre para mostrar el horario operativo."
         />
+        <div className="space-y-1.5">
+          <label htmlFor="timezone" className="block text-sm font-medium text-ink-700">
+            Zona horaria
+          </label>
+          <select
+            id="timezone"
+            name="timezone"
+            defaultValue={tenant?.timezone ?? ''}
+            className="w-full rounded-lg border-[1.5px] border-ink-300 bg-[var(--brand-card)] px-3 py-2 text-sm"
+          >
+            <option value="">Predeterminada (Ciudad de México)</option>
+            {MX_TIME_ZONES.map((tz) => (
+              <option key={tz.value} value={tz.value}>
+                {tz.label}
+              </option>
+            ))}
+          </select>
+          <p className="text-xs text-ink-500">
+            Usada para programar la visibilidad de secciones, categorías y platillos.
+          </p>
+        </div>
         <Button type="submit" className="w-full">
           Guardar contacto
         </Button>

@@ -16,13 +16,26 @@ export type Tenant = {
   cuisineType: string | null;
   defaultLocale: Locale;
   currency: string;
+  // IANA timezone for visibility scheduling. null = fall back to DEFAULT_TIME_ZONE.
+  timezone: string | null;
   plan: Plan;
   stripeCustomerId?: string | null;
   stripeSubscriptionId?: string | null;
   createdAt: string;
 };
 
-export type MenuSection = {
+// Shared publishing-visibility schedule (see lib/visibility-schedule). Empty
+// days = every day; null minutes = all day; null dates = unbounded. NOT
+// operational availability. Applied to sections, categories, and items.
+export type VisibilityScheduleFields = {
+  scheduleDays: number[];
+  scheduleStartMinute: number | null;
+  scheduleEndMinute: number | null;
+  scheduleStartDate: string | null;
+  scheduleEndDate: string | null;
+};
+
+export type MenuSection = VisibilityScheduleFields & {
   id: string;
   tenantId: string;
   name: string;
@@ -35,7 +48,7 @@ export type MenuSection = {
   deletedAt?: string | null;
 };
 
-export type Category = {
+export type Category = VisibilityScheduleFields & {
   id: string;
   tenantId: string;
   sectionId: string | null;
@@ -45,7 +58,7 @@ export type Category = {
   isVisible: boolean;
 };
 
-export type MenuItem = {
+export type MenuItem = VisibilityScheduleFields & {
   id: string;
   tenantId: string;
   categoryId: string | null;
@@ -59,11 +72,6 @@ export type MenuItem = {
   isAvailable: boolean;
   dietaryTags: string[];
   allergenTags: string[];
-  // Weekly publishing visibility (see lib/visibility-schedule). Empty days =
-  // every day; null start/end = all day. NOT operational availability.
-  scheduleDays: number[];
-  scheduleStartMinute: number | null;
-  scheduleEndMinute: number | null;
   sortOrder: number;
   createdAt: string;
   updatedAt: string;

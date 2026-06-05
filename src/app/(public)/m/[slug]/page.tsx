@@ -81,6 +81,7 @@ async function PublicMenuContent({
     items,
     otherCategoryName: t('otherCategory'),
     resolveSectionAccent: resolveBrandSurfaceColor,
+    timeZone: tenant.timezone ?? undefined,
   });
   const hasSections = sections.length > 0;
   const logoFrameClass = getLogoFrameClass(tenant.logoShape);
