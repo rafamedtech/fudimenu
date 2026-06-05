@@ -97,7 +97,7 @@ export type AnalyticsEvent =
   | { name: 'qr_downloaded'; props: { tenantId: string; format: 'png' | 'pdf' } }
   | { name: 'qr_menu_link_copied'; props: { tenantId: string } }
   | { name: 'qr_menu_link_shared'; props: { tenantId: string } }
-  | { name: 'whatsapp_clicked'; props: { itemId: string } }
+  | { name: 'whatsapp_clicked'; props: { itemId: string; locale: 'es' | 'en'; device: 'mobile' | 'tablet' | 'desktop' } }
   | { name: 'onboarding_step'; props: { step: number } }
   | { name: 'onboarding_completed'; props: { tenantId: string } }
   | { name: 'plan_upgrade_started'; props: { from: string; to: string; method: 'card' | 'cash'; cycle: 'monthly' | 'annual' } }

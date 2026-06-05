@@ -27,9 +27,12 @@ export type TenantAnalyticsStats = {
   whatsappDeltaPercent: number | null;
   // clicks / menu views over the last 7 days, as a percentage.
   whatsappConversionPercent: number | null;
+  whatsappByLocale: Array<{ locale: string; count: number }>;
+  whatsappByDevice: Array<{ device: string; count: number }>;
   topSearches: Array<{ query: string; count: number }>;
   noResultSearches: Array<{ query: string; count: number }>;
   trafficSources: Array<{ source: string; views: number }>;
+  campaignViews: Array<{ campaign: string; views: number }>;
 };
 
 const EMPTY_STATS: TenantAnalyticsStats = {
@@ -45,9 +48,12 @@ const EMPTY_STATS: TenantAnalyticsStats = {
   previousWhatsappClicks: 0,
   whatsappDeltaPercent: null,
   whatsappConversionPercent: null,
+  whatsappByLocale: [],
+  whatsappByDevice: [],
   topSearches: [],
   noResultSearches: [],
   trafficSources: [],
+  campaignViews: [],
 };
 
 export function deltaPercent(current: number, previous: number): number | null {
@@ -171,6 +177,45 @@ export async function getTenantAnalyticsStats(tenantId: string): Promise<TenantA
       `
       : null;
 
+    // WhatsApp breakdowns share the itemId-IN-tenant scope; only count last 7d.
+    const whatsappByLocaleQuery = itemIds
+      ? `
+        SELECT coalesce(nullIf(properties.locale, ''), 'es') AS loc, count() AS c
+        FROM events
+        WHERE event = 'whatsapp_clicked'
+          AND properties.itemId IN (${itemIds})
+          AND timestamp >= now() - INTERVAL 7 DAY
+        GROUP BY loc
+        ORDER BY c DESC
+        LIMIT 6
+      `
+      : null;
+
+    const whatsappByDeviceQuery = itemIds
+      ? `
+        SELECT coalesce(nullIf(properties.device, ''), 'desktop') AS dev, count() AS c
+        FROM events
+        WHERE event = 'whatsapp_clicked'
+          AND properties.itemId IN (${itemIds})
+          AND timestamp >= now() - INTERVAL 7 DAY
+        GROUP BY dev
+        ORDER BY c DESC
+        LIMIT 6
+      `
+      : null;
+
+    const campaignViewsQuery = `
+      SELECT properties.campaign AS cmp, count() AS c
+      FROM events
+      WHERE event = 'menu_viewed'
+        AND properties.tenantId = ${tenantIdLiteral}
+        AND properties.campaign != ''
+        AND timestamp >= now() - INTERVAL 7 DAY
+      GROUP BY cmp
+      ORDER BY c DESC
+      LIMIT 6
+    `;
+
     const topSearchesQuery = `
       SELECT properties.query AS q, count() AS c
       FROM events
@@ -209,16 +254,26 @@ export async function getTenantAnalyticsStats(tenantId: string): Promise<TenantA
       viewsResults,
       topItemResults,
       whatsappResults,
+      whatsappLocaleResults,
+      whatsappDeviceResults,
       topSearchResults,
       noResultSearchResults,
       trafficSourceResults,
+      campaignViewsResults,
     ] = await Promise.all([
       queryPostHog(viewsQuery, 'fudimenu stats weekly menu views'),
       topItemsQuery ? queryPostHog(topItemsQuery, 'fudimenu stats top items') : Promise.resolve([]),
       whatsappQuery ? queryPostHog(whatsappQuery, 'fudimenu stats whatsapp clicks') : Promise.resolve([]),
+      whatsappByLocaleQuery
+        ? queryPostHog(whatsappByLocaleQuery, 'fudimenu stats whatsapp by locale')
+        : Promise.resolve([]),
+      whatsappByDeviceQuery
+        ? queryPostHog(whatsappByDeviceQuery, 'fudimenu stats whatsapp by device')
+        : Promise.resolve([]),
       queryPostHog(topSearchesQuery, 'fudimenu stats top searches'),
       queryPostHog(noResultSearchesQuery, 'fudimenu stats no-result searches'),
       queryPostHog(trafficSourcesQuery, 'fudimenu stats traffic sources'),
+      queryPostHog(campaignViewsQuery, 'fudimenu stats campaign views'),
     ]);
 
     const viewsRow = viewsResults?.[0] ?? [];
@@ -256,6 +311,14 @@ export async function getTenantAnalyticsStats(tenantId: string): Promise<TenantA
       whatsappDeltaPercent: deltaPercent(whatsappClicks, previousWhatsappClicks),
       whatsappConversionPercent:
         weeklyViews > 0 ? Math.round((whatsappClicks / weeklyViews) * 100) : null,
+      whatsappByLocale: mapLabeledCounts(whatsappLocaleResults).map(({ label, count }) => ({
+        locale: label,
+        count,
+      })),
+      whatsappByDevice: mapLabeledCounts(whatsappDeviceResults).map(({ label, count }) => ({
+        device: label,
+        count,
+      })),
       topSearches: mapLabeledCounts(topSearchResults).map(({ label, count }) => ({
         query: label,
         count,
@@ -266,6 +329,10 @@ export async function getTenantAnalyticsStats(tenantId: string): Promise<TenantA
       })),
       trafficSources: mapLabeledCounts(trafficSourceResults).map(({ label, count }) => ({
         source: label,
+        views: count,
+      })),
+      campaignViews: mapLabeledCounts(campaignViewsResults).map(({ label, count }) => ({
+        campaign: label,
         views: count,
       })),
     };

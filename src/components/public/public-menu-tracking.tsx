@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { initAnalytics, track } from '@/lib/analytics/events';
 import { parseTrafficSource } from '@/lib/analytics/traffic-source';
+import { getDeviceType } from '@/lib/analytics/device';
 
 const SESSION_KEY = 'fudimenu:public-session-id';
 
@@ -70,10 +71,12 @@ export function PublicMenuTracker({ tenantId, slug, locale }: { tenantId: string
     document.querySelectorAll<HTMLElement>('[data-item-id]').forEach((el) => observer.observe(el));
 
     // whatsapp_clicked via event delegation — avoids client boundary on every card
+    const waLocale = locale === 'en' ? 'en' : 'es';
+    const device = getDeviceType(navigator.userAgent);
     function onWaClick(e: MouseEvent) {
       const el = (e.target as Element).closest<HTMLElement>('[data-track-wa]');
       if (!el) return;
-      track('whatsapp_clicked', { itemId: el.dataset.trackWa! });
+      track('whatsapp_clicked', { itemId: el.dataset.trackWa!, locale: waLocale, device });
     }
 
     document.addEventListener('click', onWaClick);

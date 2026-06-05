@@ -21,6 +21,17 @@ function formatSourceLabel(source: string) {
   return SOURCE_LABELS[source] ?? source;
 }
 
+const LOCALE_LABELS: Record<string, string> = { es: 'Español', en: 'English' };
+const DEVICE_LABELS: Record<string, string> = {
+  mobile: 'Móvil',
+  tablet: 'Tablet',
+  desktop: 'Escritorio',
+};
+
+function labelFrom(map: Record<string, string>, key: string) {
+  return map[key] ?? key;
+}
+
 function formatCount(value: number) {
   return COUNT_FORMATTER.format(value);
 }
@@ -260,6 +271,79 @@ async function AnalyticsContent({ plan, tenantId }: { plan: Plan; tenantId: stri
           ) : (
             <p className="text-sm leading-6 text-ink-600">
               Aún no hay datos de origen de tus vistas.
+            </p>
+          )}
+        </Card>
+
+        {stats && stats.campaignViews.length > 0 && (
+          <Card className="ipad:p-6">
+            <p className="mb-3 text-sm font-medium text-ink-700">Vistas por campaña</p>
+            <ul className="flex flex-col gap-3">
+              {stats.campaignViews.map((row) => {
+                const max = Math.max(...stats.campaignViews.map((item) => item.views), 1);
+                return (
+                  <li key={row.campaign} className="grid gap-1">
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="min-w-0 truncate font-medium">{row.campaign}</span>
+                      <span className="shrink-0 tabular-nums text-ink-500">
+                        {formatCount(row.views)}
+                      </span>
+                    </div>
+                    <div className="h-2 overflow-hidden rounded-full bg-ink-100">
+                      <div
+                        className="h-full rounded-full bg-coral-500"
+                        style={{ width: `${Math.max(8, (row.views / max) * 100)}%` }}
+                      />
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          </Card>
+        )}
+      </div>
+
+      <div className="grid gap-4 ipad-landscape:grid-cols-2">
+        <Card className="ipad:p-6">
+          <p className="mb-3 text-sm font-medium text-ink-700">Pedidos WhatsApp por idioma</p>
+          {stats && stats.whatsappByLocale.length > 0 ? (
+            <ul className="flex flex-col gap-2">
+              {stats.whatsappByLocale.map((row) => (
+                <li key={row.locale} className="flex items-center justify-between gap-3">
+                  <span className="min-w-0 truncate font-medium">
+                    {labelFrom(LOCALE_LABELS, row.locale)}
+                  </span>
+                  <span className="shrink-0 tabular-nums text-ink-500">
+                    {formatCount(row.count)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm leading-6 text-ink-600">
+              Aún no hay pedidos por WhatsApp esta semana.
+            </p>
+          )}
+        </Card>
+
+        <Card className="ipad:p-6">
+          <p className="mb-3 text-sm font-medium text-ink-700">Pedidos WhatsApp por dispositivo</p>
+          {stats && stats.whatsappByDevice.length > 0 ? (
+            <ul className="flex flex-col gap-2">
+              {stats.whatsappByDevice.map((row) => (
+                <li key={row.device} className="flex items-center justify-between gap-3">
+                  <span className="min-w-0 truncate font-medium">
+                    {labelFrom(DEVICE_LABELS, row.device)}
+                  </span>
+                  <span className="shrink-0 tabular-nums text-ink-500">
+                    {formatCount(row.count)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm leading-6 text-ink-600">
+              Aún no hay pedidos por WhatsApp esta semana.
             </p>
           )}
         </Card>
