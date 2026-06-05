@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { buildBrandThemeStyle, resolveBrandSurfaceColor } from '@/lib/brand-theme';
 import { buildPublicMenuGroups } from '@/lib/public-menu-groups';
+import { localizeMenuItems } from '@/lib/menu-i18n';
 import { menuService } from '@/server/services/menu.service';
 import { getPrisma } from '@/lib/db/prisma';
 import { PublicMenuLanguageSwitcher, PublicMenuPwaWrapper } from './public-menu-pwa-wrapper';
@@ -290,6 +291,11 @@ export default async function PublicMenuPage({ params }: Props) {
     localePromise,
   ]);
 
+  // Localize after the locale-agnostic menu cache so name/description follow the
+  // comensal's language, falling back to the tenant's default locale per field.
+  const viewLocale = locale === 'en' ? 'en' : 'es';
+  const localizedItems = localizeMenuItems(items, viewLocale, tenant.defaultLocale);
+
   return (
     <>
       <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="anonymous" />
@@ -298,9 +304,9 @@ export default async function PublicMenuPage({ params }: Props) {
         tenant={tenant}
         sections={sections}
         categories={categories}
-        items={items}
+        items={localizedItems}
         priceLocale={locale === 'en' ? 'en-US' : 'es-MX'}
-        locale={locale === 'en' ? 'en' : 'es'}
+        locale={viewLocale}
       />
     </>
   );

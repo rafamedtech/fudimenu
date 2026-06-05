@@ -32,19 +32,21 @@ import {
 import { upsertCategoryAction } from '@/server/actions/categories.actions';
 import { ApiError, toUserMessage } from '@/lib/api/errors';
 import { track } from '@/lib/analytics/events';
-import type { Category, MenuItem } from '@/types/domain';
+import type { Category, Locale, MenuItem } from '@/types/domain';
 
 interface Props {
   initial: MenuItem | null;
   categories: Category[];
   sectionId?: string | null;
   offlineConflictId?: number;
+  defaultLocale: Locale;
 }
 
 const DESCRIPTION_MAX_CHARS = 500;
 const FREE_ITEM_LIMIT = PLAN_CONFIG.free.limits.items ?? 20;
+const LOCALE_LABEL: Record<Locale, string> = { es: 'Español', en: 'Inglés' };
 
-export function ItemEditorForm({ initial, categories, sectionId, offlineConflictId }: Props) {
+export function ItemEditorForm({ initial, categories, sectionId, offlineConflictId, defaultLocale }: Props) {
   const locale = useLocale();
   const t = useTranslations('menu');
   const router = useRouter();
@@ -61,6 +63,8 @@ export function ItemEditorForm({ initial, categories, sectionId, offlineConflict
     (_: Category[], next: Category[]) => next,
     categories,
   );
+  const translationLocale: Locale = defaultLocale === 'es' ? 'en' : 'es';
+  const initialTranslation = initial?.translations?.find((t) => t.locale === translationLocale);
   const fallbackCategoryId = localCategories[0]?.id ?? null;
   const initialCategoryId =
     initial?.categoryId && localCategories.some((category) => category.id === initial.categoryId)
@@ -84,6 +88,13 @@ export function ItemEditorForm({ initial, categories, sectionId, offlineConflict
       imageUrl: initial?.imageUrl ?? null,
       isSpecialToday: initial?.isSpecialToday ?? false,
       specialPrice: initial?.specialPrice ?? null,
+      translations: [
+        {
+          locale: translationLocale,
+          name: initialTranslation?.name ?? '',
+          description: initialTranslation?.description ?? '',
+        },
+      ],
     },
   });
 
@@ -327,6 +338,12 @@ export function ItemEditorForm({ initial, categories, sectionId, offlineConflict
           register={register}
           charCount={charCount}
           isNearLimit={isNearDescriptionLimit}
+        />
+
+        <TranslationCard
+          register={register}
+          localeLabel={LOCALE_LABEL[translationLocale]}
+          localeCode={translationLocale.toUpperCase()}
         />
 
         <ItemEditorActions
@@ -629,6 +646,52 @@ function DescriptionField({
         </span>
       </div>
     </div>
+  );
+}
+
+function TranslationCard({
+  register,
+  localeLabel,
+  localeCode,
+}: {
+  register: UseFormRegister<ItemInput>;
+  localeLabel: string;
+  localeCode: string;
+}) {
+  return (
+    <Card className="space-y-3 border border-ink-200 bg-[var(--brand-surface)] shadow-sm">
+      <div>
+        <p className="font-bold text-ink-900">
+          Traducción ({localeCode})
+        </p>
+        <p className="text-xs text-ink-500">
+          Opcional. Se muestra a clientes en {localeLabel}. Si lo dejas vacío, se usa el texto
+          original.
+        </p>
+      </div>
+      <input type="hidden" {...register('translations.0.locale')} />
+      <Input
+        label={`Nombre en ${localeLabel}`}
+        placeholder="Ej: Al pastor tacos"
+        {...register('translations.0.name')}
+      />
+      <div>
+        <label
+          htmlFor="translation-description"
+          className="mb-1.5 block text-sm font-medium text-ink-700"
+        >
+          Descripción en {localeLabel}
+        </label>
+        <textarea
+          {...register('translations.0.description')}
+          id="translation-description"
+          rows={3}
+          maxLength={DESCRIPTION_MAX_CHARS}
+          placeholder="Traducción de la descripción"
+          className="w-full rounded-md border-[1.5px] border-ink-300 bg-[var(--brand-card)] p-4 text-base text-ink-900 outline-none placeholder:text-ink-500 focus-within:border-mostaza-500 focus-within:shadow-glow-mostaza"
+        />
+      </div>
+    </Card>
   );
 }
 

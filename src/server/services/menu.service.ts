@@ -2,7 +2,7 @@ import 'server-only';
 import { unstable_cache } from 'next/cache';
 import { getMenuRepository } from '@/server/repositories/get-repository';
 import type { MenuData, ImportResult } from '@/server/repositories/menu.repository';
-import type { MenuItem, MenuSection, Category, Tenant } from '@/types/domain';
+import type { ItemUpsertInput, MenuItem, MenuSection, Category, Tenant } from '@/types/domain';
 import type { SectionInput } from '@/lib/validators/section.schema';
 import type { CategoryInput } from '@/lib/validators/item.schema';
 import type { ImportItem } from '@/lib/validators/import.schema';
@@ -81,7 +81,7 @@ export const menuService = {
     return (await getMenuRepository()).restoreItem(tenantId, itemId);
   },
 
-  async upsertItem(tenantId: string, input: Partial<MenuItem>): Promise<MenuItem> {
+  async upsertItem(tenantId: string, input: ItemUpsertInput): Promise<MenuItem> {
     return (await getMenuRepository()).upsertItem(tenantId, input);
   },
 

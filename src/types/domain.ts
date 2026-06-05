@@ -61,6 +61,7 @@ export type MenuItem = {
   createdAt: string;
   updatedAt: string;
   deletedAt?: string | null;
+  translations?: ItemTranslation[];
 };
 
 export type ItemTranslation = {
@@ -68,6 +69,16 @@ export type ItemTranslation = {
   locale: Locale;
   name: string | null;
   description: string | null;
+};
+
+export type ItemTranslationInput = {
+  locale: Locale;
+  name?: string | null;
+  description?: string | null;
+};
+
+export type ItemUpsertInput = Partial<Omit<MenuItem, 'translations'>> & {
+  translations?: ItemTranslationInput[];
 };
 
 export type Membership = {

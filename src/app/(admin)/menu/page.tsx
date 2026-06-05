@@ -130,6 +130,7 @@ async function MenuList({
                 item={item}
                 categoryName={item.categoryId ? categoryNamesById.get(item.categoryId) : null}
                 href={`/menu/${item.id}`}
+                defaultLocale={tenant.defaultLocale}
               />
             </li>
           ))}

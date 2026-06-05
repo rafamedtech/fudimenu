@@ -16,7 +16,7 @@ interface Props {
 
 export default async function SectionDetailPage({ params }: Props) {
   const [{ id }, ctx] = await Promise.all([params, requireAuth()]);
-  const { sections, categories, items } = await menuService.getCachedMenuByTenantId(ctx.tenantId);
+  const { tenant, sections, categories, items } = await menuService.getCachedMenuByTenantId(ctx.tenantId);
 
   const section = sections.find((s) => s.id === id);
   if (!section) notFound();
@@ -72,7 +72,7 @@ export default async function SectionDetailPage({ params }: Props) {
             }
           />
         ) : (
-          <SectionCategoryList sectionId={section.id} groups={groups} />
+          <SectionCategoryList sectionId={section.id} groups={groups} defaultLocale={tenant.defaultLocale} />
         )}
         <AddItemFab sectionId={section.id} />
       </main>

@@ -1,5 +1,5 @@
 import 'server-only';
-import type { Category, MenuItem, MenuSection, Tenant } from '@/types/domain';
+import type { Category, ItemUpsertInput, MenuItem, MenuSection, Tenant } from '@/types/domain';
 import type { SectionInput } from '@/lib/validators/section.schema';
 import type { CategoryInput } from '@/lib/validators/item.schema';
 import type { ImportItem } from '@/lib/validators/import.schema';
@@ -29,7 +29,7 @@ export interface IMenuRepository {
   ): Promise<MenuItem>;
   softDeleteItem(tenantId: string, itemId: string): Promise<MenuItem>;
   restoreItem(tenantId: string, itemId: string): Promise<MenuItem>;
-  upsertItem(tenantId: string, input: Partial<MenuItem>): Promise<MenuItem>;
+  upsertItem(tenantId: string, input: ItemUpsertInput): Promise<MenuItem>;
   upsertSection(tenantId: string, input: SectionInput): Promise<MenuSection>;
   deleteSection(tenantId: string, sectionId: string): Promise<void>;
   reorderSections(tenantId: string, sectionIds: string[]): Promise<void>;

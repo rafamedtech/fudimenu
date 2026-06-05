@@ -2,7 +2,7 @@ import 'server-only';
 import { mockCategories, mockItems, mockSections, mockTenant } from '@/lib/mock/data';
 import { sanitizePlainText } from '@/lib/sanitize';
 import type { IMenuRepository, MenuData, ImportResult } from '@/server/repositories/menu.repository';
-import type { Category, MenuItem, MenuSection, Tenant } from '@/types/domain';
+import type { Category, ItemTranslation, ItemUpsertInput, MenuItem, MenuSection, Tenant } from '@/types/domain';
 import type { SectionInput } from '@/lib/validators/section.schema';
 import type { CategoryInput } from '@/lib/validators/item.schema';
 import type { ImportItem } from '@/lib/validators/import.schema';
@@ -20,7 +20,37 @@ function cloneCategory(category: Category): Category {
 }
 
 function cloneMenuItem(item: MenuItem): MenuItem {
-  return { ...item };
+  return {
+    ...item,
+    translations: item.translations?.map((translation) => ({ ...translation })),
+  };
+}
+
+/**
+ * Apply translation edits onto an item's translation list. Empty entries
+ * (name and description both blank) are dropped so reads fall back to the
+ * base locale — mirrors the soft-delete in the Prisma repository.
+ */
+function applyMockTranslations(
+  existing: ItemTranslation[] | undefined,
+  itemId: string,
+  edits: NonNullable<ItemUpsertInput['translations']>,
+): ItemTranslation[] {
+  const byLocale = new Map((existing ?? []).map((t) => [t.locale, { ...t, itemId }]));
+
+  for (const edit of edits) {
+    const name = sanitizePlainText(edit.name, 80);
+    const description = sanitizePlainText(edit.description, 500);
+
+    if (name === null && description === null) {
+      byLocale.delete(edit.locale);
+      continue;
+    }
+
+    byLocale.set(edit.locale, { itemId, locale: edit.locale, name, description });
+  }
+
+  return [...byLocale.values()];
 }
 
 function isActive(item: MenuItem) {
@@ -125,9 +155,10 @@ export class MockMenuRepository implements IMenuRepository {
     return cloneMenuItem(this.items[idx]);
   }
 
-  async upsertItem(tenantId: string, input: Partial<MenuItem>): Promise<MenuItem> {
+  async upsertItem(tenantId: string, input: ItemUpsertInput): Promise<MenuItem> {
+    const { translations: _translations, ...rest } = input;
     const sanitizedInput = {
-      ...input,
+      ...rest,
       name: sanitizePlainText(input.name, 80) ?? 'Sin nombre',
       description: sanitizePlainText(input.description, 500),
     };
@@ -141,6 +172,9 @@ export class MockMenuRepository implements IMenuRepository {
           ...this.items[idx],
           ...sanitizedInput,
           tenantId,
+          translations: input.translations
+            ? applyMockTranslations(this.items[idx].translations, input.id, input.translations)
+            : this.items[idx].translations,
           updatedAt: new Date().toISOString(),
         };
         return cloneMenuItem(this.items[idx]);
@@ -148,8 +182,9 @@ export class MockMenuRepository implements IMenuRepository {
     }
 
     const now = new Date().toISOString();
+    const id = `itm_${crypto.randomUUID().slice(0, 8)}`;
     const created: MenuItem = {
-      id: `itm_${crypto.randomUUID().slice(0, 8)}`,
+      id,
       tenantId,
       categoryId: sanitizedInput.categoryId ?? null,
       name: sanitizedInput.name,
@@ -163,6 +198,9 @@ export class MockMenuRepository implements IMenuRepository {
       sortOrder: input.sortOrder ?? 999,
       createdAt: now,
       updatedAt: now,
+      translations: input.translations
+        ? applyMockTranslations(undefined, id, input.translations)
+        : undefined,
     };
     this.items.push(created);
     return cloneMenuItem(created);

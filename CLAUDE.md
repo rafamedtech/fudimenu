@@ -128,6 +128,15 @@ Default to surfacing uncertainty, not hiding it.
 - global-setup.ts falla si DATABASE_URL no contiene "localhost", "127.0.0.1", "local", "test" o "ci"
 - Usar siempre un proyecto Supabase dedicado para tests, nunca producción/staging
 
+### Correr `pnpm test:e2e` con Supabase local
+- Requiere `supabase start` corriendo (DB en `127.0.0.1:54322`, user/pass `postgres`/`postgres`, db `postgres`).
+- Crear `.env.test.local` (gitignored vía `.env*.local`) — `playwright.config.ts` lo carga con `override:true`, así gana sobre shell/`.env` y satisface el guard de global-setup:
+  - `DATABASE_URL` y `DIRECT_URL` → `postgresql://postgres:postgres@127.0.0.1:54322/postgres?schema=public`
+  - `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` → del stack local (`supabase status -o env`); en E2E el auth admin es cookie+Prisma (`E2E_TEST_AUTH`), las keys solo evitan que el client crashee al iniciar.
+- Cada corrida hace `db:push --force-reset` → BORRA y reseed la DB local de Supabase.
+- Prisma 7 bloquea `--force-reset` solo cuando detecta un agente AI (Claude Code); desde tu terminal corre normal. Para correrlo vía AI: env `PRISMA_USER_CONSENT_FOR_DANGEROUS_AI_ACTION` = texto exacto del consentimiento del usuario.
+- Alternativa sin stack Supabase: `pnpm test:e2e:local` (Postgres efímero en Docker, puerto `55432`).
+
 ## Bundle baseline (2026-05-11)
 - `/m/[slug]` First Load JS: **115 kB gz** (de 138 kB; -23 kB sprint perf)
 - `/menu` First Load JS: 226 kB gz
