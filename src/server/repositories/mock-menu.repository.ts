@@ -1,6 +1,7 @@
 import 'server-only';
 import { mockCategories, mockItems, mockSections, mockTenant } from '@/lib/mock/data';
 import { sanitizePlainText } from '@/lib/sanitize';
+import { normalizeAllergenTags, normalizeDietaryTags } from '@/lib/item-attributes';
 import type { IMenuRepository, MenuData, ImportResult } from '@/server/repositories/menu.repository';
 import type { Category, ItemTranslation, ItemUpsertInput, MenuItem, MenuSection, Tenant } from '@/types/domain';
 import type { SectionInput } from '@/lib/validators/section.schema';
@@ -22,6 +23,8 @@ function cloneCategory(category: Category): Category {
 function cloneMenuItem(item: MenuItem): MenuItem {
   return {
     ...item,
+    dietaryTags: [...(item.dietaryTags ?? [])],
+    allergenTags: [...(item.allergenTags ?? [])],
     translations: item.translations?.map((translation) => ({ ...translation })),
   };
 }
@@ -161,6 +164,14 @@ export class MockMenuRepository implements IMenuRepository {
       ...rest,
       name: sanitizePlainText(input.name, 80) ?? 'Sin nombre',
       description: sanitizePlainText(input.description, 500),
+      // Only normalize when the caller actually sent the field, so partial
+      // updates don't wipe existing tags (mirrors the Prisma repo).
+      ...('dietaryTags' in input
+        ? { dietaryTags: normalizeDietaryTags(input.dietaryTags ?? []) }
+        : {}),
+      ...('allergenTags' in input
+        ? { allergenTags: normalizeAllergenTags(input.allergenTags ?? []) }
+        : {}),
     };
 
     if (input.id) {
@@ -195,6 +206,8 @@ export class MockMenuRepository implements IMenuRepository {
       currency: input.currency ?? 'MXN',
       imageUrl: input.imageUrl ?? null,
       isAvailable: input.isAvailable ?? true,
+      dietaryTags: normalizeDietaryTags(input.dietaryTags ?? []),
+      allergenTags: normalizeAllergenTags(input.allergenTags ?? []),
       sortOrder: input.sortOrder ?? 999,
       createdAt: now,
       updatedAt: now,

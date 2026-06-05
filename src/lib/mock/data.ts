@@ -271,6 +271,18 @@ const itemRows = [
   ['itm_38', 'cat_7', 'Atole de nuez', null, 9000, 2],
 ] as const;
 
+// A few demonstrative public attributes so the mock public menu renders badges.
+const mockDietaryTags: Record<string, string[]> = {
+  itm_27: ['vegetarian', 'gluten_free'],
+  itm_31: ['vegan', 'vegetarian'],
+  itm_38: ['vegetarian'],
+};
+const mockAllergenTags: Record<string, string[]> = {
+  itm_26: ['eggs'],
+  itm_27: ['dairy', 'nuts'],
+  itm_38: ['nuts', 'dairy'],
+};
+
 export const mockItems: MenuItem[] = itemRows.map(
   ([id, categoryId, name, description, priceCents, sortOrder]) => ({
     id,
@@ -282,6 +294,8 @@ export const mockItems: MenuItem[] = itemRows.map(
     currency: 'MXN',
     imageUrl: null,
     isAvailable: true,
+    dietaryTags: mockDietaryTags[id] ?? [],
+    allergenTags: mockAllergenTags[id] ?? [],
     sortOrder,
     createdAt: now,
     updatedAt: now,

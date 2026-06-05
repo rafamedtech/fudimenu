@@ -86,6 +86,8 @@ export type MenuItemCountAggregateOutputType = {
   currency: number
   imageUrl: number
   isAvailable: number
+  dietaryTags: number
+  allergenTags: number
   sortOrder: number
   createdAt: number
   updatedAt: number
@@ -154,6 +156,8 @@ export type MenuItemCountAggregateInputType = {
   currency?: true
   imageUrl?: true
   isAvailable?: true
+  dietaryTags?: true
+  allergenTags?: true
   sortOrder?: true
   createdAt?: true
   updatedAt?: true
@@ -259,6 +263,8 @@ export type MenuItemGroupByOutputType = {
   currency: string
   imageUrl: string | null
   isAvailable: boolean
+  dietaryTags: string[]
+  allergenTags: string[]
   sortOrder: number
   createdAt: Date
   updatedAt: Date
@@ -300,6 +306,8 @@ export type MenuItemWhereInput = {
   currency?: Prisma.StringFilter<"MenuItem"> | string
   imageUrl?: Prisma.StringNullableFilter<"MenuItem"> | string | null
   isAvailable?: Prisma.BoolFilter<"MenuItem"> | boolean
+  dietaryTags?: Prisma.StringNullableListFilter<"MenuItem">
+  allergenTags?: Prisma.StringNullableListFilter<"MenuItem">
   sortOrder?: Prisma.IntFilter<"MenuItem"> | number
   createdAt?: Prisma.DateTimeFilter<"MenuItem"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"MenuItem"> | Date | string
@@ -322,6 +330,8 @@ export type MenuItemOrderByWithRelationInput = {
   currency?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   isAvailable?: Prisma.SortOrder
+  dietaryTags?: Prisma.SortOrder
+  allergenTags?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -347,6 +357,8 @@ export type MenuItemWhereUniqueInput = Prisma.AtLeast<{
   currency?: Prisma.StringFilter<"MenuItem"> | string
   imageUrl?: Prisma.StringNullableFilter<"MenuItem"> | string | null
   isAvailable?: Prisma.BoolFilter<"MenuItem"> | boolean
+  dietaryTags?: Prisma.StringNullableListFilter<"MenuItem">
+  allergenTags?: Prisma.StringNullableListFilter<"MenuItem">
   sortOrder?: Prisma.IntFilter<"MenuItem"> | number
   createdAt?: Prisma.DateTimeFilter<"MenuItem"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"MenuItem"> | Date | string
@@ -369,6 +381,8 @@ export type MenuItemOrderByWithAggregationInput = {
   currency?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   isAvailable?: Prisma.SortOrder
+  dietaryTags?: Prisma.SortOrder
+  allergenTags?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -395,6 +409,8 @@ export type MenuItemScalarWhereWithAggregatesInput = {
   currency?: Prisma.StringWithAggregatesFilter<"MenuItem"> | string
   imageUrl?: Prisma.StringNullableWithAggregatesFilter<"MenuItem"> | string | null
   isAvailable?: Prisma.BoolWithAggregatesFilter<"MenuItem"> | boolean
+  dietaryTags?: Prisma.StringNullableListFilter<"MenuItem">
+  allergenTags?: Prisma.StringNullableListFilter<"MenuItem">
   sortOrder?: Prisma.IntWithAggregatesFilter<"MenuItem"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"MenuItem"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"MenuItem"> | Date | string
@@ -411,6 +427,8 @@ export type MenuItemCreateInput = {
   currency?: string
   imageUrl?: string | null
   isAvailable?: boolean
+  dietaryTags?: Prisma.MenuItemCreatedietaryTagsInput | string[]
+  allergenTags?: Prisma.MenuItemCreateallergenTagsInput | string[]
   sortOrder?: number
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -433,6 +451,8 @@ export type MenuItemUncheckedCreateInput = {
   currency?: string
   imageUrl?: string | null
   isAvailable?: boolean
+  dietaryTags?: Prisma.MenuItemCreatedietaryTagsInput | string[]
+  allergenTags?: Prisma.MenuItemCreateallergenTagsInput | string[]
   sortOrder?: number
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -451,6 +471,8 @@ export type MenuItemUpdateInput = {
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dietaryTags?: Prisma.MenuItemUpdatedietaryTagsInput | string[]
+  allergenTags?: Prisma.MenuItemUpdateallergenTagsInput | string[]
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -473,6 +495,8 @@ export type MenuItemUncheckedUpdateInput = {
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dietaryTags?: Prisma.MenuItemUpdatedietaryTagsInput | string[]
+  allergenTags?: Prisma.MenuItemUpdateallergenTagsInput | string[]
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -493,6 +517,8 @@ export type MenuItemCreateManyInput = {
   currency?: string
   imageUrl?: string | null
   isAvailable?: boolean
+  dietaryTags?: Prisma.MenuItemCreatedietaryTagsInput | string[]
+  allergenTags?: Prisma.MenuItemCreateallergenTagsInput | string[]
   sortOrder?: number
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -509,6 +535,8 @@ export type MenuItemUpdateManyMutationInput = {
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dietaryTags?: Prisma.MenuItemUpdatedietaryTagsInput | string[]
+  allergenTags?: Prisma.MenuItemUpdateallergenTagsInput | string[]
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -527,6 +555,8 @@ export type MenuItemUncheckedUpdateManyInput = {
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dietaryTags?: Prisma.MenuItemUpdatedietaryTagsInput | string[]
+  allergenTags?: Prisma.MenuItemUpdateallergenTagsInput | string[]
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -543,6 +573,14 @@ export type MenuItemOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type StringNullableListFilter<$PrismaModel = never> = {
+  equals?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel> | null
+  has?: string | Prisma.StringFieldRefInput<$PrismaModel> | null
+  hasEvery?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
+  hasSome?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
+  isEmpty?: boolean
+}
+
 export type MenuItemCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   tenantId?: Prisma.SortOrder
@@ -555,6 +593,8 @@ export type MenuItemCountOrderByAggregateInput = {
   currency?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   isAvailable?: Prisma.SortOrder
+  dietaryTags?: Prisma.SortOrder
+  allergenTags?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -698,12 +738,30 @@ export type MenuItemUncheckedUpdateManyWithoutCategoryNestedInput = {
   deleteMany?: Prisma.MenuItemScalarWhereInput | Prisma.MenuItemScalarWhereInput[]
 }
 
+export type MenuItemCreatedietaryTagsInput = {
+  set: string[]
+}
+
+export type MenuItemCreateallergenTagsInput = {
+  set: string[]
+}
+
 export type NullableIntFieldUpdateOperationsInput = {
   set?: number | null
   increment?: number
   decrement?: number
   multiply?: number
   divide?: number
+}
+
+export type MenuItemUpdatedietaryTagsInput = {
+  set?: string[]
+  push?: string | string[]
+}
+
+export type MenuItemUpdateallergenTagsInput = {
+  set?: string[]
+  push?: string | string[]
 }
 
 export type MenuItemCreateNestedOneWithoutTranslationsInput = {
@@ -744,6 +802,8 @@ export type MenuItemCreateWithoutTenantInput = {
   currency?: string
   imageUrl?: string | null
   isAvailable?: boolean
+  dietaryTags?: Prisma.MenuItemCreatedietaryTagsInput | string[]
+  allergenTags?: Prisma.MenuItemCreateallergenTagsInput | string[]
   sortOrder?: number
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -764,6 +824,8 @@ export type MenuItemUncheckedCreateWithoutTenantInput = {
   currency?: string
   imageUrl?: string | null
   isAvailable?: boolean
+  dietaryTags?: Prisma.MenuItemCreatedietaryTagsInput | string[]
+  allergenTags?: Prisma.MenuItemCreateallergenTagsInput | string[]
   sortOrder?: number
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -813,6 +875,8 @@ export type MenuItemScalarWhereInput = {
   currency?: Prisma.StringFilter<"MenuItem"> | string
   imageUrl?: Prisma.StringNullableFilter<"MenuItem"> | string | null
   isAvailable?: Prisma.BoolFilter<"MenuItem"> | boolean
+  dietaryTags?: Prisma.StringNullableListFilter<"MenuItem">
+  allergenTags?: Prisma.StringNullableListFilter<"MenuItem">
   sortOrder?: Prisma.IntFilter<"MenuItem"> | number
   createdAt?: Prisma.DateTimeFilter<"MenuItem"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"MenuItem"> | Date | string
@@ -829,6 +893,8 @@ export type MenuItemCreateWithoutCategoryInput = {
   currency?: string
   imageUrl?: string | null
   isAvailable?: boolean
+  dietaryTags?: Prisma.MenuItemCreatedietaryTagsInput | string[]
+  allergenTags?: Prisma.MenuItemCreateallergenTagsInput | string[]
   sortOrder?: number
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -849,6 +915,8 @@ export type MenuItemUncheckedCreateWithoutCategoryInput = {
   currency?: string
   imageUrl?: string | null
   isAvailable?: boolean
+  dietaryTags?: Prisma.MenuItemCreatedietaryTagsInput | string[]
+  allergenTags?: Prisma.MenuItemCreateallergenTagsInput | string[]
   sortOrder?: number
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -893,6 +961,8 @@ export type MenuItemCreateWithoutTranslationsInput = {
   currency?: string
   imageUrl?: string | null
   isAvailable?: boolean
+  dietaryTags?: Prisma.MenuItemCreatedietaryTagsInput | string[]
+  allergenTags?: Prisma.MenuItemCreateallergenTagsInput | string[]
   sortOrder?: number
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -914,6 +984,8 @@ export type MenuItemUncheckedCreateWithoutTranslationsInput = {
   currency?: string
   imageUrl?: string | null
   isAvailable?: boolean
+  dietaryTags?: Prisma.MenuItemCreatedietaryTagsInput | string[]
+  allergenTags?: Prisma.MenuItemCreateallergenTagsInput | string[]
   sortOrder?: number
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -947,6 +1019,8 @@ export type MenuItemUpdateWithoutTranslationsInput = {
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dietaryTags?: Prisma.MenuItemUpdatedietaryTagsInput | string[]
+  allergenTags?: Prisma.MenuItemUpdateallergenTagsInput | string[]
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -968,6 +1042,8 @@ export type MenuItemUncheckedUpdateWithoutTranslationsInput = {
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dietaryTags?: Prisma.MenuItemUpdatedietaryTagsInput | string[]
+  allergenTags?: Prisma.MenuItemUpdateallergenTagsInput | string[]
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -985,6 +1061,8 @@ export type MenuItemCreateWithoutViewsInput = {
   currency?: string
   imageUrl?: string | null
   isAvailable?: boolean
+  dietaryTags?: Prisma.MenuItemCreatedietaryTagsInput | string[]
+  allergenTags?: Prisma.MenuItemCreateallergenTagsInput | string[]
   sortOrder?: number
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1006,6 +1084,8 @@ export type MenuItemUncheckedCreateWithoutViewsInput = {
   currency?: string
   imageUrl?: string | null
   isAvailable?: boolean
+  dietaryTags?: Prisma.MenuItemCreatedietaryTagsInput | string[]
+  allergenTags?: Prisma.MenuItemCreateallergenTagsInput | string[]
   sortOrder?: number
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1039,6 +1119,8 @@ export type MenuItemUpdateWithoutViewsInput = {
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dietaryTags?: Prisma.MenuItemUpdatedietaryTagsInput | string[]
+  allergenTags?: Prisma.MenuItemUpdateallergenTagsInput | string[]
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1060,6 +1142,8 @@ export type MenuItemUncheckedUpdateWithoutViewsInput = {
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dietaryTags?: Prisma.MenuItemUpdatedietaryTagsInput | string[]
+  allergenTags?: Prisma.MenuItemUpdateallergenTagsInput | string[]
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1078,6 +1162,8 @@ export type MenuItemCreateManyTenantInput = {
   currency?: string
   imageUrl?: string | null
   isAvailable?: boolean
+  dietaryTags?: Prisma.MenuItemCreatedietaryTagsInput | string[]
+  allergenTags?: Prisma.MenuItemCreateallergenTagsInput | string[]
   sortOrder?: number
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1094,6 +1180,8 @@ export type MenuItemUpdateWithoutTenantInput = {
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dietaryTags?: Prisma.MenuItemUpdatedietaryTagsInput | string[]
+  allergenTags?: Prisma.MenuItemUpdateallergenTagsInput | string[]
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1114,6 +1202,8 @@ export type MenuItemUncheckedUpdateWithoutTenantInput = {
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dietaryTags?: Prisma.MenuItemUpdatedietaryTagsInput | string[]
+  allergenTags?: Prisma.MenuItemUpdateallergenTagsInput | string[]
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1133,6 +1223,8 @@ export type MenuItemUncheckedUpdateManyWithoutTenantInput = {
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dietaryTags?: Prisma.MenuItemUpdatedietaryTagsInput | string[]
+  allergenTags?: Prisma.MenuItemUpdateallergenTagsInput | string[]
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1150,6 +1242,8 @@ export type MenuItemCreateManyCategoryInput = {
   currency?: string
   imageUrl?: string | null
   isAvailable?: boolean
+  dietaryTags?: Prisma.MenuItemCreatedietaryTagsInput | string[]
+  allergenTags?: Prisma.MenuItemCreateallergenTagsInput | string[]
   sortOrder?: number
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1166,6 +1260,8 @@ export type MenuItemUpdateWithoutCategoryInput = {
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dietaryTags?: Prisma.MenuItemUpdatedietaryTagsInput | string[]
+  allergenTags?: Prisma.MenuItemUpdateallergenTagsInput | string[]
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1186,6 +1282,8 @@ export type MenuItemUncheckedUpdateWithoutCategoryInput = {
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dietaryTags?: Prisma.MenuItemUpdatedietaryTagsInput | string[]
+  allergenTags?: Prisma.MenuItemUpdateallergenTagsInput | string[]
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1205,6 +1303,8 @@ export type MenuItemUncheckedUpdateManyWithoutCategoryInput = {
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dietaryTags?: Prisma.MenuItemUpdatedietaryTagsInput | string[]
+  allergenTags?: Prisma.MenuItemUpdateallergenTagsInput | string[]
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1263,6 +1363,8 @@ export type MenuItemSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   currency?: boolean
   imageUrl?: boolean
   isAvailable?: boolean
+  dietaryTags?: boolean
+  allergenTags?: boolean
   sortOrder?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1286,6 +1388,8 @@ export type MenuItemSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   currency?: boolean
   imageUrl?: boolean
   isAvailable?: boolean
+  dietaryTags?: boolean
+  allergenTags?: boolean
   sortOrder?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1306,6 +1410,8 @@ export type MenuItemSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   currency?: boolean
   imageUrl?: boolean
   isAvailable?: boolean
+  dietaryTags?: boolean
+  allergenTags?: boolean
   sortOrder?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1326,13 +1432,15 @@ export type MenuItemSelectScalar = {
   currency?: boolean
   imageUrl?: boolean
   isAvailable?: boolean
+  dietaryTags?: boolean
+  allergenTags?: boolean
   sortOrder?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   deletedAt?: boolean
 }
 
-export type MenuItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "categoryId" | "name" | "description" | "priceCents" | "isSpecialToday" | "specialPrice" | "currency" | "imageUrl" | "isAvailable" | "sortOrder" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["menuItem"]>
+export type MenuItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "categoryId" | "name" | "description" | "priceCents" | "isSpecialToday" | "specialPrice" | "currency" | "imageUrl" | "isAvailable" | "dietaryTags" | "allergenTags" | "sortOrder" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["menuItem"]>
 export type MenuItemInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   category?: boolean | Prisma.MenuItem$categoryArgs<ExtArgs>
@@ -1369,6 +1477,8 @@ export type $MenuItemPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     currency: string
     imageUrl: string | null
     isAvailable: boolean
+    dietaryTags: string[]
+    allergenTags: string[]
     sortOrder: number
     createdAt: Date
     updatedAt: Date
@@ -1811,6 +1921,8 @@ export interface MenuItemFieldRefs {
   readonly currency: Prisma.FieldRef<"MenuItem", 'String'>
   readonly imageUrl: Prisma.FieldRef<"MenuItem", 'String'>
   readonly isAvailable: Prisma.FieldRef<"MenuItem", 'Boolean'>
+  readonly dietaryTags: Prisma.FieldRef<"MenuItem", 'String[]'>
+  readonly allergenTags: Prisma.FieldRef<"MenuItem", 'String[]'>
   readonly sortOrder: Prisma.FieldRef<"MenuItem", 'Int'>
   readonly createdAt: Prisma.FieldRef<"MenuItem", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"MenuItem", 'DateTime'>

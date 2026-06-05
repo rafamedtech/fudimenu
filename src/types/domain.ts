@@ -57,6 +57,8 @@ export type MenuItem = {
   currency: string;
   imageUrl: string | null;
   isAvailable: boolean;
+  dietaryTags: string[];
+  allergenTags: string[];
   sortOrder: number;
   createdAt: string;
   updatedAt: string;

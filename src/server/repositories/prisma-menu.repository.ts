@@ -1,6 +1,7 @@
 import 'server-only';
 import { getPrisma } from '@/lib/db/prisma';
 import { sanitizePlainText } from '@/lib/sanitize';
+import { normalizeAllergenTags, normalizeDietaryTags } from '@/lib/item-attributes';
 import type { MenuData, IMenuRepository, ImportResult } from '@/server/repositories/menu.repository';
 import type { Category, ItemTranslation, ItemUpsertInput, MenuItem, MenuSection, Tenant } from '@/types/domain';
 import type { SectionInput } from '@/lib/validators/section.schema';
@@ -61,6 +62,8 @@ type MenuItemRow = {
   currency: string;
   imageUrl: string | null;
   isAvailable: boolean;
+  dietaryTags: string[];
+  allergenTags: string[];
   sortOrder: number;
   createdAt: Date;
   updatedAt: Date;
@@ -136,6 +139,8 @@ function mapMenuItem(row: MenuItemRow): MenuItem {
     currency: row.currency,
     imageUrl: row.imageUrl,
     isAvailable: row.isAvailable,
+    dietaryTags: row.dietaryTags ?? [],
+    allergenTags: row.allergenTags ?? [],
     sortOrder: row.sortOrder,
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
@@ -279,6 +284,8 @@ export class PrismaMenuRepository implements IMenuRepository {
       currency: string;
       imageUrl: string | null;
       isAvailable?: boolean;
+      dietaryTags?: string[];
+      allergenTags?: string[];
       sortOrder: number;
     } = {
       categoryId: input.categoryId ?? null,
@@ -292,6 +299,16 @@ export class PrismaMenuRepository implements IMenuRepository {
 
     if (!input.id || 'isAvailable' in input) {
       payload.isAvailable = input.isAvailable ?? true;
+    }
+
+    // Normalize defensively at the persistence boundary so the DB only ever
+    // holds allowlisted values, regardless of caller.
+    if (!input.id || 'dietaryTags' in input) {
+      payload.dietaryTags = normalizeDietaryTags(input.dietaryTags ?? []);
+    }
+
+    if (!input.id || 'allergenTags' in input) {
+      payload.allergenTags = normalizeAllergenTags(input.allergenTags ?? []);
     }
 
     if (!input.id || 'isSpecialToday' in input) {
