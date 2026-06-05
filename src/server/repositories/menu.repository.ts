@@ -2,12 +2,19 @@ import 'server-only';
 import type { Category, MenuItem, MenuSection, Tenant } from '@/types/domain';
 import type { SectionInput } from '@/lib/validators/section.schema';
 import type { CategoryInput } from '@/lib/validators/item.schema';
+import type { ImportItem } from '@/lib/validators/import.schema';
 
 export type MenuData = {
   tenant: Tenant;
   sections: MenuSection[];
   categories: Category[];
   items: MenuItem[];
+};
+
+export type ImportResult = {
+  itemsCreated: number;
+  categoriesCreated: number;
+  sectionsCreated: number;
 };
 
 export interface IMenuRepository {
@@ -29,4 +36,5 @@ export interface IMenuRepository {
   upsertCategory(tenantId: string, input: CategoryInput): Promise<Category>;
   deleteCategory(tenantId: string, categoryId: string): Promise<void>;
   reorderCategories(tenantId: string, sectionId: string | null, categoryIds: string[]): Promise<void>;
+  importMenu(tenantId: string, items: ImportItem[]): Promise<ImportResult>;
 }

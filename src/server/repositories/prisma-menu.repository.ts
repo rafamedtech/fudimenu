@@ -1,10 +1,11 @@
 import 'server-only';
 import { getPrisma } from '@/lib/db/prisma';
 import { sanitizePlainText } from '@/lib/sanitize';
-import type { MenuData, IMenuRepository } from '@/server/repositories/menu.repository';
+import type { MenuData, IMenuRepository, ImportResult } from '@/server/repositories/menu.repository';
 import type { Category, MenuItem, MenuSection, Tenant } from '@/types/domain';
 import type { SectionInput } from '@/lib/validators/section.schema';
 import type { CategoryInput } from '@/lib/validators/item.schema';
+import type { ImportItem } from '@/lib/validators/import.schema';
 
 type TenantRow = {
   id: string;
@@ -434,5 +435,88 @@ export class PrismaMenuRepository implements IMenuRepository {
         }),
       ),
     );
+  }
+
+  async importMenu(tenantId: string, items: ImportItem[]): Promise<ImportResult> {
+    const prisma = getPrisma();
+
+    // Sanitize names up front so dedup matches already-stored (sanitized) rows.
+    const rows = items.map((item) => ({
+      name: sanitizePlainText(item.name, 80) ?? 'Sin nombre',
+      description: sanitizePlainText(item.description, 500),
+      priceCents: item.priceCents,
+      categoryName: sanitizePlainText(item.categoryName, 40),
+      sectionName: sanitizePlainText(item.sectionName, 40),
+    }));
+
+    return prisma.$transaction(async (tx) => {
+      const [existingSections, existingCategories, maxItem] = await Promise.all([
+        tx.menuSection.findMany({
+          where: { tenantId, deletedAt: null },
+          select: { id: true, name: true },
+        }),
+        tx.category.findMany({
+          where: { tenantId, deletedAt: null },
+          select: { id: true, name: true },
+        }),
+        tx.menuItem.findMany({
+          where: { tenantId, deletedAt: null },
+          orderBy: { sortOrder: 'desc' },
+          take: 1,
+          select: { sortOrder: true },
+        }),
+      ]);
+
+      const sectionIdByName = new Map(existingSections.map((s) => [s.name, s.id]));
+      const categoryIdByName = new Map(existingCategories.map((c) => [c.name, c.id]));
+
+      let sectionsCreated = 0;
+      let categoriesCreated = 0;
+
+      // Create missing sections (preserve first-seen order).
+      for (const row of rows) {
+        if (!row.sectionName || sectionIdByName.has(row.sectionName)) continue;
+        const created = await tx.menuSection.create({
+          data: { tenantId, name: row.sectionName, sortOrder: existingSections.length + sectionsCreated },
+        });
+        sectionIdByName.set(row.sectionName, created.id);
+        sectionsCreated++;
+      }
+
+      // Create missing categories, linking to the section of their first occurrence.
+      for (const row of rows) {
+        if (!row.categoryName || categoryIdByName.has(row.categoryName)) continue;
+        const sectionId = row.sectionName ? sectionIdByName.get(row.sectionName) ?? null : null;
+        const created = await tx.category.create({
+          data: {
+            tenantId,
+            name: row.categoryName,
+            sectionId,
+            sortOrder: existingCategories.length + categoriesCreated,
+          },
+        });
+        categoryIdByName.set(row.categoryName, created.id);
+        categoriesCreated++;
+      }
+
+      const baseSortOrder = (maxItem[0]?.sortOrder ?? -1) + 1;
+      const created = await tx.menuItem.createMany({
+        data: rows.map((row, index) => ({
+          tenantId,
+          categoryId: row.categoryName ? categoryIdByName.get(row.categoryName) ?? null : null,
+          name: row.name,
+          description: row.description,
+          priceCents: row.priceCents,
+          currency: 'MXN',
+          sortOrder: baseSortOrder + index,
+        })),
+      });
+
+      return {
+        itemsCreated: created.count,
+        categoriesCreated,
+        sectionsCreated,
+      };
+    });
   }
 }

@@ -1,10 +1,11 @@
 import 'server-only';
 import { mockCategories, mockItems, mockSections, mockTenant } from '@/lib/mock/data';
 import { sanitizePlainText } from '@/lib/sanitize';
-import type { IMenuRepository, MenuData } from '@/server/repositories/menu.repository';
+import type { IMenuRepository, MenuData, ImportResult } from '@/server/repositories/menu.repository';
 import type { Category, MenuItem, MenuSection, Tenant } from '@/types/domain';
 import type { SectionInput } from '@/lib/validators/section.schema';
 import type { CategoryInput } from '@/lib/validators/item.schema';
+import type { ImportItem } from '@/lib/validators/import.schema';
 
 function cloneTenant(tenant: Tenant): Tenant {
   return { ...tenant };
@@ -284,5 +285,69 @@ export class MockMenuRepository implements IMenuRepository {
       );
       if (idx >= 0) this.categories[idx] = { ...this.categories[idx], sortOrder: index };
     });
+  }
+
+  async importMenu(tenantId: string, items: ImportItem[]): Promise<ImportResult> {
+    const rows = items.map((item) => ({
+      name: sanitizePlainText(item.name, 80) ?? 'Sin nombre',
+      description: sanitizePlainText(item.description, 500),
+      priceCents: item.priceCents,
+      categoryName: sanitizePlainText(item.categoryName, 40),
+      sectionName: sanitizePlainText(item.sectionName, 40),
+    }));
+
+    const sectionIdByName = new Map(
+      this.sections.filter((s) => s.tenantId === tenantId && !s.deletedAt).map((s) => [s.name, s.id]),
+    );
+    const categoryIdByName = new Map(
+      this.categories.filter((c) => c.tenantId === tenantId).map((c) => [c.name, c.id]),
+    );
+
+    let sectionsCreated = 0;
+    let categoriesCreated = 0;
+
+    for (const row of rows) {
+      if (!row.sectionName || sectionIdByName.has(row.sectionName)) continue;
+      const created = await this.upsertSection(tenantId, {
+        name: row.sectionName,
+        accentColor: '#FFF8E7',
+        sortOrder: sectionIdByName.size,
+        isVisible: true,
+      });
+      sectionIdByName.set(row.sectionName, created.id);
+      sectionsCreated++;
+    }
+
+    for (const row of rows) {
+      if (!row.categoryName || categoryIdByName.has(row.categoryName)) continue;
+      const sectionId = row.sectionName ? sectionIdByName.get(row.sectionName) ?? null : null;
+      const created = await this.upsertCategory(tenantId, {
+        name: row.categoryName,
+        sectionId,
+        sortOrder: categoryIdByName.size,
+        isVisible: true,
+      });
+      categoryIdByName.set(row.categoryName, created.id);
+      categoriesCreated++;
+    }
+
+    const maxSortOrder = this.items
+      .filter((item) => item.tenantId === tenantId && isActive(item))
+      .reduce((max, item) => Math.max(max, item.sortOrder), -1);
+
+    let itemsCreated = 0;
+    for (const [index, row] of rows.entries()) {
+      await this.upsertItem(tenantId, {
+        categoryId: row.categoryName ? categoryIdByName.get(row.categoryName) ?? null : null,
+        name: row.name,
+        description: row.description,
+        priceCents: row.priceCents,
+        currency: 'MXN',
+        sortOrder: maxSortOrder + 1 + index,
+      });
+      itemsCreated++;
+    }
+
+    return { itemsCreated, categoriesCreated, sectionsCreated };
   }
 }
