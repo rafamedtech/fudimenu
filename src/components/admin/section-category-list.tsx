@@ -25,7 +25,8 @@ import { StockToggle } from '@/components/admin/stock-toggle';
 import { Button } from '@/components/ui/button';
 import { reorderCategoriesAction } from '@/server/actions/categories.actions';
 import { formatPrice } from '@/lib/utils';
-import type { Category, MenuItem } from '@/types/domain';
+import { TranslationStatusBadge } from '@/components/menu/translation-status-badge';
+import type { Category, Locale, MenuItem } from '@/types/domain';
 
 export type SectionCategoryGroup = {
   category: Category;
@@ -35,9 +36,11 @@ export type SectionCategoryGroup = {
 export function SectionCategoryList({
   sectionId,
   groups,
+  defaultLocale,
 }: {
   sectionId: string;
   groups: SectionCategoryGroup[];
+  defaultLocale: Locale;
 }) {
   const [items, setItems] = useReducer((_: SectionCategoryGroup[], next: SectionCategoryGroup[]) => next, groups);
   const [reorderMode, setReorderMode] = useState(false);
@@ -95,6 +98,7 @@ export function SectionCategoryList({
               sectionId={sectionId}
               group={group}
               reorderMode={reorderMode}
+              defaultLocale={defaultLocale}
             />
           ))}
         </SortableContext>
@@ -112,10 +116,12 @@ function SortableCategoryGroup({
   sectionId,
   group,
   reorderMode,
+  defaultLocale,
 }: {
   sectionId: string;
   group: SectionCategoryGroup;
   reorderMode: boolean;
+  defaultLocale: Locale;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: group.category.id,
@@ -176,6 +182,9 @@ function SortableCategoryGroup({
             <Link href={`/menu/${item.id}?sectionId=${sectionId}`} className="min-w-0 flex-1">
               <p className="truncate font-semibold text-ink-900">{item.name}</p>
               <p className="text-sm text-ink-500">{formatPrice(item.priceCents, item.currency)}</p>
+              <div className="mt-1.5">
+                <TranslationStatusBadge item={item} defaultLocale={defaultLocale} />
+              </div>
             </Link>
             <StockToggle itemId={item.id} initial={item.isAvailable} />
           </li>

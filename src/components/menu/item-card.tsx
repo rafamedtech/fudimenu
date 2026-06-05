@@ -2,17 +2,19 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { getCategoryEmoji } from '@/lib/category-placeholder';
 import { formatPrice } from '@/lib/utils';
-import type { MenuItem } from '@/types/domain';
+import type { Locale, MenuItem } from '@/types/domain';
 import { ItemCardQuickActions } from './item-card-quick-actions';
+import { TranslationStatusBadge } from './translation-status-badge';
 
 interface ItemCardProps {
   item: MenuItem;
   categoryName?: string | null;
   href?: string;
   showToggle?: boolean;
+  defaultLocale?: Locale;
 }
 
-export function ItemCard({ item, categoryName, href, showToggle = true }: ItemCardProps) {
+export function ItemCard({ item, categoryName, href, showToggle = true, defaultLocale }: ItemCardProps) {
   const placeholderEmoji = getCategoryEmoji(categoryName);
   const content = (
     <div className="flex items-center gap-4 rounded-[24px] bg-[var(--brand-card)] p-4 shadow-[0_4px_20px_rgba(222,18,91,0.04)] border border-[var(--brand-card-border)] transition-all duration-300 ease-spring hover:shadow-[0_8px_28px_rgba(222,18,91,0.08)] hover:-translate-y-0.5 active:scale-[0.98] ipad:gap-5 ipad:p-5 ipad-landscape:flex-col ipad-landscape:items-stretch ipad-landscape:gap-3 ipad-landscape:p-0 ipad-landscape:overflow-hidden">
@@ -33,6 +35,11 @@ export function ItemCard({ item, categoryName, href, showToggle = true }: ItemCa
       <div className="flex flex-1 flex-col justify-center min-w-0 ipad-landscape:px-4 ipad-landscape:pb-4 ipad-landscape:pt-1">
         <h3 className="truncate font-bold text-ink-900 text-base leading-snug ipad:text-lg">{item.name}</h3>
         <p className="font-extrabold text-[var(--brand-primary)] text-base mt-1 tracking-tight">{formatPrice(item.priceCents, item.currency)}</p>
+        {defaultLocale && (
+          <div className="mt-2">
+            <TranslationStatusBadge item={item} defaultLocale={defaultLocale} />
+          </div>
+        )}
       </div>
     </div>
   );
