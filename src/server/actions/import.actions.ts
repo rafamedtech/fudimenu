@@ -2,20 +2,20 @@
 import { revalidatePath, revalidateTag } from 'next/cache';
 import { PLAN_CONFIG } from '@/config/plans';
 import { checkRateLimit } from '@/lib/ratelimit';
-import { parseCsv } from '@/lib/import/csv';
-import { mapRows, type ImportRowError } from '@/lib/import/menu-import';
+import { type ImportRowError } from '@/lib/import/menu-import';
+import {
+  MAX_IMPORT_ROWS,
+  importPayloadSchema,
+  type ImportItem,
+} from '@/lib/validators/import.schema';
 import { requireAuth, type AuthContext } from '@/server/guards/require-auth';
 import { menuService } from '@/server/services/menu.service';
 import type { ImportResult } from '@/server/repositories/menu.repository';
 
-/** Hard caps to keep imports synchronous and cheap. */
-const MAX_CSV_BYTES = 512 * 1024;
-const MAX_ROWS = 500;
-
 type ImportActionResult =
   | { ok: true; result: ImportResult }
   | { ok: false; code: 'unauthorized' | 'rate_limited' | 'too_large' | 'plan_limit_reached' }
-  | { ok: false; code: 'validation'; missingHeaders?: string[]; errors?: ImportRowError[] };
+  | { ok: false; code: 'validation'; errors: ImportRowError[] };
 
 function isRedirectError(error: unknown) {
   return (
@@ -46,7 +46,15 @@ function revalidateMenu(ctx: AuthContext) {
   if (active) revalidatePath(`/m/${active.tenant.slug}`);
 }
 
-export async function importMenuAction(input: { csv: string }): Promise<ImportActionResult> {
+/**
+ * Persist the rows the user confirmed in the preview. Parsing and editing happen
+ * client-side (nothing is written until this call). The action re-validates the
+ * full payload against `importPayloadSchema` — edited rows are never trusted
+ * blindly — applies rate limit + plan limits, and scopes the write to
+ * `ctx.tenantId` (tenant isolation). Invalid CSV rows are filtered out on the
+ * client before confirmation and reported there as skipped.
+ */
+export async function importMenuAction(input: { rows: ImportItem[] }): Promise<ImportActionResult> {
   const ctx = await requireActionAuth();
   if ('ok' in ctx) return ctx;
 
@@ -57,38 +65,41 @@ export async function importMenuAction(input: { csv: string }): Promise<ImportAc
   });
   if (!limit.allowed) return { ok: false, code: 'rate_limited' };
 
-  const csv = typeof input?.csv === 'string' ? input.csv : '';
-  if (Buffer.byteLength(csv, 'utf8') > MAX_CSV_BYTES) {
+  // Reject oversized payloads before the per-row pass so a huge array can't be
+  // walked field by field.
+  if (Array.isArray(input?.rows) && input.rows.length > MAX_IMPORT_ROWS) {
     return { ok: false, code: 'too_large' };
   }
 
-  // Re-parse the raw CSV server-side: never trust client-sent rows (tenant security).
-  const grid = parseCsv(csv);
-  if (grid.length - 1 > MAX_ROWS) {
-    return { ok: false, code: 'too_large' };
+  const parsed = importPayloadSchema.safeParse(input);
+  if (!parsed.success) {
+    const errors: ImportRowError[] = parsed.error.issues.map((issue) => {
+      // issue.path = ['rows', <index>, <field>]; surface as a 1-based row number.
+      const index = typeof issue.path[1] === 'number' ? issue.path[1] : -1;
+      return {
+        rowNumber: index + 1,
+        field: String(issue.path[2] ?? 'row'),
+        message: issue.message,
+      };
+    });
+    return { ok: false, code: 'validation', errors };
   }
 
-  const mapped = mapRows(grid);
-  if (!mapped.ok) {
-    return { ok: false, code: 'validation', missingHeaders: mapped.missing };
-  }
-  if (mapped.errors.length > 0 || mapped.valid.length === 0) {
-    return { ok: false, code: 'validation', errors: mapped.errors };
-  }
+  const rows = parsed.data.rows;
 
-  // Plan validation against current counts (free tier has hard limits).
+  // Plan validation against the FINAL confirmed row count + brand-new sections.
   const limits = PLAN_CONFIG[ctx.plan].limits;
   if (limits.items !== null || limits.sections !== null) {
     const { items, sections } = await menuService.getMenuByTenantId(ctx.tenantId);
 
-    if (limits.items !== null && items.length + mapped.valid.length > limits.items) {
+    if (limits.items !== null && items.length + rows.length > limits.items) {
       return { ok: false, code: 'plan_limit_reached' };
     }
 
     if (limits.sections !== null) {
       const existingSectionNames = new Set(sections.map((section) => section.name));
       const newSectionNames = new Set(
-        mapped.valid
+        rows
           .map((row) => row.sectionName)
           .filter((name): name is string => Boolean(name) && !existingSectionNames.has(name as string)),
       );
@@ -98,7 +109,7 @@ export async function importMenuAction(input: { csv: string }): Promise<ImportAc
     }
   }
 
-  const result = await menuService.importMenu(ctx.tenantId, mapped.valid);
+  const result = await menuService.importMenu(ctx.tenantId, rows);
   revalidateMenu(ctx);
   return { ok: true, result };
 }
