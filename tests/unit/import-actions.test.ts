@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import type { ImportItem } from '@/lib/validators/import.schema';
 
 function makeCtx(plan: 'free' | 'pro' | 'business') {
   return {
@@ -43,7 +44,16 @@ async function loadImportActions() {
   return import('../../src/server/actions/import.actions');
 }
 
-const VALID_CSV = 'nombre,precio,categoria,seccion\nTacos,120,Antojitos,Comida';
+function row(overrides: Partial<ImportItem> = {}): ImportItem {
+  return {
+    name: 'Tacos',
+    description: null,
+    priceCents: 12000,
+    categoryName: 'Antojitos',
+    sectionName: 'Comida',
+    ...overrides,
+  };
+}
 
 describe('importMenuAction', () => {
   afterEach(() => {
@@ -57,7 +67,7 @@ describe('importMenuAction', () => {
     );
 
     const { importMenuAction } = await loadImportActions();
-    const result = await importMenuAction({ csv: VALID_CSV });
+    const result = await importMenuAction({ rows: [row()] });
 
     expect(result).toEqual({ ok: false, code: 'unauthorized' });
     expect(mocks.importMenu).not.toHaveBeenCalled();
@@ -68,46 +78,52 @@ describe('importMenuAction', () => {
     mocks.checkRateLimit.mockResolvedValue({ allowed: false, remaining: 0, resetSec: 60 });
 
     const { importMenuAction } = await loadImportActions();
-    const result = await importMenuAction({ csv: VALID_CSV });
+    const result = await importMenuAction({ rows: [row()] });
 
     expect(result).toEqual({ ok: false, code: 'rate_limited' });
     expect(mocks.importMenu).not.toHaveBeenCalled();
   });
 
-  it('returns too_large when row count exceeds the cap', async () => {
+  it('returns too_large when the confirmed payload exceeds the row cap', async () => {
     mocks.requireAuth.mockResolvedValue(makeCtx('business'));
     mocks.checkRateLimit.mockResolvedValue({ allowed: true, remaining: 9, resetSec: 60 });
 
-    const rows = Array.from({ length: 501 }, (_, i) => `Item ${i},100`).join('\n');
+    const rows = Array.from({ length: 501 }, (_, i) => row({ name: `Item ${i}` }));
     const { importMenuAction } = await loadImportActions();
-    const result = await importMenuAction({ csv: `nombre,precio\n${rows}` });
+    const result = await importMenuAction({ rows });
 
     expect(result).toEqual({ ok: false, code: 'too_large' });
     expect(mocks.importMenu).not.toHaveBeenCalled();
   });
 
-  it('returns validation with missing headers', async () => {
+  it('re-validates the edited payload server-side and rejects tampered rows', async () => {
+    // Why: the client can send edited rows; the server is the authority and must
+    // reject anything that violates importItemSchema before persisting.
     mocks.requireAuth.mockResolvedValue(makeCtx('business'));
     mocks.checkRateLimit.mockResolvedValue({ allowed: true, remaining: 9, resetSec: 60 });
 
     const { importMenuAction } = await loadImportActions();
-    const result = await importMenuAction({ csv: 'descripcion,categoria\nfoo,bar' });
-
-    expect(result).toEqual({ ok: false, code: 'validation', missingHeaders: ['name', 'price'] });
-    expect(mocks.importMenu).not.toHaveBeenCalled();
-  });
-
-  it('returns validation with row errors and never commits a partial import', async () => {
-    mocks.requireAuth.mockResolvedValue(makeCtx('business'));
-    mocks.checkRateLimit.mockResolvedValue({ allowed: true, remaining: 9, resetSec: 60 });
-
-    const { importMenuAction } = await loadImportActions();
-    const result = await importMenuAction({ csv: 'nombre,precio\nBueno,100\nMalo,gratis' });
+    const result = await importMenuAction({
+      rows: [row(), row({ name: '', priceCents: 0 })] as ImportItem[],
+    });
 
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.code).toBe('validation');
-    expect((result as { errors: unknown[] }).errors).toHaveLength(1);
+    expect((result as { errors: { rowNumber: number }[] }).errors[0].rowNumber).toBe(2);
+    expect(mocks.importMenu).not.toHaveBeenCalled();
+  });
+
+  it('rejects an empty payload', async () => {
+    mocks.requireAuth.mockResolvedValue(makeCtx('business'));
+    mocks.checkRateLimit.mockResolvedValue({ allowed: true, remaining: 9, resetSec: 60 });
+
+    const { importMenuAction } = await loadImportActions();
+    const result = await importMenuAction({ rows: [] });
+
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.code).toBe('validation');
     expect(mocks.importMenu).not.toHaveBeenCalled();
   });
 
@@ -120,7 +136,26 @@ describe('importMenuAction', () => {
     });
 
     const { importMenuAction } = await loadImportActions();
-    const result = await importMenuAction({ csv: VALID_CSV });
+    const result = await importMenuAction({ rows: [row()] });
+
+    expect(result).toEqual({ ok: false, code: 'plan_limit_reached' });
+    expect(mocks.importMenu).not.toHaveBeenCalled();
+  });
+
+  it('validates plan limits against the final confirmed row count', async () => {
+    // Why: plan limits must reflect what the user actually confirmed after editing
+    // and deleting rows — not the raw file. 19 existing + 2 confirmed = 21 > 20.
+    mocks.requireAuth.mockResolvedValue(makeCtx('free'));
+    mocks.checkRateLimit.mockResolvedValue({ allowed: true, remaining: 9, resetSec: 60 });
+    mocks.getMenuByTenantId.mockResolvedValue({
+      items: Array.from({ length: 19 }, (_, i) => ({ id: `i${i}` })),
+      sections: [],
+    });
+
+    const { importMenuAction } = await loadImportActions();
+    const result = await importMenuAction({
+      rows: [row({ name: 'A', sectionName: null }), row({ name: 'B', sectionName: null })],
+    });
 
     expect(result).toEqual({ ok: false, code: 'plan_limit_reached' });
     expect(mocks.importMenu).not.toHaveBeenCalled();
@@ -135,21 +170,21 @@ describe('importMenuAction', () => {
     });
 
     const { importMenuAction } = await loadImportActions();
-    // VALID_CSV adds a brand-new section "Comida" → 5 existing + 1 new = 6 > 5.
-    const result = await importMenuAction({ csv: VALID_CSV });
+    // Brand-new section "Comida" → 5 existing + 1 new = 6 > 5.
+    const result = await importMenuAction({ rows: [row()] });
 
     expect(result).toEqual({ ok: false, code: 'plan_limit_reached' });
     expect(mocks.importMenu).not.toHaveBeenCalled();
   });
 
-  it('imports under the active tenant and returns the result', async () => {
+  it('imports the confirmed subset under the active tenant', async () => {
     // Why: the action must always scope the write to ctx.tenantId — tenant isolation.
     mocks.requireAuth.mockResolvedValue(makeCtx('business'));
     mocks.checkRateLimit.mockResolvedValue({ allowed: true, remaining: 9, resetSec: 60 });
     mocks.importMenu.mockResolvedValue({ itemsCreated: 1, categoriesCreated: 1, sectionsCreated: 1 });
 
     const { importMenuAction } = await loadImportActions();
-    const result = await importMenuAction({ csv: VALID_CSV });
+    const result = await importMenuAction({ rows: [row()] });
 
     expect(result).toEqual({
       ok: true,

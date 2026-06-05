@@ -1,10 +1,31 @@
 import { describe, expect, it } from 'vitest';
-import { parseCsv } from '../../src/lib/import/csv';
+import { isCsvFile, parseCsv } from '../../src/lib/import/csv';
 import { mapRows, normalizeHeader, parsePrice } from '../../src/lib/import/menu-import';
 
 function grid(csv: string) {
   return parseCsv(csv);
 }
+
+describe('isCsvFile', () => {
+  it('accepts .csv with a csv or empty MIME type', () => {
+    expect(isCsvFile({ name: 'menu.csv', type: 'text/csv' })).toBe(true);
+    expect(isCsvFile({ name: 'MENU.CSV', type: '' })).toBe(true);
+    // Excel exports .csv as application/vnd.ms-excel.
+    expect(isCsvFile({ name: 'menu.csv', type: 'application/vnd.ms-excel' })).toBe(true);
+  });
+
+  it('rejects non-CSV formats deferred to a later version', () => {
+    // Why: this iteration is CSV-only; PDF/XLSX/images must be turned away clearly.
+    expect(isCsvFile({ name: 'menu.pdf', type: 'application/pdf' })).toBe(false);
+    expect(isCsvFile({
+      name: 'menu.xlsx',
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    })).toBe(false);
+    expect(isCsvFile({ name: 'menu.png', type: 'image/png' })).toBe(false);
+    // A non-CSV MIME wins even if the name is spoofed with a .csv extension.
+    expect(isCsvFile({ name: 'menu.csv', type: 'application/pdf' })).toBe(false);
+  });
+});
 
 describe('normalizeHeader', () => {
   it('lowercases and strips accents', () => {

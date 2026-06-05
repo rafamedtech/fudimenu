@@ -23,3 +23,17 @@ export const importItemSchema = z.object({
 });
 
 export type ImportItem = z.infer<typeof importItemSchema>;
+
+/** Hard cap on rows per import — keeps the commit synchronous and cheap. */
+export const MAX_IMPORT_ROWS = 500;
+
+/**
+ * The confirmed payload the client sends after the user reviews/edits the
+ * preview. The Server Action re-validates every row against `importItemSchema`
+ * before persisting — edited rows are trusted only after this pass.
+ */
+export const importPayloadSchema = z.object({
+  rows: z.array(importItemSchema).min(1, 'No hay filas para importar').max(MAX_IMPORT_ROWS),
+});
+
+export type ImportPayload = z.infer<typeof importPayloadSchema>;
