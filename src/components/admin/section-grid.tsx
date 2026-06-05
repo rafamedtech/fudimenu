@@ -159,8 +159,8 @@ function SortableSectionCard({
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center" aria-hidden>
-            <div className="absolute inset-4 rounded-xl border border-white/60 bg-white/30" />
-            <span className="relative flex size-16 items-center justify-center rounded-full bg-white/70 text-ink-700 shadow-sm">
+            <div className="absolute inset-4 rounded-xl border border-[var(--brand-card-border)] bg-[var(--brand-primary-faint)]" />
+            <span className="relative flex size-16 items-center justify-center rounded-full bg-[var(--brand-card)] text-[var(--brand-accent-text)] shadow-sm">
               <Utensils className="size-8" strokeWidth={1.8} />
             </span>
           </div>
@@ -179,7 +179,7 @@ function SortableSectionCard({
                     : `${itemCount} platillos`}
               </p>
             </div>
-            <span className="hidden shrink-0 items-center gap-1 rounded-full bg-white/15 px-2 py-1 text-[11px] font-bold text-white backdrop-blur ipad:inline-flex">
+            <span className="hidden shrink-0 items-center gap-1 rounded-full bg-[var(--brand-primary-faint)] px-2 py-1 text-[11px] font-bold text-white backdrop-blur ipad:inline-flex">
               <Layers3 className="size-3" aria-hidden />
               Sección
             </span>
