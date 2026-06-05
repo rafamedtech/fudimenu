@@ -1,6 +1,6 @@
 'use client';
 
-import { useDeferredValue, useEffect, useRef, useState } from 'react';
+import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import { getCategoryEmoji } from '@/lib/category-placeholder';
 import { formatPrice } from '@/lib/utils';
@@ -105,7 +105,47 @@ export function PublicMenuIsland({
   const openItemSheet = (item: MenuItem, categoryName: string) => {
     setSheetSelection({ item, categoryName, whatsappUrl: buildWhatsapp(item) });
     setIsSheetOpen(true);
+    // Make the open item shareable: reflect it in the URL hash without a history
+    // push so back returns to the menu, not to a re-open loop.
+    if (typeof history !== 'undefined') {
+      history.replaceState(null, '', `#item-${item.id}`);
+    }
   };
+
+  const clearItemHash = () => {
+    if (typeof history !== 'undefined' && location.hash.startsWith('#item-')) {
+      history.replaceState(null, '', location.pathname + location.search);
+    }
+  };
+
+  // Flat lookup of every rendered item → its display category, so a shared
+  // `#item-<id>` link can open the right detail sheet on load. Built from the
+  // unfiltered props (search hasn't run yet on mount).
+  const itemIndex = useMemo(() => {
+    const index = new Map<string, { item: MenuItem; categoryName: string }>();
+    for (const item of dailySpecials) {
+      index.set(item.id, { item, categoryName: strings.dailySpecials });
+    }
+    for (const group of groups) {
+      for (const item of group.items) {
+        if (!index.has(item.id)) index.set(item.id, { item, categoryName: group.categoryName });
+      }
+    }
+    return index;
+  }, [dailySpecials, groups, strings.dailySpecials]);
+
+  // Open the detail sheet for a deep-linked item on first load. Runs once: the
+  // anchor (`id="item-<id>"`) handles scroll/focus; this restores the overlay.
+  const didDeepLink = useRef(false);
+  useEffect(() => {
+    if (didDeepLink.current) return;
+    didDeepLink.current = true;
+    const hash = location.hash;
+    if (!hash.startsWith('#item-')) return;
+    const match = itemIndex.get(hash.slice('#item-'.length));
+    if (match) openItemSheet(match.item, match.categoryName);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [itemIndex]);
 
   const sectionsById = new Map<
     string,
@@ -238,7 +278,10 @@ export function PublicMenuIsland({
           categoryName={sheetSelection.categoryName}
           open={isSheetOpen}
           onClose={() => setIsSheetOpen(false)}
-          onClosed={() => setSheetSelection(null)}
+          onClosed={() => {
+            setSheetSelection(null);
+            clearItemHash();
+          }}
           priceLocale={priceLocale}
           whatsappUrl={sheetSelection.whatsappUrl}
           strings={strings}
@@ -337,7 +380,7 @@ export function ItemList({
           contains: strings.containsAllergens,
         });
         return (
-        <li key={item.id}>
+        <li key={item.id} id={`item-${item.id}`} className="scroll-mt-20">
           <button
             type="button"
             onClick={() => onSelect(item, categoryName)}
