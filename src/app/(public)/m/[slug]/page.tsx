@@ -6,6 +6,7 @@ import { getLocale, getTranslations } from 'next-intl/server';
 import { buildBrandThemeStyle, resolveBrandSurfaceColor } from '@/lib/brand-theme';
 import { buildPublicMenuGroups } from '@/lib/public-menu-groups';
 import { localizeMenuItems } from '@/lib/menu-i18n';
+import { buildMenuJsonLd, buildMenuMetadata, getSiteUrl, serializeJsonLd } from '@/lib/menu-seo';
 import { menuService } from '@/server/services/menu.service';
 import { getPrisma } from '@/lib/db/prisma';
 import { PublicMenuLanguageSwitcher, PublicMenuPwaWrapper } from './public-menu-pwa-wrapper';
@@ -27,13 +28,19 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const [t, tenant] = await Promise.all([getTranslations('menu'), getTenantBySlug(slug)]);
+  const [t, locale, tenant] = await Promise.all([
+    getTranslations('menu'),
+    getLocale(),
+    getTenantBySlug(slug),
+  ]);
   if (!tenant) return { title: t('metadata.notFoundTitle') };
-  return {
+  return buildMenuMetadata({
+    tenant,
     title: t('metadata.title', { restaurant: tenant.name }),
     description: t('metadata.description', { restaurant: tenant.name }),
-    formatDetection: { telephone: false },
-  };
+    locale: locale === 'en' ? 'en' : 'es',
+    baseUrl: getSiteUrl(),
+  });
 }
 
 function formatPhoneDisplay(raw: string): string {
@@ -83,6 +90,17 @@ async function PublicMenuContent({
     resolveSectionAccent: resolveBrandSurfaceColor,
   });
   const hasSections = sections.length > 0;
+
+  const menuJsonLd = buildMenuJsonLd({
+    tenant,
+    groups,
+    dailySpecials,
+    locale,
+    baseUrl: getSiteUrl(),
+    dailySpecialsLabel: t('dailySpecials'),
+    menuName: t('metadata.menuName'),
+  });
+
   const logoFrameClass = getLogoFrameClass(tenant.logoShape);
   const logoObjectClass = 'object-cover';
 
@@ -162,6 +180,12 @@ async function PublicMenuContent({
         className="mx-auto min-h-dvh w-full max-w-md scroll-smooth bg-[var(--brand-surface)] pb-12 ipad:max-w-[744px] ipad:pb-16 ipad-landscape:max-w-[984px] desktop:max-w-[1180px] desktop:border-x desktop:border-[var(--brand-card-border)]"
         style={brandThemeStyle}
       >
+        <script
+          type="application/ld+json"
+          // schema.org Restaurant/Menu/MenuItem — discovery only, no PII beyond
+          // the public business phone the tenant already shows on the page.
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(menuJsonLd) }}
+        />
         <a
           href="#menu-content"
           className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-[var(--brand-card)] focus:px-4 focus:py-3 focus:font-bold focus:text-ink-900"

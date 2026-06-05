@@ -65,7 +65,8 @@
     "metadata": {
       "notFoundTitle": "Menú no encontrado",
       "title": "{restaurant} — Menú",
-      "description": "Menú digital de {restaurant}."
+      "description": "Menú digital de {restaurant}.",
+      "menuName": "Menú"
     }
   },
   "auth": {
