@@ -175,6 +175,61 @@ describe('buildPublicMenuGroups', () => {
     expect(allOn.groups.flatMap((g) => g.items.map((i) => i.id))).toEqual(['it']);
   });
 
+  it('gates dailySpecials by their category and section window', () => {
+    // 07:00–11:00 window. T16:00:00Z = CDMX 10:00 (in), T21:00:00Z = 15:00 (out).
+    const window = { scheduleStartMinute: 420, scheduleEndMinute: 660 };
+    const monday1000 = new Date('2024-01-15T16:00:00Z');
+    const monday1500 = new Date('2024-01-15T21:00:00Z');
+    const special = item('special', 'category-1', true); // own schedule: always open
+
+    const run = (now: Date, sections: MenuSection[], categories: Category[], items = [special]) =>
+      buildPublicMenuGroups({
+        sections,
+        categories,
+        items,
+        otherCategoryName: 'Otros',
+        resolveSectionAccent: (a) => a,
+        now,
+      });
+
+    // Category off-window → special hidden even though the item itself is open.
+    const catWindowed: Category = { ...category('category-1', null), ...window };
+    expect(run(monday1500, [], [catWindowed]).dailySpecials).toEqual([]);
+    // Category in-window → special shows.
+    expect(run(monday1000, [], [catWindowed]).dailySpecials.map((i) => i.id)).toEqual(['special']);
+
+    // Section off-window (category open) → special hidden by the section.
+    const sectionWindowed: MenuSection = { ...section('section-1'), ...window };
+    const catInSection = category('category-1', 'section-1');
+    expect(run(monday1500, [sectionWindowed], [catInSection]).dailySpecials).toEqual([]);
+    // Both parents in-window → special shows.
+    expect(
+      run(monday1000, [sectionWindowed], [catInSection]).dailySpecials.map((i) => i.id),
+    ).toEqual(['special']);
+  });
+
+  it('keeps a category-less special dependent on its own schedule only', () => {
+    const monday1500 = new Date('2024-01-15T21:00:00Z'); // outside any 07:00–11:00 window
+    const orphanSpecial = item('orphan', null, true); // no category, own schedule always open
+    // A closed category exists but the special does not belong to it.
+    const closedCategory: Category = {
+      ...category('category-1', null),
+      scheduleStartMinute: 420,
+      scheduleEndMinute: 660,
+    };
+
+    const result = buildPublicMenuGroups({
+      sections: [],
+      categories: [closedCategory],
+      items: [orphanSpecial],
+      otherCategoryName: 'Otros',
+      resolveSectionAccent: (a) => a,
+      now: monday1500,
+    });
+    // No parent to inherit from → visible on its own schedule.
+    expect(result.dailySpecials.map((i) => i.id)).toEqual(['orphan']);
+  });
+
   it('creates an Otros group for uncategorized items when the category does not exist', () => {
     const result = build([], [category('food', null)], [
       item('food-item', 'food'),
