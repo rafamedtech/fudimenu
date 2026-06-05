@@ -122,6 +122,9 @@ export function ItemEditorForm({ initial, categories, sectionId, offlineConflict
       specialPrice: initial?.specialPrice ?? null,
       dietaryTags: (initial?.dietaryTags ?? []) as DietaryTag[],
       allergenTags: (initial?.allergenTags ?? []) as AllergenTag[],
+      scheduleDays: initial?.scheduleDays ?? [],
+      scheduleStartMinute: initial?.scheduleStartMinute ?? null,
+      scheduleEndMinute: initial?.scheduleEndMinute ?? null,
       variants: (initial?.variants ?? []).map((variant) => ({
         name: variant.name,
         priceCents: variant.priceCents,
@@ -173,6 +176,21 @@ export function ItemEditorForm({ initial, categories, sectionId, offlineConflict
       ? allergenTags.filter((t) => t !== tag)
       : [...allergenTags, tag];
     setValue('allergenTags', next, { shouldDirty: true, shouldValidate: true });
+  }
+
+  const scheduleDays = watch('scheduleDays') ?? [];
+  const scheduleStartMinute = watch('scheduleStartMinute') ?? null;
+  const scheduleEndMinute = watch('scheduleEndMinute') ?? null;
+
+  function toggleScheduleDay(day: number) {
+    const next = scheduleDays.includes(day)
+      ? scheduleDays.filter((d) => d !== day)
+      : [...scheduleDays, day].sort((a, b) => a - b);
+    setValue('scheduleDays', next, { shouldDirty: true, shouldValidate: true });
+  }
+
+  function setScheduleMinute(field: 'scheduleStartMinute' | 'scheduleEndMinute', minute: number | null) {
+    setValue(field, minute, { shouldDirty: true, shouldValidate: true });
   }
   const conflictRows = useMemo(
     () => buildConflictRows(initial, conflictDraft, localCategories),
@@ -399,6 +417,16 @@ export function ItemEditorForm({ initial, categories, sectionId, offlineConflict
           allergenTags={allergenTags}
           onToggleDietary={toggleDietaryTag}
           onToggleAllergen={toggleAllergenTag}
+        />
+
+        <ScheduleCard
+          days={scheduleDays}
+          startMinute={scheduleStartMinute}
+          endMinute={scheduleEndMinute}
+          onToggleDay={toggleScheduleDay}
+          onChangeStart={(m) => setScheduleMinute('scheduleStartMinute', m)}
+          onChangeEnd={(m) => setScheduleMinute('scheduleEndMinute', m)}
+          endError={errors.scheduleEndMinute?.message}
         />
 
         <VariantsCard register={register} control={control} setValue={setValue} />
@@ -758,6 +786,103 @@ function AttributesCard({
             />
           ))}
         </div>
+      </fieldset>
+    </Card>
+  );
+}
+
+// 0=Sun…6=Sat (matches DB/`getDay`), shown Monday-first for MX convention.
+const SCHEDULE_DAYS: { value: number; label: string }[] = [
+  { value: 1, label: 'Lun' },
+  { value: 2, label: 'Mar' },
+  { value: 3, label: 'Mié' },
+  { value: 4, label: 'Jue' },
+  { value: 5, label: 'Vie' },
+  { value: 6, label: 'Sáb' },
+  { value: 0, label: 'Dom' },
+];
+
+function minuteToTimeValue(minute: number | null): string {
+  if (minute == null) return '';
+  const h = Math.floor(minute / 60);
+  const m = minute % 60;
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+}
+
+function timeValueToMinute(value: string): number | null {
+  if (!value) return null;
+  const [h, m] = value.split(':').map(Number);
+  return h * 60 + m;
+}
+
+function ScheduleCard({
+  days,
+  startMinute,
+  endMinute,
+  onToggleDay,
+  onChangeStart,
+  onChangeEnd,
+  endError,
+}: {
+  days: number[];
+  startMinute: number | null;
+  endMinute: number | null;
+  onToggleDay: (day: number) => void;
+  onChangeStart: (minute: number | null) => void;
+  onChangeEnd: (minute: number | null) => void;
+  endError?: string;
+}) {
+  return (
+    <Card className="space-y-4 border border-ink-200 bg-[var(--brand-surface)] shadow-sm">
+      <div>
+        <p className="font-bold text-ink-900">Horario de visibilidad</p>
+        <p className="text-xs text-ink-500">
+          Opcional. Controla cuándo aparece este platillo en tu menú público. No
+          afecta disponibilidad ni inventario. Sin selección = siempre visible.
+        </p>
+      </div>
+
+      <fieldset>
+        <legend className="mb-2 text-sm font-medium text-ink-700">
+          Días (vacío = todos)
+        </legend>
+        <div className="flex flex-wrap gap-2">
+          {SCHEDULE_DAYS.map((day) => (
+            <TagToggle
+              key={day.value}
+              label={day.label}
+              selected={days.includes(day.value)}
+              onClick={() => onToggleDay(day.value)}
+            />
+          ))}
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend className="mb-2 text-sm font-medium text-ink-700">
+          Horas (vacío = todo el día)
+        </legend>
+        <div className="flex flex-wrap items-end gap-3">
+          <label className="flex flex-col text-sm text-ink-700">
+            <span className="mb-1">Desde</span>
+            <input
+              type="time"
+              value={minuteToTimeValue(startMinute)}
+              onChange={(e) => onChangeStart(timeValueToMinute(e.target.value))}
+              className="rounded-lg border-[1.5px] border-ink-300 bg-[var(--brand-card)] px-3 py-1.5"
+            />
+          </label>
+          <label className="flex flex-col text-sm text-ink-700">
+            <span className="mb-1">Hasta</span>
+            <input
+              type="time"
+              value={minuteToTimeValue(endMinute)}
+              onChange={(e) => onChangeEnd(timeValueToMinute(e.target.value))}
+              className="rounded-lg border-[1.5px] border-ink-300 bg-[var(--brand-card)] px-3 py-1.5"
+            />
+          </label>
+        </div>
+        {endError && <p className="mt-1.5 text-sm text-red-600">{endError}</p>}
       </fieldset>
     </Card>
   );

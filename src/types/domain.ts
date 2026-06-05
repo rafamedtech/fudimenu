@@ -59,6 +59,11 @@ export type MenuItem = {
   isAvailable: boolean;
   dietaryTags: string[];
   allergenTags: string[];
+  // Weekly publishing visibility (see lib/visibility-schedule). Empty days =
+  // every day; null start/end = all day. NOT operational availability.
+  scheduleDays: number[];
+  scheduleStartMinute: number | null;
+  scheduleEndMinute: number | null;
   sortOrder: number;
   createdAt: string;
   updatedAt: string;

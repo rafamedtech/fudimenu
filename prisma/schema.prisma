@@ -171,6 +171,11 @@ model MenuItem {
   isAvailable    Boolean           @default(true) @map("is_available")
   dietaryTags    String[]          @default([]) @map("dietary_tags")
   allergenTags   String[]          @default([]) @map("allergen_tags")
+  // Weekly publishing visibility (see lib/visibility-schedule). Empty days =
+  // every day; null minutes = all day. Local minute-of-day, single fixed TZ.
+  scheduleDays        Int[]        @default([]) @map("schedule_days")
+  scheduleStartMinute Int?         @map("schedule_start_minute")
+  scheduleEndMinute   Int?         @map("schedule_end_minute")
   sortOrder      Int               @default(999) @map("sort_order")
   createdAt      DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt      DateTime          @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)

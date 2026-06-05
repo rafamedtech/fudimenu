@@ -15,6 +15,9 @@ const item = (id: string, categoryId: string | null, isSpecialToday = false): Me
   isAvailable: true,
   dietaryTags: [],
   allergenTags: [],
+  scheduleDays: [],
+  scheduleStartMinute: null,
+  scheduleEndMinute: null,
   sortOrder: 0,
   createdAt: '2026-01-01T00:00:00.000Z',
   updatedAt: '2026-01-01T00:00:00.000Z',
@@ -102,6 +105,41 @@ describe('buildPublicMenuGroups', () => {
         ['food', ['food-item']],
         ['other', ['other-item', 'uncategorized']],
       ]);
+  });
+
+  it('filters out off-schedule items (and off-schedule specials) at the given instant', () => {
+    // Breakfast window: Mon–Fri 07:00–11:00 Tijuana. Evaluate at Mon 08:00.
+    const breakfast = (id: string, isSpecialToday = false): MenuItem => ({
+      ...item(id, 'category-1', isSpecialToday),
+      scheduleDays: [1, 2, 3, 4, 5],
+      scheduleStartMinute: 420,
+      scheduleEndMinute: 660,
+    });
+    const monday0800 = new Date('2024-01-15T16:00:00Z');
+    const monday1300 = new Date('2024-01-15T21:00:00Z');
+
+    const visible = buildPublicMenuGroups({
+      sections: [],
+      categories: [category('category-1', null)],
+      items: [breakfast('on-time'), breakfast('special-on-time', true)],
+      otherCategoryName: 'Otros',
+      resolveSectionAccent: (accent) => accent,
+      now: monday0800,
+    });
+    expect(visible.groups[0]?.items.map(({ id }) => id)).toEqual(['on-time']);
+    expect(visible.dailySpecials.map(({ id }) => id)).toEqual(['special-on-time']);
+
+    // Same items, after the window closes → nothing shows, not even the special.
+    const hidden = buildPublicMenuGroups({
+      sections: [],
+      categories: [category('category-1', null)],
+      items: [breakfast('on-time'), breakfast('special-on-time', true)],
+      otherCategoryName: 'Otros',
+      resolveSectionAccent: (accent) => accent,
+      now: monday1300,
+    });
+    expect(hidden.groups).toEqual([]);
+    expect(hidden.dailySpecials).toEqual([]);
   });
 
   it('creates an Otros group for uncategorized items when the category does not exist', () => {

@@ -1,4 +1,5 @@
 import type { Category, MenuItem, MenuSection } from '@/types/domain';
+import { isItemVisibleNow } from '@/lib/visibility-schedule';
 
 export interface PublicMenuGroup {
   sectionId: string | null;
@@ -17,6 +18,8 @@ interface BuildPublicMenuGroupsOptions {
   items: MenuItem[];
   otherCategoryName: string;
   resolveSectionAccent: (accentColor: string) => string;
+  /** Evaluation instant for visibility scheduling. Defaults to now. */
+  now?: Date;
 }
 
 export function buildPublicMenuGroups({
@@ -25,6 +28,7 @@ export function buildPublicMenuGroups({
   items,
   otherCategoryName,
   resolveSectionAccent,
+  now = new Date(),
 }: BuildPublicMenuGroupsOptions): {
   dailySpecials: MenuItem[];
   groups: PublicMenuGroup[];
@@ -49,6 +53,10 @@ export function buildPublicMenuGroups({
   const uncategorizedItems: MenuItem[] = [];
 
   for (const item of items) {
+    // Off-schedule items are absent from the public menu entirely — applied
+    // before the specials branch so a scheduled-off item can't leak as a special.
+    if (!isItemVisibleNow(item, now)) continue;
+
     if (item.isSpecialToday) {
       dailySpecials.push(item);
       continue;

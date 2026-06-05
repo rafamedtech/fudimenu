@@ -64,6 +64,9 @@ type MenuItemRow = {
   isAvailable: boolean;
   dietaryTags: string[];
   allergenTags: string[];
+  scheduleDays?: number[];
+  scheduleStartMinute?: number | null;
+  scheduleEndMinute?: number | null;
   sortOrder: number;
   createdAt: Date;
   updatedAt: Date;
@@ -149,6 +152,9 @@ function mapMenuItem(row: MenuItemRow): MenuItem {
     isAvailable: row.isAvailable,
     dietaryTags: row.dietaryTags ?? [],
     allergenTags: row.allergenTags ?? [],
+    scheduleDays: row.scheduleDays ?? [],
+    scheduleStartMinute: row.scheduleStartMinute ?? null,
+    scheduleEndMinute: row.scheduleEndMinute ?? null,
     sortOrder: row.sortOrder,
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
@@ -311,6 +317,9 @@ export class PrismaMenuRepository implements IMenuRepository {
       isAvailable?: boolean;
       dietaryTags?: string[];
       allergenTags?: string[];
+      scheduleDays?: number[];
+      scheduleStartMinute?: number | null;
+      scheduleEndMinute?: number | null;
       sortOrder: number;
     } = {
       categoryId: input.categoryId ?? null,
@@ -342,6 +351,20 @@ export class PrismaMenuRepository implements IMenuRepository {
 
     if (!input.id || 'specialPrice' in input) {
       payload.specialPrice = input.specialPrice ?? null;
+    }
+
+    // Schedule fields: only touch when sent, so partial updates (e.g. stock
+    // toggle) never wipe an existing window. Each is independent.
+    if (!input.id || 'scheduleDays' in input) {
+      payload.scheduleDays = input.scheduleDays ?? [];
+    }
+
+    if (!input.id || 'scheduleStartMinute' in input) {
+      payload.scheduleStartMinute = input.scheduleStartMinute ?? null;
+    }
+
+    if (!input.id || 'scheduleEndMinute' in input) {
+      payload.scheduleEndMinute = input.scheduleEndMinute ?? null;
     }
 
     const prisma = getPrisma();

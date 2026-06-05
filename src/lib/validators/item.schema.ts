@@ -30,6 +30,15 @@ export const itemSchema = z
       .max(MAX_TAGS_PER_LIST)
       .transform(normalizeAllergenTags)
       .optional(),
+    // Weekly publishing visibility. Days 0=Sun…6=Sat; deduped + sorted so the
+    // DB holds a canonical set. Times are local minute-of-day (0–1439).
+    scheduleDays: z
+      .array(z.number().int().min(0).max(6))
+      .max(7)
+      .transform((days) => [...new Set(days)].sort((a, b) => a - b))
+      .optional(),
+    scheduleStartMinute: z.number().int().min(0).max(1439).nullable().optional(),
+    scheduleEndMinute: z.number().int().min(1).max(1440).nullable().optional(),
     translations: z
       .array(
         z.object({
@@ -59,6 +68,21 @@ export const itemSchema = z
         code: z.ZodIssueCode.custom,
         message: 'El precio especial debe ser menor al precio normal',
         path: ['specialPrice'],
+      });
+    }
+
+    // Each bound is independent (open start = from 00:00, open end = until
+    // 24:00). When both are set the window must not cross midnight — keeps it on
+    // a single weekday so day + time checks stay independent.
+    if (
+      data.scheduleStartMinute != null &&
+      data.scheduleEndMinute != null &&
+      data.scheduleStartMinute >= data.scheduleEndMinute
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'La hora de fin debe ser mayor a la de inicio',
+        path: ['scheduleEndMinute'],
       });
     }
   });

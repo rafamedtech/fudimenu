@@ -25,6 +25,7 @@ function cloneMenuItem(item: MenuItem): MenuItem {
     ...item,
     dietaryTags: [...(item.dietaryTags ?? [])],
     allergenTags: [...(item.allergenTags ?? [])],
+    scheduleDays: [...(item.scheduleDays ?? [])],
     translations: item.translations?.map((translation) => ({ ...translation })),
     variants: item.variants?.map((variant) => ({ ...variant })),
   };
@@ -222,6 +223,9 @@ export class MockMenuRepository implements IMenuRepository {
       isAvailable: input.isAvailable ?? true,
       dietaryTags: normalizeDietaryTags(input.dietaryTags ?? []),
       allergenTags: normalizeAllergenTags(input.allergenTags ?? []),
+      scheduleDays: input.scheduleDays ?? [],
+      scheduleStartMinute: input.scheduleStartMinute ?? null,
+      scheduleEndMinute: input.scheduleEndMinute ?? null,
       sortOrder: input.sortOrder ?? 999,
       createdAt: now,
       updatedAt: now,
