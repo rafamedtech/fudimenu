@@ -87,8 +87,10 @@ export function declineAnalyticsConsent() {
 }
 
 export type AnalyticsEvent =
-  | { name: 'menu_viewed'; props: { tenantId: string; branchId?: string } }
+  | { name: 'menu_viewed'; props: { tenantId: string; branchId?: string; source?: string; campaign?: string } }
   | { name: 'item_viewed'; props: { itemId: string; category?: string } }
+  | { name: 'item_detail_viewed'; props: { itemId: string; category?: string } }
+  | { name: 'menu_search'; props: { tenantId: string; query: string; resultCount: number } }
   | { name: 'item_created'; props: { itemId: string } }
   | { name: 'item_edited'; props: { itemId: string; field: string } }
   | { name: 'stock_toggled'; props: { itemId: string; available: boolean } }

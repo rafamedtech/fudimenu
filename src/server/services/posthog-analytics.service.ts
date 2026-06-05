@@ -22,6 +22,14 @@ export type TenantAnalyticsStats = {
     name: string;
     views: number;
   }>;
+  whatsappClicks: number;
+  previousWhatsappClicks: number;
+  whatsappDeltaPercent: number | null;
+  // clicks / menu views over the last 7 days, as a percentage.
+  whatsappConversionPercent: number | null;
+  topSearches: Array<{ query: string; count: number }>;
+  noResultSearches: Array<{ query: string; count: number }>;
+  trafficSources: Array<{ source: string; views: number }>;
 };
 
 const EMPTY_STATS: TenantAnalyticsStats = {
@@ -33,7 +41,29 @@ const EMPTY_STATS: TenantAnalyticsStats = {
   previousWeeklyViews: 0,
   weeklyDeltaPercent: null,
   topItems: [],
+  whatsappClicks: 0,
+  previousWhatsappClicks: 0,
+  whatsappDeltaPercent: null,
+  whatsappConversionPercent: null,
+  topSearches: [],
+  noResultSearches: [],
+  trafficSources: [],
 };
+
+export function deltaPercent(current: number, previous: number): number | null {
+  if (previous > 0) return Math.round(((current - previous) / previous) * 100);
+  return current > 0 ? 100 : null;
+}
+
+// Maps `[label, count]` HogQL rows into typed, non-empty entries.
+export function mapLabeledCounts(rows: unknown[][] | null): Array<{ label: string; count: number }> {
+  return (rows ?? [])
+    .map((row) => ({
+      label: typeof row[0] === 'string' ? row[0].trim() : '',
+      count: toNumber(row[1]),
+    }))
+    .filter((row) => row.label && row.count > 0);
+}
 
 function getPostHogAppHost() {
   if (env.POSTHOG_API_HOST) return env.POSTHOG_API_HOST.replace(/\/$/, '');
@@ -127,9 +157,68 @@ export async function getTenantAnalyticsStats(tenantId: string): Promise<TenantA
       `
       : null;
 
-    const [viewsResults, topItemResults] = await Promise.all([
+    // WhatsApp clicks are tagged with itemId only, so scope them to this tenant's
+    // items (same pattern as item_viewed) instead of relying on a tenantId prop.
+    const whatsappQuery = itemIds
+      ? `
+        SELECT
+          countIf(timestamp >= now() - INTERVAL 7 DAY) AS week_clicks,
+          countIf(timestamp >= now() - INTERVAL 14 DAY AND timestamp < now() - INTERVAL 7 DAY) AS previous_clicks
+        FROM events
+        WHERE event = 'whatsapp_clicked'
+          AND properties.itemId IN (${itemIds})
+          AND timestamp >= now() - INTERVAL 14 DAY
+      `
+      : null;
+
+    const topSearchesQuery = `
+      SELECT properties.query AS q, count() AS c
+      FROM events
+      WHERE event = 'menu_search'
+        AND properties.tenantId = ${tenantIdLiteral}
+        AND timestamp >= now() - INTERVAL 7 DAY
+      GROUP BY q
+      ORDER BY c DESC
+      LIMIT 5
+    `;
+
+    const noResultSearchesQuery = `
+      SELECT properties.query AS q, count() AS c
+      FROM events
+      WHERE event = 'menu_search'
+        AND properties.tenantId = ${tenantIdLiteral}
+        AND toInt(properties.resultCount) = 0
+        AND timestamp >= now() - INTERVAL 7 DAY
+      GROUP BY q
+      ORDER BY c DESC
+      LIMIT 5
+    `;
+
+    const trafficSourcesQuery = `
+      SELECT coalesce(nullIf(properties.source, ''), 'direct') AS src, count() AS c
+      FROM events
+      WHERE event = 'menu_viewed'
+        AND properties.tenantId = ${tenantIdLiteral}
+        AND timestamp >= now() - INTERVAL 7 DAY
+      GROUP BY src
+      ORDER BY c DESC
+      LIMIT 6
+    `;
+
+    const [
+      viewsResults,
+      topItemResults,
+      whatsappResults,
+      topSearchResults,
+      noResultSearchResults,
+      trafficSourceResults,
+    ] = await Promise.all([
       queryPostHog(viewsQuery, 'fudimenu stats weekly menu views'),
       topItemsQuery ? queryPostHog(topItemsQuery, 'fudimenu stats top items') : Promise.resolve([]),
+      whatsappQuery ? queryPostHog(whatsappQuery, 'fudimenu stats whatsapp clicks') : Promise.resolve([]),
+      queryPostHog(topSearchesQuery, 'fudimenu stats top searches'),
+      queryPostHog(noResultSearchesQuery, 'fudimenu stats no-result searches'),
+      queryPostHog(trafficSourcesQuery, 'fudimenu stats traffic sources'),
     ]);
 
     const viewsRow = viewsResults?.[0] ?? [];
@@ -137,18 +226,12 @@ export async function getTenantAnalyticsStats(tenantId: string): Promise<TenantA
     const previousDayViews = toNumber(viewsRow[1]);
     const weeklyViews = toNumber(viewsRow[2]);
     const previousWeeklyViews = toNumber(viewsRow[3]);
-    const todayDeltaPercent =
-      previousDayViews > 0
-        ? Math.round(((todayViews - previousDayViews) / previousDayViews) * 100)
-        : todayViews > 0
-          ? 100
-          : null;
-    const weeklyDeltaPercent =
-      previousWeeklyViews > 0
-        ? Math.round(((weeklyViews - previousWeeklyViews) / previousWeeklyViews) * 100)
-        : weeklyViews > 0
-          ? 100
-          : null;
+    const todayDeltaPercent = deltaPercent(todayViews, previousDayViews);
+    const weeklyDeltaPercent = deltaPercent(weeklyViews, previousWeeklyViews);
+
+    const whatsappRow = whatsappResults?.[0] ?? [];
+    const whatsappClicks = toNumber(whatsappRow[0]);
+    const previousWhatsappClicks = toNumber(whatsappRow[1]);
 
     return {
       status: 'ready',
@@ -168,6 +251,23 @@ export async function getTenantAnalyticsStats(tenantId: string): Promise<TenantA
           };
         })
         .filter((row) => row.id && row.views > 0),
+      whatsappClicks,
+      previousWhatsappClicks,
+      whatsappDeltaPercent: deltaPercent(whatsappClicks, previousWhatsappClicks),
+      whatsappConversionPercent:
+        weeklyViews > 0 ? Math.round((whatsappClicks / weeklyViews) * 100) : null,
+      topSearches: mapLabeledCounts(topSearchResults).map(({ label, count }) => ({
+        query: label,
+        count,
+      })),
+      noResultSearches: mapLabeledCounts(noResultSearchResults).map(({ label, count }) => ({
+        query: label,
+        count,
+      })),
+      trafficSources: mapLabeledCounts(trafficSourceResults).map(({ label, count }) => ({
+        source: label,
+        views: count,
+      })),
     };
   } catch (error) {
     console.error('Failed to load PostHog analytics stats', error);

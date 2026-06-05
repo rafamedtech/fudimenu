@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { initAnalytics, track } from '@/lib/analytics/events';
+import { parseTrafficSource } from '@/lib/analytics/traffic-source';
 
 const SESSION_KEY = 'fudimenu:public-session-id';
 
@@ -41,7 +42,7 @@ export function PublicMenuTracker({ tenantId, slug, locale }: { tenantId: string
     initAnalytics();
 
     const sessionId = getSessionId();
-    track('menu_viewed', { tenantId });
+    track('menu_viewed', { tenantId, ...parseTrafficSource(window.location.search) });
     recordMenuView({
       tenantId,
       slug,

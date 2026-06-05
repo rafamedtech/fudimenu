@@ -256,6 +256,7 @@ async function PublicMenuContent({
 
         <PublicMenuIsland
           slug={slug}
+          tenantId={tenant.id}
           tenantName={tenant.name}
           whatsappPhone={tenant.whatsappPhone ?? null}
           priceLocale={priceLocale}

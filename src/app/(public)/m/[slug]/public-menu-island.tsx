@@ -2,6 +2,7 @@
 
 import { useDeferredValue, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import { track } from '@/lib/analytics/events';
 import { getCategoryEmoji } from '@/lib/category-placeholder';
 import { formatPrice } from '@/lib/utils';
 import { buildWhatsAppOrderUrl } from '@/lib/whatsapp';
@@ -36,6 +37,7 @@ export interface IslandStrings {
 
 interface IslandProps {
   slug: string;
+  tenantId: string;
   tenantName: string;
   whatsappPhone: string | null;
   priceLocale: string;
@@ -58,6 +60,7 @@ function normalize(value: string) {
 
 export function PublicMenuIsland({
   slug,
+  tenantId,
   tenantName,
   whatsappPhone,
   priceLocale,
@@ -92,6 +95,30 @@ export function PublicMenuIsland({
 
   const hasResults = filteredSpecials.length + filteredGroups.length > 0;
 
+  // Total matched items (not groups) — basis for the menu_search resultCount,
+  // so no-results searches surface menu gaps in the Pro dashboard.
+  const resultItemCount =
+    filteredSpecials.length + filteredGroups.reduce((sum, g) => sum + g.items.length, 0);
+  const resultItemCountRef = useRef(resultItemCount);
+  resultItemCountRef.current = resultItemCount;
+  const lastTrackedQueryRef = useRef('');
+
+  // Debounce per settled query: fire once a query stabilizes (min 2 chars),
+  // deduped per session, with the result count at fire time.
+  useEffect(() => {
+    if (normalizedQuery.length < 2) return;
+    const handle = setTimeout(() => {
+      if (lastTrackedQueryRef.current === normalizedQuery) return;
+      lastTrackedQueryRef.current = normalizedQuery;
+      track('menu_search', {
+        tenantId,
+        query: normalizedQuery,
+        resultCount: resultItemCountRef.current,
+      });
+    }, 700);
+    return () => clearTimeout(handle);
+  }, [normalizedQuery, tenantId]);
+
   const buildWhatsapp = (item: MenuItem) =>
     buildWhatsAppOrderUrl({
       phone: whatsappPhone,
@@ -103,6 +130,7 @@ export function PublicMenuIsland({
     });
 
   const openItemSheet = (item: MenuItem, categoryName: string) => {
+    track('item_detail_viewed', { itemId: item.id, category: categoryName });
     setSheetSelection({ item, categoryName, whatsappUrl: buildWhatsapp(item) });
     setIsSheetOpen(true);
   };
