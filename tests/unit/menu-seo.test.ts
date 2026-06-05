@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { afterEach, describe, expect, it } from 'vitest';
-import { buildMenuJsonLd, buildMenuMetadata, getSiteUrl } from '@/lib/menu-seo';
+import { buildMenuJsonLd, buildMenuMetadata, getSiteUrl, serializeJsonLd } from '@/lib/menu-seo';
 import type { PublicMenuGroup } from '@/lib/public-menu-groups';
 import type { MenuItem, Tenant } from '@/types/domain';
 
@@ -232,6 +232,52 @@ describe('buildMenuJsonLd', () => {
   it('serializes to valid JSON for the script tag', () => {
     const jsonLd = build([group()], [item({ id: 's', isSpecialToday: true })]);
     expect(() => JSON.parse(JSON.stringify(jsonLd))).not.toThrow();
+  });
+});
+
+describe('serializeJsonLd', () => {
+  const build = (groups: PublicMenuGroup[]) =>
+    buildMenuJsonLd({
+      tenant,
+      groups,
+      dailySpecials: [],
+      locale: 'es',
+      baseUrl: BASE,
+      dailySpecialsLabel: 'Especiales de hoy',
+      menuName: 'Menú',
+    });
+
+  it('escapes </script> in restaurant-managed values without breaking JSON', () => {
+    const malicious = '</script><script>alert(1)</script>';
+    const jsonLd = build([
+      group({ items: [item({ name: malicious, description: malicious })] }),
+    ]);
+    const serialized = serializeJsonLd(jsonLd);
+
+    expect(serialized).not.toContain('</script>');
+    expect(serialized).toContain('\\u003c');
+    // Still valid JSON, and the original value round-trips after parsing.
+    const parsed = JSON.parse(serialized) as Record<string, unknown>;
+    const menuItem = (
+      (
+        (parsed['@graph'] as Array<Record<string, unknown>>)[1].hasMenuSection as Array<
+          Record<string, unknown>
+        >
+      )[0].hasMenuItem as Array<Record<string, unknown>>
+    )[0];
+    expect(menuItem.name).toBe(malicious);
+  });
+
+  it('escapes U+2028/U+2029 line terminators', () => {
+    const ls = String.fromCharCode(0x2028);
+    const ps = String.fromCharCode(0x2029);
+    const raw = `a${ls}b${ps}c`;
+    const serialized = serializeJsonLd({ x: raw });
+    expect(serialized).toContain('\\u2028');
+    expect(serialized).toContain('\\u2029');
+    expect(serialized).not.toContain(ls);
+    expect(serialized).not.toContain(ps);
+    expect(JSON.parse(serialized)).toEqual({ x: raw });
   });
 });
 

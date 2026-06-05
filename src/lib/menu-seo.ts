@@ -240,3 +240,19 @@ export function buildMenuJsonLd({
     '@graph': [restaurant, menu],
   };
 }
+
+/**
+ * Serialize JSON-LD for embedding in a `<script type="application/ld+json">`.
+ * Restaurant-managed values (item names, descriptions) are untrusted text, so a
+ * literal `</script>` would otherwise close the tag and open an XSS vector.
+ * Escape `<`, and the U+2028/U+2029 line terminators that are invalid in raw
+ * JS string contexts. Output still parses as JSON.
+ */
+export function serializeJsonLd(data: unknown): string {
+  const ESCAPES: Record<string, string> = {
+    '<': '\\u003c',
+    '\u2028': '\\u2028',
+    '\u2029': '\\u2029',
+  };
+  return JSON.stringify(data).replace(/[<\u2028\u2029]/g, (ch) => ESCAPES[ch]);
+}

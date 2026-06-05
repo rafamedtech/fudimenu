@@ -6,7 +6,7 @@ import { getLocale, getTranslations } from 'next-intl/server';
 import { buildBrandThemeStyle, resolveBrandSurfaceColor } from '@/lib/brand-theme';
 import { buildPublicMenuGroups } from '@/lib/public-menu-groups';
 import { localizeMenuItems } from '@/lib/menu-i18n';
-import { buildMenuJsonLd, buildMenuMetadata, getSiteUrl } from '@/lib/menu-seo';
+import { buildMenuJsonLd, buildMenuMetadata, getSiteUrl, serializeJsonLd } from '@/lib/menu-seo';
 import { menuService } from '@/server/services/menu.service';
 import { getPrisma } from '@/lib/db/prisma';
 import { PublicMenuLanguageSwitcher, PublicMenuPwaWrapper } from './public-menu-pwa-wrapper';
@@ -184,7 +184,7 @@ async function PublicMenuContent({
           type="application/ld+json"
           // schema.org Restaurant/Menu/MenuItem — discovery only, no PII beyond
           // the public business phone the tenant already shows on the page.
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(menuJsonLd) }}
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(menuJsonLd) }}
         />
         <a
           href="#menu-content"
