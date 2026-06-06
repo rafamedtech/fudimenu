@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import QRCode from 'qrcode';
 import { checkRateLimit, getClientIp } from '@/lib/ratelimit';
+import { markTenantQrDownloaded } from '@/server/services/qr-activation.service';
 
 export const runtime = 'nodejs';
 
@@ -23,6 +24,7 @@ export async function GET(
   }
 
   const url = `${process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'}/m/${slug}`;
+  const isDownload = request.nextUrl.searchParams.get('download') === '1';
   const buffer = await QRCode.toBuffer(url, {
     width: 600,
     margin: 2,
@@ -30,13 +32,15 @@ export async function GET(
     errorCorrectionLevel: 'H',
   });
 
+  if (isDownload) {
+    await markTenantQrDownloaded(slug);
+  }
+
   return new NextResponse(new Uint8Array(buffer), {
     headers: {
       'Content-Type': 'image/png',
       'Cache-Control': 'public, max-age=86400, immutable',
-      ...(request.nextUrl.searchParams.get('download') === '1'
-        ? { 'Content-Disposition': `attachment; filename="qr-${slug}.png"` }
-        : {}),
+      ...(isDownload ? { 'Content-Disposition': `attachment; filename="qr-${slug}.png"` } : {}),
     },
   });
 }

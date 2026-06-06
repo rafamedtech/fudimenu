@@ -5,12 +5,14 @@ import { ProFeatureLock, ProBadge } from '@/components/admin/pro-feature-lock';
 import { TenantSwitcher } from '@/components/admin/tenant-switcher';
 import { Doodle } from '@/components/brand/doodles';
 import { AppHeader } from '@/components/layout/app-header';
+import { buildActivationChecklist, type ActivationChecklist } from '@/lib/activation-checklist';
 import { formatPrice } from '@/lib/utils';
 import { requireAuth } from '@/server/guards/require-auth';
 import { menuService } from '@/server/services/menu.service';
 import { getTenantAnalyticsStats } from '@/server/services/posthog-analytics.service';
+import { getTenantQrDownloadedAt } from '@/server/services/qr-activation.service';
 import type { MenuItem, Plan, Tenant } from '@/types/domain';
-import { ImageIcon } from 'lucide-react';
+import { CheckCircle2, ChevronRight, Circle, ImageIcon } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -106,12 +108,21 @@ export default async function DashboardPage() {
 }
 
 async function DashboardContent({ tenantId, plan }: { tenantId: string; plan: Plan }) {
-  const { tenant, items, categories, sections } =
-    await menuService.getCachedMenuByTenantId(tenantId);
+  const [{ tenant, items, categories, sections }, qrDownloadedAt] = await Promise.all([
+    menuService.getCachedMenuByTenantId(tenantId),
+    getTenantQrDownloadedAt(tenantId),
+  ]);
   const dailySpecial = findDailySpecial(items);
   const total = items.length;
   const agotados = items.filter((i) => !i.isAvailable).length;
   const activeSlug = tenant.slug;
+  const activationChecklist = buildActivationChecklist({
+    tenant,
+    qrDownloadedAt,
+    items,
+    categories,
+    sections,
+  });
 
   return (
       <main className="flex flex-col gap-4 px-4 pb-6 ipad:gap-5 ipad:px-6 ipad:pb-8 ipad-landscape:px-7 desktop:px-8">
@@ -148,6 +159,8 @@ async function DashboardContent({ tenantId, plan }: { tenantId: string; plan: Pl
             </div>
           </div>
         </div>
+
+        <ActivationChecklistPanel checklist={activationChecklist} />
 
         {plan === 'free' ? (
           <ProFeatureLock
@@ -222,6 +235,129 @@ async function DashboardContent({ tenantId, plan }: { tenantId: string; plan: Pl
           </Card>
         </div>
       </main>
+  );
+}
+
+function ActivationChecklistPanel({ checklist }: { checklist: ActivationChecklist }) {
+  const isComplete = checklist.completedCount === checklist.totalCount;
+
+  return (
+    <section className="overflow-hidden rounded-xl border border-[var(--brand-card-border)] bg-[var(--brand-card)] shadow-md">
+      <div className="grid gap-0 ipad-landscape:grid-cols-[minmax(0,1fr)_18rem]">
+        <div className="p-4 ipad:p-5 ipad-landscape:p-6">
+          <div className="flex flex-col gap-3 ipad:flex-row ipad:items-start ipad:justify-between">
+            <div>
+              <p className="text-[11px] font-black uppercase tracking-wider text-[var(--brand-accent-text)]">
+                Activación pública
+              </p>
+              <h2 className="mt-1 text-xl font-black leading-tight text-ink-900 ipad:text-2xl">
+                Checklist para publicar con confianza
+              </h2>
+              <p className="mt-1 max-w-2xl text-sm leading-6 text-ink-500">
+                Enfocado en lo que ve el comensal cuando abre tu menú o escanea el QR.
+              </p>
+            </div>
+            <div className="shrink-0 rounded-lg bg-[var(--brand-surface-strong)] px-3 py-2 text-left ipad:text-right">
+              <p className="text-[11px] font-black uppercase tracking-wider text-ink-500">
+                Progreso
+              </p>
+              <p className="text-2xl font-black tabular-nums text-ink-900">
+                {checklist.completedCount}/{checklist.totalCount}
+              </p>
+            </div>
+          </div>
+
+          <div
+            className="mt-4 h-2 overflow-hidden rounded-full bg-[var(--brand-surface-strong)]"
+            role="progressbar"
+            aria-valuenow={checklist.percent}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label="Progreso de activación pública"
+          >
+            <div
+              className="h-full rounded-full bg-menta-500 transition-all"
+              style={{ width: `${checklist.percent}%` }}
+            />
+          </div>
+
+          <ul className="mt-4 grid gap-2 ipad:grid-cols-2">
+            {checklist.items.map((item) => {
+              const Icon = item.completed ? CheckCircle2 : Circle;
+
+              return (
+                <li key={item.id}>
+                  <Link
+                    href={item.href}
+                    className="group flex min-h-20 items-start gap-3 rounded-lg border border-[var(--brand-card-border)] bg-[var(--brand-surface)] p-3 transition-colors hover:border-[var(--brand-primary-border)] hover:bg-[var(--brand-primary-faint)]"
+                  >
+                    <Icon
+                      className={`mt-0.5 size-5 shrink-0 ${
+                        item.completed ? 'text-menta-600' : 'text-ink-300'
+                      }`}
+                      aria-hidden
+                    />
+                    <span className="min-w-0 flex-1">
+                      <span className="flex items-center justify-between gap-2">
+                        <span className="text-sm font-extrabold text-ink-900">{item.title}</span>
+                        {item.metric ? (
+                          <span className="shrink-0 text-[11px] font-bold text-ink-400">
+                            {item.metric}
+                          </span>
+                        ) : null}
+                      </span>
+                      <span className="mt-1 block text-xs leading-5 text-ink-500">
+                        {item.description}
+                      </span>
+                    </span>
+                    <ChevronRight
+                      className="mt-0.5 size-4 shrink-0 text-ink-300 transition-transform group-hover:translate-x-0.5 group-hover:text-[var(--brand-accent-text)]"
+                      aria-hidden
+                    />
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+
+        <div className="border-t border-[var(--brand-card-border)] bg-[var(--brand-surface-strong)] p-4 ipad:p-5 ipad-landscape:border-l ipad-landscape:border-t-0 ipad-landscape:p-6">
+          <p className="text-[11px] font-black uppercase tracking-wider text-ink-500">
+            Siguiente paso
+          </p>
+          {isComplete ? (
+            <>
+              <p className="mt-2 text-lg font-black leading-tight text-ink-900">Menú activado</p>
+              <p className="mt-2 text-sm leading-6 text-ink-600">
+                Tu menú público ya tiene identidad, contacto, fotos, QR y especial.
+              </p>
+              <Link
+                href="/qr"
+                className="mt-4 inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg border-[1.5px] border-[var(--brand-primary-border)] bg-[var(--brand-card)] px-4 text-sm font-extrabold text-ink-900 shadow-sm transition-all hover:border-[var(--brand-primary)] hover:bg-[var(--brand-primary-faint)]"
+              >
+                Compartir QR
+              </Link>
+            </>
+          ) : (
+            <>
+              <p className="mt-2 text-lg font-black leading-tight text-ink-900">
+                {checklist.nextItem?.title}
+              </p>
+              <p className="mt-2 text-sm leading-6 text-ink-600">
+                {checklist.nextItem?.description}
+              </p>
+              <Link
+                href={checklist.nextItem?.href ?? '/menu'}
+                className="mt-4 inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-[var(--brand-primary)] px-4 text-sm font-extrabold text-[var(--brand-on-primary)] shadow-mostaza-sm transition-all hover:bg-[var(--brand-primary-hover)] hover:shadow-mostaza-md"
+              >
+                Completar paso
+                <ChevronRight className="size-4" aria-hidden />
+              </Link>
+            </>
+          )}
+        </div>
+      </div>
+    </section>
   );
 }
 

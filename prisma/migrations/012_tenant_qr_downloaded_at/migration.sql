@@ -1,0 +1,3 @@
+ALTER TABLE "tenants"
+ADD COLUMN IF NOT EXISTS "qr_downloaded_at" TIMESTAMPTZ(6);
+
