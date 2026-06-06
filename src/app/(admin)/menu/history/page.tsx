@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import Link from 'next/link';
 import {
   CheckCircle2,
   Eye,
@@ -6,6 +7,7 @@ import {
   Pencil,
   Sparkles,
   Trash2,
+  User,
   ArrowUpDown,
   RotateCcw,
   type LucideIcon,
@@ -20,9 +22,29 @@ import { requireAuth } from '@/server/guards/require-auth';
 import {
   listMenuHistory,
   listRestorableItemIds,
+  MENU_AUDIT_ENTITY_TYPES,
   type MenuAuditAction,
+  type MenuAuditEntity,
   type MenuHistoryEntry,
 } from '@/server/services/audit.service';
+
+// First-phase scope: simple undelete of items only. Full snapshots / versioned
+// rollback of edits and of sections/categories are intentionally out of scope.
+
+type FilterValue = MenuAuditEntity | 'all';
+
+const FILTER_TABS: Array<{ value: FilterValue; label: string }> = [
+  { value: 'all', label: 'Todo' },
+  { value: 'menu_item', label: 'Platillos' },
+  { value: 'section', label: 'Secciones' },
+  { value: 'category', label: 'Categorías' },
+];
+
+function parseFilter(raw: string | undefined): FilterValue {
+  return raw && MENU_AUDIT_ENTITY_TYPES.includes(raw as MenuAuditEntity)
+    ? (raw as MenuAuditEntity)
+    : 'all';
+}
 
 const DATE_FORMATTER = new Intl.DateTimeFormat('es-MX', {
   day: 'numeric',
@@ -48,8 +70,13 @@ const ACTION_META: Record<MenuAuditAction, { label: string; icon: LucideIcon }> 
   'category.reordered': { label: 'Categorías reordenadas', icon: ArrowUpDown },
 };
 
-export default async function MenuHistoryPage() {
-  const ctx = await requireAuth();
+type MenuHistoryPageProps = {
+  searchParams: Promise<{ type?: string }>;
+};
+
+export default async function MenuHistoryPage({ searchParams }: MenuHistoryPageProps) {
+  const [{ type }, ctx] = await Promise.all([searchParams, requireAuth()]);
+  const filter = parseFilter(type);
 
   return (
     <>
@@ -59,17 +86,43 @@ export default async function MenuHistoryPage() {
         right={<TenantSwitcher activeTenantId={ctx.tenantId} memberships={ctx.memberships} />}
       />
       <main className="flex-1 px-4 pb-24 ipad:px-6 ipad-landscape:px-7 desktop:px-8">
-        <Suspense fallback={<HistoryLoading />}>
-          <HistoryList tenantId={ctx.tenantId} />
+        <FilterTabs active={filter} />
+        <Suspense key={filter} fallback={<HistoryLoading />}>
+          <HistoryList tenantId={ctx.tenantId} filter={filter} />
         </Suspense>
       </main>
     </>
   );
 }
 
-async function HistoryList({ tenantId }: { tenantId: string }) {
+function FilterTabs({ active }: { active: FilterValue }) {
+  return (
+    <nav className="mt-4 flex flex-wrap gap-2" aria-label="Filtrar historial por tipo">
+      {FILTER_TABS.map((tab) => {
+        const isActive = tab.value === active;
+        const href = tab.value === 'all' ? '/menu/history' : `/menu/history?type=${tab.value}`;
+        return (
+          <Link
+            key={tab.value}
+            href={href}
+            aria-current={isActive ? 'page' : undefined}
+            className={`inline-flex h-9 items-center rounded-full border-[1.5px] px-4 text-sm font-extrabold transition-all ${
+              isActive
+                ? 'border-[var(--brand-primary)] bg-[var(--brand-primary-faint)] text-[var(--brand-accent-text)]'
+                : 'border-[var(--brand-card-border)] bg-[var(--brand-card)] text-ink-700 hover:border-[var(--brand-primary)]'
+            }`}
+          >
+            {tab.label}
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}
+
+async function HistoryList({ tenantId, filter }: { tenantId: string; filter: FilterValue }) {
   const [entries, restorableIds] = await Promise.all([
-    listMenuHistory(tenantId),
+    listMenuHistory(tenantId, filter === 'all' ? {} : { entityType: filter }),
     listRestorableItemIds(tenantId),
   ]);
 
@@ -115,8 +168,11 @@ function HistoryRow({ entry, canRestore }: { entry: MenuHistoryEntry; canRestore
             {meta?.label ?? entry.action}
             {entry.name ? <span className="font-medium text-ink-600"> · {entry.name}</span> : null}
           </p>
-          <p className="mt-0.5 text-xs font-medium text-ink-500">
-            {DATE_FORMATTER.format(entry.createdAt)}
+          <p className="mt-0.5 flex items-center gap-1.5 text-xs font-medium text-ink-500">
+            <User className="size-3 shrink-0" aria-hidden />
+            <span className="truncate">{entry.actor.label}</span>
+            <span aria-hidden>·</span>
+            <span className="shrink-0">{DATE_FORMATTER.format(entry.createdAt)}</span>
           </p>
         </div>
         {canRestore && entry.entityId ? <RestoreItemButton itemId={entry.entityId} /> : null}
