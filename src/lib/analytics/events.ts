@@ -93,6 +93,7 @@ export type AnalyticsEvent =
   | { name: 'item_edited'; props: { itemId: string; field: string } }
   | { name: 'stock_toggled'; props: { itemId: string; available: boolean } }
   | { name: 'qr_downloaded'; props: { tenantId: string; format: 'png' | 'pdf' } }
+  | { name: 'material_downloaded'; props: { tenantId: string; material: 'poster' | 'sticker' | 'social' } }
   | { name: 'qr_menu_link_copied'; props: { tenantId: string } }
   | { name: 'qr_menu_link_shared'; props: { tenantId: string } }
   | { name: 'whatsapp_clicked'; props: { itemId: string } }
