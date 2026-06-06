@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import { NextResponse, type NextRequest } from 'next/server';
 import { requireAuth } from '@/server/guards/require-auth';
+import { withDeliveryTransform } from '@/lib/cloudinary';
 
 export const runtime = 'nodejs';
 
@@ -94,7 +95,7 @@ export async function POST(request: NextRequest) {
 
   // f_auto/q_auto belong at delivery time (browser-dependent), not at upload.
   // Inject them into the delivery URL so the stored original stays intact.
-  const deliveryUrl = result.secure_url.replace('/image/upload/', '/image/upload/f_auto,q_auto/');
+  const deliveryUrl = withDeliveryTransform(result.secure_url);
 
   return NextResponse.json({
     ok: true,

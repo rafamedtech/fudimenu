@@ -2,6 +2,7 @@
 import { revalidateTag, revalidatePath } from 'next/cache';
 import { requireAuth, type AuthContext } from '@/server/guards/require-auth';
 import { menuService } from '@/server/services/menu.service';
+import { recordMenuEvent } from '@/server/services/audit.service';
 import { categorySchema, reorderCategoriesSchema } from '@/lib/validators/item.schema';
 import { checkRateLimit } from '@/lib/ratelimit';
 
@@ -54,6 +55,12 @@ export async function upsertCategoryAction(input: unknown) {
 
   try {
     const category = await menuService.upsertCategory(ctx.tenantId, parsed.data);
+    await recordMenuEvent(ctx, {
+      action: parsed.data.id ? 'category.updated' : 'category.created',
+      entityType: 'category',
+      entityId: category.id,
+      metadata: { name: category.name },
+    });
     revalidateMenu(ctx);
     return { ok: true as const, category };
   } catch (err) {
@@ -68,6 +75,11 @@ export async function softDeleteCategoryAction(categoryId: string) {
 
   try {
     await menuService.deleteCategory(ctx.tenantId, categoryId);
+    await recordMenuEvent(ctx, {
+      action: 'category.deleted',
+      entityType: 'category',
+      entityId: categoryId,
+    });
     revalidateMenu(ctx);
     return { ok: true as const };
   } catch (err) {
@@ -88,6 +100,11 @@ export async function reorderCategoriesAction(input: unknown) {
     parsed.data.sectionId,
     parsed.data.categoryIds,
   );
+  await recordMenuEvent(ctx, {
+    action: 'category.reordered',
+    entityType: 'category',
+    metadata: { sectionId: parsed.data.sectionId, categoryIds: parsed.data.categoryIds },
+  });
   revalidateMenu(ctx);
   return { ok: true as const };
 }

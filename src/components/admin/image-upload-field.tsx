@@ -1,10 +1,12 @@
 'use client';
 
 import Image from 'next/image';
-import { ImagePlus, Loader2, X } from 'lucide-react';
+import { ImagePlus, Images, Loader2, X } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
+import { Sheet } from '@/components/ui/sheet';
+import { listTenantImagesAction } from '@/server/actions/image-library.actions';
 
 type ImageKind = 'logo' | 'tenant-cover' | 'item' | 'section' | 'category';
 
@@ -25,6 +27,36 @@ export function ImageUploadField({
 }: ImageUploadFieldProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [library, setLibrary] = useState<string[] | null>(null);
+  const [loadingLibrary, setLoadingLibrary] = useState(false);
+
+  async function openPicker() {
+    setPickerOpen(true);
+    if (library !== null) return;
+
+    setLoadingLibrary(true);
+    try {
+      const result = await listTenantImagesAction();
+      if (!result.ok) {
+        toast.error('No pude cargar tus imágenes');
+        setLibrary([]);
+        return;
+      }
+      setLibrary(result.images);
+    } catch {
+      toast.error('No pude cargar tus imágenes');
+      setLibrary([]);
+    } finally {
+      setLoadingLibrary(false);
+    }
+  }
+
+  function chooseExisting(url: string) {
+    onChange(url);
+    setPickerOpen(false);
+    toast.success('Imagen seleccionada');
+  }
 
   async function upload(file: File) {
     const formData = new FormData();
@@ -47,6 +79,8 @@ export function ImageUploadField({
       }
 
       onChange(result.url);
+      // New upload joins the library; force a refetch next time the picker opens.
+      setLibrary(null);
       toast.success('Imagen subida');
     } catch {
       toast.error('No pude subir la imagen');
@@ -85,7 +119,7 @@ export function ImageUploadField({
           if (file) void upload(file);
         }}
       />
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-3 gap-2">
         <Button
           type="button"
           variant="outline"
@@ -95,11 +129,46 @@ export function ImageUploadField({
           <ImagePlus className="size-4" aria-hidden />
           Subir
         </Button>
+        <Button type="button" variant="outline" onClick={openPicker} disabled={uploading}>
+          <Images className="size-4" aria-hidden />
+          Elegir
+        </Button>
         <Button type="button" variant="ghost" onClick={() => onChange(null)} disabled={!value}>
           <X className="size-4" aria-hidden />
           Quitar
         </Button>
       </div>
+
+      <Sheet open={pickerOpen} onOpenChange={setPickerOpen} title="Elegir imagen existente">
+        {loadingLibrary ? (
+          <div className="flex justify-center py-8">
+            <Loader2 className="size-7 animate-spin text-ink-700" aria-hidden />
+          </div>
+        ) : library && library.length > 0 ? (
+          <ul className="grid grid-cols-3 gap-2">
+            {library.map((url) => (
+              <li key={url}>
+                <button
+                  type="button"
+                  onClick={() => chooseExisting(url)}
+                  aria-label="Usar esta imagen"
+                  className={`relative aspect-square w-full overflow-hidden rounded-md border-[1.5px] transition-colors ${
+                    url === value
+                      ? 'border-mostaza-500 ring-2 ring-mostaza-300'
+                      : 'border-ink-200 hover:border-mostaza-400'
+                  }`}
+                >
+                  <Image src={url} alt="" fill sizes="120px" className="object-cover" />
+                </button>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="py-8 text-center text-sm text-ink-500">
+            Aún no tienes imágenes. Sube una para empezar tu biblioteca.
+          </p>
+        )}
+      </Sheet>
     </div>
   );
 }

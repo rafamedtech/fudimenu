@@ -2,6 +2,7 @@
 import { revalidateTag, revalidatePath } from 'next/cache';
 import { requireAuth, type AuthContext } from '@/server/guards/require-auth';
 import { menuService } from '@/server/services/menu.service';
+import { recordMenuEvent } from '@/server/services/audit.service';
 import {
   sectionSchema,
   reorderSectionsSchema,
@@ -67,6 +68,12 @@ export async function upsertSectionAction(input: unknown) {
     }
 
     const section = await menuService.upsertSection(ctx.tenantId, parsed.data);
+    await recordMenuEvent(ctx, {
+      action: parsed.data.id ? 'section.updated' : 'section.created',
+      entityType: 'section',
+      entityId: section.id,
+      metadata: { name: section.name },
+    });
     revalidateMenu(ctx);
     return { ok: true as const, section };
   } catch (err) {
@@ -81,6 +88,11 @@ export async function softDeleteSectionAction(sectionId: string) {
 
   try {
     await menuService.deleteSection(ctx.tenantId, sectionId);
+    await recordMenuEvent(ctx, {
+      action: 'section.deleted',
+      entityType: 'section',
+      entityId: sectionId,
+    });
     revalidateMenu(ctx);
     return { ok: true as const };
   } catch (err) {
@@ -97,6 +109,11 @@ export async function reorderSectionsAction(input: unknown) {
   if (!parsed.success) return fail('validation', parsed.error.message);
 
   await menuService.reorderSections(ctx.tenantId, parsed.data.sectionIds);
+  await recordMenuEvent(ctx, {
+    action: 'section.reordered',
+    entityType: 'section',
+    metadata: { sectionIds: parsed.data.sectionIds },
+  });
   revalidateMenu(ctx);
   return { ok: true as const };
 }

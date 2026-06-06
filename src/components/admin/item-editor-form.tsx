@@ -29,6 +29,7 @@ import {
   type DietaryTag,
 } from '@/lib/item-attributes';
 import { itemSchema, type ItemInput } from '@/lib/validators/item.schema';
+import { ITEM_IMAGE_CROPS, type ItemImageCrop } from '@/lib/cloudinary';
 import {
   restoreItemAction,
   softDeleteItemAction,
@@ -110,6 +111,8 @@ export function ItemEditorForm({ initial, categories, sectionId, offlineConflict
       priceCents: initial?.priceCents ?? 0,
       currency: initial?.currency ?? 'MXN',
       imageUrl: initial?.imageUrl ?? null,
+      imageAltText: initial?.imageAltText ?? null,
+      imageCrop: (initial?.imageCrop as ItemImageCrop | null) ?? null,
       isSpecialToday: initial?.isSpecialToday ?? false,
       specialPrice: initial?.specialPrice ?? null,
       dietaryTags: (initial?.dietaryTags ?? []) as DietaryTag[],
@@ -145,6 +148,8 @@ export function ItemEditorForm({ initial, categories, sectionId, offlineConflict
   const selectedCategory = localCategories.find((category) => category.id === selectedCategoryId);
   const placeholderEmoji = getCategoryEmoji(selectedCategory?.name);
   const imageUrl = watch('imageUrl');
+  const imageAltText = watch('imageAltText') ?? '';
+  const imageCrop = (watch('imageCrop') ?? null) as ItemImageCrop | null;
   const isSpecialToday = watch('isSpecialToday') ?? false;
   const dietaryTags = watch('dietaryTags') ?? [];
   const allergenTags = watch('allergenTags') ?? [];
@@ -334,9 +339,27 @@ export function ItemEditorForm({ initial, categories, sectionId, offlineConflict
           kind="item"
           label="Foto opcional"
           value={imageUrl}
-          onChange={(url) => setValue('imageUrl', url, { shouldDirty: true, shouldValidate: true })}
+          onChange={(url) => {
+            setValue('imageUrl', url, { shouldDirty: true, shouldValidate: true });
+            // Drop editorial metadata when the photo is removed.
+            if (!url) {
+              setValue('imageAltText', null, { shouldDirty: true });
+              setValue('imageCrop', null, { shouldDirty: true });
+            }
+          }}
           fallback={<span className="text-6xl" aria-hidden>{placeholderEmoji}</span>}
         />
+
+        {imageUrl && (
+          <ImageEditorialCard
+            altText={imageAltText}
+            crop={imageCrop}
+            onAltChange={(value) =>
+              setValue('imageAltText', value || null, { shouldDirty: true, shouldValidate: true })
+            }
+            onCropChange={(value) => setValue('imageCrop', value, { shouldDirty: true })}
+          />
+        )}
 
         <Input
           label="Nombre del platillo"
@@ -695,6 +718,68 @@ function DescriptionField({
         </span>
       </div>
     </div>
+  );
+}
+
+const CROP_LABEL: Record<ItemImageCrop, string> = {
+  auto: 'Auto',
+  center: 'Centro',
+  top: 'Arriba',
+  bottom: 'Abajo',
+};
+
+function ImageEditorialCard({
+  altText,
+  crop,
+  onAltChange,
+  onCropChange,
+}: {
+  altText: string;
+  crop: ItemImageCrop | null;
+  onAltChange: (value: string) => void;
+  onCropChange: (value: ItemImageCrop) => void;
+}) {
+  return (
+    <Card className="space-y-4 border border-ink-200 bg-[var(--brand-surface)] shadow-sm">
+      <div>
+        <p className="font-bold text-ink-900">Foto: texto y encuadre</p>
+        <p className="text-xs text-ink-500">
+          El texto alternativo describe la foto para lectores de pantalla y SEO. El encuadre elige
+          qué parte se ve cuando se recorta.
+        </p>
+      </div>
+
+      <Input
+        label="Texto alternativo"
+        placeholder="Ej: Tacos al pastor con piña y cilantro"
+        maxLength={125}
+        value={altText}
+        onChange={(event) => onAltChange(event.target.value)}
+      />
+
+      <fieldset>
+        <legend className="mb-2 text-sm font-medium text-ink-700">Encuadre</legend>
+        <div className="flex flex-wrap gap-2">
+          {ITEM_IMAGE_CROPS.map((value) => (
+            <button
+              key={value}
+              type="button"
+              role="radio"
+              aria-checked={crop === value || (value === 'auto' && crop === null)}
+              onClick={() => onCropChange(value)}
+              className={cn(
+                'rounded-full border-[1.5px] px-3 py-1.5 text-sm font-medium transition-colors',
+                crop === value || (value === 'auto' && crop === null)
+                  ? 'border-mostaza-500 bg-mostaza-100 text-mostaza-800'
+                  : 'border-ink-300 bg-[var(--brand-card)] text-ink-700 hover:border-mostaza-400 hover:bg-[var(--brand-surface)]',
+              )}
+            >
+              {CROP_LABEL[value]}
+            </button>
+          ))}
+        </div>
+      </fieldset>
+    </Card>
   );
 }
 

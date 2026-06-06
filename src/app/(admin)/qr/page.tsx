@@ -9,6 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { requireAuth } from '@/server/guards/require-auth';
 import { menuService } from '@/server/services/menu.service';
 import { QrShareActions } from './qr-share-actions';
+import { QrMaterials } from './qr-materials';
 
 function getBaseUrl() {
   return (process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000').replace(/\/$/, '');
@@ -129,6 +130,16 @@ async function QrPageContent({
             </ul>
           </Card>
 
+          <QrMaterials
+            qrImageUrl={qrImageUrl}
+            tenantName={tenant.name}
+            menuUrl={menuUrl}
+            tenantSlug={tenant.slug}
+            primaryColor={tenant.primaryColor}
+            logoUrl={tenant.logoUrl}
+            logoShape={tenant.logoShape}
+            tenantId={tenantId}
+          />
         </div>
 
         {/* RIGHT: sticky QR panel */}

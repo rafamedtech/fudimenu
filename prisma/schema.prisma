@@ -167,6 +167,8 @@ model MenuItem {
   specialPrice   Int?              @map("special_price")
   currency       String            @default("MXN") @db.Char(3)
   imageUrl       String?           @map("image_url")
+  imageAltText   String?           @map("image_alt_text")
+  imageCrop      String?           @map("image_crop")
   isAvailable    Boolean           @default(true) @map("is_available")
   dietaryTags    String[]          @default([]) @map("dietary_tags")
   allergenTags   String[]          @default([]) @map("allergen_tags")
