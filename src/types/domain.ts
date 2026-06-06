@@ -56,6 +56,8 @@ export type MenuItem = {
   specialPrice?: number | null;
   currency: string;
   imageUrl: string | null;
+  imageAltText?: string | null;
+  imageCrop?: string | null;
   isAvailable: boolean;
   dietaryTags: string[];
   allergenTags: string[];

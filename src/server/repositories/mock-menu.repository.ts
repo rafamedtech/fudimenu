@@ -2,6 +2,8 @@ import 'server-only';
 import { mockCategories, mockItems, mockSections, mockTenant } from '@/lib/mock/data';
 import { sanitizePlainText } from '@/lib/sanitize';
 import { normalizeAllergenTags, normalizeDietaryTags } from '@/lib/item-attributes';
+import { dedupeImageUrls } from '@/lib/image-library';
+import { isItemImageCrop } from '@/lib/cloudinary';
 import type { IMenuRepository, MenuData, ImportResult } from '@/server/repositories/menu.repository';
 import type { Category, ItemTranslation, ItemUpsertInput, MenuItem, MenuSection, Tenant } from '@/types/domain';
 import type { SectionInput } from '@/lib/validators/section.schema';
@@ -95,6 +97,24 @@ export class MockMenuRepository implements IMenuRepository {
       .map(cloneMenuItem);
   }
 
+  async getImageLibrary(tenantId: string): Promise<string[]> {
+    if (tenantId !== this.tenant.id) return [];
+
+    return dedupeImageUrls([
+      this.tenant.logoUrl,
+      this.tenant.coverImageUrl,
+      ...this.sections
+        .filter((s) => s.tenantId === tenantId && !s.deletedAt)
+        .map((s) => s.coverImageUrl),
+      ...this.categories
+        .filter((c) => c.tenantId === tenantId)
+        .map((c) => c.coverImageUrl),
+      ...this.items
+        .filter((item) => item.tenantId === tenantId && isActive(item))
+        .map((item) => item.imageUrl),
+    ]);
+  }
+
   async toggleItemAvailability(
     tenantId: string,
     itemId: string,
@@ -172,6 +192,17 @@ export class MockMenuRepository implements IMenuRepository {
       ...('allergenTags' in input
         ? { allergenTags: normalizeAllergenTags(input.allergenTags ?? []) }
         : {}),
+      // Editorial metadata follows the image: only touched when imageUrl is
+      // part of the write, and cleared when the image is removed (mirrors Prisma).
+      ...('imageUrl' in input
+        ? (() => {
+            const hasImage = (input.imageUrl ?? null) !== null;
+            return {
+              imageAltText: hasImage ? sanitizePlainText(input.imageAltText, 125) : null,
+              imageCrop: hasImage && isItemImageCrop(input.imageCrop) ? input.imageCrop : null,
+            };
+          })()
+        : {}),
     };
 
     if (input.id) {
@@ -205,6 +236,12 @@ export class MockMenuRepository implements IMenuRepository {
       specialPrice: input.specialPrice ?? null,
       currency: input.currency ?? 'MXN',
       imageUrl: input.imageUrl ?? null,
+      imageAltText:
+        (input.imageUrl ?? null) !== null ? sanitizePlainText(input.imageAltText, 125) : null,
+      imageCrop:
+        (input.imageUrl ?? null) !== null && isItemImageCrop(input.imageCrop)
+          ? input.imageCrop
+          : null,
       isAvailable: input.isAvailable ?? true,
       dietaryTags: normalizeDietaryTags(input.dietaryTags ?? []),
       allergenTags: normalizeAllergenTags(input.allergenTags ?? []),

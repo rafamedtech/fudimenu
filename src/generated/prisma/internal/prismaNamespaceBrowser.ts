@@ -176,6 +176,8 @@ export const MenuItemScalarFieldEnum = {
   specialPrice: 'specialPrice',
   currency: 'currency',
   imageUrl: 'imageUrl',
+  imageAltText: 'imageAltText',
+  imageCrop: 'imageCrop',
   isAvailable: 'isAvailable',
   dietaryTags: 'dietaryTags',
   allergenTags: 'allergenTags',

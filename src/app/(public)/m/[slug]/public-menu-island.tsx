@@ -3,6 +3,7 @@
 import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import { getCategoryEmoji } from '@/lib/category-placeholder';
+import { withItemImageCrop, type ItemImageCrop } from '@/lib/cloudinary';
 import { formatPrice } from '@/lib/utils';
 import { buildWhatsAppOrderUrl } from '@/lib/whatsapp';
 import {
@@ -469,7 +470,10 @@ function ItemThumb({
     <div className="relative size-20 flex-shrink-0 overflow-hidden rounded-md bg-[var(--brand-primary-soft)] ipad:h-24 ipad:w-24 ipad-landscape:h-28 ipad-landscape:w-28">
       {item.imageUrl ? (
         <Image
-          src={item.imageUrl}
+          src={withItemImageCrop(item.imageUrl, item.imageCrop as ItemImageCrop | null, {
+            aspect: '1:1',
+            width: 224,
+          })}
           alt=""
           fill
           sizes="(min-width: 1024px) 112px, (min-width: 768px) 96px, 80px"
@@ -592,8 +596,11 @@ export function ItemSheet({
           <div className="relative aspect-[4/3] w-full shrink-0 overflow-hidden bg-[var(--brand-primary-soft)]">
             {item.imageUrl ? (
               <Image
-                src={item.imageUrl}
-                alt={item.name}
+                src={withItemImageCrop(item.imageUrl, item.imageCrop as ItemImageCrop | null, {
+                  aspect: '4:3',
+                  width: 800,
+                })}
+                alt={item.imageAltText?.trim() ? item.imageAltText : item.name}
                 fill
                 sizes="(min-width: 768px) 640px, 100vw"
                 className="object-cover"

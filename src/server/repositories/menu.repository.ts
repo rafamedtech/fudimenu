@@ -21,6 +21,7 @@ export interface IMenuRepository {
   getTenantBySlug(slug: string): Promise<Tenant | null>;
   getMenuByTenantId(id: string): Promise<MenuData>;
   getItemsByTenantId(id: string): Promise<MenuItem[]>;
+  getImageLibrary(tenantId: string): Promise<string[]>;
   toggleItemAvailability(tenantId: string, itemId: string, available: boolean): Promise<MenuItem>;
   setItemSpecialToday(
     tenantId: string,

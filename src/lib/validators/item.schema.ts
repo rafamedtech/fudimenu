@@ -4,6 +4,7 @@ import {
   normalizeAllergenTags,
   normalizeDietaryTags,
 } from '@/lib/item-attributes';
+import { ITEM_IMAGE_CROPS } from '@/lib/cloudinary';
 
 export const itemSchema = z
   .object({
@@ -16,6 +17,10 @@ export const itemSchema = z
     specialPrice: z.number().int().min(1, 'Precio especial debe ser mayor a 0').max(10_000_00).nullable().optional(),
     currency: z.string().length(3).default('MXN'),
     imageUrl: z.string().url().nullable().optional(),
+    // Editorial metadata: alt text for the dish photo + delivery crop preset.
+    // Both are only meaningful when imageUrl is set; UI hides them otherwise.
+    imageAltText: z.string().max(125).nullable().optional(),
+    imageCrop: z.enum(ITEM_IMAGE_CROPS).nullable().optional(),
     isAvailable: z.boolean().optional(),
     // Public diet/allergen attributes. Cap raw input length to bound payload,
     // then normalize: drop non-allowlisted values + dedupe + canonical order.

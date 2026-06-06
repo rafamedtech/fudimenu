@@ -49,6 +49,8 @@ export type MenuItemMinAggregateOutputType = {
   specialPrice: number | null
   currency: string | null
   imageUrl: string | null
+  imageAltText: string | null
+  imageCrop: string | null
   isAvailable: boolean | null
   sortOrder: number | null
   createdAt: Date | null
@@ -67,6 +69,8 @@ export type MenuItemMaxAggregateOutputType = {
   specialPrice: number | null
   currency: string | null
   imageUrl: string | null
+  imageAltText: string | null
+  imageCrop: string | null
   isAvailable: boolean | null
   sortOrder: number | null
   createdAt: Date | null
@@ -85,6 +89,8 @@ export type MenuItemCountAggregateOutputType = {
   specialPrice: number
   currency: number
   imageUrl: number
+  imageAltText: number
+  imageCrop: number
   isAvailable: number
   dietaryTags: number
   allergenTags: number
@@ -119,6 +125,8 @@ export type MenuItemMinAggregateInputType = {
   specialPrice?: true
   currency?: true
   imageUrl?: true
+  imageAltText?: true
+  imageCrop?: true
   isAvailable?: true
   sortOrder?: true
   createdAt?: true
@@ -137,6 +145,8 @@ export type MenuItemMaxAggregateInputType = {
   specialPrice?: true
   currency?: true
   imageUrl?: true
+  imageAltText?: true
+  imageCrop?: true
   isAvailable?: true
   sortOrder?: true
   createdAt?: true
@@ -155,6 +165,8 @@ export type MenuItemCountAggregateInputType = {
   specialPrice?: true
   currency?: true
   imageUrl?: true
+  imageAltText?: true
+  imageCrop?: true
   isAvailable?: true
   dietaryTags?: true
   allergenTags?: true
@@ -262,6 +274,8 @@ export type MenuItemGroupByOutputType = {
   specialPrice: number | null
   currency: string
   imageUrl: string | null
+  imageAltText: string | null
+  imageCrop: string | null
   isAvailable: boolean
   dietaryTags: string[]
   allergenTags: string[]
@@ -305,6 +319,8 @@ export type MenuItemWhereInput = {
   specialPrice?: Prisma.IntNullableFilter<"MenuItem"> | number | null
   currency?: Prisma.StringFilter<"MenuItem"> | string
   imageUrl?: Prisma.StringNullableFilter<"MenuItem"> | string | null
+  imageAltText?: Prisma.StringNullableFilter<"MenuItem"> | string | null
+  imageCrop?: Prisma.StringNullableFilter<"MenuItem"> | string | null
   isAvailable?: Prisma.BoolFilter<"MenuItem"> | boolean
   dietaryTags?: Prisma.StringNullableListFilter<"MenuItem">
   allergenTags?: Prisma.StringNullableListFilter<"MenuItem">
@@ -329,6 +345,8 @@ export type MenuItemOrderByWithRelationInput = {
   specialPrice?: Prisma.SortOrderInput | Prisma.SortOrder
   currency?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  imageAltText?: Prisma.SortOrderInput | Prisma.SortOrder
+  imageCrop?: Prisma.SortOrderInput | Prisma.SortOrder
   isAvailable?: Prisma.SortOrder
   dietaryTags?: Prisma.SortOrder
   allergenTags?: Prisma.SortOrder
@@ -356,6 +374,8 @@ export type MenuItemWhereUniqueInput = Prisma.AtLeast<{
   specialPrice?: Prisma.IntNullableFilter<"MenuItem"> | number | null
   currency?: Prisma.StringFilter<"MenuItem"> | string
   imageUrl?: Prisma.StringNullableFilter<"MenuItem"> | string | null
+  imageAltText?: Prisma.StringNullableFilter<"MenuItem"> | string | null
+  imageCrop?: Prisma.StringNullableFilter<"MenuItem"> | string | null
   isAvailable?: Prisma.BoolFilter<"MenuItem"> | boolean
   dietaryTags?: Prisma.StringNullableListFilter<"MenuItem">
   allergenTags?: Prisma.StringNullableListFilter<"MenuItem">
@@ -380,6 +400,8 @@ export type MenuItemOrderByWithAggregationInput = {
   specialPrice?: Prisma.SortOrderInput | Prisma.SortOrder
   currency?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  imageAltText?: Prisma.SortOrderInput | Prisma.SortOrder
+  imageCrop?: Prisma.SortOrderInput | Prisma.SortOrder
   isAvailable?: Prisma.SortOrder
   dietaryTags?: Prisma.SortOrder
   allergenTags?: Prisma.SortOrder
@@ -408,6 +430,8 @@ export type MenuItemScalarWhereWithAggregatesInput = {
   specialPrice?: Prisma.IntNullableWithAggregatesFilter<"MenuItem"> | number | null
   currency?: Prisma.StringWithAggregatesFilter<"MenuItem"> | string
   imageUrl?: Prisma.StringNullableWithAggregatesFilter<"MenuItem"> | string | null
+  imageAltText?: Prisma.StringNullableWithAggregatesFilter<"MenuItem"> | string | null
+  imageCrop?: Prisma.StringNullableWithAggregatesFilter<"MenuItem"> | string | null
   isAvailable?: Prisma.BoolWithAggregatesFilter<"MenuItem"> | boolean
   dietaryTags?: Prisma.StringNullableListFilter<"MenuItem">
   allergenTags?: Prisma.StringNullableListFilter<"MenuItem">
@@ -426,6 +450,8 @@ export type MenuItemCreateInput = {
   specialPrice?: number | null
   currency?: string
   imageUrl?: string | null
+  imageAltText?: string | null
+  imageCrop?: string | null
   isAvailable?: boolean
   dietaryTags?: Prisma.MenuItemCreatedietaryTagsInput | string[]
   allergenTags?: Prisma.MenuItemCreateallergenTagsInput | string[]
@@ -450,6 +476,8 @@ export type MenuItemUncheckedCreateInput = {
   specialPrice?: number | null
   currency?: string
   imageUrl?: string | null
+  imageAltText?: string | null
+  imageCrop?: string | null
   isAvailable?: boolean
   dietaryTags?: Prisma.MenuItemCreatedietaryTagsInput | string[]
   allergenTags?: Prisma.MenuItemCreateallergenTagsInput | string[]
@@ -470,6 +498,8 @@ export type MenuItemUpdateInput = {
   specialPrice?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageAltText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageCrop?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dietaryTags?: Prisma.MenuItemUpdatedietaryTagsInput | string[]
   allergenTags?: Prisma.MenuItemUpdateallergenTagsInput | string[]
@@ -494,6 +524,8 @@ export type MenuItemUncheckedUpdateInput = {
   specialPrice?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageAltText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageCrop?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dietaryTags?: Prisma.MenuItemUpdatedietaryTagsInput | string[]
   allergenTags?: Prisma.MenuItemUpdateallergenTagsInput | string[]
@@ -516,6 +548,8 @@ export type MenuItemCreateManyInput = {
   specialPrice?: number | null
   currency?: string
   imageUrl?: string | null
+  imageAltText?: string | null
+  imageCrop?: string | null
   isAvailable?: boolean
   dietaryTags?: Prisma.MenuItemCreatedietaryTagsInput | string[]
   allergenTags?: Prisma.MenuItemCreateallergenTagsInput | string[]
@@ -534,6 +568,8 @@ export type MenuItemUpdateManyMutationInput = {
   specialPrice?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageAltText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageCrop?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dietaryTags?: Prisma.MenuItemUpdatedietaryTagsInput | string[]
   allergenTags?: Prisma.MenuItemUpdateallergenTagsInput | string[]
@@ -554,6 +590,8 @@ export type MenuItemUncheckedUpdateManyInput = {
   specialPrice?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageAltText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageCrop?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dietaryTags?: Prisma.MenuItemUpdatedietaryTagsInput | string[]
   allergenTags?: Prisma.MenuItemUpdateallergenTagsInput | string[]
@@ -592,6 +630,8 @@ export type MenuItemCountOrderByAggregateInput = {
   specialPrice?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
+  imageAltText?: Prisma.SortOrder
+  imageCrop?: Prisma.SortOrder
   isAvailable?: Prisma.SortOrder
   dietaryTags?: Prisma.SortOrder
   allergenTags?: Prisma.SortOrder
@@ -618,6 +658,8 @@ export type MenuItemMaxOrderByAggregateInput = {
   specialPrice?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
+  imageAltText?: Prisma.SortOrder
+  imageCrop?: Prisma.SortOrder
   isAvailable?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -636,6 +678,8 @@ export type MenuItemMinOrderByAggregateInput = {
   specialPrice?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
+  imageAltText?: Prisma.SortOrder
+  imageCrop?: Prisma.SortOrder
   isAvailable?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -801,6 +845,8 @@ export type MenuItemCreateWithoutTenantInput = {
   specialPrice?: number | null
   currency?: string
   imageUrl?: string | null
+  imageAltText?: string | null
+  imageCrop?: string | null
   isAvailable?: boolean
   dietaryTags?: Prisma.MenuItemCreatedietaryTagsInput | string[]
   allergenTags?: Prisma.MenuItemCreateallergenTagsInput | string[]
@@ -823,6 +869,8 @@ export type MenuItemUncheckedCreateWithoutTenantInput = {
   specialPrice?: number | null
   currency?: string
   imageUrl?: string | null
+  imageAltText?: string | null
+  imageCrop?: string | null
   isAvailable?: boolean
   dietaryTags?: Prisma.MenuItemCreatedietaryTagsInput | string[]
   allergenTags?: Prisma.MenuItemCreateallergenTagsInput | string[]
@@ -874,6 +922,8 @@ export type MenuItemScalarWhereInput = {
   specialPrice?: Prisma.IntNullableFilter<"MenuItem"> | number | null
   currency?: Prisma.StringFilter<"MenuItem"> | string
   imageUrl?: Prisma.StringNullableFilter<"MenuItem"> | string | null
+  imageAltText?: Prisma.StringNullableFilter<"MenuItem"> | string | null
+  imageCrop?: Prisma.StringNullableFilter<"MenuItem"> | string | null
   isAvailable?: Prisma.BoolFilter<"MenuItem"> | boolean
   dietaryTags?: Prisma.StringNullableListFilter<"MenuItem">
   allergenTags?: Prisma.StringNullableListFilter<"MenuItem">
@@ -892,6 +942,8 @@ export type MenuItemCreateWithoutCategoryInput = {
   specialPrice?: number | null
   currency?: string
   imageUrl?: string | null
+  imageAltText?: string | null
+  imageCrop?: string | null
   isAvailable?: boolean
   dietaryTags?: Prisma.MenuItemCreatedietaryTagsInput | string[]
   allergenTags?: Prisma.MenuItemCreateallergenTagsInput | string[]
@@ -914,6 +966,8 @@ export type MenuItemUncheckedCreateWithoutCategoryInput = {
   specialPrice?: number | null
   currency?: string
   imageUrl?: string | null
+  imageAltText?: string | null
+  imageCrop?: string | null
   isAvailable?: boolean
   dietaryTags?: Prisma.MenuItemCreatedietaryTagsInput | string[]
   allergenTags?: Prisma.MenuItemCreateallergenTagsInput | string[]
@@ -960,6 +1014,8 @@ export type MenuItemCreateWithoutTranslationsInput = {
   specialPrice?: number | null
   currency?: string
   imageUrl?: string | null
+  imageAltText?: string | null
+  imageCrop?: string | null
   isAvailable?: boolean
   dietaryTags?: Prisma.MenuItemCreatedietaryTagsInput | string[]
   allergenTags?: Prisma.MenuItemCreateallergenTagsInput | string[]
@@ -983,6 +1039,8 @@ export type MenuItemUncheckedCreateWithoutTranslationsInput = {
   specialPrice?: number | null
   currency?: string
   imageUrl?: string | null
+  imageAltText?: string | null
+  imageCrop?: string | null
   isAvailable?: boolean
   dietaryTags?: Prisma.MenuItemCreatedietaryTagsInput | string[]
   allergenTags?: Prisma.MenuItemCreateallergenTagsInput | string[]
@@ -1018,6 +1076,8 @@ export type MenuItemUpdateWithoutTranslationsInput = {
   specialPrice?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageAltText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageCrop?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dietaryTags?: Prisma.MenuItemUpdatedietaryTagsInput | string[]
   allergenTags?: Prisma.MenuItemUpdateallergenTagsInput | string[]
@@ -1041,6 +1101,8 @@ export type MenuItemUncheckedUpdateWithoutTranslationsInput = {
   specialPrice?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageAltText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageCrop?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dietaryTags?: Prisma.MenuItemUpdatedietaryTagsInput | string[]
   allergenTags?: Prisma.MenuItemUpdateallergenTagsInput | string[]
@@ -1060,6 +1122,8 @@ export type MenuItemCreateWithoutViewsInput = {
   specialPrice?: number | null
   currency?: string
   imageUrl?: string | null
+  imageAltText?: string | null
+  imageCrop?: string | null
   isAvailable?: boolean
   dietaryTags?: Prisma.MenuItemCreatedietaryTagsInput | string[]
   allergenTags?: Prisma.MenuItemCreateallergenTagsInput | string[]
@@ -1083,6 +1147,8 @@ export type MenuItemUncheckedCreateWithoutViewsInput = {
   specialPrice?: number | null
   currency?: string
   imageUrl?: string | null
+  imageAltText?: string | null
+  imageCrop?: string | null
   isAvailable?: boolean
   dietaryTags?: Prisma.MenuItemCreatedietaryTagsInput | string[]
   allergenTags?: Prisma.MenuItemCreateallergenTagsInput | string[]
@@ -1118,6 +1184,8 @@ export type MenuItemUpdateWithoutViewsInput = {
   specialPrice?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageAltText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageCrop?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dietaryTags?: Prisma.MenuItemUpdatedietaryTagsInput | string[]
   allergenTags?: Prisma.MenuItemUpdateallergenTagsInput | string[]
@@ -1141,6 +1209,8 @@ export type MenuItemUncheckedUpdateWithoutViewsInput = {
   specialPrice?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageAltText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageCrop?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dietaryTags?: Prisma.MenuItemUpdatedietaryTagsInput | string[]
   allergenTags?: Prisma.MenuItemUpdateallergenTagsInput | string[]
@@ -1161,6 +1231,8 @@ export type MenuItemCreateManyTenantInput = {
   specialPrice?: number | null
   currency?: string
   imageUrl?: string | null
+  imageAltText?: string | null
+  imageCrop?: string | null
   isAvailable?: boolean
   dietaryTags?: Prisma.MenuItemCreatedietaryTagsInput | string[]
   allergenTags?: Prisma.MenuItemCreateallergenTagsInput | string[]
@@ -1179,6 +1251,8 @@ export type MenuItemUpdateWithoutTenantInput = {
   specialPrice?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageAltText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageCrop?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dietaryTags?: Prisma.MenuItemUpdatedietaryTagsInput | string[]
   allergenTags?: Prisma.MenuItemUpdateallergenTagsInput | string[]
@@ -1201,6 +1275,8 @@ export type MenuItemUncheckedUpdateWithoutTenantInput = {
   specialPrice?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageAltText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageCrop?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dietaryTags?: Prisma.MenuItemUpdatedietaryTagsInput | string[]
   allergenTags?: Prisma.MenuItemUpdateallergenTagsInput | string[]
@@ -1222,6 +1298,8 @@ export type MenuItemUncheckedUpdateManyWithoutTenantInput = {
   specialPrice?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageAltText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageCrop?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dietaryTags?: Prisma.MenuItemUpdatedietaryTagsInput | string[]
   allergenTags?: Prisma.MenuItemUpdateallergenTagsInput | string[]
@@ -1241,6 +1319,8 @@ export type MenuItemCreateManyCategoryInput = {
   specialPrice?: number | null
   currency?: string
   imageUrl?: string | null
+  imageAltText?: string | null
+  imageCrop?: string | null
   isAvailable?: boolean
   dietaryTags?: Prisma.MenuItemCreatedietaryTagsInput | string[]
   allergenTags?: Prisma.MenuItemCreateallergenTagsInput | string[]
@@ -1259,6 +1339,8 @@ export type MenuItemUpdateWithoutCategoryInput = {
   specialPrice?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageAltText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageCrop?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dietaryTags?: Prisma.MenuItemUpdatedietaryTagsInput | string[]
   allergenTags?: Prisma.MenuItemUpdateallergenTagsInput | string[]
@@ -1281,6 +1363,8 @@ export type MenuItemUncheckedUpdateWithoutCategoryInput = {
   specialPrice?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageAltText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageCrop?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dietaryTags?: Prisma.MenuItemUpdatedietaryTagsInput | string[]
   allergenTags?: Prisma.MenuItemUpdateallergenTagsInput | string[]
@@ -1302,6 +1386,8 @@ export type MenuItemUncheckedUpdateManyWithoutCategoryInput = {
   specialPrice?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageAltText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageCrop?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dietaryTags?: Prisma.MenuItemUpdatedietaryTagsInput | string[]
   allergenTags?: Prisma.MenuItemUpdateallergenTagsInput | string[]
@@ -1362,6 +1448,8 @@ export type MenuItemSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   specialPrice?: boolean
   currency?: boolean
   imageUrl?: boolean
+  imageAltText?: boolean
+  imageCrop?: boolean
   isAvailable?: boolean
   dietaryTags?: boolean
   allergenTags?: boolean
@@ -1387,6 +1475,8 @@ export type MenuItemSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   specialPrice?: boolean
   currency?: boolean
   imageUrl?: boolean
+  imageAltText?: boolean
+  imageCrop?: boolean
   isAvailable?: boolean
   dietaryTags?: boolean
   allergenTags?: boolean
@@ -1409,6 +1499,8 @@ export type MenuItemSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   specialPrice?: boolean
   currency?: boolean
   imageUrl?: boolean
+  imageAltText?: boolean
+  imageCrop?: boolean
   isAvailable?: boolean
   dietaryTags?: boolean
   allergenTags?: boolean
@@ -1431,6 +1523,8 @@ export type MenuItemSelectScalar = {
   specialPrice?: boolean
   currency?: boolean
   imageUrl?: boolean
+  imageAltText?: boolean
+  imageCrop?: boolean
   isAvailable?: boolean
   dietaryTags?: boolean
   allergenTags?: boolean
@@ -1440,7 +1534,7 @@ export type MenuItemSelectScalar = {
   deletedAt?: boolean
 }
 
-export type MenuItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "categoryId" | "name" | "description" | "priceCents" | "isSpecialToday" | "specialPrice" | "currency" | "imageUrl" | "isAvailable" | "dietaryTags" | "allergenTags" | "sortOrder" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["menuItem"]>
+export type MenuItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "categoryId" | "name" | "description" | "priceCents" | "isSpecialToday" | "specialPrice" | "currency" | "imageUrl" | "imageAltText" | "imageCrop" | "isAvailable" | "dietaryTags" | "allergenTags" | "sortOrder" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["menuItem"]>
 export type MenuItemInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   category?: boolean | Prisma.MenuItem$categoryArgs<ExtArgs>
@@ -1476,6 +1570,8 @@ export type $MenuItemPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     specialPrice: number | null
     currency: string
     imageUrl: string | null
+    imageAltText: string | null
+    imageCrop: string | null
     isAvailable: boolean
     dietaryTags: string[]
     allergenTags: string[]
@@ -1920,6 +2016,8 @@ export interface MenuItemFieldRefs {
   readonly specialPrice: Prisma.FieldRef<"MenuItem", 'Int'>
   readonly currency: Prisma.FieldRef<"MenuItem", 'String'>
   readonly imageUrl: Prisma.FieldRef<"MenuItem", 'String'>
+  readonly imageAltText: Prisma.FieldRef<"MenuItem", 'String'>
+  readonly imageCrop: Prisma.FieldRef<"MenuItem", 'String'>
   readonly isAvailable: Prisma.FieldRef<"MenuItem", 'Boolean'>
   readonly dietaryTags: Prisma.FieldRef<"MenuItem", 'String[]'>
   readonly allergenTags: Prisma.FieldRef<"MenuItem", 'String[]'>

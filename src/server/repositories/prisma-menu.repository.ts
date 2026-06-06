@@ -2,6 +2,8 @@ import 'server-only';
 import { getPrisma } from '@/lib/db/prisma';
 import { sanitizePlainText } from '@/lib/sanitize';
 import { normalizeAllergenTags, normalizeDietaryTags } from '@/lib/item-attributes';
+import { dedupeImageUrls } from '@/lib/image-library';
+import { isItemImageCrop } from '@/lib/cloudinary';
 import type { MenuData, IMenuRepository, ImportResult } from '@/server/repositories/menu.repository';
 import type { Category, ItemTranslation, ItemUpsertInput, MenuItem, MenuSection, Tenant } from '@/types/domain';
 import type { SectionInput } from '@/lib/validators/section.schema';
@@ -61,6 +63,8 @@ type MenuItemRow = {
   specialPrice?: number | null;
   currency: string;
   imageUrl: string | null;
+  imageAltText: string | null;
+  imageCrop: string | null;
   isAvailable: boolean;
   dietaryTags: string[];
   allergenTags: string[];
@@ -138,6 +142,8 @@ function mapMenuItem(row: MenuItemRow): MenuItem {
     specialPrice: row.specialPrice ?? null,
     currency: row.currency,
     imageUrl: row.imageUrl,
+    imageAltText: row.imageAltText ?? null,
+    imageCrop: row.imageCrop ?? null,
     isAvailable: row.isAvailable,
     dietaryTags: row.dietaryTags ?? [],
     allergenTags: row.allergenTags ?? [],
@@ -201,6 +207,36 @@ export class PrismaMenuRepository implements IMenuRepository {
       orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
     });
     return items.map(mapMenuItem);
+  }
+
+  async getImageLibrary(tenantId: string): Promise<string[]> {
+    const prisma = getPrisma();
+    const [tenant, sections, categories, items] = await Promise.all([
+      prisma.tenant.findUnique({
+        where: { id: tenantId },
+        select: { logoUrl: true, coverImageUrl: true },
+      }),
+      prisma.menuSection.findMany({
+        where: { tenantId, deletedAt: null },
+        select: { coverImageUrl: true },
+      }),
+      prisma.category.findMany({
+        where: { tenantId, deletedAt: null },
+        select: { coverImageUrl: true },
+      }),
+      prisma.menuItem.findMany({
+        where: { tenantId, deletedAt: null },
+        select: { imageUrl: true },
+      }),
+    ]);
+
+    return dedupeImageUrls([
+      tenant?.logoUrl,
+      tenant?.coverImageUrl,
+      ...sections.map((s) => s.coverImageUrl),
+      ...categories.map((c) => c.coverImageUrl),
+      ...items.map((i) => i.imageUrl),
+    ]);
   }
 
   async toggleItemAvailability(
@@ -283,6 +319,8 @@ export class PrismaMenuRepository implements IMenuRepository {
       specialPrice?: number | null;
       currency: string;
       imageUrl: string | null;
+      imageAltText?: string | null;
+      imageCrop?: string | null;
       isAvailable?: boolean;
       dietaryTags?: string[];
       allergenTags?: string[];
@@ -299,6 +337,17 @@ export class PrismaMenuRepository implements IMenuRepository {
 
     if (!input.id || 'isAvailable' in input) {
       payload.isAvailable = input.isAvailable ?? true;
+    }
+
+    // Editorial metadata only persists when the image itself is part of this
+    // write, so a partial update never silently strips alt/crop. Clearing the
+    // image clears its metadata too.
+    if (!input.id || 'imageUrl' in input) {
+      const hasImage = (input.imageUrl ?? null) !== null;
+      payload.imageAltText = hasImage
+        ? sanitizePlainText(input.imageAltText, 125)
+        : null;
+      payload.imageCrop = hasImage && isItemImageCrop(input.imageCrop) ? input.imageCrop : null;
     }
 
     // Normalize defensively at the persistence boundary so the DB only ever

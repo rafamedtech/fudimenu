@@ -85,6 +85,10 @@ export const menuService = {
     return (await getMenuRepository()).upsertItem(tenantId, input);
   },
 
+  async getImageLibrary(tenantId: string): Promise<string[]> {
+    return (await getMenuRepository()).getImageLibrary(tenantId);
+  },
+
   async upsertSection(tenantId: string, input: SectionInput): Promise<MenuSection> {
     return (await getMenuRepository()).upsertSection(tenantId, input);
   },

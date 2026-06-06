@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import { cookies } from 'next/headers';
-import { ExternalLink, FileUp, History, Layers3, Plus, Utensils, type LucideIcon } from 'lucide-react';
+import { ExternalLink, FileUp, History, ImageOff, Layers3, Plus, Utensils, type LucideIcon } from 'lucide-react';
+import type { MenuItem } from '@/types/domain';
 import { PlanLimitBanner } from '@/components/admin/plan-limit-banner';
 import { TenantSwitcher } from '@/components/admin/tenant-switcher';
 import { SectionGrid } from '@/components/admin/section-grid';
@@ -113,6 +114,8 @@ async function MenuList({
         canCreateSection={canCreateSection}
       />
 
+      <PhotolessChecklist items={visibleItems.filter((item) => !item.imageUrl)} />
+
       {hasSections && (
         <SectionGrid
           key={sections.map((section) => `${section.id}:${section.sortOrder}`).join('|')}
@@ -137,6 +140,40 @@ async function MenuList({
         </ul>
       )}
     </>
+  );
+}
+
+function PhotolessChecklist({ items }: { items: MenuItem[] }) {
+  if (items.length === 0) return null;
+
+  return (
+    <section className="mb-4 overflow-hidden rounded-xl border border-coral-500/30 bg-coral-50 p-4 shadow-sm ipad:mb-6">
+      <div className="flex items-start gap-3">
+        <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-coral-100 text-coral-600">
+          <ImageOff className="size-5" aria-hidden />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="font-bold text-ink-900">
+            {items.length} {items.length === 1 ? 'platillo sin foto' : 'platillos sin foto'}
+          </p>
+          <p className="mt-0.5 text-xs text-ink-500">
+            Los platillos con foto se ven mejor y venden más. Agrega una imagen:
+          </p>
+          <ul className="mt-3 flex flex-wrap gap-2">
+            {items.map((item) => (
+              <li key={item.id}>
+                <Link
+                  href={`/menu/${item.id}`}
+                  className="inline-flex items-center gap-1.5 rounded-full border-[1.5px] border-coral-500/40 bg-[var(--brand-card)] px-3 py-1.5 text-sm font-medium text-ink-900 transition-colors hover:border-coral-500 hover:bg-coral-100"
+                >
+                  {item.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </section>
   );
 }
 
