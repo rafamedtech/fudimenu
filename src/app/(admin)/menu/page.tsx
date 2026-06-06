@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { cookies } from 'next/headers';
-import { ExternalLink, FileUp, Layers3, Plus, Utensils, type LucideIcon } from 'lucide-react';
+import { ExternalLink, FileUp, History, Layers3, Plus, Utensils, type LucideIcon } from 'lucide-react';
 import { PlanLimitBanner } from '@/components/admin/plan-limit-banner';
 import { TenantSwitcher } from '@/components/admin/tenant-switcher';
 import { SectionGrid } from '@/components/admin/section-grid';
@@ -210,6 +210,13 @@ function MenuOverviewPanel({
           >
             <ExternalLink className="size-4" aria-hidden />
             Ver menú público
+          </Link>
+          <Link
+            href="/menu/history"
+            className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg border-[1.5px] border-[var(--brand-primary-border)] bg-[var(--brand-card)] px-4 text-sm font-extrabold text-ink-900 shadow-sm transition-all hover:border-[var(--brand-primary)] hover:bg-[var(--brand-primary-faint)] focus-visible:outline-none focus-visible:shadow-glow-mostaza ipad:h-12"
+          >
+            <History className="size-4" aria-hidden />
+            Historial
           </Link>
         </div>
       </div>

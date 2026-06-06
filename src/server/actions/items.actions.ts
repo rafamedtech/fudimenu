@@ -5,6 +5,7 @@ import { checkRateLimit } from '@/lib/ratelimit';
 import { itemSchema } from '@/lib/validators/item.schema';
 import { requireAuth, type AuthContext } from '@/server/guards/require-auth';
 import { menuService } from '@/server/services/menu.service';
+import { recordMenuEvent } from '@/server/services/audit.service';
 
 type ItemActionError = {
   ok: false;
@@ -73,6 +74,12 @@ export async function upsertItemAction(input: unknown) {
   }
 
   const item = await menuService.upsertItem(ctx.tenantId, data);
+  await recordMenuEvent(ctx, {
+    action: data.id ? 'item.updated' : 'item.created',
+    entityType: 'menu_item',
+    entityId: item.id,
+    metadata: { name: item.name, priceCents: item.priceCents },
+  });
   revalidateMenu(ctx);
   return { ok: true as const, item };
 }
@@ -82,6 +89,12 @@ export async function toggleItemAvailabilityAction(itemId: string, available: bo
   if ('ok' in ctx) return ctx;
 
   const item = await menuService.toggleItemAvailability(ctx.tenantId, itemId, available);
+  await recordMenuEvent(ctx, {
+    action: 'item.availability_changed',
+    entityType: 'menu_item',
+    entityId: item.id,
+    metadata: { name: item.name, available },
+  });
   revalidateMenu(ctx);
   return { ok: true as const, item };
 }
@@ -95,6 +108,12 @@ export async function setItemSpecialTodayAction(itemId: string, isSpecialToday: 
   }
 
   const item = await menuService.setItemSpecialToday(ctx.tenantId, itemId, isSpecialToday);
+  await recordMenuEvent(ctx, {
+    action: 'item.special_changed',
+    entityType: 'menu_item',
+    entityId: item.id,
+    metadata: { name: item.name, isSpecialToday },
+  });
   revalidateMenu(ctx);
   return { ok: true as const, item };
 }
@@ -104,6 +123,12 @@ export async function softDeleteItemAction(itemId: string) {
   if ('ok' in ctx) return ctx;
 
   const item = await menuService.softDeleteItem(ctx.tenantId, itemId);
+  await recordMenuEvent(ctx, {
+    action: 'item.deleted',
+    entityType: 'menu_item',
+    entityId: item.id,
+    metadata: { name: item.name },
+  });
   revalidateMenu(ctx);
   return { ok: true as const, item };
 }
@@ -113,6 +138,12 @@ export async function restoreItemAction(itemId: string) {
   if ('ok' in ctx) return ctx;
 
   const item = await menuService.restoreItem(ctx.tenantId, itemId);
+  await recordMenuEvent(ctx, {
+    action: 'item.restored',
+    entityType: 'menu_item',
+    entityId: item.id,
+    metadata: { name: item.name },
+  });
   revalidateMenu(ctx);
   return { ok: true as const, item };
 }
