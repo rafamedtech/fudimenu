@@ -136,6 +136,8 @@ async function QrPageContent({
             menuUrl={menuUrl}
             tenantSlug={tenant.slug}
             primaryColor={tenant.primaryColor}
+            logoUrl={tenant.logoUrl}
+            logoShape={tenant.logoShape}
             tenantId={tenantId}
           />
         </div>

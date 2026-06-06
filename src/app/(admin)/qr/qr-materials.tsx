@@ -1,13 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { Download, Printer, Share2, Sticker } from 'lucide-react';
+import { Download, Instagram, Printer, Share2, Smartphone, Sticker } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { track } from '@/lib/analytics/events';
+import type { LogoShape } from '@/types/domain';
 
-type MaterialType = 'poster' | 'sticker' | 'social';
+type MaterialType = 'poster' | 'sticker' | 'social-post' | 'social-story';
 
 function loadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -17,6 +18,18 @@ function loadImage(src: string): Promise<HTMLImageElement> {
     img.onerror = reject;
     img.src = src;
   });
+}
+
+// Logo is optional and may be cross-origin / 404 / blocked by CORS. A failed
+// logo must never abort the whole material, so swallow the error and render
+// without it.
+async function tryLoadImage(src: string | null): Promise<HTMLImageElement | null> {
+  if (!src) return null;
+  try {
+    return await loadImage(src);
+  } catch {
+    return null;
+  }
 }
 
 function hexToRgb(hex: string): { r: number; g: number; b: number } {
@@ -30,25 +43,76 @@ function rrp(
   ctx: CanvasRenderingContext2D,
   x: number, y: number, w: number, h: number, r: number,
 ) {
+  const rad = Math.min(r, w / 2, h / 2);
   ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.lineTo(x + w - r, y);
-  ctx.arcTo(x + w, y, x + w, y + r, r);
-  ctx.lineTo(x + w, y + h - r);
-  ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
-  ctx.lineTo(x + r, y + h);
-  ctx.arcTo(x, y + h, x, y + h - r, r);
-  ctx.lineTo(x, y + r);
-  ctx.arcTo(x, y, x + r, y, r);
+  ctx.moveTo(x + rad, y);
+  ctx.lineTo(x + w - rad, y);
+  ctx.arcTo(x + w, y, x + w, y + rad, rad);
+  ctx.lineTo(x + w, y + h - rad);
+  ctx.arcTo(x + w, y + h, x + w - rad, y + h, rad);
+  ctx.lineTo(x + rad, y + h);
+  ctx.arcTo(x, y + h, x, y + h - rad, rad);
+  ctx.lineTo(x, y + rad);
+  ctx.arcTo(x, y, x + rad, y, rad);
   ctx.closePath();
 }
 
-async function generatePoster(
-  qrImageUrl: string,
-  tenantName: string,
-  menuUrl: string,
-  primaryColor: string,
-): Promise<Blob> {
+// Draws the logo centered at `centerX`, top edge at `topY`, fit inside
+// maxW × maxH preserving aspect ratio. `plate` draws a white backing so the
+// logo stays legible over dark social backgrounds. Returns drawn height so
+// callers can advance their layout cursor.
+function drawLogo(
+  ctx: CanvasRenderingContext2D,
+  img: HTMLImageElement,
+  centerX: number,
+  topY: number,
+  maxW: number,
+  maxH: number,
+  shape: LogoShape,
+  plate: boolean,
+): number {
+  const ratio = Math.min(maxW / img.width, maxH / img.height);
+  const w = img.width * ratio;
+  const h = img.height * ratio;
+  const x = centerX - w / 2;
+
+  if (plate) {
+    const p = 16;
+    ctx.save();
+    ctx.fillStyle = '#FFFFFF';
+    rrp(ctx, x - p, topY - p, w + p * 2, h + p * 2, shape === 'round' ? (Math.max(w, h) / 2 + p) : 18);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  if (shape === 'round') {
+    const rr = Math.min(w, h) / 2;
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(centerX, topY + h / 2, rr, 0, Math.PI * 2);
+    ctx.clip();
+    ctx.drawImage(img, centerX - rr, topY + h / 2 - rr, rr * 2, rr * 2);
+    ctx.restore();
+  } else {
+    ctx.drawImage(img, x, topY, w, h);
+  }
+
+  return h;
+}
+
+type GenInput = {
+  qrImageUrl: string;
+  tenantName: string;
+  menuUrl: string;
+  primaryColor: string;
+  logoUrl: string | null;
+  logoShape: LogoShape;
+};
+
+// A4 portrait at 96 DPI (794 × 1123). Light background, print-friendly.
+async function generatePoster({
+  qrImageUrl, tenantName, menuUrl, primaryColor, logoUrl, logoShape,
+}: GenInput): Promise<Blob> {
   const W = 794, H = 1123;
   const canvas = document.createElement('canvas');
   canvas.width = W;
@@ -62,18 +126,27 @@ async function generatePoster(
   ctx.fillRect(0, 0, W, 14);
   ctx.fillRect(0, H - 14, W, 14);
 
+  let y = 88;
+  const logo = await tryLoadImage(logoUrl);
+  if (logo) {
+    const lh = drawLogo(ctx, logo, W / 2, y, 280, 96, logoShape, false);
+    y += lh + 30;
+  }
+
   ctx.fillStyle = '#1A1611';
   ctx.textAlign = 'center';
   ctx.font = 'bold 56px system-ui, -apple-system, sans-serif';
-  ctx.fillText(tenantName, W / 2, 130, W - 80);
+  y += 50;
+  ctx.fillText(tenantName, W / 2, y, W - 80);
 
   ctx.fillStyle = '#6B5E4A';
   ctx.font = '26px system-ui, -apple-system, sans-serif';
-  ctx.fillText('Escanea y ve nuestro menú digital', W / 2, 186, W - 80);
+  y += 46;
+  ctx.fillText('Escanea y ve nuestro menú digital', W / 2, y, W - 80);
 
-  const qrSize = 500;
+  const qrSize = 480;
   const qrX = (W - qrSize) / 2;
-  const qrY = 228;
+  const qrY = y + 38;
   const pad = 24;
 
   ctx.save();
@@ -88,13 +161,14 @@ async function generatePoster(
   const qrImg = await loadImage(qrImageUrl);
   ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
 
+  const urlY = qrY + qrSize + 64;
   ctx.fillStyle = '#6B5E4A';
   ctx.font = '20px monospace, monospace';
   ctx.textAlign = 'center';
-  ctx.fillText(menuUrl, W / 2, 840, W - 80);
+  ctx.fillText(menuUrl, W / 2, urlY, W - 80);
 
   ctx.fillStyle = primaryColor;
-  ctx.fillRect(W / 2 - 24, 860, 48, 3);
+  ctx.fillRect(W / 2 - 24, urlY + 20, 48, 3);
 
   ctx.fillStyle = '#9B8E7B';
   ctx.font = '16px system-ui, -apple-system, sans-serif';
@@ -103,12 +177,11 @@ async function generatePoster(
   return canvasToBlob(canvas);
 }
 
-async function generateSticker(
-  qrImageUrl: string,
-  tenantName: string,
-  menuUrl: string,
-  primaryColor: string,
-): Promise<Blob> {
+// Round sticker (500 × 500), QR + name, sized for packaging/cards. Kept
+// deliberately minimal — no logo, the round frame is too tight to stay legible.
+async function generateSticker({
+  qrImageUrl, tenantName, menuUrl, primaryColor,
+}: GenInput): Promise<Blob> {
   const S = 500;
   const canvas = document.createElement('canvas');
   canvas.width = S;
@@ -155,28 +228,23 @@ async function generateSticker(
   return canvasToBlob(canvas);
 }
 
-async function generateSocial(
-  qrImageUrl: string,
-  tenantName: string,
-  menuUrl: string,
+// Shared dark social background (gradient + dotted texture + accent bar).
+function paintSocialBackground(
+  ctx: CanvasRenderingContext2D,
+  W: number,
+  H: number,
   primaryColor: string,
-): Promise<Blob> {
-  const S = 1080;
-  const canvas = document.createElement('canvas');
-  canvas.width = S;
-  canvas.height = S;
-  const ctx = canvas.getContext('2d')!;
-
-  const grad = ctx.createLinearGradient(0, 0, S, S);
+) {
+  const grad = ctx.createLinearGradient(0, 0, W, H);
   grad.addColorStop(0, '#1A1611');
   grad.addColorStop(1, '#2D2418');
   ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, S, S);
+  ctx.fillRect(0, 0, W, H);
 
   const { r, g, b } = hexToRgb(primaryColor);
   ctx.fillStyle = `rgba(${r}, ${g}, ${b}, 0.08)`;
-  for (let px = 30; px < S; px += 48) {
-    for (let py = 30; py < S; py += 48) {
+  for (let px = 30; px < W; px += 48) {
+    for (let py = 30; py < H; py += 48) {
       ctx.beginPath();
       ctx.arc(px, py, 2.5, 0, Math.PI * 2);
       ctx.fill();
@@ -184,11 +252,55 @@ async function generateSocial(
   }
 
   ctx.fillStyle = primaryColor;
-  ctx.fillRect(0, 0, S, 10);
+  ctx.fillRect(0, 0, W, 10);
+}
 
-  const qrSize = 500;
-  const qrX = (S - qrSize) / 2;
-  const qrY = 240;
+// Instagram/WhatsApp feed post — 1080 × 1080 square.
+async function generateSocialPost(input: GenInput): Promise<Blob> {
+  return generateSocial(input, 1080, 1080, {
+    nameSize: 64, qrSize: 460, captionSize: 34,
+  });
+}
+
+// Instagram/WhatsApp/TikTok story — 1080 × 1920 vertical.
+async function generateSocialStory(input: GenInput): Promise<Blob> {
+  return generateSocial(input, 1080, 1920, {
+    nameSize: 76, qrSize: 560, captionSize: 42,
+  });
+}
+
+async function generateSocial(
+  { qrImageUrl, tenantName, menuUrl, primaryColor, logoUrl, logoShape }: GenInput,
+  W: number,
+  H: number,
+  opts: { nameSize: number; qrSize: number; captionSize: number },
+): Promise<Blob> {
+  const canvas = document.createElement('canvas');
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d')!;
+
+  paintSocialBackground(ctx, W, H, primaryColor);
+
+  // Header flows top-down (logo? + name); the QR is placed right below the
+  // measured header so name and QR can never overlap at any aspect ratio.
+  let y = Math.round(H * 0.07);
+
+  const logo = await tryLoadImage(logoUrl);
+  if (logo) {
+    const lh = drawLogo(ctx, logo, W / 2, y, 320, opts.qrSize * 0.28, logoShape, true);
+    y += lh + 36;
+  }
+
+  ctx.fillStyle = '#FFFCF5';
+  ctx.textAlign = 'center';
+  ctx.font = `bold ${opts.nameSize}px system-ui, -apple-system, sans-serif`;
+  ctx.fillText(tenantName, W / 2, y + opts.nameSize, W - 100);
+  y += opts.nameSize + 44;
+
+  const qrSize = opts.qrSize;
+  const qrX = (W - qrSize) / 2;
+  const qrY = y + 28;
   const pad = 28;
 
   ctx.save();
@@ -203,25 +315,26 @@ async function generateSocial(
   const qrImg = await loadImage(qrImageUrl);
   ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
 
-  ctx.fillStyle = '#FFFCF5';
-  ctx.textAlign = 'center';
-  ctx.font = 'bold 72px system-ui, -apple-system, sans-serif';
-  ctx.fillText(tenantName, S / 2, 178, S - 80);
+  const { r, g, b } = hexToRgb(primaryColor);
+  let cy = qrY + qrSize + 64;
 
   ctx.fillStyle = primaryColor;
-  ctx.fillRect(S / 2 - 32, 870, 64, 4);
+  ctx.fillRect(W / 2 - 32, cy, 64, 4);
+  cy += 50;
 
   ctx.fillStyle = 'rgba(255, 252, 245, 0.85)';
-  ctx.font = '36px system-ui, -apple-system, sans-serif';
-  ctx.fillText('Escanea para ver nuestro menú', S / 2, 920, S - 80);
+  ctx.textAlign = 'center';
+  ctx.font = `${opts.captionSize}px system-ui, -apple-system, sans-serif`;
+  ctx.fillText('Escanea para ver nuestro menú', W / 2, cy, W - 100);
+  cy += 50;
 
   ctx.fillStyle = 'rgba(255, 252, 245, 0.55)';
   ctx.font = '24px monospace, monospace';
-  ctx.fillText(menuUrl, S / 2, 970, S - 80);
+  ctx.fillText(menuUrl, W / 2, cy, W - 100);
 
   ctx.fillStyle = `rgba(${r}, ${g}, ${b}, 0.7)`;
   ctx.font = 'bold 20px system-ui, -apple-system, sans-serif';
-  ctx.fillText('FudiMenu', S / 2, 1038);
+  ctx.fillText('FudiMenu', W / 2, H - 44);
 
   return canvasToBlob(canvas);
 }
@@ -241,6 +354,13 @@ function downloadBlob(blob: Blob, filename: string) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
+const GENERATORS: Record<MaterialType, (input: GenInput) => Promise<Blob>> = {
+  poster: generatePoster,
+  sticker: generateSticker,
+  'social-post': generateSocialPost,
+  'social-story': generateSocialStory,
+};
+
 const MATERIALS: {
   type: MaterialType;
   label: string;
@@ -249,7 +369,8 @@ const MATERIALS: {
 }[] = [
   { type: 'poster', label: 'Cartel A4', desc: 'Imprime y pega en mesas o mostrador.', icon: Printer },
   { type: 'sticker', label: 'Sticker', desc: 'Redondo, para empaques o tarjetas.', icon: Sticker },
-  { type: 'social', label: 'Para redes', desc: '1080 × 1080 px para Instagram o WhatsApp.', icon: Share2 },
+  { type: 'social-post', label: 'Post de redes', desc: '1080 × 1080 px para feed de Instagram o WhatsApp.', icon: Instagram },
+  { type: 'social-story', label: 'Story vertical', desc: '1080 × 1920 px para stories de Instagram o TikTok.', icon: Smartphone },
 ];
 
 export function QrMaterials({
@@ -258,6 +379,8 @@ export function QrMaterials({
   menuUrl,
   tenantSlug,
   primaryColor,
+  logoUrl,
+  logoShape,
   tenantId,
 }: {
   qrImageUrl: string;
@@ -265,6 +388,8 @@ export function QrMaterials({
   menuUrl: string;
   tenantSlug: string;
   primaryColor: string;
+  logoUrl: string | null;
+  logoShape: LogoShape;
   tenantId: string;
 }) {
   const [loading, setLoading] = useState<MaterialType | null>(null);
@@ -272,10 +397,9 @@ export function QrMaterials({
   async function handleDownload(type: MaterialType) {
     setLoading(type);
     try {
-      let blob: Blob;
-      if (type === 'poster') blob = await generatePoster(qrImageUrl, tenantName, menuUrl, primaryColor);
-      else if (type === 'sticker') blob = await generateSticker(qrImageUrl, tenantName, menuUrl, primaryColor);
-      else blob = await generateSocial(qrImageUrl, tenantName, menuUrl, primaryColor);
+      const blob = await GENERATORS[type]({
+        qrImageUrl, tenantName, menuUrl, primaryColor, logoUrl, logoShape,
+      });
 
       downloadBlob(blob, `${type}-${tenantSlug}.png`);
       track('material_downloaded', { tenantId, material: type });
@@ -294,7 +418,7 @@ export function QrMaterials({
         </p>
         <span className="text-[11px] font-semibold text-ink-300">PNG · listo para usar</span>
       </div>
-      <ul className="mt-4 grid gap-3 ipad-landscape:grid-cols-3">
+      <ul className="mt-4 grid grid-cols-2 gap-3 ipad-landscape:grid-cols-4">
         {MATERIALS.map(({ type, label, desc, icon: Icon }) => (
           <li
             key={type}
