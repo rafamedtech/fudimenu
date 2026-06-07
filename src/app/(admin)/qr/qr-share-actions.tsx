@@ -4,7 +4,7 @@ import { Copy, Download, FileDown, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { track } from '@/lib/analytics/events';
-import { getShareMenuUrlAction } from './actions';
+import { getShareMenuUrlAction, markQrDownloadedAction } from './actions';
 
 async function copyText(text: string) {
   await navigator.clipboard.writeText(text);
@@ -57,13 +57,23 @@ export function QrShareActions({
     }
   }
 
-  function downloadPdf() {
-    track('qr_downloaded', { tenantId, format: 'pdf' });
+  async function markDownloaded() {
+    try {
+      const result = await markQrDownloadedAction();
+      if (result.ok) return;
+      toast.error('No pude actualizar el checklist de activación');
+    } catch {
+      toast.error('No pude actualizar el checklist de activación');
+    }
+  }
+
+  async function downloadPdf() {
     const win = window.open('', '_blank');
     if (!win) {
       toast.error('Activa ventanas emergentes para descargar el PDF');
       return;
     }
+    track('qr_downloaded', { tenantId, format: 'pdf' });
     win.document.write(
       `<!DOCTYPE html><html><head><meta charset="utf-8"><title>QR</title>` +
         `<style>body{margin:2cm;display:flex;flex-direction:column;align-items:center;font-family:sans-serif}` +
@@ -73,6 +83,7 @@ export function QrShareActions({
         `<p class="url">${menuUrl}</p></body></html>`,
     );
     win.document.close();
+    void markDownloaded();
   }
 
   return (
@@ -89,6 +100,7 @@ export function QrShareActions({
         type="button"
         variant="outline"
         onClick={() => {
+          void markDownloaded();
           track('qr_downloaded', { tenantId, format: 'png' });
           window.location.href = downloadUrl;
         }}
