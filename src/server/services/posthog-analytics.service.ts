@@ -205,11 +205,11 @@ export async function getTenantAnalyticsStats(tenantId: string): Promise<TenantA
       : null;
 
     const campaignViewsQuery = `
-      SELECT properties.campaign AS cmp, count() AS c
+      SELECT coalesce(nullIf(properties.campaign, ''), nullIf(properties.utm_campaign, ''), 'none') AS cmp, count() AS c
       FROM events
       WHERE event = 'menu_viewed'
         AND properties.tenantId = ${tenantIdLiteral}
-        AND properties.campaign != ''
+        AND coalesce(nullIf(properties.campaign, ''), nullIf(properties.utm_campaign, ''), '') != ''
         AND timestamp >= now() - INTERVAL 7 DAY
       GROUP BY cmp
       ORDER BY c DESC
@@ -232,7 +232,7 @@ export async function getTenantAnalyticsStats(tenantId: string): Promise<TenantA
       FROM events
       WHERE event = 'menu_search'
         AND properties.tenantId = ${tenantIdLiteral}
-        AND toInt(properties.resultCount) = 0
+        AND toFloatOrZero(toString(properties.resultCount)) = 0
         AND timestamp >= now() - INTERVAL 7 DAY
       GROUP BY q
       ORDER BY c DESC
@@ -240,7 +240,7 @@ export async function getTenantAnalyticsStats(tenantId: string): Promise<TenantA
     `;
 
     const trafficSourcesQuery = `
-      SELECT coalesce(nullIf(properties.source, ''), 'direct') AS src, count() AS c
+      SELECT coalesce(nullIf(properties.source, ''), nullIf(properties.utm_source, ''), 'direct') AS src, count() AS c
       FROM events
       WHERE event = 'menu_viewed'
         AND properties.tenantId = ${tenantIdLiteral}

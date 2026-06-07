@@ -131,7 +131,7 @@ export function PublicMenuIsland({
     });
 
   const openItemSheet = (item: MenuItem, categoryName: string) => {
-    track('item_detail_viewed', { itemId: item.id, category: categoryName });
+    track('item_detail_viewed', { tenantId, itemId: item.id, category: categoryName });
     setSheetSelection({ item, categoryName, whatsappUrl: buildWhatsapp(item) });
     setIsSheetOpen(true);
     // Make the open item shareable: reflect it in the URL hash without a history

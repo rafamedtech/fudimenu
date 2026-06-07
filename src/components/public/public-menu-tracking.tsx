@@ -6,12 +6,33 @@ import { parseTrafficSource } from '@/lib/analytics/traffic-source';
 import { getDeviceType } from '@/lib/analytics/device';
 
 const SESSION_KEY = 'fudimenu:public-session-id';
+let fallbackSessionId: string | null = null;
+
+function getSafeSessionStorageItem(key: string) {
+  try {
+    return window.sessionStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function setSafeSessionStorageItem(key: string, value: string) {
+  try {
+    window.sessionStorage.setItem(key, value);
+  } catch {
+    // Storage can be unavailable in restricted contexts; analytics should not crash the menu.
+  }
+}
 
 function getSessionId() {
-  let id = sessionStorage.getItem(SESSION_KEY);
+  let id = getSafeSessionStorageItem(SESSION_KEY) ?? fallbackSessionId;
   if (!id) {
-    id = crypto.randomUUID();
-    sessionStorage.setItem(SESSION_KEY, id);
+    id =
+      typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+        ? crypto.randomUUID()
+        : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+    fallbackSessionId = id;
+    setSafeSessionStorageItem(SESSION_KEY, id);
   }
   return id;
 }
@@ -43,7 +64,8 @@ export function PublicMenuTracker({ tenantId, slug, locale }: { tenantId: string
     initAnalytics();
 
     const sessionId = getSessionId();
-    track('menu_viewed', { tenantId, ...parseTrafficSource(window.location.search) });
+    const trafficSource = parseTrafficSource(window.location.search);
+    track('menu_viewed', { tenantId, ...trafficSource });
     recordMenuView({
       tenantId,
       slug,
@@ -61,7 +83,7 @@ export function PublicMenuTracker({ tenantId, slug, locale }: { tenantId: string
           const itemId = el.dataset.itemId;
           if (!itemId || viewedItems.has(itemId)) continue;
           viewedItems.add(itemId);
-          track('item_viewed', { itemId, category: el.dataset.itemCategory });
+          track('item_viewed', { itemId, category: el.dataset.itemCategory, ...trafficSource });
           observer.unobserve(el);
         }
       },
