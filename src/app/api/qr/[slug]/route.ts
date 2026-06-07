@@ -23,8 +23,10 @@ export async function GET(
     );
   }
 
-  const url = `${process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'}/m/${slug}`;
   const isDownload = request.nextUrl.searchParams.get('download') === '1';
+  // utm_source=qr lets PostHog menu_viewed attribute scans vs direct/link traffic.
+  // Page ignores searchParams (stays ISR); the client tracker reads them.
+  const url = `${process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'}/m/${slug}?utm_source=qr`;
   const buffer = await QRCode.toBuffer(url, {
     width: 600,
     margin: 2,

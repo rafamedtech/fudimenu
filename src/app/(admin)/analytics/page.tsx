@@ -11,6 +11,27 @@ import type { Plan } from '@/types/domain';
 
 const COUNT_FORMATTER = new Intl.NumberFormat('es-MX');
 
+const SOURCE_LABELS: Record<string, string> = {
+  qr: 'Código QR',
+  direct: 'Directo / link',
+  referral: 'Referidos',
+};
+
+function formatSourceLabel(source: string) {
+  return SOURCE_LABELS[source] ?? source;
+}
+
+const LOCALE_LABELS: Record<string, string> = { es: 'Español', en: 'English' };
+const DEVICE_LABELS: Record<string, string> = {
+  mobile: 'Móvil',
+  tablet: 'Tablet',
+  desktop: 'Escritorio',
+};
+
+function labelFrom(map: Record<string, string>, key: string) {
+  return map[key] ?? key;
+}
+
 function formatCount(value: number) {
   return COUNT_FORMATTER.format(value);
 }
@@ -119,6 +140,29 @@ async function AnalyticsContent({ plan, tenantId }: { plan: Plan; tenantId: stri
                 }${stats.todayDeltaPercent}% vs ayer`}
           </p>
         </Card>
+        <Card className="bg-[var(--brand-card)] ipad:p-6">
+          <p className="text-sm font-medium text-ink-500">Pedidos WhatsApp semana</p>
+          <p className="mt-1 text-4xl font-extrabold tabular-nums">
+            {formatCount(stats?.whatsappClicks ?? 0)}
+          </p>
+          <p
+            className={`mt-1 text-sm ${
+              (stats?.whatsappDeltaPercent ?? 0) >= 0 ? 'text-menta-500' : 'text-coral-500'
+            }`}
+          >
+            {formatDelta(stats?.whatsappDeltaPercent ?? null)}
+          </p>
+        </Card>
+        <Card className="bg-[var(--brand-card)] ipad:p-6">
+          <p className="text-sm font-medium text-ink-500">Conversión a WhatsApp</p>
+          <p className="mt-1 text-4xl font-extrabold tabular-nums">
+            {stats?.whatsappConversionPercent === null ||
+            stats?.whatsappConversionPercent === undefined
+              ? '—'
+              : `${stats.whatsappConversionPercent}%`}
+          </p>
+          <p className="mt-1 text-sm text-ink-500">de las vistas tocan “Pedir”</p>
+        </Card>
       </div>
 
       <Card className="ipad:p-6">
@@ -153,6 +197,157 @@ async function AnalyticsContent({ plan, tenantId }: { plan: Plan; tenantId: stri
           </p>
         )}
       </Card>
+
+      {stats && stats.noResultSearches.length > 0 && (
+        <Card className="border-[1.5px] border-coral-500 bg-coral-50 ipad:p-6">
+          <p className="text-sm font-extrabold text-ink-900">Búsquedas sin resultados</p>
+          <p className="mt-1 text-sm leading-6 text-ink-700">
+            Tus clientes buscaron esto y no lo encontraron. ¿Falta en tu menú o tiene otro
+            nombre?
+          </p>
+          <ul className="mt-3 flex flex-col gap-2">
+            {stats.noResultSearches.map((row) => (
+              <li
+                key={row.query}
+                className="flex items-center justify-between gap-3 rounded-md bg-[var(--brand-card)] px-3 py-2"
+              >
+                <span className="min-w-0 truncate font-medium text-ink-900">“{row.query}”</span>
+                <span className="shrink-0 tabular-nums text-ink-500">
+                  {formatCount(row.count)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </Card>
+      )}
+
+      <div className="grid gap-4 ipad-landscape:grid-cols-2">
+        <Card className="ipad:p-6">
+          <p className="mb-3 text-sm font-medium text-ink-700">Lo más buscado</p>
+          {stats && stats.topSearches.length > 0 ? (
+            <ul className="flex flex-col gap-2">
+              {stats.topSearches.map((row) => (
+                <li key={row.query} className="flex items-center justify-between gap-3">
+                  <span className="min-w-0 truncate font-medium">{row.query}</span>
+                  <span className="shrink-0 tabular-nums text-ink-500">
+                    {formatCount(row.count)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm leading-6 text-ink-600">
+              Todavía nadie usa el buscador esta semana.
+            </p>
+          )}
+        </Card>
+
+        <Card className="ipad:p-6">
+          <p className="mb-3 text-sm font-medium text-ink-700">De dónde llegan</p>
+          {stats && stats.trafficSources.length > 0 ? (
+            <ul className="flex flex-col gap-3">
+              {stats.trafficSources.map((row) => {
+                const max = Math.max(...stats.trafficSources.map((item) => item.views), 1);
+                return (
+                  <li key={row.source} className="grid gap-1">
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="min-w-0 truncate font-medium">
+                        {formatSourceLabel(row.source)}
+                      </span>
+                      <span className="shrink-0 tabular-nums text-ink-500">
+                        {formatCount(row.views)}
+                      </span>
+                    </div>
+                    <div className="h-2 overflow-hidden rounded-full bg-ink-100">
+                      <div
+                        className="h-full rounded-full bg-[var(--brand-primary)]"
+                        style={{ width: `${Math.max(8, (row.views / max) * 100)}%` }}
+                      />
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          ) : (
+            <p className="text-sm leading-6 text-ink-600">
+              Aún no hay datos de origen de tus vistas.
+            </p>
+          )}
+        </Card>
+
+        {stats && stats.campaignViews.length > 0 && (
+          <Card className="ipad:p-6">
+            <p className="mb-3 text-sm font-medium text-ink-700">Vistas por campaña</p>
+            <ul className="flex flex-col gap-3">
+              {stats.campaignViews.map((row) => {
+                const max = Math.max(...stats.campaignViews.map((item) => item.views), 1);
+                return (
+                  <li key={row.campaign} className="grid gap-1">
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="min-w-0 truncate font-medium">{row.campaign}</span>
+                      <span className="shrink-0 tabular-nums text-ink-500">
+                        {formatCount(row.views)}
+                      </span>
+                    </div>
+                    <div className="h-2 overflow-hidden rounded-full bg-ink-100">
+                      <div
+                        className="h-full rounded-full bg-coral-500"
+                        style={{ width: `${Math.max(8, (row.views / max) * 100)}%` }}
+                      />
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          </Card>
+        )}
+      </div>
+
+      <div className="grid gap-4 ipad-landscape:grid-cols-2">
+        <Card className="ipad:p-6">
+          <p className="mb-3 text-sm font-medium text-ink-700">Pedidos WhatsApp por idioma</p>
+          {stats && stats.whatsappByLocale.length > 0 ? (
+            <ul className="flex flex-col gap-2">
+              {stats.whatsappByLocale.map((row) => (
+                <li key={row.locale} className="flex items-center justify-between gap-3">
+                  <span className="min-w-0 truncate font-medium">
+                    {labelFrom(LOCALE_LABELS, row.locale)}
+                  </span>
+                  <span className="shrink-0 tabular-nums text-ink-500">
+                    {formatCount(row.count)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm leading-6 text-ink-600">
+              Aún no hay pedidos por WhatsApp esta semana.
+            </p>
+          )}
+        </Card>
+
+        <Card className="ipad:p-6">
+          <p className="mb-3 text-sm font-medium text-ink-700">Pedidos WhatsApp por dispositivo</p>
+          {stats && stats.whatsappByDevice.length > 0 ? (
+            <ul className="flex flex-col gap-2">
+              {stats.whatsappByDevice.map((row) => (
+                <li key={row.device} className="flex items-center justify-between gap-3">
+                  <span className="min-w-0 truncate font-medium">
+                    {labelFrom(DEVICE_LABELS, row.device)}
+                  </span>
+                  <span className="shrink-0 tabular-nums text-ink-500">
+                    {formatCount(row.count)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm leading-6 text-ink-600">
+              Aún no hay pedidos por WhatsApp esta semana.
+            </p>
+          )}
+        </Card>
+      </div>
     </>
   );
 }
