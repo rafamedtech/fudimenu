@@ -70,7 +70,7 @@ export function PlanLimitBanner({
           aria-label={addLabel}
           onClick={() => setIsUpgradeOpen(true)}
           className={cn(
-            'fixed bottom-[88px] right-4 z-30 flex size-14 items-center justify-center rounded-full bg-ink-900 text-mostaza-500 shadow-lg transition-transform active:scale-90 hover:scale-105 ipad:bottom-[104px] ipad:right-[max(1rem,calc((100vw-744px)/2+1rem))] ipad-landscape:right-[max(1rem,calc((100vw-984px)/2+1rem))] desktop:right-[max(1rem,calc((100vw-1180px)/2+1rem))]',
+            'fixed bottom-[88px] right-4 z-30 flex size-14 items-center justify-center rounded-full bg-ink-900 text-mostaza-500 shadow-lg transition-transform active:scale-90 hover:scale-105 ipad:bottom-[104px] ipad:right-[max(1rem,calc((100vw-744px)/2+1rem))] ipad-landscape:bottom-6 ipad-landscape:right-8',
           )}
         >
           <Lock size={24} strokeWidth={2.5} />
@@ -79,7 +79,7 @@ export function PlanLimitBanner({
         <Link
           href={addHref}
           aria-label={addLabel}
-          className="fixed bottom-[88px] right-4 z-30 flex size-14 items-center justify-center rounded-full bg-[var(--brand-primary)] text-[var(--brand-on-primary)] shadow-lg transition-transform active:scale-90 hover:scale-105 ipad:bottom-[104px] ipad:right-[max(1rem,calc((100vw-744px)/2+1rem))] ipad-landscape:right-[max(1rem,calc((100vw-984px)/2+1rem))] desktop:right-[max(1rem,calc((100vw-1180px)/2+1rem))]"
+          className="fixed bottom-[88px] right-4 z-30 flex size-14 items-center justify-center rounded-full bg-[var(--brand-primary)] text-[var(--brand-on-primary)] shadow-lg transition-transform active:scale-90 hover:scale-105 ipad:bottom-[104px] ipad:right-[max(1rem,calc((100vw-744px)/2+1rem))] ipad-landscape:bottom-6 ipad-landscape:right-8"
         >
           <Plus size={28} strokeWidth={2.5} />
         </Link>

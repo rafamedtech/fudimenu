@@ -320,7 +320,10 @@ export function ItemEditorForm({ initial, categories, sectionId, offlineConflict
         onChange={handleAvailabilityChange}
       />
 
-      <form onSubmit={handleSubmit(onSubmit)} className="relative flex flex-col gap-4">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="relative flex flex-col gap-4 ipad-landscape:grid ipad-landscape:grid-cols-[minmax(0,1fr)_360px] ipad-landscape:items-start ipad-landscape:gap-x-8"
+      >
         <ConflictReviewSheet
           open={Boolean(conflictDraft)}
           rows={conflictRows}
@@ -335,88 +338,94 @@ export function ItemEditorForm({ initial, categories, sectionId, offlineConflict
           }}
         />
 
-        <ImageUploadField
-          kind="item"
-          label="Foto opcional"
-          value={imageUrl}
-          onChange={(url) => {
-            setValue('imageUrl', url, { shouldDirty: true, shouldValidate: true });
-            // Drop editorial metadata when the photo is removed.
-            if (!url) {
-              setValue('imageAltText', null, { shouldDirty: true });
-              setValue('imageCrop', null, { shouldDirty: true });
-            }
-          }}
-          fallback={<span className="text-6xl" aria-hidden>{placeholderEmoji}</span>}
-        />
-
-        {imageUrl && (
-          <ImageEditorialCard
-            altText={imageAltText}
-            crop={imageCrop}
-            onAltChange={(value) =>
-              setValue('imageAltText', value || null, { shouldDirty: true, shouldValidate: true })
-            }
-            onCropChange={(value) => setValue('imageCrop', value, { shouldDirty: true })}
+        <div className="flex flex-col gap-4 ipad-landscape:col-start-2 ipad-landscape:row-start-1">
+          <ImageUploadField
+            kind="item"
+            label="Foto opcional"
+            value={imageUrl}
+            onChange={(url) => {
+              setValue('imageUrl', url, { shouldDirty: true, shouldValidate: true });
+              // Drop editorial metadata when the photo is removed.
+              if (!url) {
+                setValue('imageAltText', null, { shouldDirty: true });
+                setValue('imageCrop', null, { shouldDirty: true });
+              }
+            }}
+            fallback={<span className="text-6xl" aria-hidden>{placeholderEmoji}</span>}
           />
-        )}
 
-        <Input
-          label="Nombre del platillo"
-          placeholder="Ej: Tacos al pastor"
-          error={errors.name?.message}
-          {...register('name')}
-        />
+          {imageUrl && (
+            <ImageEditorialCard
+              altText={imageAltText}
+              crop={imageCrop}
+              onAltChange={(value) =>
+                setValue('imageAltText', value || null, { shouldDirty: true, shouldValidate: true })
+              }
+              onCropChange={(value) => setValue('imageCrop', value, { shouldDirty: true })}
+            />
+          )}
+        </div>
 
-        <CategoryPicker
-          categories={localCategories}
-          selectedCategoryId={selectedCategoryId}
-          error={errors.categoryId?.message}
-          showForm={showCategoryForm}
-          setShowForm={setShowCategoryForm}
-          newCategoryName={newCategoryName}
-          setNewCategoryName={setNewCategoryName}
-          createCategory={handleCreateCategory}
-          isPending={isCategoryPending}
-          selectCategory={(categoryId) => setValue('categoryId', categoryId, { shouldValidate: true })}
-        />
+        <div className="flex flex-col gap-4 ipad-landscape:col-start-1 ipad-landscape:row-start-1 ipad-landscape:row-span-2">
+          <Input
+            label="Nombre del platillo"
+            placeholder="Ej: Tacos al pastor"
+            error={errors.name?.message}
+            {...register('name')}
+          />
 
-        <Input
-          label="Precio"
-          type="text"
-          prefix="$"
-          inputMode="decimal"
-          placeholder="0"
-          error={errors.priceCents?.message}
-          value={priceDisplayValue}
-          onChange={(e) => handlePriceChange(e.target.value)}
-        />
+          <CategoryPicker
+            categories={localCategories}
+            selectedCategoryId={selectedCategoryId}
+            error={errors.categoryId?.message}
+            showForm={showCategoryForm}
+            setShowForm={setShowCategoryForm}
+            newCategoryName={newCategoryName}
+            setNewCategoryName={setNewCategoryName}
+            createCategory={handleCreateCategory}
+            isPending={isCategoryPending}
+            selectCategory={(categoryId) => setValue('categoryId', categoryId, { shouldValidate: true })}
+          />
 
-        <SpecialPriceCard
-          isSpecialToday={isSpecialToday}
-          setIsSpecialToday={(next) => setValue('isSpecialToday', next, { shouldDirty: true })}
-          displayValue={specialPriceDisplayValue}
-          handleChange={handleSpecialPriceChange}
-        />
+          <Input
+            label="Precio"
+            type="text"
+            prefix="$"
+            inputMode="decimal"
+            placeholder="0"
+            error={errors.priceCents?.message}
+            value={priceDisplayValue}
+            onChange={(e) => handlePriceChange(e.target.value)}
+          />
 
-        <DescriptionField
-          register={register}
-          charCount={charCount}
-          isNearLimit={isNearDescriptionLimit}
-        />
+          <SpecialPriceCard
+            isSpecialToday={isSpecialToday}
+            setIsSpecialToday={(next) => setValue('isSpecialToday', next, { shouldDirty: true })}
+            displayValue={specialPriceDisplayValue}
+            handleChange={handleSpecialPriceChange}
+          />
 
-        <AttributesCard
-          dietaryTags={dietaryTags}
-          allergenTags={allergenTags}
-          onToggleDietary={toggleDietaryTag}
-          onToggleAllergen={toggleAllergenTag}
-        />
+          <DescriptionField
+            register={register}
+            charCount={charCount}
+            isNearLimit={isNearDescriptionLimit}
+          />
+        </div>
 
-        <TranslationCard
-          register={register}
-          localeLabel={LOCALE_LABEL[translationLocale]}
-          localeCode={translationLocale.toUpperCase()}
-        />
+        <div className="flex flex-col gap-4 ipad-landscape:col-start-2 ipad-landscape:row-start-2">
+          <AttributesCard
+            dietaryTags={dietaryTags}
+            allergenTags={allergenTags}
+            onToggleDietary={toggleDietaryTag}
+            onToggleAllergen={toggleAllergenTag}
+          />
+
+          <TranslationCard
+            register={register}
+            localeLabel={LOCALE_LABEL[translationLocale]}
+            localeCode={translationLocale.toUpperCase()}
+          />
+        </div>
 
         <ItemEditorActions
           deleteAction={initial?.id ? { pending: isDeletePending, run: handleDelete } : undefined}
@@ -440,7 +449,7 @@ function ItemEditorActions({
   cancel: () => void;
 }) {
   return (
-    <div className="sticky bottom-[88px] mt-4 flex gap-3">
+    <div className="sticky bottom-[88px] mt-4 flex gap-3 ipad-landscape:col-span-full ipad-landscape:bottom-4">
       {deleteAction && (
         <Button
           type="button"
@@ -913,14 +922,14 @@ function ItemLimitDialog({ close }: { close: () => void }) {
       ref={(dialog) => {
         if (dialog && !dialog.open) dialog.showModal();
       }}
-      className="fixed inset-0 z-50 m-0 flex size-full max-h-none max-w-none items-end bg-transparent px-4 pb-4 backdrop:bg-ink-900/45 backdrop:backdrop-blur-sm"
+      className="fixed inset-0 z-50 m-0 flex size-full max-h-none max-w-none items-end bg-transparent px-4 pb-4 ipad:items-center ipad:justify-center backdrop:bg-ink-900/45 backdrop:backdrop-blur-sm"
       aria-labelledby="upgrade-item-limit-title"
       onPointerDown={(event) => {
         if (event.target === event.currentTarget) close();
       }}
       onCancel={close}
     >
-      <Card className="w-full space-y-4 rounded-lg border-[1.5px] border-mostaza-500 shadow-xl">
+      <Card className="w-full space-y-4 rounded-lg border-[1.5px] border-mostaza-500 shadow-xl ipad:max-w-lg">
         <div className="flex items-start gap-3">
           <div className="flex size-10 shrink-0 items-center justify-center rounded-md bg-mostaza-100 text-ink-900">
             <Lock className="size-5" />

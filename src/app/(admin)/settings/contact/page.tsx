@@ -19,7 +19,7 @@ export default async function ContactSettingsPage({ searchParams }: ContactSetti
   return (
     <>
       <AppHeader title="Contacto del restaurante" showBack />
-      <main className="flex flex-col gap-4 px-4">
+      <main className="mx-auto w-full max-w-2xl flex flex-col gap-4 px-4 ipad:px-6">
         {saved === '1' && (
           <Card className="flex items-center gap-3 border border-menta-500/40 bg-menta-100 shadow-sm">
             <CheckCircle2 className="size-5 text-ink-700" />
