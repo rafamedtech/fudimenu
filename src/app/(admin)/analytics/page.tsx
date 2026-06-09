@@ -141,7 +141,7 @@ async function AnalyticsContent({ plan, tenantId }: { plan: Plan; tenantId: stri
           </p>
         </Card>
         <Card className="bg-[var(--brand-card)] ipad:p-6">
-          <p className="text-sm font-medium text-ink-500">Pedidos WhatsApp semana</p>
+          <p className="text-sm font-medium text-ink-500">Clicks WhatsApp semana</p>
           <p className="mt-1 text-4xl font-extrabold tabular-nums">
             {formatCount(stats?.whatsappClicks ?? 0)}
           </p>
@@ -305,7 +305,7 @@ async function AnalyticsContent({ plan, tenantId }: { plan: Plan; tenantId: stri
 
       <div className="grid gap-4 ipad-landscape:grid-cols-2">
         <Card className="ipad:p-6">
-          <p className="mb-3 text-sm font-medium text-ink-700">Pedidos WhatsApp por idioma</p>
+          <p className="mb-3 text-sm font-medium text-ink-700">Clicks WhatsApp por idioma</p>
           {stats && stats.whatsappByLocale.length > 0 ? (
             <ul className="flex flex-col gap-2">
               {stats.whatsappByLocale.map((row) => (
@@ -321,13 +321,13 @@ async function AnalyticsContent({ plan, tenantId }: { plan: Plan; tenantId: stri
             </ul>
           ) : (
             <p className="text-sm leading-6 text-ink-600">
-              Aún no hay pedidos por WhatsApp esta semana.
+              Aún no hay clicks de WhatsApp esta semana.
             </p>
           )}
         </Card>
 
         <Card className="ipad:p-6">
-          <p className="mb-3 text-sm font-medium text-ink-700">Pedidos WhatsApp por dispositivo</p>
+          <p className="mb-3 text-sm font-medium text-ink-700">Clicks WhatsApp por dispositivo</p>
           {stats && stats.whatsappByDevice.length > 0 ? (
             <ul className="flex flex-col gap-2">
               {stats.whatsappByDevice.map((row) => (
@@ -343,7 +343,7 @@ async function AnalyticsContent({ plan, tenantId }: { plan: Plan; tenantId: stri
             </ul>
           ) : (
             <p className="text-sm leading-6 text-ink-600">
-              Aún no hay pedidos por WhatsApp esta semana.
+              Aún no hay clicks de WhatsApp esta semana.
             </p>
           )}
         </Card>

@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { initAnalytics, track } from '@/lib/analytics/events';
-import { parseTrafficSource } from '@/lib/analytics/traffic-source';
+import { rememberTrafficSource } from '@/lib/analytics/traffic-source';
 import { getDeviceType } from '@/lib/analytics/device';
 
 const SESSION_KEY = 'fudimenu:public-session-id';
@@ -64,7 +64,7 @@ export function PublicMenuTracker({ tenantId, slug, locale }: { tenantId: string
     initAnalytics();
 
     const sessionId = getSessionId();
-    const trafficSource = parseTrafficSource(window.location.search);
+    const trafficSource = rememberTrafficSource(window.location.search);
     track('menu_viewed', { tenantId, ...trafficSource });
     recordMenuView({
       tenantId,
@@ -98,7 +98,13 @@ export function PublicMenuTracker({ tenantId, slug, locale }: { tenantId: string
     function onWaClick(e: MouseEvent) {
       const el = (e.target as Element).closest<HTMLElement>('[data-track-wa]');
       if (!el) return;
-      track('whatsapp_clicked', { itemId: el.dataset.trackWa!, locale: waLocale, device });
+      track('whatsapp_clicked', {
+        tenantId,
+        itemId: el.dataset.trackWa!,
+        locale: waLocale,
+        device,
+        ...trafficSource,
+      });
     }
 
     document.addEventListener('click', onWaClick);

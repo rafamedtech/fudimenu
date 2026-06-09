@@ -3,6 +3,7 @@
 import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import { track } from '@/lib/analytics/events';
+import { rememberTrafficSource } from '@/lib/analytics/traffic-source';
 import { getCategoryEmoji } from '@/lib/category-placeholder';
 import { withItemImageCrop, type ItemImageCrop } from '@/lib/cloudinary';
 import { formatPrice } from '@/lib/utils';
@@ -78,6 +79,10 @@ export function PublicMenuIsland({
   } | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const deferredQuery = useDeferredValue(query);
+  const trafficSource = useMemo(
+    () => (typeof window === 'undefined' ? {} : rememberTrafficSource(window.location.search)),
+    [],
+  );
 
   const normalizedQuery = normalize(deferredQuery.trim());
 
@@ -115,10 +120,11 @@ export function PublicMenuIsland({
         tenantId,
         query: normalizedQuery,
         resultCount: resultItemCountRef.current,
+        ...trafficSource,
       });
     }, 700);
     return () => clearTimeout(handle);
-  }, [normalizedQuery, tenantId]);
+  }, [normalizedQuery, tenantId, trafficSource]);
 
   const buildWhatsapp = (item: MenuItem) =>
     buildWhatsAppOrderUrl({
@@ -131,7 +137,7 @@ export function PublicMenuIsland({
     });
 
   const openItemSheet = (item: MenuItem, categoryName: string) => {
-    track('item_detail_viewed', { tenantId, itemId: item.id, category: categoryName });
+    track('item_detail_viewed', { tenantId, itemId: item.id, category: categoryName, ...trafficSource });
     setSheetSelection({ item, categoryName, whatsappUrl: buildWhatsapp(item) });
     setIsSheetOpen(true);
     // Make the open item shareable: reflect it in the URL hash without a history
