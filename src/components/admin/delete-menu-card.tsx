@@ -6,6 +6,7 @@ import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { deleteTenantAction } from '@/server/actions/tenant.actions';
 
 interface DeleteMenuCardProps {
@@ -66,12 +67,13 @@ export function DeleteMenuCard({ tenantId, tenantName }: DeleteMenuCardProps) {
               <label htmlFor="delete-menu-confirmation" className="text-xs font-semibold text-ink-700">
                 Escribe <code className="rounded bg-ink-100 px-1">{tenantName}</code> para confirmar
               </label>
-              <input
+              <Input
                 type="text"
                 id="delete-menu-confirmation"
                 value={confirmText}
                 onChange={(e) => setConfirmText(e.target.value)}
-                className="w-full rounded-md border border-ink-300 bg-[var(--brand-card)] px-3 py-2 text-sm"
+                controlClassName="h-10 border-ink-300 px-3"
+                className="text-sm"
               />
               <div className="flex gap-2">
                 <Button

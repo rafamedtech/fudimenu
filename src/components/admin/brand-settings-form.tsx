@@ -168,15 +168,16 @@ export function BrandSettingsForm({
               <p className="text-sm font-medium text-ink-700">Formato del logo</p>
               <div className="grid grid-cols-3 gap-2">
                 {LOGO_SHAPES.map((option) => (
-                  <button
+                  <Button
                     key={option.value}
                     type="button"
+                    variant="outline"
                     aria-pressed={shape === option.value}
                     className="h-11 rounded-md border border-ink-200 px-2 text-sm font-bold text-ink-700 transition-all aria-pressed:border-[var(--brand-primary)] aria-pressed:bg-[var(--brand-primary-faint)] aria-pressed:text-ink-900"
                     onClick={() => setShape(option.value)}
                   >
                     {option.label}
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>
@@ -197,9 +198,10 @@ export function BrandSettingsForm({
           <div className="space-y-3">
             <div className="flex flex-wrap gap-2">
               {BRAND_COLORS.map((option) => (
-                <button
+                <Button
                   key={option}
                   type="button"
+                  variant="outline"
                   aria-label={`Usar color ${option}`}
                   aria-pressed={color === option}
                   className="size-12 rounded-md border-[1.5px] border-ink-200 ring-offset-2 transition-all aria-pressed:ring-2 aria-pressed:ring-[var(--brand-primary)]"

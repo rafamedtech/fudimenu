@@ -12,6 +12,7 @@ import {
 } from '@/components/layout/route-prefetch';
 import { useSidebarContext } from '@/components/layout/sidebar-context';
 import { SidebarToggle } from '@/components/layout/sidebar-toggle';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { Plan } from '@/types/domain';
 
@@ -127,11 +128,12 @@ export function SidebarNav({ plan, tenantName, avatarUrl }: SidebarNavProps) {
                 if (hasSub) {
                   return (
                     <li key={item.title}>
-                      <button
+                      <Button
                         type="button"
+                        variant="ghost"
                         onClick={() => isOpen && toggleExpanded(item.title)}
                         aria-expanded={isExpanded}
-                        className={cn(baseRow, 'w-full')}
+                        className={cn(baseRow, 'h-auto min-h-0 w-full justify-start p-0 shadow-none hover:bg-transparent')}
                         title={!isOpen ? item.title : undefined}
                       >
                         {iconNode}
@@ -147,7 +149,7 @@ export function SidebarNav({ plan, tenantName, avatarUrl }: SidebarNavProps) {
                             />
                           </>
                         )}
-                      </button>
+                      </Button>
                       {isOpen && isExpanded && item.items && (
                         <ul className="mt-1.5 ml-5 flex flex-col gap-1 border-l border-[var(--brand-card-border)] pl-3">
                           {item.items.map((sub) => {

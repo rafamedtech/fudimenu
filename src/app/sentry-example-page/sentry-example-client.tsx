@@ -2,6 +2,7 @@
 
 import * as Sentry from "@sentry/nextjs";
 import { useEffect, useState, useSyncExternalStore } from "react";
+import { Button } from "@/components/ui/button";
 
 let isSentryConnected = true;
 const connectivityListeners = new Set<() => void>();
@@ -80,7 +81,7 @@ export function SentryExampleClient() {
           .
         </p>
 
-        <button
+        <Button
           type="button"
           onClick={async () => {
             Sentry.logger.info("User clicked the button, throwing a sample error");
@@ -103,7 +104,7 @@ export function SentryExampleClient() {
           disabled={!isConnected}
         >
           <span>Throw Sample Error</span>
-        </button>
+        </Button>
 
         {hasSentError ? (
           <p className="success">Error sent to Sentry.</p>

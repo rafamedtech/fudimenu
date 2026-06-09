@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { PLANS } from '@/config/plans';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { SegmentedControl } from '@/components/ui/segmented-control';
 import {
   createBillingCheckoutFormAction,
   createCustomerPortalAction,
@@ -48,36 +49,17 @@ export function BillingPlans({
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Cycle toggle */}
-      <div className="flex rounded-lg border border-ink-200 bg-ink-50 p-1 ipad:w-full ipad:max-w-md">
-        <button
-          type="button"
-          onClick={() => setCycle('monthly')}
-          className={[
-            'flex-1 rounded-md py-2 text-sm font-semibold transition-colors',
-            cycle === 'monthly'
-              ? 'bg-[var(--brand-card)] text-ink-900 shadow-sm'
-              : 'text-ink-500 hover:text-ink-700',
-          ].join(' ')}
-        >
-          Mensual
-        </button>
-        <button
-          type="button"
-          onClick={() => setCycle('annual')}
-          className={[
-            'flex-1 rounded-md py-2 text-sm font-semibold transition-colors',
-            cycle === 'annual'
-              ? 'bg-[var(--brand-card)] text-ink-900 shadow-sm'
-              : 'text-ink-500 hover:text-ink-700',
-          ].join(' ')}
-        >
-          Anual{' '}
-          <span className="ml-1 rounded-full bg-menta-100 px-2 py-0.5 text-xs font-bold text-ink-800">
-            -25%
-          </span>
-        </button>
-      </div>
+      <SegmentedControl
+        value={cycle}
+        options={[
+          { value: 'monthly', label: 'Mensual' },
+          { value: 'annual', label: 'Anual -25%' },
+        ]}
+        onValueChange={setCycle}
+        ariaLabel="Ciclo de facturación"
+        className="ipad:w-full ipad:max-w-md"
+        buttonClassName="flex-1 py-2"
+      />
 
       {/* Plan cards */}
       <div className="grid gap-4 ipad-landscape:grid-cols-3">

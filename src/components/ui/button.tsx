@@ -1,11 +1,14 @@
+import * as React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
-  'inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-md font-semibold transition-all duration-150 active:scale-95 disabled:opacity-40 disabled:pointer-events-none focus-visible:outline-none focus-visible:shadow-glow-mostaza',
+  'inline-flex min-h-11 min-w-11 items-center justify-center gap-2 whitespace-nowrap rounded-md font-semibold transition-all duration-150 active:scale-95 disabled:pointer-events-none disabled:opacity-40 focus-visible:outline-none focus-visible:shadow-glow-mostaza',
   {
     variants: {
       variant: {
+        default:
+          'bg-[var(--brand-primary)] text-[var(--brand-on-primary)] shadow-mostaza-sm hover:bg-[var(--brand-primary-hover)] hover:shadow-mostaza-md',
         primary:
           'bg-[var(--brand-primary)] text-[var(--brand-on-primary)] hover:bg-[var(--brand-primary-hover)] shadow-mostaza-sm hover:shadow-mostaza-md',
         secondary: 'bg-[var(--brand-primary-soft)] text-[var(--brand-accent-text)] hover:bg-[var(--brand-primary-muted)]',
@@ -20,6 +23,7 @@ const buttonVariants = cva(
       size: {
         sm: 'h-10 px-4 text-sm',
         md: 'h-11 px-5 text-sm',
+        default: 'h-11 px-5 text-sm',
         lg: 'h-12 px-6 text-base',
         xl: 'h-14 px-8 text-base',
         icon: 'size-11 p-0',
@@ -36,6 +40,7 @@ export interface ButtonProps
   extends React.ComponentPropsWithRef<'button'>,
     VariantProps<typeof buttonVariants> {
   loading?: boolean;
+  asChild?: boolean;
 }
 
 export function Button({
@@ -45,9 +50,17 @@ export function Button({
   loading,
   disabled,
   children,
+  asChild,
   ref,
   ...props
 }: ButtonProps) {
+  if (asChild && React.isValidElement(children)) {
+    const child = children as React.ReactElement<{ className?: string }>;
+    return React.cloneElement(children, {
+      className: cn(buttonVariants({ variant, size }), child.props.className, className),
+    } as React.HTMLAttributes<HTMLElement>);
+  }
+
   return (
     <button
       ref={ref}

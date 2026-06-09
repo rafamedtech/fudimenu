@@ -111,9 +111,10 @@ export function SectionEditorForm({ initial, nextSortOrder = 0 }: SectionEditorF
         <p className="text-sm font-medium text-ink-700">Color</p>
         <div className="grid grid-cols-6 gap-2">
           {ACCENT_COLORS.map((color) => (
-            <button
+            <Button
               key={color}
               type="button"
+              variant="outline"
               aria-label={`Usar color ${color}`}
               aria-pressed={accentColor === color}
               className="h-12 rounded-md border-[1.5px] border-ink-200 ring-offset-2 transition-all aria-pressed:ring-2 aria-pressed:ring-mostaza-500"

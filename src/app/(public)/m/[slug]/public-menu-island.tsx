@@ -2,6 +2,9 @@
 
 import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
+import { Button } from '@/components/ui/button';
+import { DialogFrame } from '@/components/ui/dialog';
+import { SearchInput as UiSearchInput } from '@/components/ui/search-input';
 import { track } from '@/lib/analytics/events';
 import { rememberTrafficSource } from '@/lib/analytics/traffic-source';
 import { getCategoryEmoji } from '@/lib/category-placeholder';
@@ -340,57 +343,13 @@ function SearchInput({
   clearLabel: string;
 }) {
   return (
-    <label
-      className="flex h-12 items-center gap-2 rounded-md border border-[var(--brand-card-border)] bg-[var(--brand-card)] px-4 shadow-sm transition-all focus-within:border-[var(--brand-primary)] focus-within:shadow-glow-mostaza"
-    >
-      <span className="sr-only">{ariaLabel}</span>
-      <svg
-        aria-hidden
-        width="18"
-        height="18"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="text-ink-500"
-      >
-        <circle cx="11" cy="11" r="7" />
-        <line x1="20" y1="20" x2="16.65" y2="16.65" />
-      </svg>
-      <input
-        type="search"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        autoComplete="off"
-        className="size-full appearance-none bg-transparent text-base font-medium text-ink-900 outline-none placeholder:text-ink-500 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
-      />
-      {value && (
-        <button
-          type="button"
-          aria-label={clearLabel}
-          onClick={() => onChange('')}
-          className="inline-flex size-8 items-center justify-center rounded-full text-ink-500 transition-colors hover:bg-[var(--brand-primary-faint)] hover:text-ink-900"
-        >
-          <svg
-            aria-hidden
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <line x1="18" y1="6" x2="6" y2="18" />
-            <line x1="6" y1="6" x2="18" y2="18" />
-          </svg>
-        </button>
-      )}
-    </label>
+    <UiSearchInput
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder}
+      ariaLabel={ariaLabel}
+      clearLabel={clearLabel}
+    />
   );
 }
 
@@ -416,12 +375,13 @@ export function ItemList({
         });
         return (
         <li key={item.id} id={`item-${item.id}`} className="scroll-mt-20">
-          <button
+          <Button
             type="button"
+            variant="outline"
             onClick={() => onSelect(item, categoryName)}
             data-item-id={item.id}
             data-item-category={categoryName}
-            className="flex w-full items-start gap-3 rounded-xl border border-[var(--brand-card-border)] bg-[var(--brand-card)] p-3 text-left shadow-sm transition-all hover:border-[var(--brand-primary-border)] hover:shadow-md active:scale-[0.99] focus-visible:outline-none focus-visible:shadow-glow-mostaza ipad:gap-4 ipad:p-4"
+            className="h-auto w-full items-start justify-start gap-3 rounded-xl border-[var(--brand-card-border)] bg-[var(--brand-card)] p-3 text-left shadow-sm hover:border-[var(--brand-primary-border)] hover:shadow-md ipad:gap-4 ipad:p-4"
             aria-label={`${item.name}${badgeLabel ? `. ${badgeLabel}` : ''} — ${strings.viewDetail}`}
           >
             <ItemThumb item={item} categoryName={categoryName} soldOutLabel={strings.soldOut} />
@@ -451,7 +411,7 @@ export function ItemList({
                 {formatPrice(getItemPrice(item), item.currency, priceLocale)}
               </p>
             </div>
-          </button>
+          </Button>
         </li>
         );
       })}
@@ -616,7 +576,7 @@ export function ItemSheet({
     : '[&::backdrop]:animate-backdrop-out';
 
   return (
-    <dialog
+    <DialogFrame
       ref={dialogRef}
       onPointerDown={handleBackdropPointerDown}
       aria-labelledby={`sheet-title-${item.id}`}
@@ -648,11 +608,13 @@ export function ItemSheet({
               aria-hidden
               className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/40 to-transparent"
             />
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="icon"
               onClick={onClose}
               aria-label={strings.closeSheet}
-              className="absolute right-3 top-3 inline-flex size-10 items-center justify-center rounded-full bg-[var(--brand-card)]/95 text-ink-900 shadow-md backdrop-blur-sm transition-all hover:scale-105 hover:bg-[var(--brand-card)] active:scale-95 focus-visible:outline-none focus-visible:shadow-glow-mostaza"
+              className="absolute right-3 top-3 size-10 rounded-full bg-[var(--brand-card)]/95 text-ink-900 shadow-md backdrop-blur-sm hover:scale-105 hover:bg-[var(--brand-card)]"
             >
               <svg
                 aria-hidden
@@ -668,7 +630,7 @@ export function ItemSheet({
                 <line x1="18" y1="6" x2="6" y2="18" />
                 <line x1="6" y1="6" x2="18" y2="18" />
               </svg>
-            </button>
+            </Button>
             <div className="absolute left-3 top-3 flex flex-wrap gap-2">
               {item.isSpecialToday && (
                 <span className="inline-flex items-center rounded-full bg-coral-500 px-3 py-1 text-[10px] font-extrabold uppercase tracking-wide text-white shadow-md">
@@ -740,6 +702,6 @@ export function ItemSheet({
             )}
           </div>
       </div>
-    </dialog>
+    </DialogFrame>
   );
 }

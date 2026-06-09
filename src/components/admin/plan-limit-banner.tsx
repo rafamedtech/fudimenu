@@ -5,8 +5,8 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Dialog } from '@/components/ui/dialog';
 import { PLAN_CONFIG } from '@/config/plans';
-import { cn } from '@/lib/utils';
 import type { Plan } from '@/types/domain';
 
 type PlanLimitBannerProps = {
@@ -65,42 +65,38 @@ export function PlanLimitBanner({
       )}
 
       {showFloatingAction && isAtItemLimit ? (
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="icon"
           aria-label={addLabel}
           onClick={() => setIsUpgradeOpen(true)}
-          className={cn(
-            'fixed bottom-[88px] right-4 z-30 flex size-14 items-center justify-center rounded-full bg-ink-900 text-mostaza-500 shadow-lg transition-transform active:scale-90 hover:scale-105 ipad:bottom-[104px] ipad:right-[max(1rem,calc((100vw-744px)/2+1rem))] ipad-landscape:bottom-6 ipad-landscape:right-8',
-          )}
+          className="fixed bottom-[88px] right-4 z-30 size-14 rounded-full bg-ink-900 text-mostaza-500 shadow-lg hover:scale-105 hover:bg-ink-900 ipad:bottom-[104px] ipad:right-[max(1rem,calc((100vw-744px)/2+1rem))] ipad-landscape:bottom-6 ipad-landscape:right-8"
         >
           <Lock size={24} strokeWidth={2.5} />
-        </button>
+        </Button>
       ) : showFloatingAction ? (
-        <Link
-          href={addHref}
-          aria-label={addLabel}
-          className="fixed bottom-[88px] right-4 z-30 flex size-14 items-center justify-center rounded-full bg-[var(--brand-primary)] text-[var(--brand-on-primary)] shadow-lg transition-transform active:scale-90 hover:scale-105 ipad:bottom-[104px] ipad:right-[max(1rem,calc((100vw-744px)/2+1rem))] ipad-landscape:bottom-6 ipad-landscape:right-8"
-        >
-          <Plus size={28} strokeWidth={2.5} />
-        </Link>
+        <Button asChild size="icon" className="fixed bottom-[88px] right-4 z-30 size-14 rounded-full shadow-lg hover:scale-105 ipad:bottom-[104px] ipad:right-[max(1rem,calc((100vw-744px)/2+1rem))] ipad-landscape:bottom-6 ipad-landscape:right-8">
+          <Link href={addHref} aria-label={addLabel}>
+            <Plus size={28} strokeWidth={2.5} />
+          </Link>
+        </Button>
       ) : null}
 
       {isUpgradeOpen && (
-        <dialog
-          ref={(dialog) => {
-            if (dialog && !dialog.open) dialog.showModal();
-          }}
-          className="fixed inset-0 z-50 m-0 flex size-full max-h-none max-w-none items-end bg-transparent px-4 pb-4 ipad:items-center ipad:justify-center backdrop:bg-ink-900/45 backdrop:backdrop-blur-sm"
-          aria-labelledby="upgrade-limit-title"
-          onCancel={() => setIsUpgradeOpen(false)}
+        <Dialog
+          open={isUpgradeOpen}
+          onOpenChange={setIsUpgradeOpen}
+          title="Llegaste al límite Free"
+          contentClassName="space-y-4"
         >
-          <Card className="w-full space-y-4 rounded-lg border-[1.5px] border-mostaza-500 shadow-xl ipad:max-w-lg">
+          <Card className="space-y-4 rounded-lg border-[1.5px] border-mostaza-500 shadow-xl">
             <div className="flex items-start gap-3">
               <div className="flex size-10 shrink-0 items-center justify-center rounded-md bg-mostaza-100 text-ink-900">
                 <Lock className="size-5" />
               </div>
               <div>
-                <h2 id="upgrade-limit-title" className="text-lg font-extrabold text-ink-900">
+                <h2 className="text-lg font-extrabold text-ink-900">
                   Llegaste al límite Free
                 </h2>
                 <p className="mt-1 text-sm leading-6 text-ink-700">
@@ -119,14 +115,14 @@ export function PlanLimitBanner({
               >
                 Ahora no
               </Button>
-              <Link href="/settings/billing" className="flex-1">
-                <Button type="button" className="w-full">
+              <Button asChild type="button" className="flex-1">
+                <Link href="/settings/billing">
                   Upgrade
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             </div>
           </Card>
-        </dialog>
+        </Dialog>
       )}
     </>
   );

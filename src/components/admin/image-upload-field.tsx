@@ -148,8 +148,9 @@ export function ImageUploadField({
           <ul className="grid grid-cols-3 gap-2">
             {library.map((url) => (
               <li key={url}>
-                <button
+                <Button
                   type="button"
+                  variant="outline"
                   onClick={() => chooseExisting(url)}
                   aria-label="Usar esta imagen"
                   className={`relative aspect-square w-full overflow-hidden rounded-md border-[1.5px] transition-colors ${
@@ -159,7 +160,7 @@ export function ImageUploadField({
                   }`}
                 >
                   <Image src={url} alt="" fill sizes="120px" className="object-cover" />
-                </button>
+                </Button>
               </li>
             ))}
           </ul>

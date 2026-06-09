@@ -3,6 +3,8 @@
 import { Lock, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Sheet } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
 
@@ -25,19 +27,20 @@ export function ProFeatureLock({
 
   return (
     <>
-      <button
+      <Button
         type="button"
+        variant="ghost"
         onClick={() => setOpen(true)}
-        className={cn('group text-left', className)}
+        className={cn('group h-auto min-h-0 justify-start p-0 text-left shadow-none hover:bg-transparent', className)}
         aria-label={`${title}. Requiere Pro`}
       >
         {children ?? (
-          <span className="inline-flex items-center gap-1 rounded-full bg-ink-900 px-2.5 py-1 text-xs font-extrabold text-mostaza-500 shadow-sm">
+          <Badge variant="dark" className="gap-1 px-2.5 py-1">
             <Sparkles className="size-3.5" aria-hidden="true" />
             {label.replace('✨ ', '')}
-          </span>
+          </Badge>
         )}
-      </button>
+      </Button>
 
       <Sheet open={open} onOpenChange={setOpen} title="Desbloquea Pro">
         <div className="space-y-5">
@@ -56,12 +59,9 @@ export function ProFeatureLock({
             quitar la marca FudiMenu.
           </div>
 
-          <Link
-            href="/settings/billing"
-            className="flex min-h-12 w-full items-center justify-center rounded-md bg-[var(--brand-primary)] px-5 text-base font-semibold text-[var(--brand-on-primary)] shadow-md transition-all duration-150 active:scale-[0.97]"
-          >
-            Upgrade
-          </Link>
+          <Button asChild size="lg" className="w-full text-base">
+            <Link href="/settings/billing">Upgrade</Link>
+          </Button>
         </div>
       </Sheet>
     </>
@@ -70,9 +70,9 @@ export function ProFeatureLock({
 
 export function ProBadge() {
   return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-ink-900 px-2 py-0.5 text-[11px] font-extrabold text-mostaza-500 shadow-sm">
+    <Badge variant="dark" className="gap-1 px-2 py-0.5 text-[11px]">
       <Sparkles className="size-3" aria-hidden="true" />
       Pro
-    </span>
+    </Badge>
   );
 }

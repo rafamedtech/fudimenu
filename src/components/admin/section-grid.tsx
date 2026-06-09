@@ -186,8 +186,9 @@ function SortableSectionCard({
           </div>
         </div>
         {reorderMode ? (
-          <button
+          <Button
             type="button"
+            variant="ghost"
             className="absolute inset-0 flex items-start justify-end p-2 text-white"
             aria-label={`Mover ${section.name}`}
             {...attributes}
@@ -196,17 +197,15 @@ function SortableSectionCard({
             <span className="rounded-md bg-ink-900/70 p-2">
               <GripVertical className="size-5" aria-hidden />
             </span>
-          </button>
+          </Button>
         ) : (
           <>
             <Link href={`/menu/s/${section.id}`} className="absolute inset-0" aria-label={section.name} />
-            <Link
-              href={`/menu/sections/${section.id}/edit`}
-              className="absolute right-2 top-2 flex size-10 items-center justify-center rounded-md bg-[var(--brand-card)] text-ink-900 shadow-sm"
-              aria-label={`Editar ${section.name}`}
-            >
-              <Settings2 className="size-4" aria-hidden />
-            </Link>
+            <Button asChild variant="ghost" size="icon" className="absolute right-2 top-2 size-10 bg-[var(--brand-card)] text-ink-900 shadow-sm">
+              <Link href={`/menu/sections/${section.id}/edit`} aria-label={`Editar ${section.name}`}>
+                <Settings2 className="size-4" aria-hidden />
+              </Link>
+            </Button>
           </>
         )}
       </Card>

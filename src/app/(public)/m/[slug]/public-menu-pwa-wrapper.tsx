@@ -8,6 +8,7 @@ import {
   CookieConsentProvider,
   useCookieConsentDecided,
 } from '@/components/public/cookie-consent-context';
+import { Button } from '@/components/ui/button';
 import { usePwaInstall } from '@/hooks/use-pwa-install';
 import { localStore } from '@/lib/storage/local';
 
@@ -94,16 +95,17 @@ export function PublicMenuLanguageSwitcher({ activeLocale: initialLocale, ariaLa
           : 'flex h-8 min-w-10 items-center justify-center rounded-lg border-2 border-transparent px-2 text-xs font-extrabold uppercase text-ink-500 transition-colors hover:text-ink-900 disabled:cursor-wait';
 
         return (
-          <button
+          <Button
             key={option}
             type="button"
+            variant={isActive ? 'outline' : 'ghost'}
             aria-pressed={isActive}
             disabled={isPending}
             onClick={() => switchLocale(option)}
             className={className}
           >
             {option}
-          </button>
+          </Button>
         );
       })}
     </fieldset>
@@ -177,9 +179,9 @@ function PublicMenuPwaContent({ slug, tenantId, locale, pwaStrings, children }: 
             <p className="min-w-0 flex-1 text-sm font-semibold leading-snug text-ink-900">
               {pwaStrings.prompt}
             </p>
-            <button
+            <Button
               type="button"
-              className="inline-flex min-h-10 min-w-10 shrink-0 items-center justify-center rounded-md bg-[var(--brand-primary)] px-3 font-semibold text-[var(--brand-on-primary)] shadow-md transition-all hover:bg-[var(--brand-primary-hover)] active:scale-[0.97]"
+              className="min-h-10 min-w-10 shrink-0 px-3 font-semibold"
               onClick={promptInstall}
               aria-label={pwaStrings.install}
             >
@@ -198,10 +200,12 @@ function PublicMenuPwaContent({ slug, tenantId, locale, pwaStrings, children }: 
                 <polyline points="7 10 12 15 17 10" />
                 <line x1="12" y1="15" x2="12" y2="3" />
               </svg>
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
-              className="flex size-10 shrink-0 items-center justify-center rounded-md text-ink-500 transition-colors hover:bg-[var(--brand-primary-faint)] hover:text-ink-900 focus-visible:outline-none focus-visible:shadow-glow-mostaza"
+              variant="ghost"
+              size="icon"
+              className="size-10 shrink-0 text-ink-500 hover:text-ink-900"
               onClick={handleDismiss}
               aria-label={pwaStrings.close}
             >
@@ -219,7 +223,7 @@ function PublicMenuPwaContent({ slug, tenantId, locale, pwaStrings, children }: 
                 <line x1="18" y1="6" x2="6" y2="18" />
                 <line x1="6" y1="6" x2="18" y2="18" />
               </svg>
-            </button>
+            </Button>
           </div>
         </div>
       )}

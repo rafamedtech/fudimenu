@@ -10,9 +10,11 @@ import { toast } from 'sonner';
 import { PLAN_CONFIG } from '@/config/plans';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Dialog } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { ImageUploadField } from '@/components/admin/image-upload-field';
 import { Sheet } from '@/components/ui/sheet';
+import { Textarea } from '@/components/ui/textarea';
 import { Toggle } from '@/components/ui/toggle';
 import { usePriceInput } from '@/hooks/use-price-input';
 import { getCategoryEmoji } from '@/lib/category-placeholder';
@@ -630,9 +632,10 @@ function CategoryPicker({
         <>
           <div role="radiogroup" aria-labelledby="category-label" className="flex flex-wrap gap-2">
             {categories.map((category) => (
-              <button
+              <Button
                 key={category.id}
                 type="button"
+                variant="outline"
                 role="radio"
                 aria-checked={selectedCategoryId === category.id}
                 onClick={() => selectCategory(category.id)}
@@ -644,7 +647,7 @@ function CategoryPicker({
                 )}
               >
                 {category.name}
-              </button>
+              </Button>
             ))}
           </div>
           {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
@@ -704,16 +707,13 @@ function DescriptionField({
 }) {
   return (
     <div>
-      <label htmlFor="description" className="mb-1.5 block text-sm font-medium text-ink-700">
-        Descripción
-      </label>
-      <textarea
+      <Textarea
         {...register('description')}
         id="description"
+        label="Descripción"
         rows={4}
         maxLength={DESCRIPTION_MAX_CHARS}
         placeholder="¿Qué lleva? ¿Por qué les va a encantar?"
-        className="w-full rounded-md border-[1.5px] border-ink-300 bg-[var(--brand-card)] p-4 text-base text-ink-900 outline-none placeholder:text-ink-500 focus-within:border-mostaza-500 focus-within:shadow-glow-mostaza"
       />
       <div className="mt-1 flex justify-end">
         <span
@@ -770,9 +770,10 @@ function ImageEditorialCard({
         <legend className="mb-2 text-sm font-medium text-ink-700">Encuadre</legend>
         <div className="flex flex-wrap gap-2">
           {ITEM_IMAGE_CROPS.map((value) => (
-            <button
+            <Button
               key={value}
               type="button"
+              variant="outline"
               role="radio"
               aria-checked={crop === value || (value === 'auto' && crop === null)}
               onClick={() => onCropChange(value)}
@@ -784,7 +785,7 @@ function ImageEditorialCard({
               )}
             >
               {CROP_LABEL[value]}
-            </button>
+            </Button>
           ))}
         </div>
       </fieldset>
@@ -853,8 +854,9 @@ function TagToggle({
   onClick: () => void;
 }) {
   return (
-    <button
+    <Button
       type="button"
+      variant="outline"
       role="checkbox"
       aria-checked={selected}
       onClick={onClick}
@@ -866,7 +868,7 @@ function TagToggle({
       )}
     >
       {label}
-    </button>
+    </Button>
   );
 }
 
@@ -896,46 +898,35 @@ function TranslationCard({
         placeholder="Ej: Al pastor tacos"
         {...register('translations.0.name')}
       />
-      <div>
-        <label
-          htmlFor="translation-description"
-          className="mb-1.5 block text-sm font-medium text-ink-700"
-        >
-          Descripción en {localeLabel}
-        </label>
-        <textarea
-          {...register('translations.0.description')}
-          id="translation-description"
-          rows={3}
-          maxLength={DESCRIPTION_MAX_CHARS}
-          placeholder="Traducción de la descripción"
-          className="w-full rounded-md border-[1.5px] border-ink-300 bg-[var(--brand-card)] p-4 text-base text-ink-900 outline-none placeholder:text-ink-500 focus-within:border-mostaza-500 focus-within:shadow-glow-mostaza"
-        />
-      </div>
+      <Textarea
+        {...register('translations.0.description')}
+        id="translation-description"
+        label={`Descripción en ${localeLabel}`}
+        rows={3}
+        maxLength={DESCRIPTION_MAX_CHARS}
+        placeholder="Traducción de la descripción"
+      />
     </Card>
   );
 }
 
 function ItemLimitDialog({ close }: { close: () => void }) {
   return (
-    <dialog
-      ref={(dialog) => {
-        if (dialog && !dialog.open) dialog.showModal();
+    <Dialog
+      open
+      onOpenChange={(open) => {
+        if (!open) close();
       }}
-      className="fixed inset-0 z-50 m-0 flex size-full max-h-none max-w-none items-end bg-transparent px-4 pb-4 ipad:items-center ipad:justify-center backdrop:bg-ink-900/45 backdrop:backdrop-blur-sm"
-      aria-labelledby="upgrade-item-limit-title"
-      onPointerDown={(event) => {
-        if (event.target === event.currentTarget) close();
-      }}
-      onCancel={close}
+      title="Límite Free alcanzado"
+      contentClassName="space-y-4"
     >
-      <Card className="w-full space-y-4 rounded-lg border-[1.5px] border-mostaza-500 shadow-xl ipad:max-w-lg">
+      <Card className="space-y-4 rounded-lg border-[1.5px] border-mostaza-500 shadow-xl">
         <div className="flex items-start gap-3">
           <div className="flex size-10 shrink-0 items-center justify-center rounded-md bg-mostaza-100 text-ink-900">
             <Lock className="size-5" />
           </div>
           <div>
-            <h2 id="upgrade-item-limit-title" className="text-lg font-extrabold text-ink-900">
+            <h2 className="text-lg font-extrabold text-ink-900">
               Límite Free alcanzado
             </h2>
             <p className="mt-1 text-sm leading-6 text-ink-700">
@@ -948,14 +939,14 @@ function ItemLimitDialog({ close }: { close: () => void }) {
           <Button type="button" variant="outline" className="flex-1" onClick={close}>
             Ahora no
           </Button>
-          <Link href="/settings/billing" className="flex-1">
-            <Button type="button" className="w-full">
+          <Button asChild type="button" className="flex-1">
+            <Link href="/settings/billing">
               Upgrade
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         </div>
       </Card>
-    </dialog>
+    </Dialog>
   );
 }
 

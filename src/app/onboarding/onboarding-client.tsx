@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { ArrowRight, Check, ChevronLeft, Utensils } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Dialog } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { usePriceInput } from '@/hooks/use-price-input';
 import { track } from '@/lib/analytics/events';
@@ -275,18 +276,19 @@ export function OnboardingClient({ isAddingMenu }: { isAddingMenu: boolean }) {
         </section>
 
         <section className="space-y-4">
-          <button
+          <Button
             type="button"
+            variant="outline"
             onClick={() => setIsDishOpen((open) => !open)}
             aria-expanded={isDishOpen}
-            className="w-full rounded-2xl border-[1.5px] border-dashed border-[var(--brand-card-border)] bg-ink-100/30 p-6 text-center transition-colors hover:bg-ink-100/50"
+            className="h-auto w-full flex-col rounded-2xl border-dashed bg-ink-100/30 p-6 text-center hover:bg-ink-100/50"
           >
             <Utensils className="mx-auto size-8 text-ink-500" aria-hidden="true" />
             <p className="mt-2 font-bold text-ink-500">Paso 3: Tu primer platillo</p>
             <p className="mt-1 text-xs text-ink-500/70">
               Agregaremos un ítem para que veas cómo queda.
             </p>
-          </button>
+          </Button>
 
           {isDishOpen && (
             <Card className="grid gap-4 rounded-2xl border-[1.5px] border-[var(--brand-card-border)] p-5 shadow-sm ipad:grid-cols-2">
@@ -351,22 +353,19 @@ function ExistingTenantDialog({
   createAnotherRestaurant: () => void;
 }) {
   return (
-    <dialog
-      ref={(dialog) => {
-        if (dialog && !dialog.open) dialog.showModal();
-      }}
-      className="fixed inset-0 z-50 m-0 flex size-full max-h-none max-w-none items-end bg-transparent px-4 py-6 sm:items-center sm:justify-center backdrop:bg-ink-900/40"
-      aria-labelledby="existing-tenant-title"
-      onCancel={(event) => event.preventDefault()}
+    <Dialog
+      open
+      onOpenChange={() => undefined}
+      title={`Ya tienes este restaurante: ${slug}`}
     >
-      <div className="w-full max-w-sm rounded-md bg-[var(--brand-card)] p-6 shadow-xl">
-        <h2 id="existing-tenant-title" className="text-2xl font-extrabold text-ink-900">
+      <div className="space-y-5">
+        <h2 className="text-2xl font-extrabold text-ink-900">
           Ya tienes este restaurante: {slug}
         </h2>
-        <p className="mt-2 text-sm text-ink-500">
+        <p className="text-sm text-ink-500">
           Puedes ir al panel actual o crear otro restaurante con estos datos.
         </p>
-        <div className="mt-5 flex flex-col gap-3">
+        <div className="flex flex-col gap-3">
           <Button size="lg" onClick={openDashboard}>
             Ir al panel
           </Button>
@@ -380,6 +379,6 @@ function ExistingTenantDialog({
           </Button>
         </div>
       </div>
-    </dialog>
+    </Dialog>
   );
 }

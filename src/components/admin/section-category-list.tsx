@@ -118,32 +118,28 @@ export function SectionCategoryList({
       {items.length > 0 && (
         <div className="flex items-center justify-end gap-2">
           <div className="hidden overflow-hidden rounded-md border border-ink-200 ipad-landscape:flex">
-            <button
+            <Button
               type="button"
+              variant={view === 'cards' ? 'secondary' : 'ghost'}
+              size="icon"
               aria-label="Vista de tarjetas"
               aria-pressed={view === 'cards'}
               onClick={() => setStoredItemsView('cards')}
-              className={
-                view === 'cards'
-                  ? 'flex size-8 items-center justify-center bg-ink-900 text-mostaza-500'
-                  : 'flex size-8 items-center justify-center bg-[var(--brand-card)] text-ink-500 hover:text-ink-900'
-              }
+              className={view === 'cards' ? 'size-8 bg-ink-900 text-mostaza-500' : 'size-8 text-ink-500 hover:text-ink-900'}
             >
               <LayoutGrid className="size-4" aria-hidden />
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
+              variant={view === 'table' ? 'secondary' : 'ghost'}
+              size="icon"
               aria-label="Vista de tabla"
               aria-pressed={view === 'table'}
               onClick={() => setStoredItemsView('table')}
-              className={
-                view === 'table'
-                  ? 'flex size-8 items-center justify-center bg-ink-900 text-mostaza-500'
-                  : 'flex size-8 items-center justify-center bg-[var(--brand-card)] text-ink-500 hover:text-ink-900'
-              }
+              className={view === 'table' ? 'size-8 bg-ink-900 text-mostaza-500' : 'size-8 text-ink-500 hover:text-ink-900'}
             >
               <List className="size-4" aria-hidden />
-            </button>
+            </Button>
           </div>
           {items.length > 1 && (
             <Button
@@ -173,11 +169,11 @@ export function SectionCategoryList({
           ))}
         </SortableContext>
       </DndContext>
-      <Link href={`/menu/categories/new?sectionId=${sectionId}`}>
-        <Button type="button" variant="outline" className="w-full">
+      <Button asChild type="button" variant="outline" className="w-full">
+        <Link href={`/menu/categories/new?sectionId=${sectionId}`}>
           + Nueva categoría
-        </Button>
-      </Link>
+        </Link>
+      </Button>
     </div>
   );
 }
@@ -213,15 +209,17 @@ function SortableCategoryGroup({
       <div className="sticky top-14 z-10 mb-2 flex items-center justify-between gap-2 bg-[var(--brand-surface-translucent)] py-2 backdrop-blur ipad:top-16">
         <div className="flex items-center gap-2">
           {reorderMode && (
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="icon"
               className="flex size-10 items-center justify-center rounded-md bg-[var(--brand-card)] text-ink-700 shadow-sm"
               aria-label={`Mover ${group.category.name}`}
               {...attributes}
               {...listeners}
             >
               <GripVertical className="size-5" aria-hidden />
-            </button>
+            </Button>
           )}
           {group.category.coverImageUrl && (
             <div className="relative size-10 shrink-0 overflow-hidden rounded-md bg-[var(--brand-primary-soft)]">

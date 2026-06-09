@@ -6,6 +6,7 @@ import { AlertTriangle, Download, FileUp, Trash2, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { isCsvFile, parseCsv } from '@/lib/import/csv';
 import {
@@ -209,8 +210,8 @@ export function MenuImporter({
     });
   }
 
-  const cellClass =
-    'h-10 w-full rounded-md border bg-[var(--brand-card)] px-3 text-sm font-medium text-ink-900 outline-none transition-colors focus:border-[var(--brand-primary)]';
+  const cellControlClass = 'h-10 border px-3';
+  const cellInputClass = 'text-sm font-medium';
 
   return (
     <div className="space-y-5 pt-4">
@@ -314,12 +315,13 @@ export function MenuImporter({
                   )}
                 >
                   <div className="sm:col-span-3">
-                    <input
+                    <Input
                       aria-label="Nombre"
                       value={draft.name}
                       placeholder="Nombre"
                       onChange={(e) => updateDraft(draft.id, 'name', e.target.value)}
-                      className={cn(cellClass, fieldErrors.name ? 'border-rojo-400' : 'border-ink-200')}
+                      controlClassName={cn(cellControlClass, fieldErrors.name ? 'border-rojo-400' : 'border-ink-200')}
+                      className={cellInputClass}
                     />
                     {fieldErrors.name && (
                       <p className="mt-1 text-xs text-rojo-600">{fieldErrors.name}</p>
@@ -329,70 +331,64 @@ export function MenuImporter({
                     )}
                   </div>
                   <div className="sm:col-span-3">
-                    <input
+                    <Input
                       aria-label="Descripción"
                       value={draft.description}
                       placeholder="Descripción"
                       onChange={(e) => updateDraft(draft.id, 'description', e.target.value)}
-                      className={cn(
-                        cellClass,
-                        fieldErrors.description ? 'border-rojo-400' : 'border-ink-200',
-                      )}
+                      controlClassName={cn(cellControlClass, fieldErrors.description ? 'border-rojo-400' : 'border-ink-200')}
+                      className={cellInputClass}
                     />
                     {fieldErrors.description && (
                       <p className="mt-1 text-xs text-rojo-600">{fieldErrors.description}</p>
                     )}
                   </div>
                   <div className="sm:col-span-2">
-                    <input
+                    <Input
                       aria-label="Precio"
                       inputMode="decimal"
                       value={draft.price}
                       placeholder="Precio"
                       onChange={(e) => updateDraft(draft.id, 'price', e.target.value)}
-                      className={cn(
-                        cellClass,
-                        fieldErrors.price ? 'border-rojo-400' : 'border-ink-200',
-                      )}
+                      controlClassName={cn(cellControlClass, fieldErrors.price ? 'border-rojo-400' : 'border-ink-200')}
+                      className={cellInputClass}
                     />
                     {fieldErrors.price && (
                       <p className="mt-1 text-xs text-rojo-600">{fieldErrors.price}</p>
                     )}
                   </div>
                   <div className="sm:col-span-2">
-                    <input
+                    <Input
                       aria-label="Categoría"
                       value={draft.categoryName}
                       placeholder="Categoría"
                       onChange={(e) => updateDraft(draft.id, 'categoryName', e.target.value)}
-                      className={cn(
-                        cellClass,
-                        fieldErrors.categoryName ? 'border-rojo-400' : 'border-ink-200',
-                      )}
+                      controlClassName={cn(cellControlClass, fieldErrors.categoryName ? 'border-rojo-400' : 'border-ink-200')}
+                      className={cellInputClass}
                     />
                     {fieldErrors.categoryName && (
                       <p className="mt-1 text-xs text-rojo-600">{fieldErrors.categoryName}</p>
                     )}
                   </div>
                   <div className="flex items-start gap-2 sm:col-span-2">
-                    <input
+                    <Input
                       aria-label="Sección"
                       value={draft.sectionName}
                       placeholder="Sección"
                       onChange={(e) => updateDraft(draft.id, 'sectionName', e.target.value)}
-                      className={cn(
-                        cellClass,
-                        fieldErrors.sectionName ? 'border-rojo-400' : 'border-ink-200',
-                      )}
+                      controlClassName={cn(cellControlClass, fieldErrors.sectionName ? 'border-rojo-400' : 'border-ink-200')}
+                      className={cellInputClass}
                     />
-                    <button
+                    <Button
                       type="button"
+                      variant="outline"
+                      size="icon"
                       aria-label="Eliminar fila"
                       onClick={() => removeDraft(draft.id)}
-                      className="flex size-10 shrink-0 items-center justify-center rounded-md border border-ink-200 text-ink-500 transition-colors hover:border-rojo-300 hover:text-rojo-600"
+                      className="size-10 shrink-0 border-ink-200 text-ink-500 hover:border-rojo-300 hover:text-rojo-600"
                     >
                       <Trash2 className="size-4" aria-hidden />
-                    </button>
+                    </Button>
                   </div>
                 </div>
               );

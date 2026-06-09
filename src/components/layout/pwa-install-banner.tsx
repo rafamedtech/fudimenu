@@ -84,14 +84,16 @@ export function PwaInstallBanner() {
         >
           <Download size={18} aria-hidden />
         </Button>
-        <button
+        <Button
           type="button"
-          className="flex size-10 shrink-0 items-center justify-center rounded-md text-ink-500 transition-colors hover:bg-ink-100 hover:text-ink-900 focus-visible:outline-none focus-visible:shadow-glow-mostaza"
+          variant="ghost"
+          size="icon"
+          className="size-10 shrink-0 text-ink-500 hover:bg-ink-100 hover:text-ink-900"
           onClick={dismissAdminPwaPrompt}
           aria-label="Cerrar sugerencia"
         >
           <X size={18} aria-hidden />
-        </button>
+        </Button>
       </div>
     </div>
   );

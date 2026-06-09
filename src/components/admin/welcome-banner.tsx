@@ -3,6 +3,7 @@
 import { X } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 
 export function WelcomeBanner() {
@@ -22,14 +23,16 @@ export function WelcomeBanner() {
       <p className="text-sm font-extrabold text-ink-900">
         Tu menú arrancó con 6 platillos base. Edita nombres, precios o fotos cuando quieras.
       </p>
-      <button
+      <Button
         type="button"
+        variant="ghost"
+        size="icon"
         onClick={handleDismiss}
         aria-label="Cerrar"
-        className="absolute right-2 top-2 flex size-8 items-center justify-center rounded-md text-ink-700 hover:bg-mostaza-100"
+        className="absolute right-2 top-2 size-8 text-ink-700 hover:bg-mostaza-100"
       >
         <X className="size-4" aria-hidden />
-      </button>
+      </Button>
     </Card>
   );
 }

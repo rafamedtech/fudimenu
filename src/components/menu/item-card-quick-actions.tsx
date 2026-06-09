@@ -5,6 +5,7 @@ import { useCallback, useState, useTransition } from 'react';
 import { CheckCircle2, CircleSlash2 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
 import { toggleItemAvailabilityAction } from '@/server/actions/items.actions';
 import { track } from '@/lib/analytics/events';
 import { ApiError, toUserMessage } from '@/lib/api/errors';
@@ -62,19 +63,20 @@ export function ItemCardQuickActions({
     <div className="relative" {...longPressHandlers}>
       {isMenuOpen && (
         <div className="absolute right-2 top-2 z-20 rounded-md bg-[var(--brand-card)] p-1 shadow-lg ring-1 ring-ink-900/10">
-          <button
+          <Button
             type="button"
+            variant={nextAvailable ? 'success' : 'destructive'}
             aria-label={`Marcar como ${actionLabel}`}
             disabled={isPending}
             onClick={handleToggleStock}
             className={cn(
-              'flex h-12 min-w-12 items-center gap-2 rounded px-3 text-sm font-bold text-white transition-opacity disabled:opacity-60',
-              nextAvailable ? 'bg-menta-500' : 'bg-red-500',
+              'h-12 min-w-12 rounded px-3 text-sm font-bold transition-opacity disabled:opacity-60',
+              nextAvailable ? 'text-ink-900' : 'text-white',
             )}
           >
             <ActionIcon aria-hidden="true" className="size-4" />
             <span>{actionLabel}</span>
-          </button>
+          </Button>
         </div>
       )}
       <div className={cn(isMenuOpen && 'opacity-80')}>{children}</div>
