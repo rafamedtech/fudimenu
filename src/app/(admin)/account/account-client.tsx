@@ -118,7 +118,7 @@ export function AccountClient({ email, tenantName, tenantSlug, plan }: AccountCl
 
   return (
     <>
-      <main className="flex flex-col gap-4 px-4">
+      <main className="mx-auto w-full max-w-2xl flex flex-col gap-4 px-4 ipad:px-6">
         <Card className="space-y-3 border-[1.5px] border-mostaza-500 bg-mostaza-50 shadow-sm">
           <div>
             <p className="text-xs font-semibold uppercase text-ink-500">Correo</p>

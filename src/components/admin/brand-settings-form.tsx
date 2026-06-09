@@ -195,14 +195,14 @@ export function BrandSettingsForm({
 
         <FieldSection eyebrow="Tema" title="Color primario">
           <div className="space-y-3">
-            <div className="grid grid-cols-6 gap-2">
+            <div className="flex flex-wrap gap-2">
               {BRAND_COLORS.map((option) => (
                 <button
                   key={option}
                   type="button"
                   aria-label={`Usar color ${option}`}
                   aria-pressed={color === option}
-                  className="h-12 rounded-md border-[1.5px] border-ink-200 ring-offset-2 transition-all aria-pressed:ring-2 aria-pressed:ring-[var(--brand-primary)]"
+                  className="size-12 rounded-md border-[1.5px] border-ink-200 ring-offset-2 transition-all aria-pressed:ring-2 aria-pressed:ring-[var(--brand-primary)]"
                   style={{ backgroundColor: option }}
                   onClick={() => setColor(option)}
                 />

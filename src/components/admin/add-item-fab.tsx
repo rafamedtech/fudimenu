@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 export function AddItemFab({ sectionId }: { sectionId: string }) {
   const router = useRouter();
   return (
-    <div className="fixed bottom-24 right-4">
+    <div className="fixed bottom-[88px] right-4 z-30 ipad:bottom-[104px] ipad-landscape:bottom-6 ipad-landscape:right-8">
       <button
         type="button"
         onClick={() => router.push(`/menu/new?sectionId=${sectionId}`)}

@@ -31,7 +31,7 @@ export default async function ItemEditPage({ params, searchParams }: Props) {
           showBack
           right={<TenantSwitcher activeTenantId={ctx.tenantId} memberships={ctx.memberships} />}
         />
-        <main className="flex-1 px-4 pt-4">
+        <main className="mx-auto w-full max-w-[960px] flex-1 px-4 pt-4 ipad:px-6 ipad-landscape:px-7 desktop:px-8">
           <Card className="space-y-4 border-[1.5px] border-mostaza-500 shadow-xl">
             <div className="flex items-start gap-3">
               <div className="flex size-10 shrink-0 items-center justify-center rounded-md bg-mostaza-100 text-ink-900">
@@ -77,7 +77,7 @@ export default async function ItemEditPage({ params, searchParams }: Props) {
         showBack
         right={<TenantSwitcher activeTenantId={ctx.tenantId} memberships={ctx.memberships} />}
       />
-      <main className="flex-1 px-4 pb-24">
+      <main className="mx-auto w-full max-w-[960px] flex-1 px-4 pb-24 ipad:px-6 ipad-landscape:px-7 desktop:px-8">
         <ItemEditorForm
           initial={item ?? null}
           categories={filteredCategories}
