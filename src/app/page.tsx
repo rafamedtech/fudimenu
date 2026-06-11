@@ -32,10 +32,10 @@ export const metadata: Metadata = {
 const heroImage =
   'https://ggrhecslgdflloszjkwl.supabase.co/storage/v1/object/public/user-assets/T5aFVdCanUY/components/Jwn81WUoCdH.png';
 
-const faces = [
-  'https://randomuser.me/api/portraits/women/44.jpg',
-  'https://randomuser.me/api/portraits/men/32.jpg',
-  'https://randomuser.me/api/portraits/women/68.jpg',
+const avatars = [
+  { initials: 'SL', bg: 'bg-menta-100', text: 'text-menta-600' },
+  { initials: 'RM', bg: 'bg-[var(--brand-primary-soft)]', text: 'text-[var(--brand-accent-text)]' },
+  { initials: 'AG', bg: 'bg-coral-100', text: 'text-coral-600' },
 ];
 
 const benefits = [
@@ -127,15 +127,14 @@ export default function LandingPage() {
 
               <div className="mt-8 flex items-center gap-4 text-sm text-ink-500">
                 <div className="flex">
-                  {faces.map((src) => (
-                    <Image
-                      key={src}
-                      src={src}
-                      alt=""
-                      width={32}
-                      height={32}
-                      className="-ml-2 size-8 rounded-full object-cover ring-2 ring-[var(--brand-surface)] first:ml-0"
-                    />
+                  {avatars.map(({ initials, bg, text }) => (
+                    <span
+                      key={initials}
+                      aria-hidden="true"
+                      className={`-ml-2 flex size-8 items-center justify-center rounded-full text-[10px] font-black ring-2 ring-[var(--brand-surface)] first:ml-0 ${bg} ${text}`}
+                    >
+                      {initials}
+                    </span>
                   ))}
                 </div>
                 <p>Únete a +847 restaurantes en LATAM</p>

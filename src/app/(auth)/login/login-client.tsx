@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { ArrowRight, CheckCircle2, QrCode, Utensils } from 'lucide-react';
+import { ArrowRight, CheckCircle2 } from 'lucide-react';
 import { FudiLogo } from '@/components/brand/fudi-logo';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -240,12 +240,14 @@ export function LoginClient({ nextPath }: { nextPath: string }) {
         </div>
       </div>
 
-      <div className="fixed -bottom-10 -left-10 hidden rotate-12 text-[var(--brand-primary)] opacity-20 ipad-landscape:block">
-        <Utensils className="size-64" aria-hidden="true" />
-      </div>
-      <div className="fixed -right-10 -top-10 hidden -rotate-12 text-menta-500 opacity-20 ipad-landscape:block">
-        <QrCode className="size-64" aria-hidden="true" />
-      </div>
+      <div
+        className="fixed -bottom-32 -left-32 hidden size-96 rounded-full bg-[var(--brand-primary-faint)] blur-3xl ipad-landscape:block"
+        aria-hidden="true"
+      />
+      <div
+        className="fixed -right-32 -top-32 hidden size-96 rounded-full bg-menta-100 opacity-40 blur-3xl ipad-landscape:block"
+        aria-hidden="true"
+      />
     </main>
   );
 }

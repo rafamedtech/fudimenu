@@ -157,6 +157,7 @@ export function BillingPlans({
             </ul>
 
             {/* Actions */}
+            <div className="mt-auto">
             {plan.id === 'free' ? null : isCurrent && hasStripeCustomer && hasStripeSubscription ? (
               <form action={createCustomerPortalAction}>
                 <Button type="submit" variant="outline" className="w-full">
@@ -198,6 +199,7 @@ export function BillingPlans({
                 </p>
               </div>
             ) : null}
+            </div>
           </Card>
         );
       })}

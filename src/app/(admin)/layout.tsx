@@ -25,6 +25,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <AdminProviders>
       <SidebarProvider>
+        <a
+          href="#admin-main"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[9999] focus:rounded-md focus:bg-[var(--brand-card)] focus:px-4 focus:py-3 focus:font-bold focus:text-ink-900 focus:shadow-md"
+        >
+          Saltar al contenido
+        </a>
         <div
           className="mx-auto flex min-h-dvh w-full max-w-[480px] flex-col bg-[var(--brand-surface)] pb-[88px] ipad:max-w-[820px] ipad:pb-[104px] ipad-landscape:max-w-none ipad-landscape:flex-row ipad-landscape:pb-0 desktop:border-x desktop:border-[var(--brand-card-border)]"
           style={buildBrandThemeStyle(tenant?.primaryColor)}
@@ -35,7 +41,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             tenantName={activeMembership?.tenant.name ?? 'FudiMenu'}
             avatarUrl={ctx.avatarUrl}
           />
-          <div className="flex min-w-0 flex-1 flex-col ipad-landscape:items-center">
+          <div id="admin-main" className="flex min-w-0 flex-1 flex-col ipad-landscape:items-center">
             <div className="w-full ipad-landscape:max-w-[984px] desktop:max-w-[1180px]">
               {children}
             </div>

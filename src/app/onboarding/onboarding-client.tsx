@@ -162,7 +162,7 @@ export function OnboardingClient({ isAddingMenu }: { isAddingMenu: boolean }) {
             >
               <ChevronLeft className="size-6" />
             </Button>
-            <span className="font-heading text-sm font-bold">Paso 2 de 3</span>
+            <span className="font-heading text-sm font-bold text-ink-500">Configura tu menú</span>
           </div>
           <div className="h-2 w-full overflow-hidden rounded-full bg-ink-100" aria-label="Progreso de onboarding">
             <div
