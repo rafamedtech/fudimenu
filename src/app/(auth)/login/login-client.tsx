@@ -143,8 +143,8 @@ export function LoginClient({ nextPath }: { nextPath: string }) {
           </div>
 
           <div className="mb-8 space-y-2 text-center">
-            <h1 className="font-heading text-2xl font-bold tracking-[0] text-ink-900 ipad:text-3xl">
-              ¡Hola de nuevo!
+            <h1 className="font-heading text-2xl font-bold tracking-tight text-ink-900 ipad:text-3xl">
+              Hola de nuevo
             </h1>
             <p className="text-sm text-ink-500 ipad:text-base">
               Ingresa para gestionar tu menú digital
@@ -210,7 +210,7 @@ export function LoginClient({ nextPath }: { nextPath: string }) {
                 <CheckCircle2 className="size-10" aria-hidden="true" />
               </div>
               <h2 className="font-heading text-xl font-bold text-ink-900">
-                ¡Revisa tu bandeja!
+                Revisa tu bandeja de entrada
               </h2>
               <p className="text-sm leading-6 text-ink-500">
                 Te enviamos un enlace mágico a <strong>{email}</strong>. Haz clic en el botón para

@@ -14,6 +14,19 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'FudiMenu - Tu menú online en menos de 3 minutos',
   description: 'Reemplaza tu PDF por un menú digital editable y accesible desde un QR fijo.',
+  openGraph: {
+    title: 'FudiMenu - Tu menú online en menos de 3 minutos',
+    description: 'Reemplaza tu PDF por un menú digital editable y accesible desde un QR fijo.',
+    type: 'website',
+    images: [
+      {
+        url: 'https://ggrhecslgdflloszjkwl.supabase.co/storage/v1/object/public/user-assets/T5aFVdCanUY/components/Jwn81WUoCdH.png',
+        width: 720,
+        height: 620,
+        alt: 'FudiMenu — menú digital para restaurantes',
+      },
+    ],
+  },
 };
 
 const heroImage =
@@ -49,6 +62,12 @@ const benefits = [
 export default function LandingPage() {
   return (
     <div className="flex min-h-dvh flex-col bg-[var(--brand-surface)] text-ink-900">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[9999] focus:rounded-md focus:bg-[var(--brand-card)] focus:px-4 focus:py-3 focus:font-bold focus:text-ink-900 focus:shadow-md"
+      >
+        Saltar al contenido
+      </a>
       <header className="sticky top-0 z-50 w-full border-b border-[var(--brand-card-border)] bg-[var(--brand-surface-translucent)] backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-[1180px] items-center justify-between px-6 ipad:h-20 ipad:px-8">
           <FudiLogo markClassName="h-12" textClassName="text-xl" />
@@ -69,19 +88,19 @@ export default function LandingPage() {
         </div>
       </header>
 
-      <main className="flex-1">
+      <main id="main-content" className="flex-1">
         <section className="relative mx-auto max-w-[1180px] px-6 pb-20 pt-16 ipad:px-8 ipad:pt-24 ipad-landscape:pb-28 ipad-landscape:pt-32">
           <div className="grid items-center gap-12 ipad-landscape:grid-cols-2 ipad-landscape:gap-8">
             <div className="mx-auto flex max-w-2xl flex-col items-center text-center ipad-landscape:mx-0 ipad-landscape:items-start ipad-landscape:text-left">
-              <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-[var(--brand-primary-soft)] px-3 py-1 text-sm font-semibold text-[var(--brand-accent-text)]">
+              <div className="mb-6 inline-flex items-center gap-2 rounded-md bg-[var(--brand-primary-soft)] px-3 py-1 text-sm font-semibold text-[var(--brand-accent-text)]">
                 <span className="relative flex size-2">
                   <span className="absolute inline-flex size-full animate-ping rounded-full bg-menta-500 opacity-75" />
                   <span className="relative inline-flex size-2 rounded-full bg-menta-500" />
                 </span>
-                Nuevo: Soporte multi-sucursal
+                Multi-sucursal ya disponible
               </div>
 
-              <h1 className="font-heading max-w-3xl text-4xl font-black leading-[1.1] tracking-[0] text-ink-900 ipad:text-5xl ipad-landscape:text-6xl">
+              <h1 className="font-heading max-w-3xl text-4xl font-black leading-[1.1] tracking-tight text-ink-900 ipad:text-5xl ipad-landscape:text-6xl" style={{ letterSpacing: '-0.025em' }}>
                 Tu menú vive online en menos de{' '}
                 <span className="text-[var(--brand-primary)]">3 minutos.</span>
               </h1>
@@ -119,7 +138,7 @@ export default function LandingPage() {
                     />
                   ))}
                 </div>
-                <p>Únete a +1,000 restaurantes en LATAM</p>
+                <p>Únete a +847 restaurantes en LATAM</p>
               </div>
             </div>
 
@@ -134,17 +153,17 @@ export default function LandingPage() {
                 className="h-auto max-h-[400px] w-full object-contain drop-shadow-sm ipad-landscape:max-h-[500px]"
               />
 
-              <div className="absolute left-0 top-8 flex animate-[bounce_3s_infinite] items-center gap-3 rounded-lg border-2 border-[var(--brand-card-border)] bg-[var(--brand-card)] p-3 shadow-xl sm:-left-6 ipad:top-12">
+              <div className="absolute left-0 top-8 flex animate-float items-center gap-3 rounded-lg border border-[var(--brand-card-border)] bg-[var(--brand-card)] p-3 shadow-lg sm:-left-6 ipad:top-12">
                 <div className="rounded-md bg-menta-100 p-2 text-menta-600">
                   <Check className="size-5" aria-hidden="true" />
                 </div>
                 <div>
-                  <p className="text-xs font-black">¡Menú actualizado!</p>
+                  <p className="text-xs font-black">Menú actualizado</p>
                   <p className="text-[10px] text-ink-500">Al instante</p>
                 </div>
               </div>
 
-              <div className="absolute bottom-6 right-0 flex animate-[bounce_3.5s_infinite] items-center gap-3 rounded-lg border-2 border-[var(--brand-card-border)] bg-[var(--brand-card)] p-3 shadow-xl sm:-right-4 ipad:bottom-10">
+              <div className="absolute bottom-6 right-0 flex animate-float-slow items-center gap-3 rounded-lg border border-[var(--brand-card-border)] bg-[var(--brand-card)] p-3 shadow-lg sm:-right-4 ipad:bottom-10">
                 <div className="rounded-md bg-coral-100 p-2 text-coral-500">
                   <AlertCircle className="size-5" aria-hidden="true" />
                 </div>
@@ -157,16 +176,19 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="border-y border-[var(--brand-card-border)] bg-[var(--brand-card)] py-16">
+        <section className="border-y border-[var(--brand-card-border)] bg-[var(--brand-surface-strong)] py-16 ipad:py-20">
           <div className="mx-auto max-w-[1180px] px-6 ipad:px-8">
-            <div className="grid grid-cols-1 gap-8 ipad:grid-cols-3">
-              {benefits.map(({ title, description, Icon }) => (
-                <div key={title} className="flex flex-col items-center p-6 text-center">
-                  <div className="mb-4 flex size-14 items-center justify-center rounded-lg bg-[var(--brand-primary-soft)] text-[var(--brand-accent-text)]">
-                    <Icon className="size-7" aria-hidden="true" />
+            <div className="grid grid-cols-1 divide-y divide-[var(--brand-card-border)] ipad-landscape:grid-cols-3 ipad-landscape:divide-x ipad-landscape:divide-y-0">
+              {benefits.map(({ title, description, Icon }, i) => (
+                <div key={title} className="flex flex-col gap-4 py-10 ipad-landscape:px-10 ipad-landscape:py-8 first:pt-0 last:pb-0 ipad-landscape:first:pl-0 ipad-landscape:last:pr-0 ipad-landscape:first:pt-8 ipad-landscape:last:pb-8">
+                  <div className="flex items-start justify-between">
+                    <span className="font-heading text-5xl font-black text-[var(--brand-primary)] opacity-25 ipad:text-6xl">
+                      0{i + 1}
+                    </span>
+                    <Icon className="size-7 text-ink-300" aria-hidden="true" />
                   </div>
-                  <h2 className="font-heading mb-2 text-xl font-black">{title}</h2>
-                  <p className="leading-7 text-ink-500">{description}</p>
+                  <h2 className="font-heading text-xl font-black text-ink-900">{title}</h2>
+                  <p className="text-sm leading-7 text-ink-500">{description}</p>
                 </div>
               ))}
             </div>
@@ -175,9 +197,19 @@ export default function LandingPage() {
       </main>
 
       <footer className="border-t border-[var(--brand-card-border)] bg-[var(--brand-surface)] py-12">
-        <div className="mx-auto flex max-w-[1180px] flex-col items-center justify-between gap-4 px-6 ipad:flex-row ipad:px-8">
+        <div className="mx-auto flex max-w-[1180px] flex-col items-center justify-between gap-6 px-6 ipad:flex-row ipad:gap-4 ipad:px-8">
           <FudiLogo markClassName="h-12 opacity-75" textClassName="text-lg text-ink-500" />
-          <p className="text-sm text-ink-500">© 2026 FudiMenu. Hecho para restaurantes.</p>
+          <div className="flex flex-col items-center gap-3 ipad:flex-row ipad:gap-6">
+            <nav aria-label="Legal" className="flex items-center gap-4 text-sm text-ink-500">
+              <Link href="/legal/privacy" className="hover:text-ink-900 transition-colors">
+                Privacidad
+              </Link>
+              <Link href="/legal/terms" className="hover:text-ink-900 transition-colors">
+                Términos
+              </Link>
+            </nav>
+            <p className="text-sm text-ink-500">© 2026 FudiMenu.</p>
+          </div>
         </div>
       </footer>
     </div>

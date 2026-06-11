@@ -6,6 +6,7 @@ import { PLANS } from '@/config/plans';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { SegmentedControl } from '@/components/ui/segmented-control';
+import { cn } from '@/lib/utils';
 import {
   createBillingCheckoutFormAction,
   createCustomerPortalAction,
@@ -91,15 +92,30 @@ export function BillingPlans({
             ? `Ahorras ${formatMoney(savingsCents)} al año`
             : null;
 
+        const isRecommended = plan.id === 'pro';
+
         return (
-          <Card key={plan.id} className="space-y-4 ipad:p-5">
+          <Card
+            key={plan.id}
+            className={cn(
+              'relative flex flex-col space-y-4 ipad:p-5',
+              isRecommended && 'border-[1.5px] border-[var(--brand-primary)] shadow-mostaza-sm',
+            )}
+          >
+            {isRecommended && (
+              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
+                <span className="inline-flex items-center rounded-md bg-[var(--brand-primary)] px-3 py-1 text-[11px] font-black tracking-wide text-[var(--brand-on-primary)] shadow-sm">
+                  Recomendado
+                </span>
+              </div>
+            )}
             {/* Header */}
             <div className="flex items-start justify-between gap-3">
               <div>
                 <div className="flex items-center gap-2">
                   <h2 className="text-lg font-extrabold text-ink-900">{plan.name}</h2>
                   {isCurrent && (
-                    <span className="rounded-full bg-menta-100 px-2.5 py-0.5 text-xs font-bold text-ink-800">
+                    <span className="rounded-md bg-menta-100 px-2.5 py-0.5 text-xs font-bold text-ink-800">
                       Plan actual
                     </span>
                   )}
@@ -113,7 +129,7 @@ export function BillingPlans({
             </div>
 
             {/* Features */}
-            <ul className="space-y-1.5 text-sm text-ink-600">
+            <ul className="flex-1 space-y-1.5 text-sm text-ink-600">
               {plan.id === 'free' && (
                 <>
                   <li>· {plan.limits.items} platillos máximo</li>

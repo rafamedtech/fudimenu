@@ -184,8 +184,8 @@ export function OnboardingClient({ isAddingMenu }: { isAddingMenu: boolean }) {
             className="size-24 shrink-0 object-contain ipad:h-32 ipad:w-32"
           />
           <div className="space-y-1">
-            <h1 className="font-heading text-2xl font-bold leading-tight text-ink-900">
-              ¡Casi listo! <br />
+            <h1 className="font-heading text-2xl font-bold leading-tight tracking-tight text-ink-900">
+              Ya casi. <br />
               <span className="text-[var(--brand-primary)]">
                 {isAddingMenu ? '¿Cómo se llama?' : '¿Qué cocina preparas?'}
               </span>

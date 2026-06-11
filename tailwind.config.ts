@@ -68,6 +68,14 @@ export default {
         spring: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
       },
       keyframes: {
+        float: {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-8px)' },
+        },
+        'float-slow': {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-6px)' },
+        },
         shimmer: {
           '0%': { backgroundPosition: '-200% 0' },
           '100%': { backgroundPosition: '200% 0' },
@@ -94,6 +102,8 @@ export default {
         },
       },
       animation: {
+        float: 'float 3s ease-in-out infinite',
+        'float-slow': 'float-slow 3.8s ease-in-out infinite',
         shimmer: 'shimmer 1.5s linear infinite',
         'fade-in': 'fade-in 200ms ease-out',
         'sheet-in': 'sheet-in 360ms cubic-bezier(0.16, 1, 0.3, 1)',
