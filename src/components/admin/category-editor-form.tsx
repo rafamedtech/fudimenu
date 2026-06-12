@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { ImageUploadField } from '@/components/admin/image-upload-field';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { refreshMenuPreview } from '@/lib/menu-preview';
 import {
   softDeleteCategoryAction,
   upsertCategoryAction,
@@ -50,6 +51,7 @@ export function CategoryEditorForm({
         return;
       }
 
+      refreshMenuPreview();
       toast.success('Categoría guardada');
       router.push(returnPath());
       router.refresh();
@@ -66,6 +68,7 @@ export function CategoryEditorForm({
         toast.error('No se pudo eliminar la categoría');
         return;
       }
+      refreshMenuPreview();
       toast.success('Categoría eliminada');
       router.push(returnPath());
       router.refresh();

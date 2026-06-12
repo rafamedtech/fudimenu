@@ -3,6 +3,7 @@ import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { refreshMenuPreview } from '@/lib/menu-preview';
 import { restoreItemAction } from '@/server/actions/items.actions';
 
 export function RestoreItemButton({ itemId }: { itemId: string }) {
@@ -15,6 +16,7 @@ export function RestoreItemButton({ itemId }: { itemId: string }) {
     startTransition(async () => {
       const result = await restoreItemAction(itemId);
       if (result.ok) {
+        refreshMenuPreview();
         router.refresh();
       } else {
         setError(true);

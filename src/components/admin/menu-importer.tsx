@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { refreshMenuPreview } from '@/lib/menu-preview';
 import { cn } from '@/lib/utils';
 import { isCsvFile, parseCsv } from '@/lib/import/csv';
 import {
@@ -182,6 +183,7 @@ export function MenuImporter({
     startTransition(async () => {
       const result = await importMenuAction({ rows: validItems });
       if (result.ok) {
+        refreshMenuPreview();
         const { itemsCreated, categoriesCreated, sectionsCreated } = result.result;
         toast.success(
           `Importados ${itemsCreated} platillos, ${categoriesCreated} categorías, ${sectionsCreated} secciones`,
