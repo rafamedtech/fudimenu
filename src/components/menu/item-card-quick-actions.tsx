@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { toggleItemAvailabilityAction } from '@/server/actions/items.actions';
 import { track } from '@/lib/analytics/events';
 import { ApiError, toUserMessage } from '@/lib/api/errors';
+import { refreshMenuPreview } from '@/lib/menu-preview';
 import { cn } from '@/lib/utils';
 import { useLongPress } from '@/hooks/use-long-press';
 
@@ -51,6 +52,7 @@ export function ItemCardQuickActions({
           return;
         }
 
+        refreshMenuPreview();
         toast.success(nextAvailable ? t('available') : t('soldOut'));
       } catch (err) {
         setAvailable(previous);

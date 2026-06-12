@@ -1,5 +1,7 @@
+import { Suspense } from 'react';
 import { AdminProviders } from '@/components/admin-providers';
 import { AuthBroadcast } from '@/components/admin/auth-broadcast';
+import { MenuPreviewPanel } from '@/components/admin/menu-preview-panel';
 import { BottomNav } from '@/components/layout/bottom-nav';
 import { SidebarNav } from '@/components/layout/sidebar-nav';
 import { SidebarProvider } from '@/components/layout/sidebar-context';
@@ -16,10 +18,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     ctx.memberships[0];
   const tenant =
     process.env.USE_MOCKS === 'true'
-      ? { primaryColor: mockTenant.primaryColor }
+      ? { primaryColor: mockTenant.primaryColor, slug: mockTenant.slug }
       : await getPrisma().tenant.findUnique({
           where: { id: ctx.tenantId },
-          select: { primaryColor: true },
+          select: { primaryColor: true, slug: true },
         });
 
   return (
@@ -46,6 +48,11 @@ export default async function AdminLayout({ children }: { children: React.ReactN
               {children}
             </div>
           </div>
+          {tenant?.slug && (
+            <Suspense fallback={null}>
+              <MenuPreviewPanel slug={tenant.slug} />
+            </Suspense>
+          )}
           <PwaInstallBanner />
           <BottomNav plan={ctx.plan} />
         </div>

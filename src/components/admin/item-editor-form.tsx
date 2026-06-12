@@ -18,6 +18,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Toggle } from '@/components/ui/toggle';
 import { usePriceInput } from '@/hooks/use-price-input';
 import { getCategoryEmoji } from '@/lib/category-placeholder';
+import { refreshMenuPreview } from '@/lib/menu-preview';
 import {
   getQueuedOfflineMutation,
   keepLocalOfflineMutation,
@@ -213,6 +214,7 @@ export function ItemEditorForm({ initial, categories, sectionId, offlineConflict
           itemId: res.item.id,
           field: 'all',
         } as never);
+        refreshMenuPreview();
         toast.success('✓ Guardado');
         router.push(sectionId ? `/menu/s/${sectionId}` : '/menu');
       }
@@ -238,6 +240,7 @@ export function ItemEditorForm({ initial, categories, sectionId, offlineConflict
       }
       setLocalCategories([...localCategories, res.category]);
       setValue('categoryId', res.category.id, { shouldDirty: true, shouldValidate: true });
+      refreshMenuPreview();
       toast.success('Categoría creada');
       setShowCategoryForm(false);
       setNewCategoryName('');
@@ -265,6 +268,7 @@ export function ItemEditorForm({ initial, categories, sectionId, offlineConflict
           return;
         }
 
+        refreshMenuPreview();
         toast.success(next ? t('available') : t('soldOut'));
       } catch (err) {
         setStockAvailable(previous);
@@ -284,6 +288,7 @@ export function ItemEditorForm({ initial, categories, sectionId, offlineConflict
           return;
         }
 
+        refreshMenuPreview();
         router.push(sectionId ? `/menu/s/${sectionId}` : '/menu');
         router.refresh();
 
@@ -299,6 +304,7 @@ export function ItemEditorForm({ initial, categories, sectionId, offlineConflict
                   return;
                 }
 
+                refreshMenuPreview();
                 toast.success('Platillo restaurado');
                 router.refresh();
               } catch (err) {

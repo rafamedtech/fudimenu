@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { resolveBrandSurfaceColor } from '@/lib/brand-theme';
+import { refreshMenuPreview } from '@/lib/menu-preview';
 import {
   softDeleteSectionAction,
   upsertSectionAction,
@@ -51,6 +52,7 @@ export function SectionEditorForm({ initial, nextSortOrder = 0 }: SectionEditorF
         return;
       }
 
+      refreshMenuPreview();
       toast.success('Guardado');
       router.push('/menu');
       router.refresh();
@@ -67,6 +69,7 @@ export function SectionEditorForm({ initial, nextSortOrder = 0 }: SectionEditorF
         toast.error('No se pudo eliminar la sección');
         return;
       }
+      refreshMenuPreview();
       toast.success('Sección eliminada');
       router.push('/menu');
       router.refresh();

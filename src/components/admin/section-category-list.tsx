@@ -26,6 +26,7 @@ import { StockToggle } from '@/components/admin/stock-toggle';
 import { Button } from '@/components/ui/button';
 import { useIsDesktop } from '@/hooks/use-is-desktop';
 import { reorderCategoriesAction } from '@/server/actions/categories.actions';
+import { refreshMenuPreview } from '@/lib/menu-preview';
 import { formatPrice } from '@/lib/utils';
 import { TranslationStatusBadge } from '@/components/menu/translation-status-badge';
 import type { Category, Locale, MenuItem } from '@/types/domain';
@@ -105,6 +106,7 @@ export function SectionCategoryList({
         toast.error('No se pudo reordenar');
         return;
       }
+      refreshMenuPreview();
       toast.success('Orden guardado');
     });
   }

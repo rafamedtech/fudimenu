@@ -61,6 +61,9 @@ function recordMenuView(payload: {
 
 export function PublicMenuTracker({ tenantId, slug, locale }: { tenantId: string; slug: string; locale: string }) {
   useEffect(() => {
+    // Dentro de un iframe (vista previa del admin) no se trackea: contaminaría analytics.
+    if (window.self !== window.top) return;
+
     initAnalytics();
 
     const sessionId = getSessionId();
