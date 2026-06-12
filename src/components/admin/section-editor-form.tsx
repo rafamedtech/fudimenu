@@ -77,9 +77,12 @@ export function SectionEditorForm({ initial, nextSortOrder = 0 }: SectionEditorF
   }
 
   return (
-    <form className="space-y-5 pt-4" action={handleSave}>
+    <form
+      className="flex flex-col gap-5 pt-4 ipad-landscape:grid ipad-landscape:grid-cols-[minmax(0,1fr)_360px] ipad-landscape:items-start ipad-landscape:gap-x-8"
+      action={handleSave}
+    >
       <Card
-        className="relative aspect-[4/5] overflow-hidden p-0 shadow-sm"
+        className="relative aspect-[4/5] overflow-hidden p-0 shadow-sm ipad-landscape:sticky ipad-landscape:top-4 ipad-landscape:col-start-2 ipad-landscape:row-start-1"
         style={{ backgroundColor: resolveBrandSurfaceColor(accentColor) }}
       >
         {coverImageUrl ? (
@@ -87,7 +90,7 @@ export function SectionEditorForm({ initial, nextSortOrder = 0 }: SectionEditorF
             src={coverImageUrl}
             alt=""
             fill
-            sizes="50vw"
+            sizes="(min-width: 1024px) 360px, 50vw"
             className="object-cover opacity-80"
           />
         ) : (
@@ -101,47 +104,49 @@ export function SectionEditorForm({ initial, nextSortOrder = 0 }: SectionEditorF
         </div>
       </Card>
 
-      <Input
-        label="Nombre"
-        required
-        maxLength={40}
-        value={name}
-        onChange={(event) => setName(event.target.value)}
-        placeholder="Ej: Desayunos"
-      />
-
-      <div className="space-y-2">
-        <p className="text-sm font-medium text-ink-700">Color</p>
-        <div className="grid grid-cols-6 gap-2">
-          {ACCENT_COLORS.map((color) => (
-            <Button
-              key={color}
-              type="button"
-              variant="outline"
-              aria-label={`Usar color ${color}`}
-              aria-pressed={accentColor === color}
-              className="h-12 rounded-md border-[1.5px] border-ink-200 ring-offset-2 transition-all aria-pressed:ring-2 aria-pressed:ring-mostaza-500"
-              style={{ backgroundColor: color }}
-              onClick={() => setAccentColor(color)}
-            />
-          ))}
-        </div>
+      <div className="flex flex-col gap-5 ipad-landscape:col-start-1 ipad-landscape:row-start-1">
         <Input
-          label="Hex personalizado"
-          value={accentColor}
-          onChange={(event) => setAccentColor(event.target.value)}
-          pattern="^#[0-9A-Fa-f]{6}$"
+          label="Nombre"
+          required
+          maxLength={40}
+          value={name}
+          onChange={(event) => setName(event.target.value)}
+          placeholder="Ej: Desayunos"
+        />
+
+        <div className="space-y-2">
+          <p className="text-sm font-medium text-ink-700">Color</p>
+          <div className="grid grid-cols-6 gap-2">
+            {ACCENT_COLORS.map((color) => (
+              <Button
+                key={color}
+                type="button"
+                variant="outline"
+                aria-label={`Usar color ${color}`}
+                aria-pressed={accentColor === color}
+                className="h-12 rounded-md border-[1.5px] border-ink-200 ring-offset-2 transition-all aria-pressed:ring-2 aria-pressed:ring-mostaza-500"
+                style={{ backgroundColor: color }}
+                onClick={() => setAccentColor(color)}
+              />
+            ))}
+          </div>
+          <Input
+            label="Hex personalizado"
+            value={accentColor}
+            onChange={(event) => setAccentColor(event.target.value)}
+            pattern="^#[0-9A-Fa-f]{6}$"
+          />
+        </div>
+
+        <ImageUploadField
+          kind="section"
+          label="Cover"
+          value={coverImageUrl}
+          onChange={setCoverImageUrl}
         />
       </div>
 
-      <ImageUploadField
-        kind="section"
-        label="Cover"
-        value={coverImageUrl}
-        onChange={setCoverImageUrl}
-      />
-
-      <div className="sticky bottom-[88px] flex gap-3">
+      <div className="sticky bottom-[88px] flex gap-3 ipad-landscape:col-span-full ipad-landscape:bottom-4">
         {initial?.id && (
           <Button
             type="button"
