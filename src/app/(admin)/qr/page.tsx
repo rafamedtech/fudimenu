@@ -142,7 +142,7 @@ async function QrPageContent({
           />
         </div>
 
-        {/* RIGHT: sticky QR panel */}
+        {/* RIGHT: sticky QR panel — live preview mirroring the downloadable A4 poster */}
         <div className="ipad-landscape:sticky ipad-landscape:top-24">
           <Card className="flex flex-col items-center gap-5 ipad:p-7 ipad-landscape:p-8">
             <div className="flex w-full items-center justify-between">
@@ -150,39 +150,58 @@ async function QrPageContent({
                 <p className="text-[11px] font-black uppercase tracking-wider text-ink-500">
                   Tu código QR
                 </p>
-                <p className="text-xs text-ink-500">Alta resolución, listo para imprimir</p>
+                <p className="text-xs text-ink-500">Así se ve tu cartel descargable</p>
               </div>
               <span className="rounded-full bg-menta-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-menta-600">
                 Activo
               </span>
             </div>
 
-            <div className="relative rounded-xl bg-gradient-to-br from-mostaza-50 via-white to-crema-100 p-3 shadow-md ipad-landscape:p-4">
-              <div className="relative h-[280px] w-[280px] overflow-hidden rounded-lg border-[1.5px] border-dashed border-mostaza-300 bg-white ipad:h-[340px] ipad:w-[340px] ipad-landscape:h-[400px] ipad-landscape:w-[400px]">
-                <Image
-                  src={qrImagePath}
-                  alt={`QR del menú de ${tenant.name}`}
-                  fill
-                  sizes="(min-width: 1024px) 400px, (min-width: 768px) 340px, 280px"
-                  priority
-                  unoptimized
-                  className="object-contain p-4"
-                />
-              </div>
-              {/* corner anchors */}
-              <span aria-hidden className="absolute -left-1 -top-1 size-3 rounded-tl-md border-l border-t border-mostaza-500" />
-              <span aria-hidden className="absolute -right-1 -top-1 size-3 rounded-tr-md border-r border-t border-mostaza-500" />
-              <span aria-hidden className="absolute -bottom-1 -left-1 size-3 rounded-bl-md border-b border-l border-mostaza-500" />
-              <span aria-hidden className="absolute -bottom-1 -right-1 size-3 rounded-br-md border-b border-r border-mostaza-500" />
-            </div>
+            <div className="w-full overflow-hidden rounded-xl border border-ink-100 bg-[#FFFCF5] shadow-md">
+              <div aria-hidden className="h-2.5 w-full" style={{ backgroundColor: tenant.primaryColor }} />
+              <div className="flex flex-col items-center px-6 py-8 text-center ipad:px-8 ipad:py-10">
+                {tenant.logoUrl ? (
+                  <Image
+                    src={tenant.logoUrl}
+                    alt={`Logo de ${tenant.name}`}
+                    width={96}
+                    height={96}
+                    unoptimized
+                    className={
+                      tenant.logoShape === 'round'
+                        ? 'mb-4 size-16 rounded-full object-cover'
+                        : 'mb-4 max-h-16 w-auto object-contain'
+                    }
+                  />
+                ) : null}
+                <p className="font-heading text-2xl font-extrabold leading-tight text-[#1A1611] ipad:text-3xl">
+                  {tenant.name}
+                </p>
+                <p className="mt-1.5 text-sm text-[#6B5E4A]">Escanea y ve nuestro menú digital</p>
 
-            <div className="w-full rounded-md bg-[var(--brand-surface-strong)] p-4">
-              <p className="text-[11px] font-black uppercase tracking-wider text-ink-500">
-                Link del menú
-              </p>
-              <p className="mt-1.5 break-all font-mono text-sm font-bold text-ink-900">
-                {menuUrl}
-              </p>
+                <div className="mt-6 rounded-[20px] bg-white p-4 shadow-[0_4px_28px_rgba(26,22,17,0.10)] ipad:p-5">
+                  <div className="relative h-[200px] w-[200px] ipad:h-[240px] ipad:w-[240px] ipad-landscape:h-[280px] ipad-landscape:w-[280px]">
+                    <Image
+                      src={qrImagePath}
+                      alt={`QR del menú de ${tenant.name}`}
+                      fill
+                      sizes="(min-width: 1024px) 280px, (min-width: 768px) 240px, 200px"
+                      priority
+                      unoptimized
+                      className="object-contain"
+                    />
+                  </div>
+                </div>
+
+                <p className="mt-6 break-all font-mono text-sm text-[#6B5E4A]">{menuUrl}</p>
+                <span
+                  aria-hidden
+                  className="mt-2 h-[3px] w-12"
+                  style={{ backgroundColor: tenant.primaryColor }}
+                />
+                <p className="mt-6 text-xs text-[#9B8E7B]">Creado con FudiMenu</p>
+              </div>
+              <div aria-hidden className="h-2.5 w-full" style={{ backgroundColor: tenant.primaryColor }} />
             </div>
 
             <QrShareActions
@@ -220,8 +239,7 @@ function QrPageLoading() {
         </div>
         <Card className="flex flex-col items-center gap-5 ipad:p-7 ipad-landscape:p-8">
           <Skeleton className="h-6 w-full" />
-          <Skeleton className="h-[280px] w-[280px] rounded-lg ipad:h-[340px] ipad:w-[340px] ipad-landscape:h-[400px] ipad-landscape:w-[400px]" />
-          <Skeleton className="h-16 w-full rounded-md" />
+          <Skeleton className="h-[420px] w-full rounded-xl ipad:h-[480px] ipad-landscape:h-[540px]" />
           <div className="grid w-full gap-3 ipad:grid-cols-2">
             <Skeleton className="h-11 w-full" />
             <Skeleton className="h-11 w-full" />
