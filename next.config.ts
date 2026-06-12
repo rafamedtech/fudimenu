@@ -36,7 +36,16 @@ const config: NextConfig = {
         value: 'max-age=63072000; includeSubDomains; preload',
       });
     }
-    return [{ source: '/(.*)', headers: baseHeaders }];
+    return [
+      { source: '/(.*)', headers: baseHeaders },
+      // /m/* se permite en iframes same-origin (vista previa admin); la última regla gana.
+      {
+        source: '/m/:path*',
+        headers: baseHeaders.map((h) =>
+          h.key === 'X-Frame-Options' ? { key: h.key, value: 'SAMEORIGIN' } : h,
+        ),
+      },
+    ];
   },
 };
 

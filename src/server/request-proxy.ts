@@ -20,7 +20,12 @@ function generateNonce() {
   return btoa(String.fromCharCode(...array));
 }
 
-function buildCsp(nonce: string) {
+// /m/* se permite en iframes same-origin para la vista previa del admin.
+function allowsSameOriginFraming(pathname: string) {
+  return pathname === '/m' || pathname.startsWith('/m/');
+}
+
+function buildCsp(nonce: string, pathname: string) {
   const isDev = process.env.NODE_ENV === 'development';
   const devConnectSrc = isDev
     ? ' http://localhost:* http://127.0.0.1:* ws://localhost:* ws://127.0.0.1:*'
@@ -34,7 +39,7 @@ function buildCsp(nonce: string) {
     `font-src 'self' data:`,
     `connect-src 'self' https://*.supabase.co https://api.stripe.com https://us.i.posthog.com https://us-assets.i.posthog.com https://*.sentry.io wss://*.supabase.co${devConnectSrc}`,
     `frame-src 'self' https://js.stripe.com https://hooks.stripe.com`,
-    `frame-ancestors 'none'`,
+    `frame-ancestors ${allowsSameOriginFraming(pathname) ? "'self'" : "'none'"}`,
     `base-uri 'self'`,
     `form-action 'self' https://checkout.stripe.com`,
   ].join('; ');
@@ -57,11 +62,19 @@ function setLocaleCookie(response: NextResponse, locale: AppLocale) {
   });
 }
 
-function applyResponseHeaders(response: NextResponse, locale: AppLocale, nonce: string) {
+function applyResponseHeaders(
+  response: NextResponse,
+  locale: AppLocale,
+  nonce: string,
+  pathname: string,
+) {
   setLocaleCookie(response, locale);
-  response.headers.set('Content-Security-Policy', buildCsp(nonce));
+  response.headers.set('Content-Security-Policy', buildCsp(nonce, pathname));
   response.headers.set('X-Content-Type-Options', 'nosniff');
-  response.headers.set('X-Frame-Options', 'DENY');
+  response.headers.set(
+    'X-Frame-Options',
+    allowsSameOriginFraming(pathname) ? 'SAMEORIGIN' : 'DENY',
+  );
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
   return response;
@@ -79,7 +92,7 @@ export async function requestProxy(request: NextRequest) {
 
   const createResponse = () => {
     const response = NextResponse.next({ request: { headers: requestHeaders } });
-    return applyResponseHeaders(response, locale, nonce);
+    return applyResponseHeaders(response, locale, nonce, pathname);
   };
 
   if (useMocks) return createResponse();
@@ -96,21 +109,21 @@ export async function requestProxy(request: NextRequest) {
   }
 
   const { response, user } = await updateSession(request, requestHeaders);
-  applyResponseHeaders(response, locale, nonce);
+  applyResponseHeaders(response, locale, nonce, pathname);
 
   if (isAdminRoute && !user) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
     url.searchParams.set('next', pathname);
     const redirectResponse = NextResponse.redirect(url);
-    return applyResponseHeaders(redirectResponse, locale, nonce);
+    return applyResponseHeaders(redirectResponse, locale, nonce, pathname);
   }
 
   if (isAuthRoute && user) {
     const url = request.nextUrl.clone();
     url.pathname = '/dashboard';
     const redirectResponse = NextResponse.redirect(url);
-    return applyResponseHeaders(redirectResponse, locale, nonce);
+    return applyResponseHeaders(redirectResponse, locale, nonce, pathname);
   }
 
   if (
@@ -123,7 +136,7 @@ export async function requestProxy(request: NextRequest) {
     url.pathname = ONBOARDING_PATH;
     url.search = '';
     const redirectResponse = NextResponse.redirect(url);
-    return applyResponseHeaders(redirectResponse, locale, nonce);
+    return applyResponseHeaders(redirectResponse, locale, nonce, pathname);
   }
 
   return response;

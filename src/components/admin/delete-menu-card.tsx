@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { refreshMenuPreview } from '@/lib/menu-preview';
 import { deleteTenantAction } from '@/server/actions/tenant.actions';
 
 interface DeleteMenuCardProps {
@@ -35,6 +36,7 @@ export function DeleteMenuCard({ tenantId, tenantName }: DeleteMenuCardProps) {
         toast.error(ERROR_MESSAGES[result.code] ?? 'No se pudo eliminar.');
         return;
       }
+      refreshMenuPreview();
       toast.success('Menú eliminado.');
       router.replace('/menu');
       router.refresh();

@@ -6,6 +6,7 @@ import { Toggle } from '@/components/ui/toggle';
 import { toggleItemAvailabilityAction } from '@/server/actions/items.actions';
 import { track } from '@/lib/analytics/events';
 import { ApiError, toUserMessage } from '@/lib/api/errors';
+import { refreshMenuPreview } from '@/lib/menu-preview';
 
 interface StockToggleProps {
   itemId: string;
@@ -32,6 +33,7 @@ export function StockToggle({ itemId, initial }: StockToggleProps) {
           return;
         }
 
+        refreshMenuPreview();
         toast.success(next ? t('available') : t('soldOut'));
       } catch (err) {
         setAvailable(previous);
