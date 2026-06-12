@@ -418,7 +418,7 @@ export function QrMaterials({
         </p>
         <span className="text-[11px] font-semibold text-ink-300">PNG · listo para usar</span>
       </div>
-      <ul className="mt-4 grid grid-cols-2 gap-3 ipad-landscape:grid-cols-4">
+      <ul className="mt-4 grid grid-cols-2 gap-3">
         {MATERIALS.map(({ type, label, desc, icon: Icon }) => (
           <li
             key={type}
