@@ -13,13 +13,11 @@ import {
   Palette,
   QrCode,
   Sparkles,
-  Trash2,
   UserCircle2,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { canCreateAnotherMenu } from '@/config/plans';
 import { requireAuth } from '@/server/guards/require-auth';
-import { SettingsTabs, type SettingsTab } from './settings-tabs';
 
 type SettingLink = {
   href: string;
@@ -32,7 +30,6 @@ type SettingsSection = {
   id: string;
   eyebrow: string;
   title: string;
-  icon: LucideIcon;
   links: SettingLink[];
 };
 
@@ -41,7 +38,6 @@ const SECTIONS: SettingsSection[] = [
     id: 'brand',
     eyebrow: 'Tu identidad',
     title: 'Marca y menú',
-    icon: Palette,
     links: [
       {
         href: '/settings/brand',
@@ -61,7 +57,6 @@ const SECTIONS: SettingsSection[] = [
     id: 'ops',
     eyebrow: 'Día a día',
     title: 'Operaciones',
-    icon: MessageCircle,
     links: [
       {
         href: '/settings/contact',
@@ -81,7 +76,6 @@ const SECTIONS: SettingsSection[] = [
     id: 'account',
     eyebrow: 'Tu cuenta',
     title: 'Plan y acceso',
-    icon: CreditCard,
     links: [
       {
         href: '/settings/billing',
@@ -107,115 +101,104 @@ export default async function SettingsPage() {
     ctx.memberships.length > 1 &&
     activeMembership?.role === 'owner';
 
-  const tabs: SettingsTab[] = SECTIONS.map((section) => ({
-    id: section.id,
-    label: section.title,
-    icon: <section.icon className="size-4" strokeWidth={2.25} />,
-    panel: (
-      <section aria-labelledby={`section-${section.id}`}>
-        <SectionHeader
-          id={`section-${section.id}`}
-          eyebrow={section.eyebrow}
-          title={section.title}
-          meta={`${section.links.length} opciones`}
-        />
-        <div className="mt-4 grid gap-3 ipad:grid-cols-2 ipad:gap-4 ipad-landscape:mt-0">
-          {section.links.map((link) => (
-            <SettingsRow key={link.href} {...link} />
-          ))}
-        </div>
-      </section>
-    ),
-  }));
-
-  tabs.push({
-    id: 'pro',
-    label: 'Más herramientas',
-    icon: <Sparkles className="size-4" strokeWidth={2.25} />,
-    panel: (
-      <section aria-labelledby="section-pro">
-        <SectionHeader
-          id="section-pro"
-          eyebrow="Crece con Pro"
-          eyebrowClassName="text-mostaza-700"
-          title="Más herramientas"
-        />
-        <div className="mt-4 grid gap-3 ipad:grid-cols-2 ipad:gap-4 ipad-landscape:mt-0">
-          {ctx.plan === 'free' ? (
-            <>
-              <ProFeatureLock
-                title="Quitar marca es Pro"
-                description="Oculta el footer 'Hecho con FudiMenu' para que el menú público se sienta 100% tuyo."
-                className="block"
-              >
-                <ProRow
-                  icon={Sparkles}
-                  label="Quitar marca FudiMenu"
-                  description="Esconde el footer en tu menú público."
-                />
-              </ProFeatureLock>
-              <ProFeatureLock
-                title="Multi-sucursal es Pro"
-                description="Administra varias sucursales sin duplicar trabajo y cambia entre restaurantes desde el panel."
-                className="block"
-              >
-                <ProRow
-                  icon={Building2}
-                  label="Sucursales"
-                  description="Maneja varias ubicaciones sin duplicar trabajo."
-                />
-              </ProFeatureLock>
-            </>
-          ) : (
-            <Card className="flex items-center gap-4 opacity-90 ipad:min-h-24 ipad:p-5">
-              <span className="inline-flex size-11 items-center justify-center rounded-lg bg-[var(--brand-surface-strong)] text-ink-500">
-                <Building2 className="size-5" />
-              </span>
-              <div className="flex-1">
-                <p className="font-semibold text-ink-900">Sucursales</p>
-                <p className="mt-0.5 text-xs text-ink-500">
-                  Maneja varias ubicaciones sin duplicar trabajo.
-                </p>
-              </div>
-              <span className="rounded-full bg-[var(--brand-surface-strong)] px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-ink-500">
-                Pronto
-              </span>
-            </Card>
-          )}
-        </div>
-      </section>
-    ),
-  });
-
-  if (canDeleteMenu && activeMembership) {
-    tabs.push({
-      id: 'danger',
-      label: 'Eliminar menú',
-      icon: <Trash2 className="size-4" strokeWidth={2.25} />,
-      panel: (
-        <section aria-labelledby="section-danger">
-          <SectionHeader
-            id="section-danger"
-            eyebrow="Zona delicada"
-            eyebrowClassName="text-coral-600"
-            title="Eliminar menú"
-          />
-          <div className="mt-4 ipad-landscape:mt-0">
-            <DeleteMenuCard tenantId={ctx.tenantId} tenantName={activeMembership.tenant.name} />
-          </div>
-        </section>
-      ),
-    });
-  }
-
   return (
     <>
       <AppHeader
         title="Ajustes"
         right={<TenantSwitcher activeTenantId={ctx.tenantId} memberships={ctx.memberships} />}
       />
-      <main className="mx-auto w-full max-w-6xl px-4 pb-16 ipad:px-6 ipad-landscape:px-7 desktop:px-8">
-        <SettingsTabs tabs={tabs} />
+      <main className="mx-auto w-full max-w-5xl px-4 pb-20 ipad:px-6 ipad-landscape:px-7 desktop:px-8">
+        <p className="max-w-prose text-sm leading-6 text-ink-500">
+          Todo lo que controla cómo se ve tu restaurante y cómo funciona tu cuenta, en un solo
+          lugar.
+        </p>
+
+        <div className="mt-7 flex flex-col gap-10 ipad:mt-8 ipad:gap-12">
+          {SECTIONS.map((section) => (
+            <section key={section.id} aria-labelledby={`section-${section.id}`}>
+              <SectionHeader
+                id={`section-${section.id}`}
+                eyebrow={section.eyebrow}
+                title={section.title}
+                meta={`${section.links.length} opciones`}
+              />
+              <div className="mt-4 grid gap-3 sm:grid-cols-2 ipad:gap-4">
+                {section.links.map((link) => (
+                  <SettingsRow key={link.href} {...link} />
+                ))}
+              </div>
+            </section>
+          ))}
+
+          <section aria-labelledby="section-pro">
+            <SectionHeader
+              id="section-pro"
+              eyebrow="Crece con Pro"
+              eyebrowClassName="text-mostaza-700"
+              title="Más herramientas"
+            />
+            <div className="mt-4 grid gap-3 sm:grid-cols-2 ipad:gap-4">
+              {ctx.plan === 'free' ? (
+                <>
+                  <ProFeatureLock
+                    title="Quitar marca es Pro"
+                    description="Oculta el footer 'Hecho con FudiMenu' para que el menú público se sienta 100% tuyo."
+                    className="block"
+                  >
+                    <ProRow
+                      icon={Sparkles}
+                      label="Quitar marca FudiMenu"
+                      description="Esconde el footer en tu menú público."
+                    />
+                  </ProFeatureLock>
+                  <ProFeatureLock
+                    title="Multi-sucursal es Pro"
+                    description="Administra varias sucursales sin duplicar trabajo y cambia entre restaurantes desde el panel."
+                    className="block"
+                  >
+                    <ProRow
+                      icon={Building2}
+                      label="Sucursales"
+                      description="Maneja varias ubicaciones sin duplicar trabajo."
+                    />
+                  </ProFeatureLock>
+                </>
+              ) : (
+                <Card className="flex items-center gap-4 opacity-90 ipad:min-h-24 ipad:p-5">
+                  <span className="inline-flex size-11 shrink-0 items-center justify-center rounded-lg bg-[var(--brand-surface-strong)] text-ink-500">
+                    <Building2 className="size-5" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-ink-900">Sucursales</p>
+                    <p className="mt-0.5 text-xs text-ink-500">
+                      Maneja varias ubicaciones sin duplicar trabajo.
+                    </p>
+                  </div>
+                  <span className="shrink-0 rounded-full bg-[var(--brand-surface-strong)] px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-ink-500">
+                    Pronto
+                  </span>
+                </Card>
+              )}
+            </div>
+          </section>
+
+          {canDeleteMenu && activeMembership && (
+            <section aria-labelledby="section-danger">
+              <SectionHeader
+                id="section-danger"
+                eyebrow="Zona delicada"
+                eyebrowClassName="text-coral-600"
+                title="Eliminar menú"
+              />
+              <div className="mt-4">
+                <DeleteMenuCard
+                  tenantId={ctx.tenantId}
+                  tenantName={activeMembership.tenant.name}
+                />
+              </div>
+            </section>
+          )}
+        </div>
       </main>
     </>
   );
@@ -235,11 +218,9 @@ function SectionHeader({
   eyebrowClassName?: string;
 }) {
   return (
-    <header className="flex items-baseline justify-between gap-3 ipad-landscape:hidden">
+    <header className="flex items-baseline justify-between gap-3 border-b border-[var(--brand-card-border)] pb-3">
       <div>
-        <p
-          className={`text-[11px] font-black uppercase tracking-wider ${eyebrowClassName}`}
-        >
+        <p className={`text-[11px] font-black uppercase tracking-wider ${eyebrowClassName}`}>
           {eyebrow}
         </p>
         <h2
@@ -250,7 +231,9 @@ function SectionHeader({
         </h2>
       </div>
       {meta ? (
-        <span className="hidden text-[11px] font-semibold text-ink-300 ipad:inline">{meta}</span>
+        <span className="hidden shrink-0 text-[11px] font-semibold text-ink-300 ipad:inline">
+          {meta}
+        </span>
       ) : null}
     </header>
   );
@@ -258,9 +241,12 @@ function SectionHeader({
 
 function SettingsRow({ href, label, description, icon: Icon }: SettingLink) {
   return (
-    <Link href={href} className="group block">
-      <Card className="flex items-center gap-4 transition-colors group-hover:border-mostaza-300 ipad:min-h-24 ipad:p-5">
-        <span className="inline-flex size-11 shrink-0 items-center justify-center rounded-lg bg-mostaza-50 text-mostaza-700 transition-colors group-hover:bg-white group-hover:ring-1 group-hover:ring-mostaza-300">
+    <Link
+      href={href}
+      className="group block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mostaza-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--brand-surface)]"
+    >
+      <Card className="flex h-full items-center gap-4 transition-all duration-200 group-hover:border-mostaza-300 ipad:min-h-24 ipad:p-5 desktop:group-hover:-translate-y-0.5">
+        <span className="inline-flex size-11 shrink-0 items-center justify-center rounded-lg bg-mostaza-50 text-mostaza-700 ring-1 ring-inset ring-mostaza-300/40 transition-colors group-hover:bg-mostaza-100">
           <Icon className="size-5" strokeWidth={2.25} />
         </span>
         <div className="min-w-0 flex-1">
@@ -269,7 +255,7 @@ function SettingsRow({ href, label, description, icon: Icon }: SettingLink) {
         </div>
         <ChevronRight
           size={18}
-          className="text-ink-300 transition-transform group-hover:translate-x-0.5 group-hover:text-mostaza-600"
+          className="shrink-0 text-ink-300 transition-transform group-hover:translate-x-0.5 group-hover:text-mostaza-600"
         />
       </Card>
     </Link>
@@ -286,7 +272,7 @@ function ProRow({
   description: string;
 }) {
   return (
-    <Card className="flex items-center gap-4 border-[1.5px] border-mostaza-500 bg-mostaza-50 shadow-sm ipad:min-h-24 ipad:p-5">
+    <Card className="flex h-full items-center gap-4 border-[1.5px] border-mostaza-500 bg-mostaza-50 shadow-sm ipad:min-h-24 ipad:p-5">
       <span className="inline-flex size-11 shrink-0 items-center justify-center rounded-lg bg-white text-mostaza-700 ring-1 ring-mostaza-300">
         <Icon className="size-5" strokeWidth={2.25} />
       </span>
