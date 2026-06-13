@@ -83,29 +83,39 @@ export function PublicMenuLanguageSwitcher({ activeLocale: initialLocale, ariaLa
     });
   }
 
+  const activeIndex = LOCALES.indexOf(activeLocale);
+
   return (
     <fieldset
-      className="inline-grid h-10 grid-cols-2 gap-1 rounded-xl border border-[var(--brand-card-border)] bg-[var(--brand-card)] p-1 shadow-sm"
+      data-pending={isPending ? '' : undefined}
+      className="group relative inline-grid grid-cols-2 items-center gap-0 rounded-full border border-[var(--brand-card-border)] bg-[var(--brand-card)]/85 p-1 shadow-sm backdrop-blur-sm data-[pending]:cursor-wait"
     >
       <legend className="sr-only">{ariaLabel}</legend>
+      {/* Sliding thumb sits behind the labels and tracks the active locale */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-y-1 left-1 w-[calc(50%-0.25rem)] rounded-full bg-[var(--brand-primary)] shadow-[0_1px_2px_rgba(var(--brand-primary-rgb)/0.45)] transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-data-[pending]:opacity-70"
+        style={{ transform: `translateX(${activeIndex * 100}%)` }}
+      />
       {LOCALES.map((option) => {
         const isActive = option === activeLocale;
-        const className = isActive
-          ? 'flex h-8 min-w-10 items-center justify-center rounded-lg border-2 border-[var(--brand-primary)] bg-[var(--brand-primary-faint)] px-2 text-xs font-extrabold uppercase text-ink-900 transition-colors disabled:cursor-wait'
-          : 'flex h-8 min-w-10 items-center justify-center rounded-lg border-2 border-transparent px-2 text-xs font-extrabold uppercase text-ink-500 transition-colors hover:text-ink-900 disabled:cursor-wait';
-
         return (
-          <Button
+          <button
             key={option}
             type="button"
-            variant={isActive ? 'outline' : 'ghost'}
             aria-pressed={isActive}
             disabled={isPending}
             onClick={() => switchLocale(option)}
-            className={className}
+            className={[
+              'relative z-10 flex h-7 min-w-11 items-center justify-center rounded-full px-3 text-xs font-bold uppercase tracking-wide tabular-nums transition-colors duration-200',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary-ring)] disabled:cursor-wait',
+              isActive
+                ? 'text-[var(--brand-on-primary)]'
+                : 'text-ink-500 hover:text-ink-900',
+            ].join(' ')}
           >
             {option}
-          </Button>
+          </button>
         );
       })}
     </fieldset>
