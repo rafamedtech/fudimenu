@@ -14,7 +14,7 @@ export function AppHeader({ title, showBack, right }: AppHeaderProps) {
   return (
     <>
       <span className="block h-px" aria-hidden="true" />
-      <header className="sticky top-0 z-20 -mt-px flex h-14 items-center justify-between bg-[var(--brand-surface-translucent)] px-2 pt-safe backdrop-blur ipad:h-16 ipad:px-5 ipad-landscape:h-[76px] ipad-landscape:px-8 desktop:px-10">
+      <header className="sticky top-0 z-20 -mt-px flex h-14 items-center justify-between bg-[var(--brand-surface-translucent)] px-4 pt-safe backdrop-blur ipad:h-16 ipad:px-6 ipad-landscape:h-[76px] ipad-landscape:px-7 desktop:px-8">
         <div className="flex w-12 items-center gap-2 ipad:w-24 ipad-landscape:w-auto">
           {showBack && (
             <Button
