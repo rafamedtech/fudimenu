@@ -39,6 +39,8 @@ export default {
       fontFamily: {
         sans: ['var(--font-inter, Inter)', 'Inter', 'system-ui', 'sans-serif'],
         heading: [
+          'var(--font-montserrat, Montserrat)',
+          'Montserrat',
           'var(--font-dm-sans, "DM Sans")',
           'DM Sans',
           'var(--font-inter, Inter)',

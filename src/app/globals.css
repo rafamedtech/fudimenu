@@ -82,7 +82,7 @@
     font-variant-numeric: tabular-nums;
   }
   .fudi-h1 {
-    font-family: var(--font-dm-sans, "DM Sans"), var(--font-inter, Inter), system-ui, sans-serif;
+    font-family: var(--font-montserrat, Montserrat), var(--font-dm-sans, "DM Sans"), var(--font-inter, Inter), system-ui, sans-serif;
     font-size: 36px;
     line-height: 1.1;
     font-weight: 900;
@@ -101,7 +101,7 @@
     }
   }
   .fudi-title {
-    font-family: var(--font-dm-sans, "DM Sans"), var(--font-inter, Inter), system-ui, sans-serif;
+    font-family: var(--font-montserrat, Montserrat), var(--font-dm-sans, "DM Sans"), var(--font-inter, Inter), system-ui, sans-serif;
     font-size: 20px;
     line-height: 1.2;
     font-weight: 800;

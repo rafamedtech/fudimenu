@@ -1,8 +1,23 @@
 import type { Metadata, Viewport } from 'next';
+import { Inter, Montserrat } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
 import './globals.css';
 import { Providers } from '@/components/providers';
+
+// Brand heading/display face (self-hosted at build by next/font — no runtime CDN).
+const montserrat = Montserrat({
+  subsets: ['latin'],
+  variable: '--font-montserrat',
+  display: 'swap',
+});
+
+// Body, labels, inputs.
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: 'FudiMenu — Tu menú online en segundos',
@@ -21,7 +36,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const [locale, messages] = await Promise.all([getLocale(), getMessages()]);
 
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <html
+      lang={locale}
+      className={`${montserrat.variable} ${inter.variable}`}
+      suppressHydrationWarning
+    >
       <head>
         <meta
           name="description"
