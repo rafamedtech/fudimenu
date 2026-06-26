@@ -14,6 +14,13 @@
       "port": 3010
     },
     {
+      "name": "Next.js dev (mocks)",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["dev", "--port", "3011"],
+      "port": 3011,
+      "env": { "USE_MOCKS": "true" }
+    },
+    {
       "name": "Prisma Studio",
       "runtimeExecutable": "pnpm",
       "runtimeArgs": ["db:studio"],

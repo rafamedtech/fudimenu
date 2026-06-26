@@ -108,11 +108,6 @@ export default async function SettingsPage() {
         right={<TenantSwitcher activeTenantId={ctx.tenantId} memberships={ctx.memberships} />}
       />
       <main className="mx-auto w-full max-w-5xl px-4 pb-20 ipad:px-6 ipad-landscape:px-7 desktop:px-8">
-        <p className="max-w-prose text-sm leading-6 text-ink-500">
-          Todo lo que controla cómo se ve tu restaurante y cómo funciona tu cuenta, en un solo
-          lugar.
-        </p>
-
         <div className="mt-7 flex flex-col gap-10 ipad:mt-8 ipad:gap-12">
           {SECTIONS.map((section) => (
             <section key={section.id} aria-labelledby={`section-${section.id}`}>
@@ -120,7 +115,6 @@ export default async function SettingsPage() {
                 id={`section-${section.id}`}
                 eyebrow={section.eyebrow}
                 title={section.title}
-                meta={`${section.links.length} opciones`}
               />
               <div className="mt-4 grid gap-3 sm:grid-cols-2 ipad:gap-4">
                 {section.links.map((link) => (
@@ -220,12 +214,9 @@ function SectionHeader({
   return (
     <header className="flex items-baseline justify-between gap-3 border-b border-[var(--brand-card-border)] pb-3">
       <div>
-        <p className={`text-[11px] font-black uppercase tracking-wider ${eyebrowClassName}`}>
-          {eyebrow}
-        </p>
         <h2
           id={id}
-          className="mt-1 font-heading text-xl font-extrabold text-ink-900 ipad:text-2xl"
+          className="font-heading text-xl font-extrabold text-ink-900 ipad:text-2xl"
         >
           {title}
         </h2>
