@@ -82,10 +82,7 @@ export default function PrivacyPage() {
           Volver a FudiMenu
         </Link>
         <header className="mt-8 border-b border-ink-200 pb-6">
-          <p className="text-sm font-bold uppercase tracking-wide text-mostaza-600">
-            Aviso de privacidad integral
-          </p>
-          <h1 className="mt-3 text-4xl font-extrabold">Aviso de privacidad</h1>
+          <h1 className="text-4xl font-extrabold">Aviso de privacidad</h1>
           <p className="mt-3 text-sm text-ink-500">Ultima actualizacion: {updatedAt}</p>
           <p className="mt-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded px-3 py-2">
             Nota: este documento esta en revision legal externa. No constituye asesoramiento juridico definitivo hasta confirmacion formal.

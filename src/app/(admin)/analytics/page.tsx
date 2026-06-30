@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import { AppHeader } from '@/components/layout/app-header';
 import { TenantSwitcher } from '@/components/admin/tenant-switcher';
-import { ProFeatureLock } from '@/components/admin/pro-feature-lock';
+import { ProBadge, ProFeatureLock } from '@/components/admin/pro-feature-lock';
 import { Doodle } from '@/components/brand/doodles';
 import { Card } from '@/components/ui/card';
 import { Skeleton, StatCardSkeleton } from '@/components/ui/skeleton';
@@ -64,10 +64,12 @@ async function AnalyticsContent({ plan, tenantId }: { plan: Plan; tenantId: stri
     return (
       <Card className="flex flex-col gap-5 overflow-hidden border-[1.5px] border-mostaza-500 bg-mostaza-50 shadow-sm ipad:grid ipad:grid-cols-[1fr_220px] ipad:items-center ipad:p-6">
         <div>
-          <p className="text-sm font-extrabold uppercase text-mostaza-600">Pro</p>
-          <h2 className="mt-1 text-2xl font-extrabold text-ink-900 ipad:text-3xl">
-            Analytics desbloquea decisiones
-          </h2>
+          <div className="flex flex-wrap items-center gap-2">
+            <h2 className="text-2xl font-extrabold text-ink-900 ipad:text-3xl">
+              Analytics desbloquea decisiones
+            </h2>
+            <ProBadge />
+          </div>
           <p className="mt-2 text-sm leading-6 text-ink-700">
             Ve qué platillos jalan más vistas, qué cambió en la semana y qué conviene
             empujar como especial.

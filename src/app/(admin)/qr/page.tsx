@@ -4,6 +4,7 @@ import { Printer, Smartphone, Sticker } from 'lucide-react';
 import { AppHeader } from '@/components/layout/app-header';
 import { TenantSwitcher } from '@/components/admin/tenant-switcher';
 import { Card } from '@/components/ui/card';
+import { SectionHeading } from '@/components/ui/section-heading';
 import { Skeleton } from '@/components/ui/skeleton';
 import { requireAuth } from '@/server/guards/require-auth';
 import { menuService } from '@/server/services/menu.service';
@@ -76,17 +77,17 @@ async function QrPageContent({
         {/* LEFT: sticky QR panel — live preview mirroring the downloadable A4 poster */}
         <div className="ipad-landscape:sticky ipad-landscape:top-24">
           <Card className="flex flex-col items-center gap-5 ipad:p-7 ipad-landscape:p-8">
-            <div className="flex w-full items-center justify-between">
-              <div>
-                <p className="text-[11px] font-black uppercase tracking-wider text-ink-500">
-                  Tu código QR
-                </p>
-                <p className="text-xs text-ink-500">Así se ve tu cartel descargable</p>
-              </div>
-              <span className="rounded-full bg-menta-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-menta-600">
-                Activo
-              </span>
-            </div>
+            <SectionHeading
+              title="Tu código QR"
+              description="Así se ve tu cartel descargable."
+              className="w-full"
+              titleClassName="text-lg ipad:text-xl"
+              meta={
+                <span className="rounded-full bg-menta-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-menta-600">
+                  Activo
+                </span>
+              }
+            />
 
             <div className="w-full overflow-hidden rounded-xl border border-ink-100 bg-[#FFFCF5] shadow-md">
               <div aria-hidden className="h-2.5 w-full" style={{ backgroundColor: tenant.primaryColor }} />
@@ -147,12 +148,11 @@ async function QrPageContent({
         {/* RIGHT: ideas + materials */}
         <div className="flex flex-col gap-5">
           <Card className="ipad:p-6 ipad-landscape:p-7">
-            <div className="flex items-center justify-between gap-2">
-              <p className="text-[11px] font-black uppercase tracking-wider text-ink-500">
-                Cómo usarlo
-              </p>
-              <span className="text-[11px] font-semibold text-ink-300">3 ideas rápidas</span>
-            </div>
+            <SectionHeading
+              title="Dónde poner tu QR"
+              description="Tres ideas rápidas para que tus clientes lo encuentren."
+              titleClassName="text-lg ipad:text-xl"
+            />
             <ul className="mt-4 grid gap-3 ipad-landscape:grid-cols-3">
               {USAGE_IDEAS.map(({ icon: Icon, title, body }) => (
                 <li

@@ -453,6 +453,8 @@ Typography uses Satoshi first, with Inter and system sans-serif fallbacks. The v
 
 Use extra-bold type for brand moments, onboarding questions, and numeric dashboard highlights. Use tabular numerals for metrics, prices, and counts so dashboard cards do not jitter. Labels, helper text, and metadata should be smaller and muted rather than all-caps, except for status overlays such as sold-out badges.
 
+Section headers start with the heading itself. Add sentence-case supporting copy below only when it helps the user act or understand scope. Do not place topical eyebrows above headings. Plan and status information belongs in a badge beside the heading, while category context belongs in normal supporting text below it.
+
 ## Layout
 
 The product is centered around a single-column mobile shell with a maximum width near 448px. Page gutters are usually 16px in the app and 24px on landing, auth, and onboarding screens. Vertical rhythm is compact: lists use 8px to 12px gaps, forms use 16px gaps, and larger content sections use 32px or more.

@@ -374,45 +374,45 @@ export function ItemList({
           contains: strings.containsAllergens,
         });
         return (
-        <li key={item.id} id={`item-${item.id}`} className="scroll-mt-20">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => onSelect(item, categoryName)}
-            data-item-id={item.id}
-            data-item-category={categoryName}
-            className="h-auto w-full items-start justify-start gap-3 rounded-xl border-[var(--brand-card-border)] bg-[var(--brand-card)] p-3 text-left shadow-sm hover:border-[var(--brand-primary-border)] hover:shadow-md ipad:gap-4 ipad:p-4"
-            aria-label={`${item.name}${badgeLabel ? `. ${badgeLabel}` : ''} — ${strings.viewDetail}`}
-          >
-            <ItemThumb item={item} categoryName={categoryName} soldOutLabel={strings.soldOut} />
-            <div className="flex min-w-0 flex-1 flex-col">
-              <div className="flex items-start justify-between gap-2">
-                <h4 className="font-bold text-ink-900 ipad:text-lg">{item.name}</h4>
-                {item.isSpecialToday && (
-                  <span className="shrink-0 rounded-md bg-coral-500 px-2 py-1 text-[10px] font-extrabold uppercase text-white">
-                    {strings.special}
-                  </span>
+          <li key={item.id} id={`item-${item.id}`} className="min-w-0 scroll-mt-20">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onSelect(item, categoryName)}
+              data-item-id={item.id}
+              data-item-category={categoryName}
+              className="h-auto w-full min-w-0 items-start justify-start gap-3 whitespace-normal rounded-xl border-[var(--brand-card-border)] bg-[var(--brand-card)] p-3 text-left shadow-sm hover:border-[var(--brand-primary-border)] hover:shadow-md ipad:gap-4 ipad:p-4"
+              aria-label={`${item.name}${badgeLabel ? `. ${badgeLabel}` : ''} — ${strings.viewDetail}`}
+            >
+              <ItemThumb item={item} categoryName={categoryName} soldOutLabel={strings.soldOut} />
+              <div className="flex min-w-0 flex-1 flex-col">
+                <div className="flex items-start justify-between gap-2">
+                  <h4 className="font-bold text-ink-900 ipad:text-lg">{item.name}</h4>
+                  {item.isSpecialToday && (
+                    <span className="shrink-0 rounded-md bg-coral-500 px-2 py-1 text-[10px] font-extrabold uppercase text-white">
+                      {strings.special}
+                    </span>
+                  )}
+                </div>
+                {item.description && (
+                  <p className="mt-1 line-clamp-2 text-sm text-ink-500 ipad:text-base">
+                    {item.description}
+                  </p>
                 )}
-              </div>
-              {item.description && (
-                <p className="mt-1 line-clamp-2 text-sm text-ink-500 ipad:text-base">
-                  {item.description}
-                </p>
-              )}
-              {/* Visual only: the badge meaning is carried by the button's
+                {/* Visual only: the badge meaning is carried by the button's
                   aria-label, so hide the chips from the a11y tree to avoid a
                   duplicate/confusing announcement. */}
-              <BadgeRow badges={badges} size="sm" ariaHidden />
-              <p
-                className={`mt-2 font-extrabold tabular-nums text-ink-900 ipad:text-lg ${
-                  !item.isAvailable ? 'line-through opacity-50' : ''
-                }`}
-              >
-                {formatPrice(getItemPrice(item), item.currency, priceLocale)}
-              </p>
-            </div>
-          </Button>
-        </li>
+                <BadgeRow badges={badges} size="sm" ariaHidden />
+                <p
+                  className={`mt-2 font-extrabold tabular-nums text-ink-900 ipad:text-lg ${
+                    !item.isAvailable ? 'line-through opacity-50' : ''
+                  }`}
+                >
+                  {formatPrice(getItemPrice(item), item.currency, priceLocale)}
+                </p>
+              </div>
+            </Button>
+          </li>
         );
       })}
     </ul>
@@ -646,15 +646,15 @@ export function ItemSheet({
           </div>
 
           <div className="flex flex-1 flex-col gap-4 overflow-y-auto px-6 pb-4 pt-5 ipad:px-8 ipad:pt-6">
-            <span className="inline-flex w-fit items-center rounded-full bg-[var(--brand-primary-soft)] px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-[var(--brand-primary)]">
-              {categoryName}
-            </span>
             <h2
               id={`sheet-title-${item.id}`}
               className="text-2xl font-extrabold leading-tight tracking-tight text-ink-900 ipad:text-3xl"
             >
               {item.name}
             </h2>
+            <p className="-mt-2 text-sm font-semibold text-[var(--brand-accent-text)]">
+              {categoryName}
+            </p>
             {item.description && (
               <p className="text-base leading-relaxed text-ink-700">{item.description}</p>
             )}

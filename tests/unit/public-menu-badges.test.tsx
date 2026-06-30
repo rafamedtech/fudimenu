@@ -107,4 +107,9 @@ describe('public detail badge render', () => {
       'Allergen and dietary information is managed by the restaurant.',
     );
   });
+
+  it('places the category as supporting copy after the item title', () => {
+    expect(html).toContain('>Ensaladas</p>');
+    expect(html.indexOf('Ensalada</h2>')).toBeLessThan(html.indexOf('>Ensaladas</p>'));
+  });
 });

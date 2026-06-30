@@ -24,6 +24,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { resolveBrandSurfaceColor } from '@/lib/brand-theme';
+import { cn } from '@/lib/utils';
 import { reorderSectionsAction } from '@/server/actions/sections.actions';
 import type { MenuSection } from '@/types/domain';
 
@@ -68,10 +69,7 @@ export function SectionGrid({ sections, canCreateSection, itemCountBySectionId }
     <section className="space-y-3 ipad:space-y-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-[var(--brand-accent-text)]">
-            Arquitectura del menú
-          </p>
-          <h2 className="mt-1 text-xl font-black text-ink-900 ipad:text-2xl">Secciones</h2>
+          <h2 className="text-xl font-black text-ink-900 ipad:text-2xl">Secciones</h2>
           <p className="mt-1 hidden max-w-xl text-sm font-medium leading-6 text-ink-500 ipad:block">
             Ordena la carta como la ve el cliente: primero secciones, después categorías y platillos.
           </p>
@@ -101,10 +99,10 @@ export function SectionGrid({ sections, canCreateSection, itemCountBySectionId }
               />
             ))}
             {canCreateSection && (
-              <li>
+              <li className="min-w-0">
                 <Link
                   href="/menu/sections/new"
-                  className="group flex aspect-[6/5] min-h-40 flex-col items-center justify-center gap-3 rounded-xl border-[1.5px] border-dashed border-ink-300 bg-[rgb(var(--brand-card-rgb)/0.72)] px-5 text-center text-ink-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--brand-primary)] hover:bg-[var(--brand-primary-faint)] hover:shadow-md focus-visible:outline-none focus-visible:shadow-glow-mostaza ipad:aspect-[5/4] ipad:min-h-44 ipad:gap-4"
+                  className="group flex aspect-[6/5] min-h-32 flex-col items-center justify-center gap-3 rounded-xl border-[1.5px] border-dashed border-ink-300 bg-[rgb(var(--brand-card-rgb)/0.72)] px-5 text-center text-ink-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--brand-primary)] hover:bg-[var(--brand-primary-faint)] hover:shadow-md focus-visible:outline-none focus-visible:shadow-glow-mostaza ipad:aspect-[5/4] ipad:min-h-44 ipad:gap-4"
                 >
                   <span className="flex size-14 items-center justify-center rounded-full bg-[var(--brand-coral-soft)] text-ink-900 transition-transform duration-200 group-hover:scale-105">
                     <Plus className="size-6" aria-hidden />
@@ -144,9 +142,13 @@ function SortableSectionCard({
   };
 
   return (
-    <li ref={setNodeRef} style={style} className={isDragging ? 'z-10 opacity-80' : undefined}>
+    <li
+      ref={setNodeRef}
+      style={style}
+      className={cn('min-w-0', isDragging && 'z-10 opacity-80')}
+    >
       <Card
-        className="group relative aspect-[6/5] min-h-40 overflow-hidden p-0 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg ipad:aspect-[5/4] ipad:min-h-44"
+        className="group relative aspect-[6/5] min-h-32 overflow-hidden p-0 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg ipad:aspect-[5/4] ipad:min-h-44"
         style={{ backgroundColor: resolveBrandSurfaceColor(section.accentColor) }}
       >
         {section.coverImageUrl ? (

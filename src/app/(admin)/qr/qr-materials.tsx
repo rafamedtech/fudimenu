@@ -5,6 +5,7 @@ import { Download, Instagram, Printer, Share2, Smartphone, Sticker } from 'lucid
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { SectionHeading } from '@/components/ui/section-heading';
 import { track } from '@/lib/analytics/events';
 import type { LogoShape } from '@/types/domain';
 
@@ -412,12 +413,12 @@ export function QrMaterials({
 
   return (
     <Card className="ipad:p-6 ipad-landscape:p-7">
-      <div className="flex items-center justify-between gap-2">
-        <p className="text-[11px] font-black uppercase tracking-wider text-ink-500">
-          Materiales descargables
-        </p>
-        <span className="text-[11px] font-semibold text-ink-300">PNG · listo para usar</span>
-      </div>
+      <SectionHeading
+        title="Materiales descargables"
+        description="Piezas listas para imprimir o publicar."
+        titleClassName="text-lg ipad:text-xl"
+        meta={<span className="text-xs font-semibold text-ink-400">PNG</span>}
+      />
       <ul className="mt-4 grid grid-cols-2 gap-3">
         {MATERIALS.map(({ type, label, desc, icon: Icon }) => (
           <li

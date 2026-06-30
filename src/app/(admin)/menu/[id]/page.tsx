@@ -4,6 +4,7 @@ import { Lock } from 'lucide-react';
 import { AppHeader } from '@/components/layout/app-header';
 import { ItemEditorForm } from '@/components/admin/item-editor-form';
 import { TenantSwitcher } from '@/components/admin/tenant-switcher';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { PLAN_CONFIG } from '@/config/plans';
@@ -38,10 +39,12 @@ export default async function ItemEditPage({ params, searchParams }: Props) {
                 <Lock className="size-5" />
               </div>
               <div>
-                <p className="text-sm font-extrabold uppercase text-mostaza-600">Plan Free</p>
-                <h1 className="mt-0.5 text-xl font-extrabold text-ink-900">
-                  Llegaste a {freeItemLimit} platillos
-                </h1>
+                <div className="flex flex-wrap items-center gap-2">
+                  <h1 className="text-xl font-extrabold text-ink-900">
+                    Llegaste a {freeItemLimit} platillos
+                  </h1>
+                  <Badge variant="secondary">Plan Free</Badge>
+                </div>
                 <p className="mt-2 text-sm leading-6 text-ink-700">
                   Pro desbloquea items ilimitados, quitar la marca FudiMenu y activar
                   analytics básico.

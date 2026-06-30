@@ -99,7 +99,6 @@ export function SectionEditorForm({ initial, nextSortOrder = 0 }: SectionEditorF
           </div>
         )}
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink-900/80 to-transparent p-4">
-          <p className="text-sm font-semibold uppercase text-white/80">Preview</p>
           <h2 className="text-2xl font-extrabold text-white">{name.trim() || 'Nombre sección'}</h2>
         </div>
       </Card>

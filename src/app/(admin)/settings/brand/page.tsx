@@ -3,6 +3,7 @@ import { CheckCircle2, Palette } from 'lucide-react';
 import { BrandSettingsForm } from '@/components/admin/brand-settings-form';
 import { AppHeader } from '@/components/layout/app-header';
 import { Card } from '@/components/ui/card';
+import { SectionHeading } from '@/components/ui/section-heading';
 import { FormSkeleton } from '@/components/ui/skeleton';
 import { getPrisma } from '@/lib/db/prisma';
 import { mockTenant } from '@/lib/mock/data';
@@ -19,22 +20,15 @@ export default async function BrandSettingsPage({ searchParams }: BrandSettingsP
       <AppHeader title="Marca y tema" showBack />
       <main className="mx-auto w-full max-w-6xl px-4 pb-16 ipad:px-6 ipad-landscape:px-7 desktop:px-8">
         <div className="flex flex-col gap-6 ipad:gap-8">
-          <header className="flex items-start gap-3">
-            <span className="inline-flex size-11 shrink-0 items-center justify-center rounded-lg bg-mostaza-50 text-mostaza-700">
-              <Palette className="size-5" strokeWidth={2.25} />
-            </span>
-            <div>
-              <p className="text-[11px] font-black uppercase tracking-wider text-ink-500">
-                Tu identidad
-              </p>
-              <h2 className="mt-1 font-heading text-xl font-extrabold text-ink-900 ipad:text-2xl">
-                Identidad del menú
-              </h2>
-              <p className="mt-1 text-sm leading-6 text-ink-600">
-                Ajusta cómo se ve y se comparte tu restaurante.
-              </p>
-            </div>
-          </header>
+          <SectionHeading
+            title="Identidad del menú"
+            description="Ajusta cómo se ve y se comparte tu restaurante."
+            icon={
+              <span className="inline-flex size-11 shrink-0 items-center justify-center rounded-lg bg-mostaza-50 text-mostaza-700">
+                <Palette className="size-5" strokeWidth={2.25} aria-hidden />
+              </span>
+            }
+          />
 
           {saved === '1' && (
             <Card className="flex items-center gap-3 border border-menta-500/40 bg-menta-100 shadow-sm">

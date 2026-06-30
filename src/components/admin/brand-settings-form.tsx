@@ -8,6 +8,7 @@ import { ImageUploadField } from '@/components/admin/image-upload-field';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { SectionHeading } from '@/components/ui/section-heading';
 import { buildBrandThemeStyle } from '@/lib/brand-theme';
 import { updateBrandSettingsFormAction } from '@/server/actions/tenant.actions';
 import type { LogoShape } from '@/types/domain';
@@ -54,7 +55,7 @@ function BrandPreview({
       className="overflow-hidden rounded-xl border border-[var(--brand-card-border)] bg-[var(--brand-surface)] shadow-sm"
       style={buildBrandThemeStyle(color)}
     >
-      <p className="border-b border-[var(--brand-card-border)] bg-[var(--brand-card)] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-ink-400">
+      <p className="border-b border-[var(--brand-card-border)] bg-[var(--brand-card)] px-3 py-2 text-xs font-semibold text-ink-500">
         Vista previa
       </p>
       <div className="relative h-24 bg-[var(--brand-primary-faint)]">
@@ -105,20 +106,22 @@ function BrandPreview({
 }
 
 function FieldSection({
-  eyebrow,
   title,
+  description,
   children,
 }: {
-  eyebrow: string;
   title: string;
+  description: string;
   children: React.ReactNode;
 }) {
   return (
     <section className="space-y-3">
-      <div>
-        <p className="text-[11px] font-black uppercase tracking-wider text-ink-500">{eyebrow}</p>
-        <h3 className="mt-0.5 font-heading text-lg font-extrabold text-ink-900">{title}</h3>
-      </div>
+      <SectionHeading
+        as="h3"
+        title={title}
+        description={description}
+        titleClassName="text-lg ipad:text-xl"
+      />
       <Card className="ipad:p-5">{children}</Card>
     </section>
   );
@@ -151,11 +154,17 @@ export function BrandSettingsForm({
       <input type="hidden" name="logoShape" value={shape} />
 
       <div className="flex flex-col gap-6 ipad:gap-8">
-        <FieldSection eyebrow="Dirección web" title="URL pública">
+        <FieldSection
+          title="URL pública"
+          description="El enlace que abrirán tus clientes desde el QR."
+        >
           <BrandSlugInput currentSlug={currentSlug} />
         </FieldSection>
 
-        <FieldSection eyebrow="Imagen" title="Logo">
+        <FieldSection
+          title="Logo"
+          description="Usa una imagen reconocible incluso en tamaño pequeño."
+        >
           <div className="space-y-5">
             <ImageUploadField
               kind="logo"
@@ -184,7 +193,7 @@ export function BrandSettingsForm({
           </div>
         </FieldSection>
 
-        <FieldSection eyebrow="Imagen" title="Portada">
+        <FieldSection title="Portada" description="Presenta tu restaurante al abrir el menú.">
           <ImageUploadField
             kind="tenant-cover"
             label="Sube una imagen de portada"
@@ -194,7 +203,10 @@ export function BrandSettingsForm({
           />
         </FieldSection>
 
-        <FieldSection eyebrow="Tema" title="Color primario">
+        <FieldSection
+          title="Color primario"
+          description="Se aplicará a botones, navegación y acentos del menú."
+        >
           <div className="space-y-3">
             <div className="flex flex-wrap gap-2">
               {BRAND_COLORS.map((option) => (
@@ -225,10 +237,12 @@ export function BrandSettingsForm({
       </div>
 
       <aside className="flex flex-col gap-4 ipad-landscape:sticky ipad-landscape:top-6">
-        <div>
-          <p className="text-[11px] font-black uppercase tracking-wider text-ink-500">En vivo</p>
-          <h3 className="mt-0.5 font-heading text-lg font-extrabold text-ink-900">Vista previa</h3>
-        </div>
+        <SectionHeading
+          as="h3"
+          title="Vista previa"
+          description="Se actualiza mientras editas."
+          titleClassName="text-lg ipad:text-xl"
+        />
         <BrandPreview
           tenantName={tenantName}
           logoUrl={logo}

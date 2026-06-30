@@ -28,7 +28,6 @@ type SettingLink = {
 
 type SettingsSection = {
   id: string;
-  eyebrow: string;
   title: string;
   links: SettingLink[];
 };
@@ -36,7 +35,6 @@ type SettingsSection = {
 const SECTIONS: SettingsSection[] = [
   {
     id: 'brand',
-    eyebrow: 'Tu identidad',
     title: 'Marca y menú',
     links: [
       {
@@ -55,7 +53,6 @@ const SECTIONS: SettingsSection[] = [
   },
   {
     id: 'ops',
-    eyebrow: 'Día a día',
     title: 'Operaciones',
     links: [
       {
@@ -74,7 +71,6 @@ const SECTIONS: SettingsSection[] = [
   },
   {
     id: 'account',
-    eyebrow: 'Tu cuenta',
     title: 'Plan y acceso',
     links: [
       {
@@ -113,7 +109,6 @@ export default async function SettingsPage() {
             <section key={section.id} aria-labelledby={`section-${section.id}`}>
               <SectionHeader
                 id={`section-${section.id}`}
-                eyebrow={section.eyebrow}
                 title={section.title}
               />
               <div className="mt-4 grid gap-3 sm:grid-cols-2 ipad:gap-4">
@@ -125,12 +120,7 @@ export default async function SettingsPage() {
           ))}
 
           <section aria-labelledby="section-pro">
-            <SectionHeader
-              id="section-pro"
-              eyebrow="Crece con Pro"
-              eyebrowClassName="text-mostaza-700"
-              title="Más herramientas"
-            />
+            <SectionHeader id="section-pro" title="Más herramientas" />
             <div className="mt-4 grid gap-3 sm:grid-cols-2 ipad:gap-4">
               {ctx.plan === 'free' ? (
                 <>
@@ -178,12 +168,7 @@ export default async function SettingsPage() {
 
           {canDeleteMenu && activeMembership && (
             <section aria-labelledby="section-danger">
-              <SectionHeader
-                id="section-danger"
-                eyebrow="Zona delicada"
-                eyebrowClassName="text-coral-600"
-                title="Eliminar menú"
-              />
+              <SectionHeader id="section-danger" title="Eliminar menú" />
               <div className="mt-4">
                 <DeleteMenuCard
                   tenantId={ctx.tenantId}
@@ -200,32 +185,16 @@ export default async function SettingsPage() {
 
 function SectionHeader({
   id,
-  eyebrow,
   title,
-  meta,
-  eyebrowClassName = 'text-ink-500',
 }: {
   id: string;
-  eyebrow: string;
   title: string;
-  meta?: string;
-  eyebrowClassName?: string;
 }) {
   return (
-    <header className="flex items-baseline justify-between gap-3 border-b border-[var(--brand-card-border)] pb-3">
-      <div>
-        <h2
-          id={id}
-          className="font-heading text-xl font-extrabold text-ink-900 ipad:text-2xl"
-        >
-          {title}
-        </h2>
-      </div>
-      {meta ? (
-        <span className="hidden shrink-0 text-[11px] font-semibold text-ink-300 ipad:inline">
-          {meta}
-        </span>
-      ) : null}
+    <header className="border-b border-[var(--brand-card-border)] pb-3">
+      <h2 id={id} className="font-heading text-xl font-extrabold text-ink-900 ipad:text-2xl">
+        {title}
+      </h2>
     </header>
   );
 }
@@ -234,7 +203,7 @@ function SettingsRow({ href, label, description, icon: Icon }: SettingLink) {
   return (
     <Link
       href={href}
-      className="group block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mostaza-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--brand-surface)]"
+      className="group block min-w-0 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mostaza-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--brand-surface)]"
     >
       <Card className="flex h-full items-center gap-4 transition-all duration-200 group-hover:border-mostaza-300 ipad:min-h-24 ipad:p-5 desktop:group-hover:-translate-y-0.5">
         <span className="inline-flex size-11 shrink-0 items-center justify-center rounded-lg bg-mostaza-50 text-mostaza-700 ring-1 ring-inset ring-mostaza-300/40 transition-colors group-hover:bg-mostaza-100">

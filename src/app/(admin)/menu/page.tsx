@@ -195,11 +195,8 @@ function MenuOverviewPanel({
           <div className="absolute right-4 top-4 hidden size-24 rounded-full bg-[var(--brand-primary-faint)] blur-2xl ipad:block" />
           <div className="relative flex flex-col gap-4 ipad:flex-row ipad:items-center ipad:justify-between">
             <div className="max-w-2xl">
-              <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-[var(--brand-accent-text)]">
-                Centro de operaciones
-              </p>
-              <h2 className="mt-2 text-xl font-black leading-tight text-ink-900 ipad:text-3xl">
-                Construye tu carta por bloques
+              <h2 className="text-xl font-black leading-tight text-ink-900 ipad:text-3xl">
+                Organiza tu carta por secciones
               </h2>
               <p className="mt-2 max-w-xl text-sm font-medium leading-6 text-ink-500 ipad:block">
                 Revisa la estructura, abre la vista pública y crea nuevas secciones sin salir del flujo.

@@ -41,10 +41,12 @@ export default async function ReferralLandingPage({ params }: ReferralPageProps)
   return (
     <main className="mx-auto flex min-h-dvh max-w-md flex-col justify-center px-6 py-10">
       <div className="rounded-md border-[1.5px] border-ink-100 bg-[var(--brand-card)] p-6 shadow-md">
-        <p className="text-sm font-bold uppercase text-mostaza-700">Invitacion de restaurante</p>
-        <h1 className="mt-4 text-3xl font-extrabold tracking-tight text-ink-900">
-          Recomendado por {landing.restaurantName}
+        <h1 className="text-3xl font-extrabold tracking-tight text-ink-900">
+          Crea tu menú digital en minutos
         </h1>
+        <p className="mt-3 text-sm font-semibold text-mostaza-700">
+          Recomendado por {landing.restaurantName}
+        </p>
         <p className="mt-3 text-base leading-7 text-ink-600">
           Crea tu menu digital en minutos y deja que tus clientes vean platillos, precios y
           especiales desde cualquier QR.
